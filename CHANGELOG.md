@@ -1,3 +1,14 @@
+## 1.2.2 (2026-02-24)
+
+### 🩹 Fixes
+
+- **dashboard:** use CJS format for standalone server bundle ([29f2773](https://github.com/maystudios/maxsim/commit/29f2773))
+
+### ❤️ Thank You
+
+- Claude Sonnet 4.6
+- Sven
+
 ## 1.2.1 (2026-02-24)
 
 ### 🚀 Features
