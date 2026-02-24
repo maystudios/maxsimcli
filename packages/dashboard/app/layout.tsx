@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { WebSocketProvider } from "./components/providers/websocket-provider";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -27,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="bg-background text-foreground antialiased">
-        {children}
+        <WebSocketProvider>{children}</WebSocketProvider>
       </body>
     </html>
   );
