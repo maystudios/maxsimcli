@@ -114,6 +114,22 @@ function getDirName(runtime: RuntimeName): string {
 }
 
 /**
+ * Recursively copy a directory (plain copy, no path replacement)
+ */
+function copyDirRecursive(src: string, dest: string): void {
+  fs.mkdirSync(dest, { recursive: true });
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyDirRecursive(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
+/**
  * Get the global config directory for OpenCode (for JSONC permissions)
  * OpenCode follows XDG Base Directory spec
  */
@@ -1462,6 +1478,25 @@ function install(
     }
   }
 
+  // Copy dashboard standalone build (if bundled in dist/assets/dashboard/)
+  const dashboardSrc = path.resolve(__dirname, 'assets', 'dashboard');
+  if (fs.existsSync(dashboardSrc)) {
+    spinner = ora({ text: 'Installing dashboard...', color: 'cyan' }).start();
+    const dashboardDest = path.join(targetDir, 'dashboard');
+    copyDirRecursive(dashboardSrc, dashboardDest);
+
+    // Write dashboard.json NEXT TO dashboard/ dir (survives overwrites on upgrade)
+    const dashboardConfigDest = path.join(targetDir, 'dashboard.json');
+    const projectCwd = isGlobal ? targetDir : process.cwd();
+    fs.writeFileSync(dashboardConfigDest, JSON.stringify({ projectCwd }, null, 2) + '\n');
+
+    if (fs.existsSync(path.join(dashboardDest, 'server.js'))) {
+      spinner.succeed(chalk.green('✓') + ' Installed dashboard');
+    } else {
+      spinner.succeed(chalk.green('✓') + ' Installed dashboard (server.js not found in bundle)');
+    }
+  }
+
   if (failures.length > 0) {
     console.error(
       `\n  ${chalk.yellow('Installation incomplete!')} Failed: ${failures.join(', ')}`,
@@ -1771,62 +1806,80 @@ const subcommand = args.find(a => !a.startsWith('-'));
 (async () => {
   // Dashboard subcommand
   if (subcommand === 'dashboard') {
-    const { execSync: execSyncDash, spawn: spawnDash } = await import('node:child_process');
+    const { spawn: spawnDash } = await import('node:child_process');
 
-    // Try to find dashboard in monorepo (development)
-    const monorepoDashboard = path.resolve(process.cwd(), 'packages', 'dashboard');
-    const monorepoRoot = findMonorepoRoot(process.cwd());
+    // Strategy 1: Check installed standalone build (local project)
+    const localDashboard = path.join(process.cwd(), '.claude', 'dashboard', 'server.js');
+    // Strategy 2: Check installed standalone build (global)
+    const globalDashboard = path.join(os.homedir(), '.claude', 'dashboard', 'server.js');
 
-    if (monorepoRoot) {
-      const dashDir = path.join(monorepoRoot, 'packages', 'dashboard');
-      if (fs.existsSync(path.join(dashDir, 'server.ts'))) {
-        console.log(chalk.blue('Starting dashboard from monorepo...'));
-        console.log(chalk.gray(`  Project: ${process.cwd()}`));
-        console.log(chalk.gray(`  Dashboard: ${dashDir}\n`));
-
-        const child = spawnDash('node', ['--import', 'tsx', 'server.ts'], {
-          cwd: dashDir,
-          stdio: 'inherit',
-          env: {
-            ...process.env,
-            MAXSIM_PROJECT_CWD: process.cwd(),
-            NODE_ENV: 'development',
-          },
-        });
-
-        child.on('exit', (code) => process.exit(code ?? 0));
-        return;
-      }
+    let serverPath: string | null = null;
+    if (fs.existsSync(localDashboard)) {
+      serverPath = localDashboard;
+    } else if (fs.existsSync(globalDashboard)) {
+      serverPath = globalDashboard;
     }
 
-    // Try to find dashboard via installed maxsim-tools
-    const toolsPaths = [
-      path.join(process.cwd(), '.claude', 'maxsim', 'bin', 'maxsim-tools.cjs'),
-      path.join(os.homedir(), '.claude', 'maxsim', 'bin', 'maxsim-tools.cjs'),
-    ];
-    for (const toolsPath of toolsPaths) {
-      if (fs.existsSync(toolsPath)) {
-        try {
-          const child = spawnDash('node', [toolsPath, 'dashboard'], {
-            cwd: process.cwd(),
-            stdio: 'inherit',
-          });
-          child.on('exit', (code) => process.exit(code ?? 0));
-          return;
-        } catch {
-          // Try next path
+    // Auto-install if not found: copy from dist/assets/dashboard/ then launch
+    if (!serverPath) {
+      const dashboardAssetSrc = path.resolve(__dirname, 'assets', 'dashboard');
+      if (fs.existsSync(dashboardAssetSrc)) {
+        console.log(chalk.blue('Dashboard not installed. Installing now...'));
+        // Default to local install
+        const autoInstallDir = path.join(process.cwd(), '.claude');
+        const autoInstallDashDir = path.join(autoInstallDir, 'dashboard');
+        fs.mkdirSync(autoInstallDashDir, { recursive: true });
+        copyDirRecursive(dashboardAssetSrc, autoInstallDashDir);
+        // Write dashboard.json
+        const dashConfigPath = path.join(autoInstallDir, 'dashboard.json');
+        fs.writeFileSync(dashConfigPath, JSON.stringify({ projectCwd: process.cwd() }, null, 2) + '\n');
+        console.log(chalk.green('  Dashboard installed to .claude/dashboard/'));
+
+        if (fs.existsSync(path.join(autoInstallDashDir, 'server.js'))) {
+          serverPath = path.join(autoInstallDashDir, 'server.js');
         }
       }
     }
 
-    console.log(chalk.yellow('\n  Dashboard not found.\n'));
-    console.log('  The dashboard requires the MAXSIM monorepo.\n');
-    console.log('  ' + chalk.bold('To use the dashboard:'));
-    console.log('    1. Clone the repo: git clone https://github.com/maystudios/maxsim.git');
-    console.log('    2. Install deps:   cd maxsim && pnpm install');
-    console.log('    3. Start:          cd packages/dashboard && pnpm run dev\n');
-    console.log('  Set ' + chalk.cyan('MAXSIM_PROJECT_CWD') + ' to point at your project:\n');
-    console.log('    ' + chalk.gray('MAXSIM_PROJECT_CWD=/path/to/your/project pnpm run dev') + '\n');
+    if (!serverPath) {
+      console.log(chalk.yellow('\n  Dashboard not available.\n'));
+      console.log('  Install MAXSIM first: ' + chalk.cyan('npx maxsimcli@latest') + '\n');
+      process.exit(0);
+    }
+
+    // Read projectCwd from dashboard.json (one level up from dashboard/ dir)
+    const dashboardDir = path.dirname(serverPath);
+    const dashboardConfigPath = path.join(path.dirname(dashboardDir), 'dashboard.json');
+    let projectCwd = process.cwd();
+    if (fs.existsSync(dashboardConfigPath)) {
+      try {
+        const config = JSON.parse(fs.readFileSync(dashboardConfigPath, 'utf8')) as { projectCwd?: string };
+        if (config.projectCwd) {
+          projectCwd = config.projectCwd;
+        }
+      } catch {
+        // Use default cwd
+      }
+    }
+
+    console.log(chalk.blue('Starting dashboard...'));
+    console.log(chalk.gray(`  Project: ${projectCwd}`));
+    console.log(chalk.gray(`  Server:  ${serverPath}\n`));
+
+    const child = spawnDash('node', [serverPath], {
+      cwd: dashboardDir,
+      detached: true,
+      stdio: 'ignore',
+      env: {
+        ...process.env,
+        MAXSIM_PROJECT_CWD: projectCwd,
+        NODE_ENV: 'production',
+      },
+      ...(process.platform === 'win32' ? { shell: true } : {}),
+    });
+    child.unref();
+
+    console.log(chalk.green('  Dashboard starting at http://localhost:3333'));
     process.exit(0);
   }
 
