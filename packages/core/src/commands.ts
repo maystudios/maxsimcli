@@ -105,9 +105,15 @@ export function cmdListTodos(cwd: string, area: string | undefined, raw: boolean
           area: todoArea,
           path: path.join('.planning', 'todos', 'pending', file),
         });
-      } catch { /* skip unreadable files */ }
+      } catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG) console.error(e);
+      }
     }
-  } catch { /* no pending dir */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   const result = { count, todos };
   output(result, raw, count.toString());
@@ -162,7 +168,10 @@ export function cmdHistoryDigest(cwd: string, raw: boolean): void {
       for (const dir of currentDirs) {
         allPhaseDirs.push({ name: dir, fullPath: path.join(phasesDir, dir), milestone: null });
       }
-    } catch { /* ignore */ }
+    } catch (e) {
+      /* optional op, ignore */
+      if (process.env.MAXSIM_DEBUG) console.error(e);
+    }
   }
 
   if (allPhaseDirs.length === 0) {
@@ -223,8 +232,9 @@ export function cmdHistoryDigest(cwd: string, raw: boolean): void {
               (digest.tech_stack as Set<string>).add(typeof t === 'string' ? t : (t as FrontmatterData).name as string)
             );
           }
-        } catch {
-          // Skip malformed summaries
+        } catch (e) {
+          /* optional op, ignore */
+          if (process.env.MAXSIM_DEBUG) console.error(e);
         }
       }
     }
@@ -505,7 +515,10 @@ export function cmdProgressRender(cwd: string, format: string, raw: boolean): vo
 
       phases.push({ number: phaseNum, name: phaseName, plans: planCount, summaries: summaryCount, status });
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   const percent = totalPlans > 0 ? Math.min(100, Math.round((totalSummaries / totalPlans) * 100)) : 0;
 

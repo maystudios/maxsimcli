@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { normalizePhaseName, output, error, findPhaseInternal } from './core.js';
+import { normalizePhaseName, getPhasePattern, output, error, findPhaseInternal } from './core.js';
 import type {
   PhaseStatus,
   RoadmapPhase,
@@ -31,10 +31,7 @@ export function cmdRoadmapGetPhase(cwd: string, phaseNum: string, raw: boolean):
 
     const escapedPhase = phaseNum.replace(/\./g, '\\.');
 
-    const phasePattern = new RegExp(
-      `#{2,4}\\s*Phase\\s+${escapedPhase}:\\s*([^\\n]+)`,
-      'i'
-    );
+    const phasePattern = getPhasePattern(escapedPhase, 'i');
     const headerMatch = content.match(phasePattern);
 
     if (!headerMatch) {
@@ -106,7 +103,7 @@ export function cmdRoadmapAnalyze(cwd: string, raw: boolean): void {
   const content = fs.readFileSync(roadmapPath, 'utf-8');
   const phasesDir = path.join(cwd, '.planning', 'phases');
 
-  const phasePattern = /#{2,4}\s*Phase\s+(\d+[A-Z]?(?:\.\d+)?)\s*:\s*([^\n]+)/gi;
+  const phasePattern = getPhasePattern();
   const phases: RoadmapPhase[] = [];
   let match: RegExpExecArray | null;
 
@@ -152,7 +149,10 @@ export function cmdRoadmapAnalyze(cwd: string, raw: boolean): void {
         else if (hasContext) diskStatus = 'discussed';
         else diskStatus = 'empty';
       }
-    } catch { /* empty */ }
+    } catch (e) {
+      /* optional op, ignore */
+      if (process.env.MAXSIM_DEBUG) console.error(e);
+    }
 
     const checkboxPattern = new RegExp(`-\\s*\\[(x| )\\]\\s*.*Phase\\s+${phaseNum.replace('.', '\\.')}`, 'i');
     const checkboxMatch = content.match(checkboxPattern);

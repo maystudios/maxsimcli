@@ -198,6 +198,36 @@ export function comparePhaseNum(a: string | number, b: string | number): number 
   return da - db;
 }
 
+// ─── Phase regex helper ──────────────────────────────────────────────────────
+
+/**
+ * Returns the canonical regex for matching Phase heading lines in ROADMAP.md.
+ *
+ * General form (no escapedPhaseNum):
+ *   Matches: ## Phase 03: Name Here
+ *   Group 1: phase number string (e.g. "03", "3A", "2.1")
+ *   Group 2: phase name string (e.g. "Name Here")
+ *
+ * Specific form (with escapedPhaseNum):
+ *   Matches: ## Phase 03: Name Here
+ *   Group 1: phase name string only
+ *
+ * @param escapedPhaseNum - regex-escaped phase number string to match a specific phase
+ * @param flags - regex flags (default: 'gi')
+ */
+export function getPhasePattern(escapedPhaseNum?: string, flags = 'gi'): RegExp {
+  if (escapedPhaseNum) {
+    return new RegExp(
+      `#{2,4}\\s*Phase\\s+${escapedPhaseNum}:\\s*([^\\n]+)`,
+      flags,
+    );
+  }
+  return new RegExp(
+    `#{2,4}\\s*Phase\\s+(\\d+[A-Z]?(?:\\.\\d+)?)\\s*:\\s*([^\\n]+)`,
+    flags,
+  );
+}
+
 function searchPhaseInDir(baseDir: string, relBase: string, normalized: string): PhaseSearchResult | null {
   try {
     const entries = fs.readdirSync(baseDir, { withFileTypes: true });
@@ -275,7 +305,10 @@ export function findPhaseInternal(cwd: string, phase: string): PhaseSearchResult
         return result;
       }
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   return null;
 }
@@ -311,7 +344,10 @@ export function getArchivedPhaseDirs(cwd: string): ArchivedPhaseDir[] {
         });
       }
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   return results;
 }
@@ -326,7 +362,7 @@ export function getRoadmapPhaseInternal(cwd: string, phaseNum: string | number):
   try {
     const content = fs.readFileSync(roadmapPath, 'utf-8');
     const escapedPhase = phaseNum.toString().replace(/\./g, '\\.');
-    const phasePattern = new RegExp(`#{2,4}\\s*Phase\\s+${escapedPhase}:\\s*([^\\n]+)`, 'i');
+    const phasePattern = getPhasePattern(escapedPhase, 'i');
     const headerMatch = content.match(phasePattern);
     if (!headerMatch) return null;
 

@@ -59,7 +59,10 @@ export function cmdStateLoad(cwd: string, raw: boolean): void {
   let stateRaw = '';
   try {
     stateRaw = fs.readFileSync(path.join(planningDir, 'STATE.md'), 'utf-8');
-  } catch { /* empty */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   const configExists = fs.existsSync(path.join(planningDir, 'config.json'));
   const roadmapExists = fs.existsSync(path.join(planningDir, 'ROADMAP.md'));

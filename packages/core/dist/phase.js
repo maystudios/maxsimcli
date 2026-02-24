@@ -178,8 +178,10 @@ function cmdPhasePlanIndex(cwd, phase, raw) {
             phaseDirName = match;
         }
     }
-    catch {
-        // phases dir doesn't exist
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
     }
     if (!phaseDir) {
         (0, core_js_1.output)({ phase: normalized, error: 'Phase not found', plans: [], waves: {}, incomplete: [], has_checkpoints: false }, raw);
@@ -245,7 +247,7 @@ function cmdPhaseAdd(cwd, description, raw) {
     }
     const content = node_fs_1.default.readFileSync(roadmapPath, 'utf-8');
     const slug = (0, core_js_1.generateSlugInternal)(description);
-    const phasePattern = /#{2,4}\s*Phase\s+(\d+)[A-Z]?(?:\.\d+)?:/gi;
+    const phasePattern = (0, core_js_1.getPhasePattern)();
     let maxPhase = 0;
     let m;
     while ((m = phasePattern.exec(content)) !== null) {
@@ -285,7 +287,7 @@ function cmdPhaseInsert(cwd, afterPhase, description, raw) {
     const normalizedAfter = (0, core_js_1.normalizePhaseName)(afterPhase);
     const unpadded = normalizedAfter.replace(/^0+/, '');
     const afterPhaseEscaped = unpadded.replace(/\./g, '\\.');
-    const targetPattern = new RegExp(`#{2,4}\\s*Phase\\s+0*${afterPhaseEscaped}:`, 'i');
+    const targetPattern = (0, core_js_1.getPhasePattern)(afterPhaseEscaped, 'i');
     if (!targetPattern.test(content)) {
         (0, core_js_1.error)(`Phase ${afterPhase} not found in ROADMAP.md`);
     }
@@ -302,7 +304,11 @@ function cmdPhaseInsert(cwd, afterPhase, description, raw) {
                 existingDecimals.push(parseInt(dm[1], 10));
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     const nextDecimal = existingDecimals.length === 0 ? 1 : Math.max(...existingDecimals) + 1;
     const decimalPhase = `${normalizedBase}.${nextDecimal}`;
     const dirName = `${decimalPhase}-${slug}`;
@@ -348,7 +354,11 @@ function cmdPhaseRemove(cwd, targetPhase, options, raw) {
         const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort((a, b) => (0, core_js_1.comparePhaseNum)(a, b));
         targetDir = dirs.find(d => d.startsWith(normalized + '-') || d === normalized) || null;
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     if (targetDir && !force) {
         const targetPath = node_path_1.default.join(phasesDir, targetDir);
         const files = node_fs_1.default.readdirSync(targetPath);
@@ -395,7 +405,11 @@ function cmdPhaseRemove(cwd, targetPhase, options, raw) {
                 }
             }
         }
-        catch { /* ignore */ }
+        catch (e) {
+            /* optional op, ignore */
+            if (process.env.MAXSIM_DEBUG)
+                console.error(e);
+        }
     }
     else {
         const removedInt = parseInt(normalized, 10);
@@ -444,7 +458,11 @@ function cmdPhaseRemove(cwd, targetPhase, options, raw) {
                 }
             }
         }
-        catch { /* ignore */ }
+        catch (e) {
+            /* optional op, ignore */
+            if (process.env.MAXSIM_DEBUG)
+                console.error(e);
+        }
     }
     // Update ROADMAP.md
     let roadmapContent = node_fs_1.default.readFileSync(roadmapPath, 'utf-8');
@@ -559,7 +577,11 @@ function cmdPhaseComplete(cwd, phaseNum, raw) {
             }
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     // Update STATE.md
     if (node_fs_1.default.existsSync(statePath)) {
         let stateContent = node_fs_1.default.readFileSync(statePath, 'utf-8');

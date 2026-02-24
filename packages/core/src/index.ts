@@ -87,6 +87,7 @@ export {
   execGit,
   normalizePhaseName,
   comparePhaseNum,
+  getPhasePattern,
   findPhaseInternal,
   getArchivedPhaseDirs,
   getRoadmapPhaseInternal,

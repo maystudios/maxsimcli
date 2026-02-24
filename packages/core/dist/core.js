@@ -17,6 +17,7 @@ exports.isGitIgnored = isGitIgnored;
 exports.execGit = execGit;
 exports.normalizePhaseName = normalizePhaseName;
 exports.comparePhaseNum = comparePhaseNum;
+exports.getPhasePattern = getPhasePattern;
 exports.findPhaseInternal = findPhaseInternal;
 exports.getArchivedPhaseDirs = getArchivedPhaseDirs;
 exports.getRoadmapPhaseInternal = getRoadmapPhaseInternal;
@@ -200,6 +201,28 @@ function comparePhaseNum(a, b) {
     const db = pb[3] ? parseFloat(pb[3]) : -1;
     return da - db;
 }
+// ─── Phase regex helper ──────────────────────────────────────────────────────
+/**
+ * Returns the canonical regex for matching Phase heading lines in ROADMAP.md.
+ *
+ * General form (no escapedPhaseNum):
+ *   Matches: ## Phase 03: Name Here
+ *   Group 1: phase number string (e.g. "03", "3A", "2.1")
+ *   Group 2: phase name string (e.g. "Name Here")
+ *
+ * Specific form (with escapedPhaseNum):
+ *   Matches: ## Phase 03: Name Here
+ *   Group 1: phase name string only
+ *
+ * @param escapedPhaseNum - regex-escaped phase number string to match a specific phase
+ * @param flags - regex flags (default: 'gi')
+ */
+function getPhasePattern(escapedPhaseNum, flags = 'gi') {
+    if (escapedPhaseNum) {
+        return new RegExp(`#{2,4}\\s*Phase\\s+${escapedPhaseNum}:\\s*([^\\n]+)`, flags);
+    }
+    return new RegExp(`#{2,4}\\s*Phase\\s+(\\d+[A-Z]?(?:\\.\\d+)?)\\s*:\\s*([^\\n]+)`, flags);
+}
 function searchPhaseInDir(baseDir, relBase, normalized) {
     try {
         const entries = node_fs_1.default.readdirSync(baseDir, { withFileTypes: true });
@@ -272,7 +295,11 @@ function findPhaseInternal(cwd, phase) {
             }
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     return null;
 }
 function getArchivedPhaseDirs(cwd) {
@@ -305,7 +332,11 @@ function getArchivedPhaseDirs(cwd) {
             }
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     return results;
 }
 // ─── Roadmap & model utilities ───────────────────────────────────────────────
@@ -318,7 +349,7 @@ function getRoadmapPhaseInternal(cwd, phaseNum) {
     try {
         const content = node_fs_1.default.readFileSync(roadmapPath, 'utf-8');
         const escapedPhase = phaseNum.toString().replace(/\./g, '\\.');
-        const phasePattern = new RegExp(`#{2,4}\\s*Phase\\s+${escapedPhase}:\\s*([^\\n]+)`, 'i');
+        const phasePattern = getPhasePattern(escapedPhase, 'i');
         const headerMatch = content.match(phasePattern);
         if (!headerMatch)
             return null;

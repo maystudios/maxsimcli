@@ -80,10 +80,18 @@ function cmdListTodos(cwd, area, raw) {
                     path: node_path_1.default.join('.planning', 'todos', 'pending', file),
                 });
             }
-            catch { /* skip unreadable files */ }
+            catch (e) {
+                /* optional op, ignore */
+                if (process.env.MAXSIM_DEBUG)
+                    console.error(e);
+            }
         }
     }
-    catch { /* no pending dir */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     const result = { count, todos };
     (0, core_js_1.output)(result, raw, count.toString());
 }
@@ -126,7 +134,11 @@ function cmdHistoryDigest(cwd, raw) {
                 allPhaseDirs.push({ name: dir, fullPath: node_path_1.default.join(phasesDir, dir), milestone: null });
             }
         }
-        catch { /* ignore */ }
+        catch (e) {
+            /* optional op, ignore */
+            if (process.env.MAXSIM_DEBUG)
+                console.error(e);
+        }
     }
     if (allPhaseDirs.length === 0) {
         const emptyDigest = { phases: {}, decisions: [], tech_stack: [] };
@@ -177,8 +189,10 @@ function cmdHistoryDigest(cwd, raw) {
                         techStack.added.forEach(t => digest.tech_stack.add(typeof t === 'string' ? t : t.name));
                     }
                 }
-                catch {
-                    // Skip malformed summaries
+                catch (e) {
+                    /* optional op, ignore */
+                    if (process.env.MAXSIM_DEBUG)
+                        console.error(e);
                 }
             }
         }
@@ -401,7 +415,11 @@ function cmdProgressRender(cwd, format, raw) {
             phases.push({ number: phaseNum, name: phaseName, plans: planCount, summaries: summaryCount, status });
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     const percent = totalPlans > 0 ? Math.min(100, Math.round((totalSummaries / totalPlans) * 100)) : 0;
     if (format === 'table') {
         const barWidth = 10;

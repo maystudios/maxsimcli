@@ -10,6 +10,7 @@ import path from 'node:path';
 import {
   safeReadFile,
   normalizePhaseName,
+  getPhasePattern,
   execGit,
   findPhaseInternal,
   getMilestoneInfo,
@@ -613,7 +614,7 @@ export function cmdValidateConsistency(cwd: string, raw: boolean): void {
   const roadmapContent = fs.readFileSync(roadmapPath, 'utf-8');
 
   const roadmapPhases = new Set<string>();
-  const phasePattern = /#{2,4}\s*Phase\s+(\d+[A-Z]?(?:\.\d+)?)\s*:/gi;
+  const phasePattern = getPhasePattern();
   let m: RegExpExecArray | null;
   while ((m = phasePattern.exec(roadmapContent)) !== null) {
     roadmapPhases.add(m[1]);
@@ -627,7 +628,10 @@ export function cmdValidateConsistency(cwd: string, raw: boolean): void {
       const dm = dir.match(/^(\d+[A-Z]?(?:\.\d+)?)/i);
       if (dm) diskPhases.add(dm[1]);
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   for (const p of roadmapPhases) {
     if (!diskPhases.has(p) && !diskPhases.has(normalizePhaseName(p))) {
@@ -682,7 +686,10 @@ export function cmdValidateConsistency(cwd: string, raw: boolean): void {
         }
       }
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
@@ -701,7 +708,10 @@ export function cmdValidateConsistency(cwd: string, raw: boolean): void {
         }
       }
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   const passed = errors.length === 0;
   const result: ConsistencyResult = { passed, errors, warnings, warning_count: warnings.length };
@@ -783,7 +793,10 @@ export function cmdValidateHealth(cwd: string, options: HealthOptions, raw: bool
           if (dm) diskPhases.add(dm[1]);
         }
       }
-    } catch { /* ignore */ }
+    } catch (e) {
+      /* optional op, ignore */
+      if (process.env.MAXSIM_DEBUG) console.error(e);
+    }
     for (const ref of phaseRefs) {
       const normalizedRef = String(parseInt(ref, 10)).padStart(2, '0');
       if (!diskPhases.has(ref) && !diskPhases.has(normalizedRef) && !diskPhases.has(String(parseInt(ref, 10)))) {
@@ -822,7 +835,10 @@ export function cmdValidateHealth(cwd: string, options: HealthOptions, raw: bool
         addIssue('warning', 'W005', `Phase directory "${e.name}" doesn't follow NN-name format`, 'Rename to match pattern (e.g., 01-setup)');
       }
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   // Check 7: Orphaned plans
   try {
@@ -841,13 +857,16 @@ export function cmdValidateHealth(cwd: string, options: HealthOptions, raw: bool
         }
       }
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   // Check 8: Roadmap consistency
   if (fs.existsSync(roadmapPath)) {
     const roadmapContent = fs.readFileSync(roadmapPath, 'utf-8');
     const roadmapPhases = new Set<string>();
-    const phasePattern = /#{2,4}\s*Phase\s+(\d+[A-Z]?(?:\.\d+)?)\s*:/gi;
+    const phasePattern = getPhasePattern();
     let m: RegExpExecArray | null;
     while ((m = phasePattern.exec(roadmapContent)) !== null) {
       roadmapPhases.add(m[1]);
@@ -862,7 +881,10 @@ export function cmdValidateHealth(cwd: string, options: HealthOptions, raw: bool
           if (dm) diskPhases.add(dm[1]);
         }
       }
-    } catch { /* ignore */ }
+    } catch (e) {
+      /* optional op, ignore */
+      if (process.env.MAXSIM_DEBUG) console.error(e);
+    }
 
     for (const p of roadmapPhases) {
       const padded = String(parseInt(p, 10)).padStart(2, '0');

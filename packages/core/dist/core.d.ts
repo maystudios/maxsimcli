@@ -13,6 +13,22 @@ export declare function isGitIgnored(cwd: string, targetPath: string): boolean;
 export declare function execGit(cwd: string, args: string[]): GitResult;
 export declare function normalizePhaseName(phase: string): string;
 export declare function comparePhaseNum(a: string | number, b: string | number): number;
+/**
+ * Returns the canonical regex for matching Phase heading lines in ROADMAP.md.
+ *
+ * General form (no escapedPhaseNum):
+ *   Matches: ## Phase 03: Name Here
+ *   Group 1: phase number string (e.g. "03", "3A", "2.1")
+ *   Group 2: phase name string (e.g. "Name Here")
+ *
+ * Specific form (with escapedPhaseNum):
+ *   Matches: ## Phase 03: Name Here
+ *   Group 1: phase name string only
+ *
+ * @param escapedPhaseNum - regex-escaped phase number string to match a specific phase
+ * @param flags - regex flags (default: 'gi')
+ */
+export declare function getPhasePattern(escapedPhaseNum?: string, flags?: string): RegExp;
 export declare function findPhaseInternal(cwd: string, phase: string): PhaseSearchResult | null;
 export declare function getArchivedPhaseDirs(cwd: string): ArchivedPhaseDir[];
 export declare function getRoadmapPhaseInternal(cwd: string, phaseNum: string | number): RoadmapPhaseInfo | null;

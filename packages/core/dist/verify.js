@@ -432,7 +432,7 @@ function cmdValidateConsistency(cwd, raw) {
     }
     const roadmapContent = node_fs_1.default.readFileSync(roadmapPath, 'utf-8');
     const roadmapPhases = new Set();
-    const phasePattern = /#{2,4}\s*Phase\s+(\d+[A-Z]?(?:\.\d+)?)\s*:/gi;
+    const phasePattern = (0, core_js_1.getPhasePattern)();
     let m;
     while ((m = phasePattern.exec(roadmapContent)) !== null) {
         roadmapPhases.add(m[1]);
@@ -447,7 +447,11 @@ function cmdValidateConsistency(cwd, raw) {
                 diskPhases.add(dm[1]);
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     for (const p of roadmapPhases) {
         if (!diskPhases.has(p) && !diskPhases.has((0, core_js_1.normalizePhaseName)(p))) {
             warnings.push(`Phase ${p} in ROADMAP.md but no directory on disk`);
@@ -493,7 +497,11 @@ function cmdValidateConsistency(cwd, raw) {
             }
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     try {
         const entries = node_fs_1.default.readdirSync(phasesDir, { withFileTypes: true });
         const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
@@ -509,7 +517,11 @@ function cmdValidateConsistency(cwd, raw) {
             }
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     const passed = errors.length === 0;
     const result = { passed, errors, warnings, warning_count: warnings.length };
     (0, core_js_1.output)(result, raw, passed ? 'passed' : 'failed');
@@ -583,7 +595,11 @@ function cmdValidateHealth(cwd, options, raw) {
                 }
             }
         }
-        catch { /* ignore */ }
+        catch (e) {
+            /* optional op, ignore */
+            if (process.env.MAXSIM_DEBUG)
+                console.error(e);
+        }
         for (const ref of phaseRefs) {
             const normalizedRef = String(parseInt(ref, 10)).padStart(2, '0');
             if (!diskPhases.has(ref) && !diskPhases.has(normalizedRef) && !diskPhases.has(String(parseInt(ref, 10)))) {
@@ -624,7 +640,11 @@ function cmdValidateHealth(cwd, options, raw) {
             }
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     // Check 7: Orphaned plans
     try {
         const entries = node_fs_1.default.readdirSync(phasesDir, { withFileTypes: true });
@@ -643,12 +663,16 @@ function cmdValidateHealth(cwd, options, raw) {
             }
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     // Check 8: Roadmap consistency
     if (node_fs_1.default.existsSync(roadmapPath)) {
         const roadmapContent = node_fs_1.default.readFileSync(roadmapPath, 'utf-8');
         const roadmapPhases = new Set();
-        const phasePattern = /#{2,4}\s*Phase\s+(\d+[A-Z]?(?:\.\d+)?)\s*:/gi;
+        const phasePattern = (0, core_js_1.getPhasePattern)();
         let m;
         while ((m = phasePattern.exec(roadmapContent)) !== null) {
             roadmapPhases.add(m[1]);
@@ -664,7 +688,11 @@ function cmdValidateHealth(cwd, options, raw) {
                 }
             }
         }
-        catch { /* ignore */ }
+        catch (e) {
+            /* optional op, ignore */
+            if (process.env.MAXSIM_DEBUG)
+                console.error(e);
+        }
         for (const p of roadmapPhases) {
             const padded = String(parseInt(p, 10)).padStart(2, '0');
             if (!diskPhases.has(p) && !diskPhases.has(padded)) {

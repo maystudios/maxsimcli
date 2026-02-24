@@ -61,7 +61,11 @@ function cmdStateLoad(cwd, raw) {
     try {
         stateRaw = node_fs_1.default.readFileSync(node_path_1.default.join(planningDir, 'STATE.md'), 'utf-8');
     }
-    catch { /* empty */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     const configExists = node_fs_1.default.existsSync(node_path_1.default.join(planningDir, 'config.json'));
     const roadmapExists = node_fs_1.default.existsSync(node_path_1.default.join(planningDir, 'ROADMAP.md'));
     const stateExists = stateRaw.length > 0;
