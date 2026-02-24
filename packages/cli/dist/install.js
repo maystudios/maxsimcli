@@ -1,0 +1,1495 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(require("node:fs"));
+const path = __importStar(require("node:path"));
+const os = __importStar(require("node:os"));
+const readline = __importStar(require("node:readline"));
+const crypto = __importStar(require("node:crypto"));
+const adapters_1 = require("@maxsim/adapters");
+// Colors
+const cyan = '\x1b[36m';
+const green = '\x1b[32m';
+const yellow = '\x1b[33m';
+const dim = '\x1b[2m';
+const reset = '\x1b[0m';
+// Get version from package.json
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const pkg = require('../package.json');
+// Resolve template asset root — bundled into dist/assets/templates at publish time
+const templatesRoot = path.resolve(__dirname, 'assets', 'templates');
+// Parse args
+const args = process.argv.slice(2);
+const hasGlobal = args.includes('--global') || args.includes('-g');
+const hasLocal = args.includes('--local') || args.includes('-l');
+const hasOpencode = args.includes('--opencode');
+const hasClaude = args.includes('--claude');
+const hasGemini = args.includes('--gemini');
+const hasCodex = args.includes('--codex');
+const hasBoth = args.includes('--both'); // Legacy flag, keeps working
+const hasAll = args.includes('--all');
+const hasUninstall = args.includes('--uninstall') || args.includes('-u');
+// Runtime selection - can be set by flags or interactive prompt
+let selectedRuntimes = [];
+if (hasAll) {
+    selectedRuntimes = ['claude', 'opencode', 'gemini', 'codex'];
+}
+else if (hasBoth) {
+    selectedRuntimes = ['claude', 'opencode'];
+}
+else {
+    if (hasOpencode)
+        selectedRuntimes.push('opencode');
+    if (hasClaude)
+        selectedRuntimes.push('claude');
+    if (hasGemini)
+        selectedRuntimes.push('gemini');
+    if (hasCodex)
+        selectedRuntimes.push('codex');
+}
+/**
+ * Adapter registry keyed by runtime name
+ */
+const adapterMap = {
+    claude: adapters_1.claudeAdapter,
+    opencode: adapters_1.opencodeAdapter,
+    gemini: adapters_1.geminiAdapter,
+    codex: adapters_1.codexAdapter,
+};
+/**
+ * Get adapter for a runtime
+ */
+function getAdapter(runtime) {
+    return adapterMap[runtime];
+}
+/**
+ * Get the global config directory for a runtime, using adapter
+ */
+function getGlobalDir(runtime, explicitDir = null) {
+    return getAdapter(runtime).getGlobalDir(explicitDir);
+}
+/**
+ * Get the config directory path relative to home for hook templating
+ */
+function getConfigDirFromHome(runtime, isGlobal) {
+    return getAdapter(runtime).getConfigDirFromHome(isGlobal);
+}
+/**
+ * Get the local directory name for a runtime
+ */
+function getDirName(runtime) {
+    return getAdapter(runtime).dirName;
+}
+/**
+ * Get the global config directory for OpenCode (for JSONC permissions)
+ * OpenCode follows XDG Base Directory spec
+ */
+function getOpencodeGlobalDir() {
+    return adapters_1.opencodeAdapter.getGlobalDir();
+}
+const banner = '\n' +
+    cyan +
+    '  \u2588\u2588\u2557  \u2588\u2588\u2557 \u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2557  \u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2557\u2588\u2588\u2557  \u2588\u2588\u2557\n' +
+    '  \u2588\u2588\u2588\u2557\u2588\u2588\u2588\u2551\u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2557\u255a\u2588\u2588\u2557\u2588\u2588\u2554\u255d\u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255d\u2588\u2588\u2551\u2588\u2588\u2588\u2557\u2588\u2588\u2588\u2551\n' +
+    '  \u2588\u2588\u2554\u2588\u2588\u2588\u2588\u2554\u2588\u2588\u2551\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2551 \u255a\u2588\u2588\u2588\u2554\u255d \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2551\u2588\u2588\u2554\u2588\u2588\u2588\u2588\u2554\u2588\u2588\u2551\n' +
+    '  \u2588\u2588\u2551\u255a\u2588\u2588\u2554\u255d\u2588\u2588\u2551\u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2551 \u2588\u2588\u2554\u2588\u2588\u2557 \u255a\u2550\u2550\u2550\u2550\u2588\u2588\u2551\u2588\u2588\u2551\u2588\u2588\u2551\u255a\u2588\u2588\u2554\u255d\u2588\u2588\u2551\n' +
+    '  \u2588\u2588\u2551 \u255a\u2550\u255d \u2588\u2588\u2551\u2588\u2588\u2551  \u2588\u2588\u2551\u2588\u2588\u2554\u255d \u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2551\u2588\u2588\u2551\u2588\u2588\u2551 \u255a\u2550\u255d \u2588\u2588\u2551\n' +
+    '  \u255a\u2550\u255d     \u255a\u2550\u255d\u255a\u2550\u255d  \u255a\u2550\u255d\u255a\u2550\u255d  \u255a\u2550\u255d\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u255d\u255a\u2550\u255d\u255a\u2550\u255d     \u255a\u2550\u255d' +
+    reset +
+    '\n' +
+    '\n' +
+    '  MAXSIM ' +
+    dim +
+    'v' +
+    pkg.version +
+    reset +
+    '\n' +
+    '  A meta-prompting, context engineering and spec-driven\n' +
+    '  development system for Claude Code, OpenCode, Gemini, and Codex.\n';
+// Parse --config-dir argument
+function parseConfigDirArg() {
+    const configDirIndex = args.findIndex((arg) => arg === '--config-dir' || arg === '-c');
+    if (configDirIndex !== -1) {
+        const nextArg = args[configDirIndex + 1];
+        if (!nextArg || nextArg.startsWith('-')) {
+            console.error(`  ${yellow}--config-dir requires a path argument${reset}`);
+            process.exit(1);
+        }
+        return nextArg;
+    }
+    const configDirArg = args.find((arg) => arg.startsWith('--config-dir=') || arg.startsWith('-c='));
+    if (configDirArg) {
+        const value = configDirArg.split('=')[1];
+        if (!value) {
+            console.error(`  ${yellow}--config-dir requires a non-empty path${reset}`);
+            process.exit(1);
+        }
+        return value;
+    }
+    return null;
+}
+const explicitConfigDir = parseConfigDirArg();
+const hasHelp = args.includes('--help') || args.includes('-h');
+const forceStatusline = args.includes('--force-statusline');
+console.log(banner);
+// Show help if requested
+if (hasHelp) {
+    console.log(`  ${yellow}Usage:${reset} npx maxsimcli [options]\n\n  ${yellow}Options:${reset}\n    ${cyan}-g, --global${reset}              Install globally (to config directory)\n    ${cyan}-l, --local${reset}               Install locally (to current directory)\n    ${cyan}--claude${reset}                  Install for Claude Code only\n    ${cyan}--opencode${reset}                Install for OpenCode only\n    ${cyan}--gemini${reset}                  Install for Gemini only\n    ${cyan}--codex${reset}                   Install for Codex only\n    ${cyan}--all${reset}                     Install for all runtimes\n    ${cyan}-u, --uninstall${reset}           Uninstall MAXSIM (remove all MAXSIM files)\n    ${cyan}-c, --config-dir <path>${reset}   Specify custom config directory\n    ${cyan}-h, --help${reset}                Show this help message\n    ${cyan}--force-statusline${reset}        Replace existing statusline config\n\n  ${yellow}Examples:${reset}\n    ${dim}# Interactive install (prompts for runtime and location)${reset}\n    npx maxsimcli\n\n    ${dim}# Install for Claude Code globally${reset}\n    npx maxsimcli --claude --global\n\n    ${dim}# Install for Gemini globally${reset}\n    npx maxsimcli --gemini --global\n\n    ${dim}# Install for Codex globally${reset}\n    npx maxsimcli --codex --global\n\n    ${dim}# Install for all runtimes globally${reset}\n    npx maxsimcli --all --global\n\n    ${dim}# Install to custom config directory${reset}\n    npx maxsimcli --codex --global --config-dir ~/.codex-work\n\n    ${dim}# Install to current project only${reset}\n    npx maxsimcli --claude --local\n\n    ${dim}# Uninstall MAXSIM from Codex globally${reset}\n    npx maxsimcli --codex --global --uninstall\n\n  ${yellow}Notes:${reset}\n    The --config-dir option is useful when you have multiple configurations.\n    It takes priority over CLAUDE_CONFIG_DIR / GEMINI_CONFIG_DIR / CODEX_HOME environment variables.\n`);
+    process.exit(0);
+}
+// Cache for attribution settings (populated once per runtime during install)
+const attributionCache = new Map();
+/**
+ * Get commit attribution setting for a runtime
+ * @returns null = remove, undefined = keep default, string = custom
+ */
+function getCommitAttribution(runtime) {
+    if (attributionCache.has(runtime)) {
+        return attributionCache.get(runtime);
+    }
+    let result;
+    if (runtime === 'opencode') {
+        const config = (0, adapters_1.readSettings)(path.join(getGlobalDir('opencode', null), 'opencode.json'));
+        result =
+            config.disable_ai_attribution === true
+                ? null
+                : undefined;
+    }
+    else if (runtime === 'gemini') {
+        const settings = (0, adapters_1.readSettings)(path.join(getGlobalDir('gemini', explicitConfigDir), 'settings.json'));
+        const attr = settings.attribution;
+        if (!attr || attr.commit === undefined) {
+            result = undefined;
+        }
+        else if (attr.commit === '') {
+            result = null;
+        }
+        else {
+            result = attr.commit;
+        }
+    }
+    else if (runtime === 'claude') {
+        const settings = (0, adapters_1.readSettings)(path.join(getGlobalDir('claude', explicitConfigDir), 'settings.json'));
+        const attr = settings.attribution;
+        if (!attr || attr.commit === undefined) {
+            result = undefined;
+        }
+        else if (attr.commit === '') {
+            result = null;
+        }
+        else {
+            result = attr.commit;
+        }
+    }
+    else {
+        result = undefined;
+    }
+    attributionCache.set(runtime, result);
+    return result;
+}
+/**
+ * Copy commands to a flat structure for OpenCode
+ * OpenCode expects: command/maxsim-help.md (invoked as /maxsim-help)
+ * Source structure: commands/maxsim/help.md
+ */
+function copyFlattenedCommands(srcDir, destDir, prefix, pathPrefix, runtime) {
+    if (!fs.existsSync(srcDir)) {
+        return;
+    }
+    if (fs.existsSync(destDir)) {
+        for (const file of fs.readdirSync(destDir)) {
+            if (file.startsWith(`${prefix}-`) && file.endsWith('.md')) {
+                fs.unlinkSync(path.join(destDir, file));
+            }
+        }
+    }
+    else {
+        fs.mkdirSync(destDir, { recursive: true });
+    }
+    const entries = fs.readdirSync(srcDir, { withFileTypes: true });
+    for (const entry of entries) {
+        const srcPath = path.join(srcDir, entry.name);
+        if (entry.isDirectory()) {
+            copyFlattenedCommands(srcPath, destDir, `${prefix}-${entry.name}`, pathPrefix, runtime);
+        }
+        else if (entry.name.endsWith('.md')) {
+            const baseName = entry.name.replace('.md', '');
+            const destName = `${prefix}-${baseName}.md`;
+            const destPath = path.join(destDir, destName);
+            let content = fs.readFileSync(srcPath, 'utf8');
+            const globalClaudeRegex = /~\/\.claude\//g;
+            const localClaudeRegex = /\.\/\.claude\//g;
+            const opencodeDirRegex = /~\/\.opencode\//g;
+            content = content.replace(globalClaudeRegex, pathPrefix);
+            content = content.replace(localClaudeRegex, `./${getDirName(runtime)}/`);
+            content = content.replace(opencodeDirRegex, pathPrefix);
+            content = (0, adapters_1.processAttribution)(content, getCommitAttribution(runtime));
+            content = (0, adapters_1.convertClaudeToOpencodeFrontmatter)(content);
+            fs.writeFileSync(destPath, content);
+        }
+    }
+}
+function listCodexSkillNames(skillsDir, prefix = 'maxsim-') {
+    if (!fs.existsSync(skillsDir))
+        return [];
+    const entries = fs.readdirSync(skillsDir, { withFileTypes: true });
+    return entries
+        .filter((entry) => entry.isDirectory() && entry.name.startsWith(prefix))
+        .filter((entry) => fs.existsSync(path.join(skillsDir, entry.name, 'SKILL.md')))
+        .map((entry) => entry.name)
+        .sort();
+}
+function copyCommandsAsCodexSkills(srcDir, skillsDir, prefix, pathPrefix, runtime) {
+    if (!fs.existsSync(srcDir)) {
+        return;
+    }
+    fs.mkdirSync(skillsDir, { recursive: true });
+    const existing = fs.readdirSync(skillsDir, { withFileTypes: true });
+    for (const entry of existing) {
+        if (entry.isDirectory() && entry.name.startsWith(`${prefix}-`)) {
+            fs.rmSync(path.join(skillsDir, entry.name), { recursive: true });
+        }
+    }
+    function recurse(currentSrcDir, currentPrefix) {
+        const entries = fs.readdirSync(currentSrcDir, { withFileTypes: true });
+        for (const entry of entries) {
+            const srcPath = path.join(currentSrcDir, entry.name);
+            if (entry.isDirectory()) {
+                recurse(srcPath, `${currentPrefix}-${entry.name}`);
+                continue;
+            }
+            if (!entry.name.endsWith('.md')) {
+                continue;
+            }
+            const baseName = entry.name.replace('.md', '');
+            const skillName = `${currentPrefix}-${baseName}`;
+            const skillDir = path.join(skillsDir, skillName);
+            fs.mkdirSync(skillDir, { recursive: true });
+            let content = fs.readFileSync(srcPath, 'utf8');
+            const globalClaudeRegex = /~\/\.claude\//g;
+            const localClaudeRegex = /\.\/\.claude\//g;
+            const codexDirRegex = /~\/\.codex\//g;
+            content = content.replace(globalClaudeRegex, pathPrefix);
+            content = content.replace(localClaudeRegex, `./${getDirName(runtime)}/`);
+            content = content.replace(codexDirRegex, pathPrefix);
+            content = (0, adapters_1.processAttribution)(content, getCommitAttribution(runtime));
+            content = (0, adapters_1.convertClaudeCommandToCodexSkill)(content, skillName);
+            fs.writeFileSync(path.join(skillDir, 'SKILL.md'), content);
+        }
+    }
+    recurse(srcDir, prefix);
+}
+/**
+ * Recursively copy directory, replacing paths in .md files
+ * Deletes existing destDir first to remove orphaned files from previous versions
+ */
+function copyWithPathReplacement(srcDir, destDir, pathPrefix, runtime, isCommand = false) {
+    const isOpencode = runtime === 'opencode';
+    const isCodex = runtime === 'codex';
+    const dirName = getDirName(runtime);
+    if (fs.existsSync(destDir)) {
+        fs.rmSync(destDir, { recursive: true });
+    }
+    fs.mkdirSync(destDir, { recursive: true });
+    const entries = fs.readdirSync(srcDir, { withFileTypes: true });
+    for (const entry of entries) {
+        const srcPath = path.join(srcDir, entry.name);
+        const destPath = path.join(destDir, entry.name);
+        if (entry.isDirectory()) {
+            copyWithPathReplacement(srcPath, destPath, pathPrefix, runtime, isCommand);
+        }
+        else if (entry.name.endsWith('.md')) {
+            let content = fs.readFileSync(srcPath, 'utf8');
+            const globalClaudeRegex = /~\/\.claude\//g;
+            const localClaudeRegex = /\.\/\.claude\//g;
+            content = content.replace(globalClaudeRegex, pathPrefix);
+            content = content.replace(localClaudeRegex, `./${dirName}/`);
+            content = (0, adapters_1.processAttribution)(content, getCommitAttribution(runtime));
+            if (isOpencode) {
+                content = (0, adapters_1.convertClaudeToOpencodeFrontmatter)(content);
+                fs.writeFileSync(destPath, content);
+            }
+            else if (runtime === 'gemini') {
+                if (isCommand) {
+                    content = (0, adapters_1.stripSubTags)(content);
+                    const tomlContent = (0, adapters_1.convertClaudeToGeminiToml)(content);
+                    const tomlPath = destPath.replace(/\.md$/, '.toml');
+                    fs.writeFileSync(tomlPath, tomlContent);
+                }
+                else {
+                    fs.writeFileSync(destPath, content);
+                }
+            }
+            else if (isCodex) {
+                content = (0, adapters_1.convertClaudeToCodexMarkdown)(content);
+                fs.writeFileSync(destPath, content);
+            }
+            else {
+                fs.writeFileSync(destPath, content);
+            }
+        }
+        else {
+            fs.copyFileSync(srcPath, destPath);
+        }
+    }
+}
+/**
+ * Clean up orphaned files from previous MAXSIM versions
+ */
+function cleanupOrphanedFiles(configDir) {
+    const orphanedFiles = [
+        'hooks/maxsim-notify.sh',
+        'hooks/statusline.js',
+    ];
+    for (const relPath of orphanedFiles) {
+        const fullPath = path.join(configDir, relPath);
+        if (fs.existsSync(fullPath)) {
+            fs.unlinkSync(fullPath);
+            console.log(`  ${green}\u2713${reset} Removed orphaned ${relPath}`);
+        }
+    }
+}
+/**
+ * Clean up orphaned hook registrations from settings.json
+ */
+function cleanupOrphanedHooks(settings) {
+    const orphanedHookPatterns = [
+        'maxsim-notify.sh',
+        'hooks/statusline.js',
+        'maxsim-intel-index.js',
+        'maxsim-intel-session.js',
+        'maxsim-intel-prune.js',
+    ];
+    let cleanedHooks = false;
+    const hooks = settings.hooks;
+    if (hooks) {
+        for (const eventType of Object.keys(hooks)) {
+            const hookEntries = hooks[eventType];
+            if (Array.isArray(hookEntries)) {
+                const filtered = hookEntries.filter((entry) => {
+                    if (entry.hooks && Array.isArray(entry.hooks)) {
+                        const hasOrphaned = entry.hooks.some((h) => h.command &&
+                            orphanedHookPatterns.some((pattern) => h.command.includes(pattern)));
+                        if (hasOrphaned) {
+                            cleanedHooks = true;
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+                hooks[eventType] = filtered;
+            }
+        }
+    }
+    if (cleanedHooks) {
+        console.log(`  ${green}\u2713${reset} Removed orphaned hook registrations`);
+    }
+    const statusLine = settings.statusLine;
+    if (statusLine &&
+        statusLine.command &&
+        statusLine.command.includes('statusline.js') &&
+        !statusLine.command.includes('maxsim-statusline.js')) {
+        statusLine.command = statusLine.command.replace(/statusline\.js/, 'maxsim-statusline.js');
+        console.log(`  ${green}\u2713${reset} Updated statusline path (statusline.js \u2192 maxsim-statusline.js)`);
+    }
+    return settings;
+}
+/**
+ * Uninstall MAXSIM from the specified directory for a specific runtime
+ */
+function uninstall(isGlobal, runtime = 'claude') {
+    const isOpencode = runtime === 'opencode';
+    const isCodex = runtime === 'codex';
+    const dirName = getDirName(runtime);
+    const targetDir = isGlobal
+        ? getGlobalDir(runtime, explicitConfigDir)
+        : path.join(process.cwd(), dirName);
+    const locationLabel = isGlobal
+        ? targetDir.replace(os.homedir(), '~')
+        : targetDir.replace(process.cwd(), '.');
+    let runtimeLabel = 'Claude Code';
+    if (runtime === 'opencode')
+        runtimeLabel = 'OpenCode';
+    if (runtime === 'gemini')
+        runtimeLabel = 'Gemini';
+    if (runtime === 'codex')
+        runtimeLabel = 'Codex';
+    console.log(`  Uninstalling MAXSIM from ${cyan}${runtimeLabel}${reset} at ${cyan}${locationLabel}${reset}\n`);
+    if (!fs.existsSync(targetDir)) {
+        console.log(`  ${yellow}\u26a0${reset} Directory does not exist: ${locationLabel}`);
+        console.log(`  Nothing to uninstall.\n`);
+        return;
+    }
+    let removedCount = 0;
+    // 1. Remove MAXSIM commands/skills
+    if (isOpencode) {
+        const commandDir = path.join(targetDir, 'command');
+        if (fs.existsSync(commandDir)) {
+            const files = fs.readdirSync(commandDir);
+            for (const file of files) {
+                if (file.startsWith('maxsim-') && file.endsWith('.md')) {
+                    fs.unlinkSync(path.join(commandDir, file));
+                    removedCount++;
+                }
+            }
+            console.log(`  ${green}\u2713${reset} Removed MAXSIM commands from command/`);
+        }
+    }
+    else if (isCodex) {
+        const skillsDir = path.join(targetDir, 'skills');
+        if (fs.existsSync(skillsDir)) {
+            let skillCount = 0;
+            const entries = fs.readdirSync(skillsDir, { withFileTypes: true });
+            for (const entry of entries) {
+                if (entry.isDirectory() && entry.name.startsWith('maxsim-')) {
+                    fs.rmSync(path.join(skillsDir, entry.name), { recursive: true });
+                    skillCount++;
+                }
+            }
+            if (skillCount > 0) {
+                removedCount++;
+                console.log(`  ${green}\u2713${reset} Removed ${skillCount} Codex skills`);
+            }
+        }
+    }
+    else {
+        const maxsimCommandsDir = path.join(targetDir, 'commands', 'maxsim');
+        if (fs.existsSync(maxsimCommandsDir)) {
+            fs.rmSync(maxsimCommandsDir, { recursive: true });
+            removedCount++;
+            console.log(`  ${green}\u2713${reset} Removed commands/maxsim/`);
+        }
+    }
+    // 2. Remove maxsim directory
+    const maxsimDir = path.join(targetDir, 'maxsim');
+    if (fs.existsSync(maxsimDir)) {
+        fs.rmSync(maxsimDir, { recursive: true });
+        removedCount++;
+        console.log(`  ${green}\u2713${reset} Removed maxsim/`);
+    }
+    // 3. Remove MAXSIM agents
+    const agentsDir = path.join(targetDir, 'agents');
+    if (fs.existsSync(agentsDir)) {
+        const files = fs.readdirSync(agentsDir);
+        let agentCount = 0;
+        for (const file of files) {
+            if (file.startsWith('maxsim-') && file.endsWith('.md')) {
+                fs.unlinkSync(path.join(agentsDir, file));
+                agentCount++;
+            }
+        }
+        if (agentCount > 0) {
+            removedCount++;
+            console.log(`  ${green}\u2713${reset} Removed ${agentCount} MAXSIM agents`);
+        }
+    }
+    // 4. Remove MAXSIM hooks
+    const hooksDir = path.join(targetDir, 'hooks');
+    if (fs.existsSync(hooksDir)) {
+        const maxsimHooks = [
+            'maxsim-statusline.js',
+            'maxsim-check-update.js',
+            'maxsim-check-update.sh',
+            'maxsim-context-monitor.js',
+        ];
+        let hookCount = 0;
+        for (const hook of maxsimHooks) {
+            const hookPath = path.join(hooksDir, hook);
+            if (fs.existsSync(hookPath)) {
+                fs.unlinkSync(hookPath);
+                hookCount++;
+            }
+        }
+        if (hookCount > 0) {
+            removedCount++;
+            console.log(`  ${green}\u2713${reset} Removed ${hookCount} MAXSIM hooks`);
+        }
+    }
+    // 5. Remove MAXSIM package.json (CommonJS mode marker)
+    const pkgJsonPath = path.join(targetDir, 'package.json');
+    if (fs.existsSync(pkgJsonPath)) {
+        try {
+            const content = fs.readFileSync(pkgJsonPath, 'utf8').trim();
+            if (content === '{"type":"commonjs"}') {
+                fs.unlinkSync(pkgJsonPath);
+                removedCount++;
+                console.log(`  ${green}\u2713${reset} Removed MAXSIM package.json`);
+            }
+        }
+        catch {
+            // Ignore read errors
+        }
+    }
+    // 6. Clean up settings.json
+    const settingsPath = path.join(targetDir, 'settings.json');
+    if (fs.existsSync(settingsPath)) {
+        const settings = (0, adapters_1.readSettings)(settingsPath);
+        let settingsModified = false;
+        const statusLine = settings.statusLine;
+        if (statusLine &&
+            statusLine.command &&
+            statusLine.command.includes('maxsim-statusline')) {
+            delete settings.statusLine;
+            settingsModified = true;
+            console.log(`  ${green}\u2713${reset} Removed MAXSIM statusline from settings`);
+        }
+        const settingsHooks = settings.hooks;
+        if (settingsHooks && settingsHooks.SessionStart) {
+            const before = settingsHooks.SessionStart.length;
+            settingsHooks.SessionStart = settingsHooks.SessionStart.filter((entry) => {
+                if (entry.hooks && Array.isArray(entry.hooks)) {
+                    const hasMaxsimHook = entry.hooks.some((h) => h.command &&
+                        (h.command.includes('maxsim-check-update') ||
+                            h.command.includes('maxsim-statusline')));
+                    return !hasMaxsimHook;
+                }
+                return true;
+            });
+            if (settingsHooks.SessionStart.length < before) {
+                settingsModified = true;
+                console.log(`  ${green}\u2713${reset} Removed MAXSIM hooks from settings`);
+            }
+            if (settingsHooks.SessionStart.length === 0) {
+                delete settingsHooks.SessionStart;
+            }
+        }
+        if (settingsHooks && settingsHooks.PostToolUse) {
+            const before = settingsHooks.PostToolUse.length;
+            settingsHooks.PostToolUse = settingsHooks.PostToolUse.filter((entry) => {
+                if (entry.hooks && Array.isArray(entry.hooks)) {
+                    const hasMaxsimHook = entry.hooks.some((h) => h.command &&
+                        h.command.includes('maxsim-context-monitor'));
+                    return !hasMaxsimHook;
+                }
+                return true;
+            });
+            if (settingsHooks.PostToolUse.length < before) {
+                settingsModified = true;
+                console.log(`  ${green}\u2713${reset} Removed context monitor hook from settings`);
+            }
+            if (settingsHooks.PostToolUse.length === 0) {
+                delete settingsHooks.PostToolUse;
+            }
+        }
+        if (settingsHooks && Object.keys(settingsHooks).length === 0) {
+            delete settings.hooks;
+        }
+        if (settingsModified) {
+            (0, adapters_1.writeSettings)(settingsPath, settings);
+            removedCount++;
+        }
+    }
+    // 7. For OpenCode, clean up permissions from opencode.json
+    if (isOpencode) {
+        const opencodeConfigDir = isGlobal
+            ? getOpencodeGlobalDir()
+            : path.join(process.cwd(), '.opencode');
+        const configPath = path.join(opencodeConfigDir, 'opencode.json');
+        if (fs.existsSync(configPath)) {
+            try {
+                const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+                let modified = false;
+                const permission = config.permission;
+                if (permission) {
+                    for (const permType of ['read', 'external_directory']) {
+                        if (permission[permType]) {
+                            const keys = Object.keys(permission[permType]);
+                            for (const key of keys) {
+                                if (key.includes('maxsim')) {
+                                    delete permission[permType][key];
+                                    modified = true;
+                                }
+                            }
+                            if (Object.keys(permission[permType]).length === 0) {
+                                delete permission[permType];
+                            }
+                        }
+                    }
+                    if (Object.keys(permission).length === 0) {
+                        delete config.permission;
+                    }
+                }
+                if (modified) {
+                    fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n');
+                    removedCount++;
+                    console.log(`  ${green}\u2713${reset} Removed MAXSIM permissions from opencode.json`);
+                }
+            }
+            catch {
+                // Ignore JSON parse errors
+            }
+        }
+    }
+    if (removedCount === 0) {
+        console.log(`  ${yellow}\u26a0${reset} No MAXSIM files found to remove.`);
+    }
+    console.log(`
+  ${green}Done!${reset} MAXSIM has been uninstalled from ${runtimeLabel}.
+  Your other files and settings have been preserved.
+`);
+}
+/**
+ * Parse JSONC (JSON with Comments) by stripping comments and trailing commas.
+ */
+function parseJsonc(content) {
+    if (content.charCodeAt(0) === 0xfeff) {
+        content = content.slice(1);
+    }
+    let result = '';
+    let inString = false;
+    let i = 0;
+    while (i < content.length) {
+        const char = content[i];
+        const next = content[i + 1];
+        if (inString) {
+            result += char;
+            if (char === '\\' && i + 1 < content.length) {
+                result += next;
+                i += 2;
+                continue;
+            }
+            if (char === '"') {
+                inString = false;
+            }
+            i++;
+        }
+        else {
+            if (char === '"') {
+                inString = true;
+                result += char;
+                i++;
+            }
+            else if (char === '/' && next === '/') {
+                while (i < content.length && content[i] !== '\n') {
+                    i++;
+                }
+            }
+            else if (char === '/' && next === '*') {
+                i += 2;
+                while (i < content.length - 1 &&
+                    !(content[i] === '*' && content[i + 1] === '/')) {
+                    i++;
+                }
+                i += 2;
+            }
+            else {
+                result += char;
+                i++;
+            }
+        }
+    }
+    result = result.replace(/,(\s*[}\]])/g, '$1');
+    return JSON.parse(result);
+}
+/**
+ * Configure OpenCode permissions to allow reading MAXSIM reference docs
+ */
+function configureOpencodePermissions(isGlobal = true) {
+    const opencodeConfigDir = isGlobal
+        ? getOpencodeGlobalDir()
+        : path.join(process.cwd(), '.opencode');
+    const configPath = path.join(opencodeConfigDir, 'opencode.json');
+    fs.mkdirSync(opencodeConfigDir, { recursive: true });
+    let config = {};
+    if (fs.existsSync(configPath)) {
+        try {
+            const content = fs.readFileSync(configPath, 'utf8');
+            config = parseJsonc(content);
+        }
+        catch (e) {
+            console.log(`  ${yellow}\u26a0${reset} Could not parse opencode.json - skipping permission config`);
+            console.log(`    ${dim}Reason: ${e.message}${reset}`);
+            console.log(`    ${dim}Your config was NOT modified. Fix the syntax manually if needed.${reset}`);
+            return;
+        }
+    }
+    if (!config.permission) {
+        config.permission = {};
+    }
+    const permission = config.permission;
+    const defaultConfigDir = path.join(os.homedir(), '.config', 'opencode');
+    const maxsimPath = opencodeConfigDir === defaultConfigDir
+        ? '~/.config/opencode/maxsim/*'
+        : `${opencodeConfigDir.replace(/\\/g, '/')}/maxsim/*`;
+    let modified = false;
+    if (!permission.read || typeof permission.read !== 'object') {
+        permission.read = {};
+    }
+    if (permission.read[maxsimPath] !== 'allow') {
+        permission.read[maxsimPath] = 'allow';
+        modified = true;
+    }
+    if (!permission.external_directory ||
+        typeof permission.external_directory !== 'object') {
+        permission.external_directory = {};
+    }
+    if (permission.external_directory[maxsimPath] !== 'allow') {
+        permission.external_directory[maxsimPath] = 'allow';
+        modified = true;
+    }
+    if (!modified) {
+        return;
+    }
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n');
+    console.log(`  ${green}\u2713${reset} Configured read permission for MAXSIM docs`);
+}
+/**
+ * Verify a directory exists and contains files
+ */
+function verifyInstalled(dirPath, description) {
+    if (!fs.existsSync(dirPath)) {
+        console.error(`  ${yellow}\u2717${reset} Failed to install ${description}: directory not created`);
+        return false;
+    }
+    try {
+        const entries = fs.readdirSync(dirPath);
+        if (entries.length === 0) {
+            console.error(`  ${yellow}\u2717${reset} Failed to install ${description}: directory is empty`);
+            return false;
+        }
+    }
+    catch (e) {
+        console.error(`  ${yellow}\u2717${reset} Failed to install ${description}: ${e.message}`);
+        return false;
+    }
+    return true;
+}
+/**
+ * Verify a file exists
+ */
+function verifyFileInstalled(filePath, description) {
+    if (!fs.existsSync(filePath)) {
+        console.error(`  ${yellow}\u2717${reset} Failed to install ${description}: file not created`);
+        return false;
+    }
+    return true;
+}
+// ──────────────────────────────────────────────────────
+// Local Patch Persistence
+// ──────────────────────────────────────────────────────
+const PATCHES_DIR_NAME = 'maxsim-local-patches';
+const MANIFEST_NAME = 'maxsim-file-manifest.json';
+/**
+ * Compute SHA256 hash of file contents
+ */
+function fileHash(filePath) {
+    const content = fs.readFileSync(filePath);
+    return crypto.createHash('sha256').update(content).digest('hex');
+}
+/**
+ * Recursively collect all files in dir with their hashes
+ */
+function generateManifest(dir, baseDir) {
+    if (!baseDir)
+        baseDir = dir;
+    const manifest = {};
+    if (!fs.existsSync(dir))
+        return manifest;
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        const relPath = path.relative(baseDir, fullPath).replace(/\\/g, '/');
+        if (entry.isDirectory()) {
+            Object.assign(manifest, generateManifest(fullPath, baseDir));
+        }
+        else {
+            manifest[relPath] = fileHash(fullPath);
+        }
+    }
+    return manifest;
+}
+/**
+ * Write file manifest after installation for future modification detection
+ */
+function writeManifest(configDir, runtime = 'claude') {
+    const isOpencode = runtime === 'opencode';
+    const isCodex = runtime === 'codex';
+    const maxsimDir = path.join(configDir, 'maxsim');
+    const commandsDir = path.join(configDir, 'commands', 'maxsim');
+    const opencodeCommandDir = path.join(configDir, 'command');
+    const codexSkillsDir = path.join(configDir, 'skills');
+    const agentsDir = path.join(configDir, 'agents');
+    const manifest = {
+        version: pkg.version,
+        timestamp: new Date().toISOString(),
+        files: {},
+    };
+    const maxsimHashes = generateManifest(maxsimDir);
+    for (const [rel, hash] of Object.entries(maxsimHashes)) {
+        manifest.files['maxsim/' + rel] = hash;
+    }
+    if (!isOpencode && !isCodex && fs.existsSync(commandsDir)) {
+        const cmdHashes = generateManifest(commandsDir);
+        for (const [rel, hash] of Object.entries(cmdHashes)) {
+            manifest.files['commands/maxsim/' + rel] = hash;
+        }
+    }
+    if (isOpencode && fs.existsSync(opencodeCommandDir)) {
+        for (const file of fs.readdirSync(opencodeCommandDir)) {
+            if (file.startsWith('maxsim-') && file.endsWith('.md')) {
+                manifest.files['command/' + file] = fileHash(path.join(opencodeCommandDir, file));
+            }
+        }
+    }
+    if (isCodex && fs.existsSync(codexSkillsDir)) {
+        for (const skillName of listCodexSkillNames(codexSkillsDir)) {
+            const skillRoot = path.join(codexSkillsDir, skillName);
+            const skillHashes = generateManifest(skillRoot);
+            for (const [rel, hash] of Object.entries(skillHashes)) {
+                manifest.files[`skills/${skillName}/${rel}`] = hash;
+            }
+        }
+    }
+    if (fs.existsSync(agentsDir)) {
+        for (const file of fs.readdirSync(agentsDir)) {
+            if (file.startsWith('maxsim-') && file.endsWith('.md')) {
+                manifest.files['agents/' + file] = fileHash(path.join(agentsDir, file));
+            }
+        }
+    }
+    fs.writeFileSync(path.join(configDir, MANIFEST_NAME), JSON.stringify(manifest, null, 2));
+    return manifest;
+}
+/**
+ * Detect user-modified MAXSIM files by comparing against install manifest.
+ */
+function saveLocalPatches(configDir) {
+    const manifestPath = path.join(configDir, MANIFEST_NAME);
+    if (!fs.existsSync(manifestPath))
+        return [];
+    let manifest;
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    }
+    catch {
+        return [];
+    }
+    const patchesDir = path.join(configDir, PATCHES_DIR_NAME);
+    const modified = [];
+    for (const [relPath, originalHash] of Object.entries(manifest.files || {})) {
+        const fullPath = path.join(configDir, relPath);
+        if (!fs.existsSync(fullPath))
+            continue;
+        const currentHash = fileHash(fullPath);
+        if (currentHash !== originalHash) {
+            const backupPath = path.join(patchesDir, relPath);
+            fs.mkdirSync(path.dirname(backupPath), { recursive: true });
+            fs.copyFileSync(fullPath, backupPath);
+            modified.push(relPath);
+        }
+    }
+    if (modified.length > 0) {
+        const meta = {
+            backed_up_at: new Date().toISOString(),
+            from_version: manifest.version,
+            files: modified,
+        };
+        fs.writeFileSync(path.join(patchesDir, 'backup-meta.json'), JSON.stringify(meta, null, 2));
+        console.log('  ' +
+            yellow +
+            'i' +
+            reset +
+            '  Found ' +
+            modified.length +
+            ' locally modified MAXSIM file(s) \u2014 backed up to ' +
+            PATCHES_DIR_NAME +
+            '/');
+        for (const f of modified) {
+            console.log('     ' + dim + f + reset);
+        }
+    }
+    return modified;
+}
+/**
+ * After install, report backed-up patches for user to reapply.
+ */
+function reportLocalPatches(configDir, runtime = 'claude') {
+    const patchesDir = path.join(configDir, PATCHES_DIR_NAME);
+    const metaPath = path.join(patchesDir, 'backup-meta.json');
+    if (!fs.existsSync(metaPath))
+        return [];
+    let meta;
+    try {
+        meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+    }
+    catch {
+        return [];
+    }
+    if (meta.files && meta.files.length > 0) {
+        const reapplyCommand = runtime === 'opencode'
+            ? '/maxsim-reapply-patches'
+            : runtime === 'codex'
+                ? '$maxsim-reapply-patches'
+                : '/maxsim:reapply-patches';
+        console.log('');
+        console.log('  ' +
+            yellow +
+            'Local patches detected' +
+            reset +
+            ' (from v' +
+            meta.from_version +
+            '):');
+        for (const f of meta.files) {
+            console.log('     ' + cyan + f + reset);
+        }
+        console.log('');
+        console.log('  Your modifications are saved in ' +
+            cyan +
+            PATCHES_DIR_NAME +
+            '/' +
+            reset);
+        console.log('  Run ' +
+            cyan +
+            reapplyCommand +
+            reset +
+            ' to merge them into the new version.');
+        console.log('  Or manually compare and merge the files.');
+        console.log('');
+    }
+    return meta.files || [];
+}
+function install(isGlobal, runtime = 'claude') {
+    const isOpencode = runtime === 'opencode';
+    const isGemini = runtime === 'gemini';
+    const isCodex = runtime === 'codex';
+    const dirName = getDirName(runtime);
+    const src = templatesRoot;
+    const targetDir = isGlobal
+        ? getGlobalDir(runtime, explicitConfigDir)
+        : path.join(process.cwd(), dirName);
+    const locationLabel = isGlobal
+        ? targetDir.replace(os.homedir(), '~')
+        : targetDir.replace(process.cwd(), '.');
+    const pathPrefix = isGlobal
+        ? `${targetDir.replace(/\\/g, '/')}/`
+        : `./${dirName}/`;
+    let runtimeLabel = 'Claude Code';
+    if (isOpencode)
+        runtimeLabel = 'OpenCode';
+    if (isGemini)
+        runtimeLabel = 'Gemini';
+    if (isCodex)
+        runtimeLabel = 'Codex';
+    console.log(`  Installing for ${cyan}${runtimeLabel}${reset} to ${cyan}${locationLabel}${reset}\n`);
+    const failures = [];
+    // Save any locally modified MAXSIM files before they get wiped
+    saveLocalPatches(targetDir);
+    // Clean up orphaned files from previous versions
+    cleanupOrphanedFiles(targetDir);
+    // OpenCode uses command/ (flat), Codex uses skills/, Claude/Gemini use commands/maxsim/
+    if (isOpencode) {
+        const commandDir = path.join(targetDir, 'command');
+        fs.mkdirSync(commandDir, { recursive: true });
+        const maxsimSrc = path.join(src, 'commands', 'maxsim');
+        copyFlattenedCommands(maxsimSrc, commandDir, 'maxsim', pathPrefix, runtime);
+        if (verifyInstalled(commandDir, 'command/maxsim-*')) {
+            const count = fs
+                .readdirSync(commandDir)
+                .filter((f) => f.startsWith('maxsim-')).length;
+            console.log(`  ${green}\u2713${reset} Installed ${count} commands to command/`);
+        }
+        else {
+            failures.push('command/maxsim-*');
+        }
+    }
+    else if (isCodex) {
+        const skillsDir = path.join(targetDir, 'skills');
+        const maxsimSrc = path.join(src, 'commands', 'maxsim');
+        copyCommandsAsCodexSkills(maxsimSrc, skillsDir, 'maxsim', pathPrefix, runtime);
+        const installedSkillNames = listCodexSkillNames(skillsDir);
+        if (installedSkillNames.length > 0) {
+            console.log(`  ${green}\u2713${reset} Installed ${installedSkillNames.length} skills to skills/`);
+        }
+        else {
+            failures.push('skills/maxsim-*');
+        }
+    }
+    else {
+        const commandsDir = path.join(targetDir, 'commands');
+        fs.mkdirSync(commandsDir, { recursive: true });
+        const maxsimSrc = path.join(src, 'commands', 'maxsim');
+        const maxsimDest = path.join(commandsDir, 'maxsim');
+        copyWithPathReplacement(maxsimSrc, maxsimDest, pathPrefix, runtime, true);
+        if (verifyInstalled(maxsimDest, 'commands/maxsim')) {
+            console.log(`  ${green}\u2713${reset} Installed commands/maxsim`);
+        }
+        else {
+            failures.push('commands/maxsim');
+        }
+    }
+    // Copy maxsim directory content (workflows, templates, references) with path replacement
+    // Templates package layout: workflows/, templates/, references/ at root
+    // Install target: maxsim/workflows/, maxsim/templates/, maxsim/references/
+    const skillDest = path.join(targetDir, 'maxsim');
+    const maxsimSubdirs = ['workflows', 'templates', 'references'];
+    if (fs.existsSync(skillDest)) {
+        fs.rmSync(skillDest, { recursive: true });
+    }
+    fs.mkdirSync(skillDest, { recursive: true });
+    for (const subdir of maxsimSubdirs) {
+        const subdirSrc = path.join(src, subdir);
+        if (fs.existsSync(subdirSrc)) {
+            const subdirDest = path.join(skillDest, subdir);
+            copyWithPathReplacement(subdirSrc, subdirDest, pathPrefix, runtime);
+        }
+    }
+    if (verifyInstalled(skillDest, 'maxsim')) {
+        console.log(`  ${green}\u2713${reset} Installed maxsim`);
+    }
+    else {
+        failures.push('maxsim');
+    }
+    // Copy agents to agents directory
+    const agentsSrc = path.join(src, 'agents');
+    if (fs.existsSync(agentsSrc)) {
+        const agentsDest = path.join(targetDir, 'agents');
+        fs.mkdirSync(agentsDest, { recursive: true });
+        // Remove old MAXSIM agents before copying new ones
+        if (fs.existsSync(agentsDest)) {
+            for (const file of fs.readdirSync(agentsDest)) {
+                if (file.startsWith('maxsim-') && file.endsWith('.md')) {
+                    fs.unlinkSync(path.join(agentsDest, file));
+                }
+            }
+        }
+        const agentEntries = fs.readdirSync(agentsSrc, { withFileTypes: true });
+        for (const entry of agentEntries) {
+            if (entry.isFile() && entry.name.endsWith('.md')) {
+                let content = fs.readFileSync(path.join(agentsSrc, entry.name), 'utf8');
+                const dirRegex = /~\/\.claude\//g;
+                content = content.replace(dirRegex, pathPrefix);
+                content = (0, adapters_1.processAttribution)(content, getCommitAttribution(runtime));
+                if (isOpencode) {
+                    content = (0, adapters_1.convertClaudeToOpencodeFrontmatter)(content);
+                }
+                else if (isGemini) {
+                    content = (0, adapters_1.convertClaudeToGeminiAgent)(content);
+                }
+                else if (isCodex) {
+                    content = (0, adapters_1.convertClaudeToCodexMarkdown)(content);
+                }
+                fs.writeFileSync(path.join(agentsDest, entry.name), content);
+            }
+        }
+        if (verifyInstalled(agentsDest, 'agents')) {
+            console.log(`  ${green}\u2713${reset} Installed agents`);
+        }
+        else {
+            failures.push('agents');
+        }
+    }
+    // Copy CHANGELOG.md (lives at repo root, one level above templates package)
+    const changelogSrc = path.join(src, '..', 'CHANGELOG.md');
+    const changelogDest = path.join(targetDir, 'maxsim', 'CHANGELOG.md');
+    if (fs.existsSync(changelogSrc)) {
+        fs.copyFileSync(changelogSrc, changelogDest);
+        if (verifyFileInstalled(changelogDest, 'CHANGELOG.md')) {
+            console.log(`  ${green}\u2713${reset} Installed CHANGELOG.md`);
+        }
+        else {
+            failures.push('CHANGELOG.md');
+        }
+    }
+    // Copy CLAUDE.md (global MAXSIM context for Claude Code)
+    const claudeMdSrc = path.join(src, 'CLAUDE.md');
+    const claudeMdDest = path.join(targetDir, 'CLAUDE.md');
+    if (fs.existsSync(claudeMdSrc)) {
+        fs.copyFileSync(claudeMdSrc, claudeMdDest);
+        if (verifyFileInstalled(claudeMdDest, 'CLAUDE.md')) {
+            console.log(`  ${green}\u2713${reset} Installed CLAUDE.md`);
+        }
+        else {
+            failures.push('CLAUDE.md');
+        }
+    }
+    // Write VERSION file
+    const versionDest = path.join(targetDir, 'maxsim', 'VERSION');
+    fs.writeFileSync(versionDest, pkg.version);
+    if (verifyFileInstalled(versionDest, 'VERSION')) {
+        console.log(`  ${green}\u2713${reset} Wrote VERSION (${pkg.version})`);
+    }
+    else {
+        failures.push('VERSION');
+    }
+    if (!isCodex) {
+        // Write package.json to force CommonJS mode for MAXSIM scripts
+        const pkgJsonDest = path.join(targetDir, 'package.json');
+        fs.writeFileSync(pkgJsonDest, '{"type":"commonjs"}\n');
+        console.log(`  ${green}\u2713${reset} Wrote package.json (CommonJS mode)`);
+        // Copy hooks from bundled assets directory (copied from @maxsim/hooks/dist at build time)
+        let hooksSrc = null;
+        const bundledHooksDir = path.resolve(__dirname, 'assets', 'hooks');
+        if (fs.existsSync(bundledHooksDir)) {
+            hooksSrc = bundledHooksDir;
+        }
+        else {
+            console.warn(`  ${yellow}!${reset} bundled hooks not found - hooks will not be installed`);
+        }
+        if (hooksSrc) {
+            const hooksDest = path.join(targetDir, 'hooks');
+            fs.mkdirSync(hooksDest, { recursive: true });
+            const hookEntries = fs.readdirSync(hooksSrc);
+            const configDirReplacement = getConfigDirFromHome(runtime, isGlobal);
+            for (const entry of hookEntries) {
+                const srcFile = path.join(hooksSrc, entry);
+                if (fs.statSync(srcFile).isFile() && entry.endsWith('.cjs') && !entry.includes('.d.')) {
+                    const destName = entry.replace(/\.cjs$/, '.js');
+                    const destFile = path.join(hooksDest, destName);
+                    let content = fs.readFileSync(srcFile, 'utf8');
+                    content = content.replace(/'\.claude'/g, configDirReplacement);
+                    fs.writeFileSync(destFile, content);
+                }
+            }
+            if (verifyInstalled(hooksDest, 'hooks')) {
+                console.log(`  ${green}\u2713${reset} Installed hooks (bundled)`);
+            }
+            else {
+                failures.push('hooks');
+            }
+        }
+    }
+    if (failures.length > 0) {
+        console.error(`\n  ${yellow}Installation incomplete!${reset} Failed: ${failures.join(', ')}`);
+        process.exit(1);
+    }
+    // Write file manifest for future modification detection
+    writeManifest(targetDir, runtime);
+    console.log(`  ${green}\u2713${reset} Wrote file manifest (${MANIFEST_NAME})`);
+    // Report any backed-up local patches
+    reportLocalPatches(targetDir, runtime);
+    if (isCodex) {
+        return {
+            settingsPath: null,
+            settings: null,
+            statuslineCommand: null,
+            runtime,
+        };
+    }
+    // Configure statusline and hooks in settings.json
+    const settingsPath = path.join(targetDir, 'settings.json');
+    const settings = cleanupOrphanedHooks((0, adapters_1.readSettings)(settingsPath));
+    const statuslineCommand = isGlobal
+        ? (0, adapters_1.buildHookCommand)(targetDir, 'maxsim-statusline.js')
+        : 'node ' + dirName + '/hooks/maxsim-statusline.js';
+    const updateCheckCommand = isGlobal
+        ? (0, adapters_1.buildHookCommand)(targetDir, 'maxsim-check-update.js')
+        : 'node ' + dirName + '/hooks/maxsim-check-update.js';
+    const contextMonitorCommand = isGlobal
+        ? (0, adapters_1.buildHookCommand)(targetDir, 'maxsim-context-monitor.js')
+        : 'node ' + dirName + '/hooks/maxsim-context-monitor.js';
+    // Enable experimental agents for Gemini CLI
+    if (isGemini) {
+        if (!settings.experimental) {
+            settings.experimental = {};
+        }
+        const experimental = settings.experimental;
+        if (!experimental.enableAgents) {
+            experimental.enableAgents = true;
+            console.log(`  ${green}\u2713${reset} Enabled experimental agents`);
+        }
+    }
+    // Configure SessionStart hook for update checking (skip for opencode)
+    if (!isOpencode) {
+        if (!settings.hooks) {
+            settings.hooks = {};
+        }
+        const installHooks = settings.hooks;
+        if (!installHooks.SessionStart) {
+            installHooks.SessionStart = [];
+        }
+        const hasMaxsimUpdateHook = installHooks.SessionStart.some((entry) => entry.hooks &&
+            entry.hooks.some((h) => h.command && h.command.includes('maxsim-check-update')));
+        if (!hasMaxsimUpdateHook) {
+            installHooks.SessionStart.push({
+                hooks: [
+                    {
+                        type: 'command',
+                        command: updateCheckCommand,
+                    },
+                ],
+            });
+            console.log(`  ${green}\u2713${reset} Configured update check hook`);
+        }
+        // Configure PostToolUse hook for context window monitoring
+        if (!installHooks.PostToolUse) {
+            installHooks.PostToolUse = [];
+        }
+        const hasContextMonitorHook = installHooks.PostToolUse.some((entry) => entry.hooks &&
+            entry.hooks.some((h) => h.command && h.command.includes('maxsim-context-monitor')));
+        if (!hasContextMonitorHook) {
+            installHooks.PostToolUse.push({
+                hooks: [
+                    {
+                        type: 'command',
+                        command: contextMonitorCommand,
+                    },
+                ],
+            });
+            console.log(`  ${green}\u2713${reset} Configured context window monitor hook`);
+        }
+    }
+    return { settingsPath, settings, statuslineCommand, runtime };
+}
+/**
+ * Apply statusline config, then print completion message
+ */
+function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline, runtime = 'claude', isGlobal = true) {
+    const isOpencode = runtime === 'opencode';
+    const isCodex = runtime === 'codex';
+    if (shouldInstallStatusline && !isOpencode && !isCodex) {
+        settings.statusLine = {
+            type: 'command',
+            command: statuslineCommand,
+        };
+        console.log(`  ${green}\u2713${reset} Configured statusline`);
+    }
+    if (!isCodex && settingsPath && settings) {
+        (0, adapters_1.writeSettings)(settingsPath, settings);
+    }
+    if (isOpencode) {
+        configureOpencodePermissions(isGlobal);
+    }
+    let program = 'Claude Code';
+    if (runtime === 'opencode')
+        program = 'OpenCode';
+    if (runtime === 'gemini')
+        program = 'Gemini';
+    if (runtime === 'codex')
+        program = 'Codex';
+    let command = '/maxsim:help';
+    if (runtime === 'opencode')
+        command = '/maxsim-help';
+    if (runtime === 'codex')
+        command = '$maxsim-help';
+    console.log(`
+  ${green}Done!${reset} Launch ${program} and run ${cyan}${command}${reset}.
+
+  ${cyan}Join the community:${reset} https://discord.gg/5JJgD5svVS
+`);
+}
+/**
+ * Handle statusline configuration with optional prompt
+ */
+function handleStatusline(settings, isInteractive, callback) {
+    const hasExisting = settings.statusLine != null;
+    if (!hasExisting) {
+        callback(true);
+        return;
+    }
+    if (forceStatusline) {
+        callback(true);
+        return;
+    }
+    if (!isInteractive) {
+        console.log(`  ${yellow}\u26a0${reset} Skipping statusline (already configured)`);
+        console.log(`    Use ${cyan}--force-statusline${reset} to replace\n`);
+        callback(false);
+        return;
+    }
+    const statusLine = settings.statusLine;
+    const existingCmd = statusLine.command || statusLine.url || '(custom)';
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+    console.log(`
+  ${yellow}\u26a0${reset} Existing statusline detected\n
+  Your current statusline:
+    ${dim}command: ${existingCmd}${reset}
+
+  MAXSIM includes a statusline showing:
+    \u2022 Model name
+    \u2022 Current task (from todo list)
+    \u2022 Context window usage (color-coded)
+
+  ${cyan}1${reset}) Keep existing
+  ${cyan}2${reset}) Replace with MAXSIM statusline
+`);
+    rl.question(`  Choice ${dim}[1]${reset}: `, (answer) => {
+        rl.close();
+        const choice = answer.trim() || '1';
+        callback(choice === '2');
+    });
+}
+/**
+ * Prompt for runtime selection
+ */
+function promptRuntime(callback) {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+    let answered = false;
+    rl.on('close', () => {
+        if (!answered) {
+            answered = true;
+            console.log(`\n  ${yellow}Installation cancelled${reset}\n`);
+            process.exit(0);
+        }
+    });
+    console.log(`  ${yellow}Which runtime(s) would you like to install for?${reset}\n\n  ${cyan}1${reset}) Claude Code ${dim}(~/.claude)${reset}
+  ${cyan}2${reset}) OpenCode    ${dim}(~/.config/opencode)${reset} - open source, free models
+  ${cyan}3${reset}) Gemini      ${dim}(~/.gemini)${reset}
+  ${cyan}4${reset}) Codex       ${dim}(~/.codex)${reset}
+  ${cyan}5${reset}) All
+`);
+    rl.question(`  Choice ${dim}[1]${reset}: `, (answer) => {
+        answered = true;
+        rl.close();
+        const choice = answer.trim() || '1';
+        if (choice === '5') {
+            callback(['claude', 'opencode', 'gemini', 'codex']);
+        }
+        else if (choice === '4') {
+            callback(['codex']);
+        }
+        else if (choice === '3') {
+            callback(['gemini']);
+        }
+        else if (choice === '2') {
+            callback(['opencode']);
+        }
+        else {
+            callback(['claude']);
+        }
+    });
+}
+/**
+ * Prompt for install location
+ */
+function promptLocation(runtimes) {
+    if (!process.stdin.isTTY) {
+        console.log(`  ${yellow}Non-interactive terminal detected, defaulting to global install${reset}\n`);
+        installAllRuntimes(runtimes, true, false);
+        return;
+    }
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+    let answered = false;
+    rl.on('close', () => {
+        if (!answered) {
+            answered = true;
+            console.log(`\n  ${yellow}Installation cancelled${reset}\n`);
+            process.exit(0);
+        }
+    });
+    const pathExamples = runtimes
+        .map((r) => {
+        const globalPath = getGlobalDir(r, explicitConfigDir);
+        return globalPath.replace(os.homedir(), '~');
+    })
+        .join(', ');
+    const localExamples = runtimes
+        .map((r) => `./${getDirName(r)}`)
+        .join(', ');
+    console.log(`  ${yellow}Where would you like to install?${reset}\n\n  ${cyan}1${reset}) Global ${dim}(${pathExamples})${reset} - available in all projects
+  ${cyan}2${reset}) Local  ${dim}(${localExamples})${reset} - this project only
+`);
+    rl.question(`  Choice ${dim}[1]${reset}: `, (answer) => {
+        answered = true;
+        rl.close();
+        const choice = answer.trim() || '1';
+        const isGlobal = choice !== '2';
+        installAllRuntimes(runtimes, isGlobal, true);
+    });
+}
+/**
+ * Install MAXSIM for all selected runtimes
+ */
+function installAllRuntimes(runtimes, isGlobal, isInteractive) {
+    const results = [];
+    for (const runtime of runtimes) {
+        const result = install(isGlobal, runtime);
+        results.push(result);
+    }
+    const statuslineRuntimes = ['claude', 'gemini'];
+    const primaryStatuslineResult = results.find((r) => statuslineRuntimes.includes(r.runtime));
+    const finalize = (shouldInstallStatusline) => {
+        for (const result of results) {
+            const useStatusline = statuslineRuntimes.includes(result.runtime) && shouldInstallStatusline;
+            finishInstall(result.settingsPath, result.settings, result.statuslineCommand, useStatusline, result.runtime, isGlobal);
+        }
+    };
+    if (primaryStatuslineResult && primaryStatuslineResult.settings) {
+        handleStatusline(primaryStatuslineResult.settings, isInteractive, finalize);
+    }
+    else {
+        finalize(false);
+    }
+}
+// Main logic
+if (hasGlobal && hasLocal) {
+    console.error(`  ${yellow}Cannot specify both --global and --local${reset}`);
+    process.exit(1);
+}
+else if (explicitConfigDir && hasLocal) {
+    console.error(`  ${yellow}Cannot use --config-dir with --local${reset}`);
+    process.exit(1);
+}
+else if (hasUninstall) {
+    if (!hasGlobal && !hasLocal) {
+        console.error(`  ${yellow}--uninstall requires --global or --local${reset}`);
+        process.exit(1);
+    }
+    const runtimes = selectedRuntimes.length > 0 ? selectedRuntimes : ['claude'];
+    for (const runtime of runtimes) {
+        uninstall(hasGlobal, runtime);
+    }
+}
+else if (selectedRuntimes.length > 0) {
+    if (!hasGlobal && !hasLocal) {
+        promptLocation(selectedRuntimes);
+    }
+    else {
+        installAllRuntimes(selectedRuntimes, hasGlobal, false);
+    }
+}
+else if (hasGlobal || hasLocal) {
+    installAllRuntimes(['claude'], hasGlobal, false);
+}
+else {
+    if (!process.stdin.isTTY) {
+        console.log(`  ${yellow}Non-interactive terminal detected, defaulting to Claude Code global install${reset}\n`);
+        installAllRuntimes(['claude'], true, false);
+    }
+    else {
+        promptRuntime((runtimes) => {
+            promptLocation(runtimes);
+        });
+    }
+}
+//# sourceMappingURL=install.js.map

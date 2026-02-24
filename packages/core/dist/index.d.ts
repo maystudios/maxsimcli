@@ -1,0 +1,20 @@
+/**
+ * @maxsim/core — Shared utilities, constants, and type definitions
+ */
+export type { PhaseNumber, PhasePath, PhaseSlug, Result, ModelTier, ModelProfileName, ModelResolution, ModelProfileEntry, AgentType, ModelProfiles, PhaseSearchResult, RoadmapPhaseInfo, ArchivedPhaseDir, GitResult, MilestoneInfo, AppConfig, FrontmatterData, FrontmatterValue, FrontmatterParseResult, FrontmatterValidationResult, FrontmatterSchema, PlanningConfig, WorkflowConfig, StateSection, Decision, Blocker, PerformanceMetric, StateData, StatePatchResult, StateSessionOptions, StateMetricOptions, StateDecisionOptions, StateBlockerOptions, StateSnapshot, PhaseStatus, RoadmapPhase, RoadmapMilestone, RoadmapAnalysis, RoadmapPhaseDetail, RoadmapPhaseNotFound, RoadmapGetPhaseResult, MilestoneCompleteOptions, MilestoneResult, ArchiveResult, TodoItem, HistoryDigest, HistoryPhaseDigest, SlugResult, WebSearchOptions, WebSearchResult, ScaffoldOptions, TimestampFormat, PhaseAddResult, PhaseInsertResult, PhaseRemoveResult, PhaseCompleteResult, PhasePlanIndexResult, PhasesListOptions, RuntimeName, AdapterConfig, } from './types.js';
+export { phaseNumber, phasePath, phaseSlug, ok, err, PLANNING_CONFIG_DEFAULTS, } from './types.js';
+export { MODEL_PROFILES, output, error, safeReadFile, loadConfig, isGitIgnored, execGit, normalizePhaseName, comparePhaseNum, findPhaseInternal, getArchivedPhaseDirs, getRoadmapPhaseInternal, resolveModelInternal, pathExistsInternal, generateSlugInternal, getMilestoneInfo, } from './core.js';
+export { extractFrontmatter, reconstructFrontmatter, spliceFrontmatter, parseMustHavesBlock, FRONTMATTER_SCHEMAS, cmdFrontmatterGet, cmdFrontmatterSet, cmdFrontmatterMerge, cmdFrontmatterValidate, } from './frontmatter.js';
+export { cmdConfigEnsureSection, cmdConfigSet, cmdConfigGet, } from './config.js';
+export { stateExtractField, stateReplaceField, cmdStateLoad, cmdStateGet, cmdStatePatch, cmdStateUpdate, cmdStateAdvancePlan, cmdStateRecordMetric, cmdStateUpdateProgress, cmdStateAddDecision, cmdStateAddBlocker, cmdStateResolveBlocker, cmdStateRecordSession, cmdStateSnapshot, } from './state.js';
+export { cmdRoadmapGetPhase, cmdRoadmapAnalyze, cmdRoadmapUpdatePlanProgress, } from './roadmap.js';
+export { cmdRequirementsMarkComplete, cmdMilestoneComplete, } from './milestone.js';
+export { cmdGenerateSlug, cmdCurrentTimestamp, cmdListTodos, cmdVerifyPathExists, cmdHistoryDigest, cmdResolveModel, cmdCommit, cmdSummaryExtract, cmdWebsearch, cmdProgressRender, cmdTodoComplete, cmdScaffold, } from './commands.js';
+export type { ValidationError, ValidationWarning, TaskInfo, VerificationResult, PlanStructureResult, PhaseCompletenessResult, ReferencesResult, CommitsResult, ArtifactCheck, ArtifactsResult, KeyLinkCheck, KeyLinksResult, ConsistencyResult, HealthResult, } from './verify.js';
+export { cmdVerifySummary, cmdVerifyPlanStructure, cmdVerifyPhaseCompleteness, cmdVerifyReferences, cmdVerifyCommits, cmdVerifyArtifacts, cmdVerifyKeyLinks, cmdValidateConsistency, cmdValidateHealth, } from './verify.js';
+export { cmdPhasesList, cmdPhaseNextDecimal, cmdFindPhase, cmdPhasePlanIndex, cmdPhaseAdd, cmdPhaseInsert, cmdPhaseRemove, cmdPhaseComplete, } from './phase.js';
+export type { TemplateSelectResult, TemplateFillOptions, TemplateFillResult, } from './template.js';
+export { cmdTemplateSelect, cmdTemplateFill, } from './template.js';
+export type { WorkflowType, InitContext, ExecutePhaseContext, PlanPhaseContext, NewProjectContext, NewMilestoneContext, QuickContext, ResumeContext, VerifyWorkContext, PhaseOpContext, TodosContext, MilestoneOpContext, MapCodebaseContext, ProgressContext, } from './init.js';
+export { cmdInitExecutePhase, cmdInitPlanPhase, cmdInitNewProject, cmdInitNewMilestone, cmdInitQuick, cmdInitResume, cmdInitVerifyWork, cmdInitPhaseOp, cmdInitTodos, cmdInitMilestoneOp, cmdInitMapCodebase, cmdInitProgress, } from './init.js';
+//# sourceMappingURL=index.d.ts.map

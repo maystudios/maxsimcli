@@ -1,0 +1,32 @@
+node_modules/
+.DS_Store
+TO-DOS.md
+CLAUDE.md
+!packages/templates/CLAUDE.md
+/research.claude/
+commands.html
+
+# Local test installs
+.claude/
+
+# NX cache and workspace data
+.nx/
+
+# Temp files
+tmp/
+
+# Build artifacts (committed to npm, not git)
+hooks/dist/
+
+# Animation assets
+animation/
+*.gif
+
+# Internal planning documents
+reports/
+RAILROAD_ARCHITECTURE.md
+.planning/
+analysis/
+gaps.md
+improve.md
+philosophy.md

@@ -1,0 +1,26 @@
+name: Cleanup npm versions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Unpublish all versions
+        run: |
+          npm unpublish maxsimcli@1.0.0 || true
+          npm unpublish maxsimcli@1.0.1 || true
+          npm unpublish maxsimcli@1.0.2 || true
+          npm unpublish maxsimcli@1.0.3 || true
+          npm unpublish maxsimcli@1.0.4 || true
+          npm unpublish maxsimcli@1.0.5 || true
+          echo "Done. Remaining versions:"
+          npm view maxsimcli versions --json 2>/dev/null || echo "none"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

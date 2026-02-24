@@ -1,0 +1,47 @@
+{
+  "name": "maxsimcli",
+  "version": "1.0.0",
+  "private": false,
+  "description": "A meta-prompting, context engineering and spec-driven development system for Claude Code, OpenCode, Gemini and Codex by MayStudios.",
+  "bin": {
+    "maxsimcli": "dist/install.cjs"
+  },
+  "main": "./dist/cli.cjs",
+  "types": "./dist/cli.d.cts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "ai",
+    "meta-prompting",
+    "context-engineering",
+    "spec-driven-development",
+    "gemini",
+    "gemini-cli",
+    "codex",
+    "codex-cli"
+  ],
+  "author": "MayStudios",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maystudios/maxsim.git"
+  },
+  "homepage": "https://github.com/maystudios/maxsim",
+  "bugs": {
+    "url": "https://github.com/maystudios/maxsim/issues"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@maxsim/adapters": "workspace:*",
+    "@maxsim/core": "workspace:*",
+    "@maxsim/templates": "workspace:*",
+    "@maxsim/hooks": "workspace:*",
+    "@types/node": "^25.3.0"
+  }
+}

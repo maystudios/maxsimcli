@@ -1,0 +1,1 @@
+{"version":3,"file":"codex.d.ts","sourceRoot":"","sources":["../src/codex.ts"],"names":[],"mappings":"AAAA;;;;;;;;GAQG;AAIH,OAAO,KAAK,EAAE,aAAa,EAAE,MAAM,cAAc,CAAC;AAElD,OAAO,EAAE,gCAAgC,EAAE,MAAM,6BAA6B,CAAC;AAC/E,OAAO,EACL,4BAA4B,EAE7B,MAAM,yBAAyB,CAAC;AAkCjC;;;GAGG;AACH,eAAO,MAAM,YAAY,EAAE,aAO1B,CAAC;AAGF,OAAO,EAAE,gCAAgC,EAAE,4BAA4B,EAAE,CAAC"}

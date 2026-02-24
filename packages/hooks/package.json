@@ -1,0 +1,16 @@
+{
+  "name": "@maxsim/hooks",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.cts"
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0"
+  }
+}

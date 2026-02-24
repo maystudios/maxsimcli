@@ -1,0 +1,71 @@
+{
+  "name": "maxsimcli",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "pnpm@10.30.1",
+  "description": "A meta-prompting, context engineering and spec-driven development system for Claude Code, OpenCode, Gemini and Codex by MayStudios.",
+  "bin": {
+    "maxsim": "bin/install.js"
+  },
+  "files": [
+    "bin",
+    "commands",
+    "maxsim",
+    "agents",
+    "hooks/dist",
+    "scripts"
+  ],
+  "keywords": [
+    "claude",
+    "claude-code",
+    "ai",
+    "meta-prompting",
+    "context-engineering",
+    "spec-driven-development",
+    "gemini",
+    "gemini-cli",
+    "codex",
+    "codex-cli"
+  ],
+  "author": "MayStudios",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maystudios/maxsim.git"
+  },
+  "homepage": "https://github.com/maystudios/maxsim",
+  "bugs": {
+    "url": "https://github.com/maystudios/maxsim/issues"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "nx",
+      "@nx/nx-win32-x64-msvc"
+    ]
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@nx/js": "22.5.1",
+    "@nx/vitest": "22.5.1",
+    "@types/node": "^25.3.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "esbuild": "^0.24.0",
+    "nx": "22.5.1",
+    "tsdown": "^0.20.3",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "scripts": {
+    "build:hooks": "node scripts/build-hooks.js",
+    "build": "nx run-many --target=build",
+    "prepublishOnly": "npm run build:hooks",
+    "test": "nx run-many --target=test",
+    "e2e": "node scripts/e2e-test.cjs",
+    "e2e:publish": "node scripts/e2e-test.cjs --bump-and-publish",
+    "release": "nx release && pnpm publish --filter maxsimcli --no-git-checks"
+  }
+}
