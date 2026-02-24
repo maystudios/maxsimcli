@@ -80,6 +80,22 @@ else {
         selectedRuntimes.push('codex');
 }
 /**
+ * Walk up from cwd to find the MAXSIM monorepo root (has packages/dashboard)
+ */
+function findMonorepoRoot(startDir) {
+    let dir = startDir;
+    for (let i = 0; i < 10; i++) {
+        if (fs.existsSync(path.join(dir, 'packages', 'dashboard', 'server.ts'))) {
+            return dir;
+        }
+        const parent = path.dirname(dir);
+        if (parent === dir)
+            break;
+        dir = parent;
+    }
+    return null;
+}
+/**
  * Adapter registry keyed by runtime name
  */
 const adapterMap = {
@@ -111,6 +127,22 @@ function getConfigDirFromHome(runtime, isGlobal) {
  */
 function getDirName(runtime) {
     return getAdapter(runtime).dirName;
+}
+/**
+ * Recursively copy a directory (plain copy, no path replacement)
+ */
+function copyDirRecursive(src, dest) {
+    fs.mkdirSync(dest, { recursive: true });
+    for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+        const srcPath = path.join(src, entry.name);
+        const destPath = path.join(dest, entry.name);
+        if (entry.isDirectory()) {
+            copyDirRecursive(srcPath, destPath);
+        }
+        else {
+            fs.copyFileSync(srcPath, destPath);
+        }
+    }
 }
 /**
  * Get the global config directory for OpenCode (for JSONC permissions)
@@ -155,7 +187,13 @@ function parseConfigDirArg() {
 }
 const explicitConfigDir = parseConfigDirArg();
 const hasHelp = args.includes('--help') || args.includes('-h');
+const hasVersion = args.includes('--version');
 const forceStatusline = args.includes('--force-statusline');
+// Show version if requested (before banner for clean output)
+if (hasVersion) {
+    console.log(pkg.version);
+    process.exit(0);
+}
 console.log(banner);
 // Show help if requested
 if (hasHelp) {
@@ -1191,6 +1229,23 @@ function install(isGlobal, runtime = 'claude') {
             }
         }
     }
+    // Copy dashboard standalone build (if bundled in dist/assets/dashboard/)
+    const dashboardSrc = path.resolve(__dirname, 'assets', 'dashboard');
+    if (fs.existsSync(dashboardSrc)) {
+        spinner = (0, ora_1.default)({ text: 'Installing dashboard...', color: 'cyan' }).start();
+        const dashboardDest = path.join(targetDir, 'dashboard');
+        copyDirRecursive(dashboardSrc, dashboardDest);
+        // Write dashboard.json NEXT TO dashboard/ dir (survives overwrites on upgrade)
+        const dashboardConfigDest = path.join(targetDir, 'dashboard.json');
+        const projectCwd = isGlobal ? targetDir : process.cwd();
+        fs.writeFileSync(dashboardConfigDest, JSON.stringify({ projectCwd }, null, 2) + '\n');
+        if (fs.existsSync(path.join(dashboardDest, 'server.js'))) {
+            spinner.succeed(chalk_1.default.green('✓') + ' Installed dashboard');
+        }
+        else {
+            spinner.succeed(chalk_1.default.green('✓') + ' Installed dashboard (server.js not found in bundle)');
+        }
+    }
     if (failures.length > 0) {
         console.error(`\n  ${chalk_1.default.yellow('Installation incomplete!')} Failed: ${failures.join(', ')}`);
         process.exit(1);
@@ -1407,7 +1462,118 @@ async function installAllRuntimes(runtimes, isGlobal, isInteractive) {
     }
 }
 // Main logic
+// Subcommand routing — intercept before install flow
+const subcommand = args.find(a => !a.startsWith('-'));
 (async () => {
+    // Dashboard subcommand
+    if (subcommand === 'dashboard') {
+        const { spawn: spawnDash } = await import('node:child_process');
+        // Always refresh dashboard from bundled assets before launching.
+        // This ensures users get the latest version (fixes broken ESM builds, etc.)
+        const dashboardAssetSrc = path.resolve(__dirname, 'assets', 'dashboard');
+        const installDir = path.join(process.cwd(), '.claude');
+        const installDashDir = path.join(installDir, 'dashboard');
+        if (fs.existsSync(dashboardAssetSrc)) {
+            fs.mkdirSync(installDashDir, { recursive: true });
+            copyDirRecursive(dashboardAssetSrc, installDashDir);
+            // Write/update dashboard.json
+            const dashConfigPath = path.join(installDir, 'dashboard.json');
+            if (!fs.existsSync(dashConfigPath)) {
+                fs.writeFileSync(dashConfigPath, JSON.stringify({ projectCwd: process.cwd() }, null, 2) + '\n');
+            }
+        }
+        // Resolve server path: local project first, then global
+        const localDashboard = path.join(process.cwd(), '.claude', 'dashboard', 'server.js');
+        const globalDashboard = path.join(os.homedir(), '.claude', 'dashboard', 'server.js');
+        let serverPath = null;
+        if (fs.existsSync(localDashboard)) {
+            serverPath = localDashboard;
+        }
+        else if (fs.existsSync(globalDashboard)) {
+            serverPath = globalDashboard;
+        }
+        if (!serverPath) {
+            console.log(chalk_1.default.yellow('\n  Dashboard not available.\n'));
+            console.log('  Install MAXSIM first: ' + chalk_1.default.cyan('npx maxsimcli@latest') + '\n');
+            process.exit(0);
+        }
+        // Read projectCwd from dashboard.json (one level up from dashboard/ dir)
+        const dashboardDir = path.dirname(serverPath);
+        const dashboardConfigPath = path.join(path.dirname(dashboardDir), 'dashboard.json');
+        let projectCwd = process.cwd();
+        if (fs.existsSync(dashboardConfigPath)) {
+            try {
+                const config = JSON.parse(fs.readFileSync(dashboardConfigPath, 'utf8'));
+                if (config.projectCwd) {
+                    projectCwd = config.projectCwd;
+                }
+            }
+            catch {
+                // Use default cwd
+            }
+        }
+        console.log(chalk_1.default.blue('Starting dashboard...'));
+        console.log(chalk_1.default.gray(`  Project: ${projectCwd}`));
+        console.log(chalk_1.default.gray(`  Server:  ${serverPath}\n`));
+        const child = spawnDash('node', [serverPath], {
+            cwd: dashboardDir,
+            detached: true,
+            stdio: ['ignore', 'ignore', 'pipe'],
+            env: {
+                ...process.env,
+                MAXSIM_PROJECT_CWD: projectCwd,
+                NODE_ENV: 'production',
+            },
+            ...(process.platform === 'win32' ? { shell: true } : {}),
+        });
+        // Collect stderr briefly to detect startup failures
+        let stderrData = '';
+        if (child.stderr) {
+            child.stderr.setEncoding('utf8');
+            child.stderr.on('data', (chunk) => { stderrData += chunk; });
+        }
+        // Wait for server to start or fail
+        const started = await new Promise((resolve) => {
+            child.on('error', () => resolve(false));
+            child.on('exit', (code) => {
+                if (code !== null && code !== 0)
+                    resolve(false);
+            });
+            setTimeout(async () => {
+                // Check health
+                try {
+                    const controller = new AbortController();
+                    const timer = setTimeout(() => controller.abort(), 2000);
+                    const res = await fetch('http://localhost:3333/api/health', { signal: controller.signal });
+                    clearTimeout(timer);
+                    resolve(res.ok);
+                }
+                catch {
+                    resolve(false);
+                }
+            }, 3000);
+        });
+        if (started) {
+            child.unref();
+            if (child.stderr)
+                child.stderr.destroy();
+            console.log(chalk_1.default.green('  Dashboard ready at http://localhost:3333'));
+        }
+        else {
+            // Show error info if server failed
+            if (stderrData.trim()) {
+                console.log(chalk_1.default.red('\n  Dashboard failed to start:\n'));
+                console.log(chalk_1.default.gray('  ' + stderrData.trim().split('\n').join('\n  ')));
+            }
+            else {
+                console.log(chalk_1.default.yellow('\n  Dashboard did not respond. Check if port 3333 is available.'));
+            }
+            child.unref();
+            if (child.stderr)
+                child.stderr.destroy();
+        }
+        process.exit(0);
+    }
     if (hasGlobal && hasLocal) {
         console.error(chalk_1.default.yellow('Cannot specify both --global and --local'));
         process.exit(1);

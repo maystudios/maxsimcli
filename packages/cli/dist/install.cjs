@@ -6485,7 +6485,7 @@ var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 var require_package = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"name": "maxsimcli",
-		"version": "1.1.2",
+		"version": "1.2.3",
 		"private": false,
 		"description": "A meta-prompting, context engineering and spec-driven development system for Claude Code, OpenCode, Gemini and Codex by MayStudios.",
 		"bin": { "maxsimcli": "dist/install.cjs" },
@@ -6592,6 +6592,18 @@ function getDirName(runtime) {
 	return getAdapter(runtime).dirName;
 }
 /**
+* Recursively copy a directory (plain copy, no path replacement)
+*/
+function copyDirRecursive(src, dest) {
+	node_fs.mkdirSync(dest, { recursive: true });
+	for (const entry of node_fs.readdirSync(src, { withFileTypes: true })) {
+		const srcPath = node_path.join(src, entry.name);
+		const destPath = node_path.join(dest, entry.name);
+		if (entry.isDirectory()) copyDirRecursive(srcPath, destPath);
+		else node_fs.copyFileSync(srcPath, destPath);
+	}
+}
+/**
 * Get the global config directory for OpenCode (for JSONC permissions)
 * OpenCode follows XDG Base Directory spec
 */
@@ -6622,7 +6634,12 @@ function parseConfigDirArg() {
 }
 const explicitConfigDir = parseConfigDirArg();
 const hasHelp = args.includes("--help") || args.includes("-h");
+const hasVersion = args.includes("--version");
 const forceStatusline = args.includes("--force-statusline");
+if (hasVersion) {
+	console.log(pkg.version);
+	process.exit(0);
+}
 console.log(banner);
 if (hasHelp) {
 	console.log(`  ${chalk.yellow("Usage:")} npx maxsimcli [options]\n\n  ${chalk.yellow("Options:")}\n    ${chalk.cyan("-g, --global")}              Install globally (to config directory)\n    ${chalk.cyan("-l, --local")}               Install locally (to current directory)\n    ${chalk.cyan("--claude")}                  Install for Claude Code only\n    ${chalk.cyan("--opencode")}                Install for OpenCode only\n    ${chalk.cyan("--gemini")}                  Install for Gemini only\n    ${chalk.cyan("--codex")}                   Install for Codex only\n    ${chalk.cyan("--all")}                     Install for all runtimes\n    ${chalk.cyan("-u, --uninstall")}           Uninstall MAXSIM (remove all MAXSIM files)\n    ${chalk.cyan("-c, --config-dir <path>")}   Specify custom config directory\n    ${chalk.cyan("-h, --help")}                Show this help message\n    ${chalk.cyan("--force-statusline")}        Replace existing statusline config\n\n  ${chalk.yellow("Examples:")}\n    ${chalk.dim("# Interactive install (prompts for runtime and location)")}\n    npx maxsimcli\n\n    ${chalk.dim("# Install for Claude Code globally")}\n    npx maxsimcli --claude --global\n\n    ${chalk.dim("# Install for Gemini globally")}\n    npx maxsimcli --gemini --global\n\n    ${chalk.dim("# Install for Codex globally")}\n    npx maxsimcli --codex --global\n\n    ${chalk.dim("# Install for all runtimes globally")}\n    npx maxsimcli --all --global\n\n    ${chalk.dim("# Install to custom config directory")}\n    npx maxsimcli --codex --global --config-dir ~/.codex-work\n\n    ${chalk.dim("# Install to current project only")}\n    npx maxsimcli --claude --local\n\n    ${chalk.dim("# Uninstall MAXSIM from Codex globally")}\n    npx maxsimcli --codex --global --uninstall\n\n  ${chalk.yellow("Notes:")}\n    The --config-dir option is useful when you have multiple configurations.\n    It takes priority over CLAUDE_CONFIG_DIR / GEMINI_CONFIG_DIR / CODEX_HOME environment variables.\n`);
@@ -7371,6 +7388,20 @@ function install(isGlobal, runtime = "claude") {
 			}
 		}
 	}
+	const dashboardSrc = node_path.resolve(__dirname, "assets", "dashboard");
+	if (node_fs.existsSync(dashboardSrc)) {
+		spinner = ora({
+			text: "Installing dashboard...",
+			color: "cyan"
+		}).start();
+		const dashboardDest = node_path.join(targetDir, "dashboard");
+		copyDirRecursive(dashboardSrc, dashboardDest);
+		const dashboardConfigDest = node_path.join(targetDir, "dashboard.json");
+		const projectCwd = isGlobal ? targetDir : process.cwd();
+		node_fs.writeFileSync(dashboardConfigDest, JSON.stringify({ projectCwd }, null, 2) + "\n");
+		if (node_fs.existsSync(node_path.join(dashboardDest, "server.js"))) spinner.succeed(chalk.green("✓") + " Installed dashboard");
+		else spinner.succeed(chalk.green("✓") + " Installed dashboard (server.js not found in bundle)");
+	}
 	if (failures.length > 0) {
 		console.error(`\n  ${chalk.yellow("Installation incomplete!")} Failed: ${failures.join(", ")}`);
 		process.exit(1);
@@ -7548,7 +7579,91 @@ async function installAllRuntimes(runtimes, isGlobal, isInteractive) {
 		finishInstall(result.settingsPath, result.settings, result.statuslineCommand, useStatusline, result.runtime, isGlobal);
 	}
 }
+const subcommand = args.find((a) => !a.startsWith("-"));
 (async () => {
+	if (subcommand === "dashboard") {
+		const { spawn: spawnDash } = await import("node:child_process");
+		const dashboardAssetSrc = node_path.resolve(__dirname, "assets", "dashboard");
+		const installDir = node_path.join(process.cwd(), ".claude");
+		const installDashDir = node_path.join(installDir, "dashboard");
+		if (node_fs.existsSync(dashboardAssetSrc)) {
+			node_fs.mkdirSync(installDashDir, { recursive: true });
+			copyDirRecursive(dashboardAssetSrc, installDashDir);
+			const dashConfigPath = node_path.join(installDir, "dashboard.json");
+			if (!node_fs.existsSync(dashConfigPath)) node_fs.writeFileSync(dashConfigPath, JSON.stringify({ projectCwd: process.cwd() }, null, 2) + "\n");
+		}
+		const localDashboard = node_path.join(process.cwd(), ".claude", "dashboard", "server.js");
+		const globalDashboard = node_path.join(node_os.homedir(), ".claude", "dashboard", "server.js");
+		let serverPath = null;
+		if (node_fs.existsSync(localDashboard)) serverPath = localDashboard;
+		else if (node_fs.existsSync(globalDashboard)) serverPath = globalDashboard;
+		if (!serverPath) {
+			console.log(chalk.yellow("\n  Dashboard not available.\n"));
+			console.log("  Install MAXSIM first: " + chalk.cyan("npx maxsimcli@latest") + "\n");
+			process.exit(0);
+		}
+		const dashboardDir = node_path.dirname(serverPath);
+		const dashboardConfigPath = node_path.join(node_path.dirname(dashboardDir), "dashboard.json");
+		let projectCwd = process.cwd();
+		if (node_fs.existsSync(dashboardConfigPath)) try {
+			const config = JSON.parse(node_fs.readFileSync(dashboardConfigPath, "utf8"));
+			if (config.projectCwd) projectCwd = config.projectCwd;
+		} catch {}
+		console.log(chalk.blue("Starting dashboard..."));
+		console.log(chalk.gray(`  Project: ${projectCwd}`));
+		console.log(chalk.gray(`  Server:  ${serverPath}\n`));
+		const child = spawnDash("node", [serverPath], {
+			cwd: dashboardDir,
+			detached: true,
+			stdio: [
+				"ignore",
+				"ignore",
+				"pipe"
+			],
+			env: {
+				...process.env,
+				MAXSIM_PROJECT_CWD: projectCwd,
+				NODE_ENV: "production"
+			},
+			...process.platform === "win32" ? { shell: true } : {}
+		});
+		let stderrData = "";
+		if (child.stderr) {
+			child.stderr.setEncoding("utf8");
+			child.stderr.on("data", (chunk) => {
+				stderrData += chunk;
+			});
+		}
+		if (await new Promise((resolve) => {
+			child.on("error", () => resolve(false));
+			child.on("exit", (code) => {
+				if (code !== null && code !== 0) resolve(false);
+			});
+			setTimeout(async () => {
+				try {
+					const controller = new AbortController();
+					const timer = setTimeout(() => controller.abort(), 2e3);
+					const res = await fetch("http://localhost:3333/api/health", { signal: controller.signal });
+					clearTimeout(timer);
+					resolve(res.ok);
+				} catch {
+					resolve(false);
+				}
+			}, 3e3);
+		})) {
+			child.unref();
+			if (child.stderr) child.stderr.destroy();
+			console.log(chalk.green("  Dashboard ready at http://localhost:3333"));
+		} else {
+			if (stderrData.trim()) {
+				console.log(chalk.red("\n  Dashboard failed to start:\n"));
+				console.log(chalk.gray("  " + stderrData.trim().split("\n").join("\n  ")));
+			} else console.log(chalk.yellow("\n  Dashboard did not respond. Check if port 3333 is available."));
+			child.unref();
+			if (child.stderr) child.stderr.destroy();
+		}
+		process.exit(0);
+	}
 	if (hasGlobal && hasLocal) {
 		console.error(chalk.yellow("Cannot specify both --global and --local"));
 		process.exit(1);

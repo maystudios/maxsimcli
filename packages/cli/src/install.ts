@@ -183,7 +183,14 @@ function parseConfigDirArg(): string | null {
 }
 const explicitConfigDir = parseConfigDirArg();
 const hasHelp = args.includes('--help') || args.includes('-h');
+const hasVersion = args.includes('--version');
 const forceStatusline = args.includes('--force-statusline');
+
+// Show version if requested (before banner for clean output)
+if (hasVersion) {
+  console.log(pkg.version);
+  process.exit(0);
+}
 
 console.log(banner);
 
