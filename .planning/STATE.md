@@ -150,6 +150,9 @@ Recent decisions affecting current work:
 - [Phase 13-04]: useDashboardData uses useState+useEffect (not SWR/react-query) to keep dependencies minimal
 - [Phase 13-04]: Roadmap API data mapped from snake_case to DashboardPhase camelCase in page.tsx, not in the hook
 - [Phase 13-04]: @codemirror/view added as dependency to fix pre-existing build error in plan-editor.tsx
+- [Phase 13-05]: Checkbox toggle modifies raw Markdown <done> tag content with [x] prefix rather than external state tracking
+- [Phase 13-05]: PlanEditor uses fixed overlay (inset-0 z-50) for near-full-screen editing experience
+- [Phase 13-05]: usePhaseDetail re-fetches on WebSocket lastChange signal for real-time reactivity without polling
 
 ### Roadmap Evolution
 
@@ -173,5 +176,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 13-04-PLAN.md (dashboard main view with stats header and phase overview)
-Resume file: .planning/phases/13-live-project-dashboard/13-04-SUMMARY.md
+Stopped at: Completed 13-05-PLAN.md (phase detail view with plan editor and task checkboxes)
+Resume file: .planning/phases/13-live-project-dashboard/13-05-SUMMARY.md
