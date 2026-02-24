@@ -67,6 +67,56 @@ if (fs.existsSync(changelogSrc)) {
   console.log(`  [assets] Copied CHANGELOG.md -> dist/assets/`);
 }
 
+/**
+ * Hoist pnpm flat-store packages to top-level node_modules entries.
+ *
+ * pnpm stores packages at node_modules/.pnpm/<name>@<ver>/node_modules/<pkg>/
+ * with top-level symlinks (node_modules/<pkg> -> .pnpm/.../node_modules/<pkg>).
+ * Next.js standalone traces only real files from .pnpm/ but omits the symlinks,
+ * breaking require() resolution. This function recreates the top-level entries
+ * by copying from .pnpm/ into node_modules/<pkg>.
+ */
+function hoistPnpmPackages(nodeModulesDir) {
+  const pnpmDir = path.join(nodeModulesDir, '.pnpm');
+  if (!fs.existsSync(pnpmDir)) return;
+
+  let hoisted = 0;
+  for (const storeEntry of fs.readdirSync(pnpmDir)) {
+    const innerNM = path.join(pnpmDir, storeEntry, 'node_modules');
+    if (!fs.existsSync(innerNM)) continue;
+
+    for (const pkg of fs.readdirSync(innerNM)) {
+      // Skip the .pnpm virtual store link
+      if (pkg === '.pnpm') continue;
+
+      const pkgSrc = path.join(innerNM, pkg);
+      const pkgDest = path.join(nodeModulesDir, pkg);
+
+      // Skip if already exists at top level (first match wins, like pnpm hoisting)
+      if (fs.existsSync(pkgDest)) continue;
+
+      // Handle scoped packages: entry is @scope, contains actual package dirs
+      if (pkg.startsWith('@') && fs.statSync(pkgSrc).isDirectory()) {
+        for (const scopedPkg of fs.readdirSync(pkgSrc)) {
+          const scopedSrc = path.join(pkgSrc, scopedPkg);
+          const scopedDest = path.join(pkgDest, scopedPkg);
+          if (!fs.existsSync(scopedDest) && fs.statSync(scopedSrc).isDirectory()) {
+            fs.cpSync(scopedSrc, scopedDest, { recursive: true });
+            hoisted++;
+          }
+        }
+      } else if (fs.statSync(pkgSrc).isDirectory()) {
+        fs.cpSync(pkgSrc, pkgDest, { recursive: true });
+        hoisted++;
+      }
+    }
+  }
+
+  if (hoisted > 0) {
+    console.log(`  [assets] Hoisted ${hoisted} packages from .pnpm/ to top-level node_modules/`);
+  }
+}
+
 // 4. Copy dashboard standalone build into dist/assets/dashboard
 const dashboardStandalone = path.join(monorepoRoot, 'packages', 'dashboard', '.next', 'standalone');
 const dashboardStatic = path.join(monorepoRoot, 'packages', 'dashboard', '.next', 'static');
@@ -78,6 +128,12 @@ if (fs.existsSync(dashboardStandalone)) {
   // that the simple copyDir function cannot handle (EISDIR on symlinked dirs)
   fs.cpSync(dashboardStandalone, dashboardDest, { recursive: true, dereference: true });
   console.log(`  [assets] Copied standalone build -> dist/assets/dashboard/`);
+
+  // Hoist pnpm flat store packages to top-level node_modules entries.
+  // Next.js standalone traces files from .pnpm/ but does NOT recreate pnpm's
+  // top-level symlinks (e.g. node_modules/next -> .pnpm/next@.../node_modules/next).
+  // Without hoisting, require("next") fails with MODULE_NOT_FOUND.
+  hoistPnpmPackages(path.join(dashboardDest, 'node_modules'));
 
   // Copy static assets into the standalone .next/static (required by Next.js)
   if (fs.existsSync(dashboardStatic)) {

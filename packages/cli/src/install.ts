@@ -1808,9 +1808,24 @@ const subcommand = args.find(a => !a.startsWith('-'));
   if (subcommand === 'dashboard') {
     const { spawn: spawnDash } = await import('node:child_process');
 
-    // Strategy 1: Check installed standalone build (local project)
+    // Always refresh dashboard from bundled assets before launching.
+    // This ensures users get the latest version (fixes broken ESM builds, etc.)
+    const dashboardAssetSrc = path.resolve(__dirname, 'assets', 'dashboard');
+    const installDir = path.join(process.cwd(), '.claude');
+    const installDashDir = path.join(installDir, 'dashboard');
+
+    if (fs.existsSync(dashboardAssetSrc)) {
+      fs.mkdirSync(installDashDir, { recursive: true });
+      copyDirRecursive(dashboardAssetSrc, installDashDir);
+      // Write/update dashboard.json
+      const dashConfigPath = path.join(installDir, 'dashboard.json');
+      if (!fs.existsSync(dashConfigPath)) {
+        fs.writeFileSync(dashConfigPath, JSON.stringify({ projectCwd: process.cwd() }, null, 2) + '\n');
+      }
+    }
+
+    // Resolve server path: local project first, then global
     const localDashboard = path.join(process.cwd(), '.claude', 'dashboard', 'server.js');
-    // Strategy 2: Check installed standalone build (global)
     const globalDashboard = path.join(os.homedir(), '.claude', 'dashboard', 'server.js');
 
     let serverPath: string | null = null;
@@ -1818,27 +1833,6 @@ const subcommand = args.find(a => !a.startsWith('-'));
       serverPath = localDashboard;
     } else if (fs.existsSync(globalDashboard)) {
       serverPath = globalDashboard;
-    }
-
-    // Auto-install if not found: copy from dist/assets/dashboard/ then launch
-    if (!serverPath) {
-      const dashboardAssetSrc = path.resolve(__dirname, 'assets', 'dashboard');
-      if (fs.existsSync(dashboardAssetSrc)) {
-        console.log(chalk.blue('Dashboard not installed. Installing now...'));
-        // Default to local install
-        const autoInstallDir = path.join(process.cwd(), '.claude');
-        const autoInstallDashDir = path.join(autoInstallDir, 'dashboard');
-        fs.mkdirSync(autoInstallDashDir, { recursive: true });
-        copyDirRecursive(dashboardAssetSrc, autoInstallDashDir);
-        // Write dashboard.json
-        const dashConfigPath = path.join(autoInstallDir, 'dashboard.json');
-        fs.writeFileSync(dashConfigPath, JSON.stringify({ projectCwd: process.cwd() }, null, 2) + '\n');
-        console.log(chalk.green('  Dashboard installed to .claude/dashboard/'));
-
-        if (fs.existsSync(path.join(autoInstallDashDir, 'server.js'))) {
-          serverPath = path.join(autoInstallDashDir, 'server.js');
-        }
-      }
     }
 
     if (!serverPath) {
@@ -1869,7 +1863,7 @@ const subcommand = args.find(a => !a.startsWith('-'));
     const child = spawnDash('node', [serverPath], {
       cwd: dashboardDir,
       detached: true,
-      stdio: 'ignore',
+      stdio: ['ignore', 'ignore', 'pipe'],
       env: {
         ...process.env,
         MAXSIM_PROJECT_CWD: projectCwd,
@@ -1877,9 +1871,49 @@ const subcommand = args.find(a => !a.startsWith('-'));
       },
       ...(process.platform === 'win32' ? { shell: true } : {}),
     });
-    child.unref();
 
-    console.log(chalk.green('  Dashboard starting at http://localhost:3333'));
+    // Collect stderr briefly to detect startup failures
+    let stderrData = '';
+    if (child.stderr) {
+      child.stderr.setEncoding('utf8');
+      child.stderr.on('data', (chunk: string) => { stderrData += chunk; });
+    }
+
+    // Wait for server to start or fail
+    const started = await new Promise<boolean>((resolve) => {
+      child.on('error', () => resolve(false));
+      child.on('exit', (code) => {
+        if (code !== null && code !== 0) resolve(false);
+      });
+      setTimeout(async () => {
+        // Check health
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 2000);
+          const res = await fetch('http://localhost:3333/api/health', { signal: controller.signal });
+          clearTimeout(timer);
+          resolve(res.ok);
+        } catch {
+          resolve(false);
+        }
+      }, 3000);
+    });
+
+    if (started) {
+      child.unref();
+      if (child.stderr) child.stderr.destroy();
+      console.log(chalk.green('  Dashboard ready at http://localhost:3333'));
+    } else {
+      // Show error info if server failed
+      if (stderrData.trim()) {
+        console.log(chalk.red('\n  Dashboard failed to start:\n'));
+        console.log(chalk.gray('  ' + stderrData.trim().split('\n').join('\n  ')));
+      } else {
+        console.log(chalk.yellow('\n  Dashboard did not respond. Check if port 3333 is available.'));
+      }
+      child.unref();
+      if (child.stderr) child.stderr.destroy();
+    }
     process.exit(0);
   }
 
