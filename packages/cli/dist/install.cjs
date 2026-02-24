@@ -6483,7 +6483,7 @@ var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 var require_package = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"name": "maxsimcli",
-		"version": "1.0.6",
+		"version": "1.0.8",
 		"private": false,
 		"description": "A meta-prompting, context engineering and spec-driven development system for Claude Code, OpenCode, Gemini and Codex by MayStudios.",
 		"bin": { "maxsimcli": "dist/install.cjs" },
@@ -7325,6 +7325,17 @@ function install(isGlobal, runtime = "claude") {
 		const pkgJsonDest = node_path.join(targetDir, "package.json");
 		node_fs.writeFileSync(pkgJsonDest, "{\"type\":\"commonjs\"}\n");
 		console.log(`  ${chalk.green("✓")} Wrote package.json (CommonJS mode)`);
+		const toolSrc = node_path.resolve(__dirname, "cli.cjs");
+		const binDir = node_path.join(targetDir, "maxsim", "bin");
+		const toolDest = node_path.join(binDir, "maxsim-tools.cjs");
+		if (node_fs.existsSync(toolSrc)) {
+			node_fs.mkdirSync(binDir, { recursive: true });
+			node_fs.copyFileSync(toolSrc, toolDest);
+			console.log(`  ${chalk.green("✓")} Installed maxsim-tools.cjs`);
+		} else {
+			console.warn(`  ${chalk.yellow("!")} cli.cjs not found at ${toolSrc} — maxsim-tools.cjs not installed`);
+			failures.push("maxsim-tools.cjs");
+		}
 		let hooksSrc = null;
 		const bundledHooksDir = node_path.resolve(__dirname, "assets", "hooks");
 		if (node_fs.existsSync(bundledHooksDir)) hooksSrc = bundledHooksDir;

@@ -15,9 +15,9 @@ const __dirname = path.dirname(__filename);
 
 /**
  * Absolute path to maxsim-tools.cjs entry point.
- * Three levels up from packages/core/tests/ to repo root.
+ * Uses the compiled cli.cjs from the cli package dist.
  */
-export const TOOLS_PATH = path.resolve(__dirname, '..', '..', '..', 'maxsim', 'bin', 'maxsim-tools.cjs');
+export const TOOLS_PATH = path.resolve(__dirname, '..', '..', 'cli', 'dist', 'cli.cjs');
 
 export interface RunResult {
   success: boolean;

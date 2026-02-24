@@ -1400,6 +1400,19 @@ function install(
       `  ${chalk.green('\u2713')} Wrote package.json (CommonJS mode)`,
     );
 
+    // Install maxsim-tools.cjs binary — workflows call `node ~/.claude/maxsim/bin/maxsim-tools.cjs`
+    const toolSrc = path.resolve(__dirname, 'cli.cjs');
+    const binDir = path.join(targetDir, 'maxsim', 'bin');
+    const toolDest = path.join(binDir, 'maxsim-tools.cjs');
+    if (fs.existsSync(toolSrc)) {
+      fs.mkdirSync(binDir, { recursive: true });
+      fs.copyFileSync(toolSrc, toolDest);
+      console.log(`  ${chalk.green('\u2713')} Installed maxsim-tools.cjs`);
+    } else {
+      console.warn(`  ${chalk.yellow('!')} cli.cjs not found at ${toolSrc} — maxsim-tools.cjs not installed`);
+      failures.push('maxsim-tools.cjs');
+    }
+
     // Copy hooks from bundled assets directory (copied from @maxsim/hooks/dist at build time)
     let hooksSrc: string | null = null;
     const bundledHooksDir = path.resolve(__dirname, 'assets', 'hooks');

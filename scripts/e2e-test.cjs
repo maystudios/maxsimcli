@@ -94,6 +94,14 @@ function checkFiles(configDir) {
     detail: !agentsExist ? 'directory missing' : agentsCount === 0 ? 'empty directory' : `${agentsCount} files`,
   });
 
+  // maxsim/bin/maxsim-tools.cjs — CLI binary that workflows call via `node ~/.claude/maxsim/bin/maxsim-tools.cjs`
+  const toolBin = path.join(configDir, 'maxsim', 'bin', 'maxsim-tools.cjs');
+  checks.push({
+    label: 'maxsim/bin/maxsim-tools.cjs',
+    passed: fs.existsSync(toolBin),
+    detail: fs.existsSync(toolBin) ? 'present' : 'file missing — workflows will fail with "Cannot find module"',
+  });
+
   // hooks/ — directory with at least 1 .js file (install.ts renames .cjs -> .js)
   const hooksDir = path.join(configDir, 'hooks');
   const hooksExist = fs.existsSync(hooksDir);
