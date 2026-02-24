@@ -140,31 +140,29 @@ Loop **discuss → plan → execute → verify** until done. Archive the milesto
 |---------|-------------|
 | `npx maxsimcli dashboard` | Launch the live project dashboard |
 
-The dashboard is a real-time web UI that shows your project's progress as you work. It also auto-launches during `/maxsim:execute-phase`.
-
-**Start the dashboard:**
+MAXSIM includes a real-time web dashboard that shows phase progress, open tasks, blockers,
+and allows inline plan editing.
 
 ```bash
-# From your project directory
 npx maxsimcli dashboard
 ```
 
-If you're developing MAXSIM locally:
+The dashboard auto-detects a free port starting from 3333 and opens your browser.
+It watches `.planning/` for changes and updates in real-time via WebSocket.
 
-```bash
-# From the monorepo root — point at your project
-MAXSIM_PROJECT_CWD=/path/to/your/project pnpm --filter @maxsim/dashboard dev
-```
-
-The dashboard auto-detects a free port (starting at 3333) and opens in your browser.
+- **Auto-installed** during `npx maxsimcli@latest` -- no separate setup needed
+- **Works with both global and local installs**
+- **Auto-opens browser** on launch
+- **Detects running instances** -- won't start a duplicate server
+- **Auto-launches** during `/maxsim:execute-phase`
 
 **Features:**
-- Real-time updates via WebSocket — edit a `.planning/` file and the dashboard refreshes instantly
+- Real-time updates via WebSocket -- edit a `.planning/` file and the dashboard refreshes instantly
 - Phase overview with animated progress bars and milestone stats
 - Phase drill-down with plan tasks and toggleable checkboxes
 - Inline CodeMirror Markdown editor for plan files (Ctrl+S to save)
-- Todos panel — create, complete, and manage todos
-- Blockers panel — view and resolve blockers from STATE.md
+- Todos panel -- create, complete, and manage todos
+- Blockers panel -- view and resolve blockers from STATE.md
 - Swiss Style Design dark theme
 
 ### Phase Management
