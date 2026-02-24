@@ -198,7 +198,7 @@ Phases execute in dependency order: 1 → 2 → 3 → 4 → 5, with Phase 6 exec
 | 11. Remove Discord command and deploy website via GitHub Pages | 2/2 | Complete | 2026-02-24 |
 | 12. UX Polish + Core Hardening | 1/3 | In Progress | - |
 | 13. Live Project Dashboard | 8/8 | Complete   | 2026-02-24 |
-| 14. Dashboard npm Delivery | 3/3 | Complete | 2026-02-24 |
+| 14. Dashboard npm Delivery | 3/3 | Complete    | 2026-02-24 |
 
 ### Phase 10: CLI UX — chalk, ora spinners, @inquirer/prompts
 
