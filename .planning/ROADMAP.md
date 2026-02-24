@@ -24,6 +24,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 10: CLI UX — chalk, ora spinners, @inquirer/prompts** - Replace raw ANSI codes with chalk, add ora spinners, replace readline prompts with @inquirer/prompts (completed 2026-02-24)
 - [ ] **Phase 11: Remove Discord command and deploy website via GitHub Pages** - Remove `/maxsim:join-discord` from shipped command set, set up GitHub Actions deploy workflow for GitHub Pages
 - [x] **Phase 12: UX Polish + Core Hardening** - ASCII progress bars in `/maxsim:progress`, new `/maxsim:roadmap` read command, sanity check guard at workflow start, centralized `getPhasePattern()` helper, atomic ROADMAP.md writes, and zero silent `catch {}` blocks in `packages/core/src/` (completed 2026-02-24)
+- [ ] **Phase 13: Live Project Dashboard** - Real-time web dashboard (Swiss Style Design + Aceternity UI) showing current phase, progress bars, open tasks, and inline plan editing — launchable alongside MAXSIM
 
 ## Phase Details
 
@@ -195,6 +196,7 @@ Phases execute in dependency order: 1 → 2 → 3 → 4 → 5, with Phase 6 exec
 | 10. CLI UX — chalk, ora, @inquirer/prompts | 2/2 | Complete | 2026-02-24 |
 | 11. Remove Discord command and deploy website via GitHub Pages | 2/2 | Complete | 2026-02-24 |
 | 12. UX Polish + Core Hardening | 1/3 | In Progress | - |
+| 13. Live Project Dashboard | 0/8 | Not started | - |
 
 ### Phase 10: CLI UX — chalk, ora spinners, @inquirer/prompts
 
@@ -252,3 +254,29 @@ Plans:
 - [ ] 12-01-PLAN.md — Add `getPhasePattern()` to core.ts; replace all inline phase regex in phase.ts, roadmap.ts, verify.ts; atomic write helper; fix silent catch blocks; build green
 - [ ] 12-02-PLAN.md — Update `/maxsim:progress` workflow to render ASCII progress bars; add `/maxsim:roadmap` command file; add sanity check guard to execute/plan workflows
 - [ ] 12-03-PLAN.md — Integration validation — nx build clean, run tests, verify progress/roadmap commands render correctly
+
+### Phase 13: Live Project Dashboard
+
+**Goal:** A real-time web dashboard that can be launched alongside MAXSIM (e.g. via `maxsim dashboard` or auto-started during phase execution). It displays the current phase, per-phase progress bars, completion percentages, open tasks/blockers, and allows basic inline plan editing — all styled with Swiss Style Design principles using Aceternity UI animated components.
+**Requirements**: TBD (internal quality — no formal requirement IDs)
+**Depends on:** Phase 12
+**Plans:** 8 plans
+
+**Success Criteria** (what must be TRUE):
+  1. `packages/dashboard` is a buildable Next.js 15 App Router application registered as an NX project
+  2. Dashboard launches via `maxsim dashboard` CLI command and auto-detects free port from 3333
+  3. Real-time file watching via chokidar + WebSocket pushes updates to browser within sub-second latency
+  4. Phase overview shows all phases with animated progress bars, status icons, and current phase highlight
+  5. Phase drill-down shows plan tasks with toggleable checkboxes and CodeMirror Markdown editor
+  6. Sidebar navigation provides access to phase list, todos panel, and blockers panel
+  7. Swiss Style Design: dark theme, mono+sans typography, data-dense, mission control aesthetic
+
+Plans:
+- [ ] 13-01-PLAN.md — Scaffold packages/dashboard NX package with Next.js 15, Tailwind v4, Aceternity UI, and all dependencies
+- [ ] 13-02-PLAN.md — Custom server with WebSocket integration, chokidar file watcher, and React WebSocket provider
+- [ ] 13-03-PLAN.md — Data layer: lib/parsers.ts wrappers around @maxsim/core + 7 API route handlers
+- [ ] 13-04-PLAN.md — Dashboard main view: stats header with milestone progress and phase overview with animated progress bars
+- [ ] 13-05-PLAN.md — Phase drill-down: plan cards with task checkboxes and CodeMirror Markdown editor
+- [ ] 13-06-PLAN.md — Sidebar navigation, todos panel, blockers panel, and STATE.md editing
+- [ ] 13-07-PLAN.md — CLI integration: maxsim dashboard command with subprocess launch and health check
+- [ ] 13-08-PLAN.md — Integration validation and visual polish with human verification
