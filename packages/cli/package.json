@@ -40,6 +40,7 @@
     "@inquirer/prompts": "^8.3.0",
     "@maxsim/adapters": "workspace:*",
     "@maxsim/core": "workspace:*",
+    "@maxsim/dashboard": "workspace:*",
     "@maxsim/hooks": "workspace:*",
     "@maxsim/templates": "workspace:*",
     "@types/figlet": "^1.7.0",

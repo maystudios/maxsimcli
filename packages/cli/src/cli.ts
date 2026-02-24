@@ -12,6 +12,8 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { spawn, execSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 
 import type { TimestampFormat } from '@maxsim/core';
 
@@ -556,9 +558,187 @@ async function main(): Promise<void> {
       break;
     }
 
+    case 'dashboard': {
+      await handleDashboard(args.slice(1));
+      break;
+    }
+
     default:
       error(`Unknown command: ${command}`);
   }
+}
+
+/**
+ * Dashboard launch command.
+ *
+ * Spawns the dashboard as a detached subprocess with MAXSIM_PROJECT_CWD set.
+ * If the dashboard is already running (detected via /api/health), prints the URL.
+ * Supports --stop to kill a running instance.
+ */
+async function handleDashboard(args: string[]): Promise<void> {
+  const DEFAULT_PORT = 3333;
+  const PORT_RANGE_END = 3343;
+  const HEALTH_TIMEOUT_MS = 1500;
+
+  // Handle --stop flag
+  if (args.includes('--stop')) {
+    for (let port = DEFAULT_PORT; port <= PORT_RANGE_END; port++) {
+      const running = await checkHealth(port, HEALTH_TIMEOUT_MS);
+      if (running) {
+        console.log(`Dashboard found on port ${port} — sending shutdown...`);
+        // Try to reach a shutdown endpoint, or just inform user
+        console.log(`Dashboard at http://localhost:${port} is running.`);
+        console.log(`To stop it, close the browser tab or kill the process on port ${port}.`);
+        // On Windows: netstat -ano | findstr :PORT, then taskkill /PID
+        // On Unix: lsof -i :PORT | awk 'NR>1 {print $2}' | xargs kill
+        try {
+          if (process.platform === 'win32') {
+            const result = execSync(`netstat -ano | findstr :${port} | findstr LISTENING`, { encoding: 'utf-8' }).trim();
+            const lines = result.split('\n');
+            const pids = new Set<string>();
+            for (const line of lines) {
+              const parts = line.trim().split(/\s+/);
+              const pid = parts[parts.length - 1];
+              if (pid && pid !== '0') pids.add(pid);
+            }
+            for (const pid of pids) {
+              try {
+                execSync(`taskkill /PID ${pid} /F`, { stdio: 'ignore' });
+                console.log(`Killed process ${pid}`);
+              } catch {
+                // Process may have already exited
+              }
+            }
+          } else {
+            execSync(`lsof -i :${port} -t | xargs kill -SIGTERM 2>/dev/null`, { stdio: 'ignore' });
+          }
+          console.log('Dashboard stopped.');
+        } catch {
+          console.log('Could not automatically stop the dashboard. Kill the process manually.');
+        }
+        return;
+      }
+    }
+    console.log('No running dashboard found.');
+    return;
+  }
+
+  // Check if dashboard is already running
+  for (let port = DEFAULT_PORT; port <= PORT_RANGE_END; port++) {
+    const running = await checkHealth(port, HEALTH_TIMEOUT_MS);
+    if (running) {
+      console.log(`Dashboard already running at http://localhost:${port}`);
+      return;
+    }
+  }
+
+  // Resolve the dashboard server entry point
+  const serverPath = resolveDashboardServer();
+  if (!serverPath) {
+    console.error('Could not find @maxsim/dashboard server entry point.');
+    console.error('Ensure @maxsim/dashboard is installed and built.');
+    process.exit(1);
+  }
+
+  // Determine runner: if .ts file, use tsx; if .js file, use node
+  const isTsFile = serverPath.endsWith('.ts');
+  const runner = isTsFile ? 'node' : 'node';
+  const runnerArgs: string[] = isTsFile ? ['--import', 'tsx', serverPath] : [serverPath];
+
+  console.log('Dashboard starting...');
+
+  const child = spawn(runner, runnerArgs, {
+    cwd: process.cwd(),
+    detached: true,
+    stdio: 'ignore',
+    env: {
+      ...process.env,
+      MAXSIM_PROJECT_CWD: process.cwd(),
+      NODE_ENV: isTsFile ? 'development' : 'production',
+    },
+    // On Windows, use shell to ensure detached works correctly
+    ...(process.platform === 'win32' ? { shell: true } : {}),
+  });
+
+  child.unref();
+
+  // Wait briefly for the server to start, then check health
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+
+  for (let port = DEFAULT_PORT; port <= PORT_RANGE_END; port++) {
+    const running = await checkHealth(port, HEALTH_TIMEOUT_MS);
+    if (running) {
+      console.log(`Dashboard ready at http://localhost:${port}`);
+      return;
+    }
+  }
+
+  console.log(`Dashboard spawned (PID ${child.pid}). It may take a moment to start.`);
+  console.log(`Check http://localhost:${DEFAULT_PORT} once ready.`);
+}
+
+/**
+ * Check if a dashboard health endpoint is responding on the given port.
+ */
+async function checkHealth(port: number, timeoutMs: number): Promise<boolean> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const res = await fetch(`http://localhost:${port}/api/health`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    if (res.ok) {
+      const data = await res.json() as { status?: string };
+      return data.status === 'ok';
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Resolve the dashboard server entry point path.
+ * Tries: built server.js first, then source server.ts for dev mode.
+ */
+function resolveDashboardServer(): string | null {
+  // Strategy 1: Resolve from @maxsim/dashboard package
+  try {
+    const require_ = createRequire(import.meta.url);
+    const pkgPath = require_.resolve('@maxsim/dashboard/package.json');
+    const pkgDir = path.dirname(pkgPath);
+
+    // Prefer built server.js for production
+    const serverJs = path.join(pkgDir, 'server.js');
+    if (fs.existsSync(serverJs)) return serverJs;
+
+    // Fall back to source server.ts for dev (requires tsx)
+    const serverTs = path.join(pkgDir, 'server.ts');
+    if (fs.existsSync(serverTs)) return serverTs;
+  } catch {
+    // @maxsim/dashboard not resolvable
+  }
+
+  // Strategy 2: Walk up from this file to find the monorepo root
+  try {
+    let dir = path.dirname(new URL(import.meta.url).pathname);
+    // On Windows, remove leading / from /C:/...
+    if (process.platform === 'win32' && dir.startsWith('/')) {
+      dir = dir.slice(1);
+    }
+    for (let i = 0; i < 5; i++) {
+      const candidate = path.join(dir, 'packages', 'dashboard', 'server.ts');
+      if (fs.existsSync(candidate)) return candidate;
+      const candidateJs = path.join(dir, 'packages', 'dashboard', 'server.js');
+      if (fs.existsSync(candidateJs)) return candidateJs;
+      dir = path.dirname(dir);
+    }
+  } catch {
+    // Fallback walk failed
+  }
+
+  return null;
 }
 
 main();
