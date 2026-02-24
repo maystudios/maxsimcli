@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 13 of 13 (Live Project Dashboard) — IN PROGRESS
-Plan: 7 of 8 in current phase
-Status: Plan 13-07 complete — CLI integration and dashboard auto-launch
-Last activity: 2026-02-24 — dashboard CLI command, health endpoint, build pipeline, workflow auto-launch
+Plan: 8 of 8 in current phase
+Status: Plan 13-06 complete — sidebar navigation, todos panel, blockers panel, state editor
+Last activity: 2026-02-24 — sidebar nav, app shell layout, todos CRUD, blockers resolve, state editor
 
 Progress: [████████░░] 87%
 
@@ -75,6 +75,7 @@ Progress: [████████░░] 87%
 | Phase 13 P04 | 3min | 2 tasks | 6 files |
 | Phase 13 P05 | 3min | 2 tasks | 5 files |
 | Phase 13 P07 | 6min | 4 tasks | 6 files |
+| Phase 13 P06 | 4min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -158,6 +159,10 @@ Recent decisions affecting current work:
 - [Phase 13-05]: Checkbox toggle modifies raw Markdown <done> tag content with [x] prefix rather than external state tracking
 - [Phase 13-05]: PlanEditor uses fixed overlay (inset-0 z-50) for near-full-screen editing experience
 - [Phase 13-05]: usePhaseDetail re-fetches on WebSocket lastChange signal for real-time reactivity without polling
+- [Phase 13-06]: View routing via React state (activeView/activePhaseId) rather than Next.js router for SPA-like navigation
+- [Phase 13-06]: Sidebar hidden below md breakpoint for responsive design without hamburger menu complexity
+- [Phase 13-06]: StateEditor embedded within BlockersPanel as collapsible section rather than separate route
+- [Phase 13-06]: TodosPanel fetches independently from useDashboardData to allow granular WebSocket-driven refresh
 
 ### Roadmap Evolution
 
@@ -181,5 +186,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 13-07-PLAN.md (CLI integration and dashboard auto-launch)
-Resume file: .planning/phases/13-live-project-dashboard/13-07-SUMMARY.md
+Stopped at: Completed 13-06-PLAN.md (sidebar navigation, todos panel, blockers panel, state editor)
+Resume file: .planning/phases/13-live-project-dashboard/13-06-SUMMARY.md

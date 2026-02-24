@@ -196,7 +196,7 @@ Phases execute in dependency order: 1 → 2 → 3 → 4 → 5, with Phase 6 exec
 | 10. CLI UX — chalk, ora, @inquirer/prompts | 2/2 | Complete | 2026-02-24 |
 | 11. Remove Discord command and deploy website via GitHub Pages | 2/2 | Complete | 2026-02-24 |
 | 12. UX Polish + Core Hardening | 1/3 | In Progress | - |
-| 13. Live Project Dashboard | 6/8 | In Progress|  |
+| 13. Live Project Dashboard | 7/8 | In Progress|  |
 
 ### Phase 10: CLI UX — chalk, ora spinners, @inquirer/prompts
 
@@ -260,7 +260,7 @@ Plans:
 **Goal:** A real-time web dashboard that can be launched alongside MAXSIM (e.g. via `maxsim dashboard` or auto-started during phase execution). It displays the current phase, per-phase progress bars, completion percentages, open tasks/blockers, and allows basic inline plan editing — all styled with Swiss Style Design principles using Aceternity UI animated components.
 **Requirements**: TBD (internal quality — no formal requirement IDs)
 **Depends on:** Phase 12
-**Plans:** 6/8 plans executed
+**Plans:** 7/8 plans executed
 
 **Success Criteria** (what must be TRUE):
   1. `packages/dashboard` is a buildable Next.js 15 App Router application registered as an NX project
