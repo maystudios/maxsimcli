@@ -13,6 +13,11 @@ commands.html
 # NX cache and workspace data
 .nx/
 
+# Next.js build output
+.next/
+next-env.d.ts
+*.tsbuildinfo
+
 # Temp files
 tmp/
 
