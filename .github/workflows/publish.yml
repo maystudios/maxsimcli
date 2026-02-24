@@ -35,34 +35,34 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Version bump (nx release)
+        id: release
+        run: |
+          # nx release analyzes conventional commits since last tag,
+          # bumps version in package.json, updates CHANGELOG, commits and tags.
+          # fix: → patch, feat: → minor, feat!:/fix!: → major
+          npx nx release --skip-publish 2>&1
+          echo "version=$(node -p "require('./packages/cli/package.json').version")" >> $GITHUB_OUTPUT
+
       - name: Build
         run: pnpm run build
 
-      - name: Release
+      - name: Push release commit and tag
+        run: git push --follow-tags
+
+      - name: Check if already published
+        id: check
         run: |
-          # Only bump version if there are existing git tags (not initial release)
-          if git tag -l | grep -q .; then
-            npx nx release --skip-publish 2>&1 || true
-          fi
-
-          # Get local version
-          VERSION=$(node -p "require('./packages/cli/package.json').version")
-          echo "Local version: $VERSION"
-
-          # Check if already on npm
           NPM_VERSION=$(npm view maxsimcli version 2>/dev/null || echo "none")
-          echo "npm version: $NPM_VERSION"
-
-          if [ "$VERSION" = "$NPM_VERSION" ]; then
-            echo "v$VERSION already published, nothing to do."
-            exit 0
+          echo "npm=$NPM_VERSION local=${{ steps.release.outputs.version }}"
+          if [ "${{ steps.release.outputs.version }}" = "$NPM_VERSION" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
           fi
 
-          # Push commits and tags (if any)
-          git push --follow-tags 2>/dev/null || true
-
-          # Publish
-          pnpm publish --filter maxsimcli --no-git-checks --access public
+      - name: Publish to npm
+        if: steps.check.outputs.skip == 'false'
+        run: pnpm publish --filter maxsimcli --no-git-checks --access public
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
