@@ -1,3 +1,14 @@
+## 1.2.3 (2026-02-24)
+
+### 🩹 Fixes
+
+- **dashboard:** resolve standalone server startup failures ([10c3c31](https://github.com/maystudios/maxsim/commit/10c3c31))
+
+### ❤️ Thank You
+
+- Claude Sonnet 4.6
+- Sven
+
 ## 1.2.2 (2026-02-24)
 
 ### 🩹 Fixes
