@@ -1673,54 +1673,35 @@ async function promptRuntime(): Promise<RuntimeName[]> {
 /**
  * Prompt for install location
  */
-function promptLocation(runtimes: RuntimeName[]): void {
+async function promptLocation(runtimes: RuntimeName[]): Promise<boolean> {
   if (!process.stdin.isTTY) {
     console.log(
-      `  ${chalk.yellow('Non-interactive terminal detected, defaulting to global install')}\n`,
+      chalk.yellow('Non-interactive terminal detected, defaulting to global install') + '\n',
     );
-    installAllRuntimes(runtimes, true, false);
-    return;
+    return true; // isGlobal
   }
 
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  let answered = false;
-
-  rl.on('close', () => {
-    if (!answered) {
-      answered = true;
-      console.log(`\n  ${chalk.yellow('Installation cancelled')}\n`);
-      process.exit(0);
-    }
-  });
-
   const pathExamples = runtimes
-    .map((r) => {
-      const globalPath = getGlobalDir(r, explicitConfigDir);
-      return globalPath.replace(os.homedir(), '~');
-    })
+    .map((r) => getGlobalDir(r, explicitConfigDir).replace(os.homedir(), '~'))
     .join(', ');
 
-  const localExamples = runtimes
-    .map((r) => `./${getDirName(r)}`)
-    .join(', ');
+  const localExamples = runtimes.map((r) => `./${getDirName(r)}`).join(', ');
 
-  console.log(
-    `  ${chalk.yellow('Where would you like to install?')}\n\n  ${chalk.cyan('1')}) Global ${chalk.dim(`(${pathExamples})`)} - available in all projects
-  ${chalk.cyan('2')}) Local  ${chalk.dim(`(${localExamples})`)} - this project only
-`,
-  );
-
-  rl.question(`  Choice ${chalk.dim('[1]')}: `, (answer: string) => {
-    answered = true;
-    rl.close();
-    const choice = answer.trim() || '1';
-    const isGlobal = choice !== '2';
-    installAllRuntimes(runtimes, isGlobal, true);
+  const choice = await select<'global' | 'local'>({
+    message: 'Where would you like to install?',
+    choices: [
+      {
+        name: 'Global  ' + chalk.dim(`(${pathExamples})`) + '  — available in all projects',
+        value: 'global',
+      },
+      {
+        name: 'Local   ' + chalk.dim(`(${localExamples})`) + '  — this project only',
+        value: 'local',
+      },
+    ],
   });
+
+  return choice === 'global';
 }
 
 /**
