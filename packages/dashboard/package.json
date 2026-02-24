@@ -5,33 +5,35 @@
   "type": "module",
   "scripts": {
     "dev": "node --import tsx server.ts",
-    "build": "next build",
+    "build": "next build && npm run build:server",
+    "build:server": "npx tsdown server.ts --format esm --out-dir .",
     "start": "node server.js"
   },
   "dependencies": {
+    "@codemirror/lang-markdown": "^6",
+    "@codemirror/theme-one-dark": "^6",
+    "@codemirror/view": "6",
     "@maxsim/core": "workspace:*",
+    "@uiw/react-codemirror": "^4",
+    "chokidar": "^4",
+    "clsx": "^2",
+    "detect-port": "^2",
+    "motion": "^12",
     "next": "^15",
+    "open": "^10",
     "react": "^19",
     "react-dom": "^19",
-    "ws": "^8",
-    "chokidar": "^4",
-    "motion": "^12",
-    "clsx": "^2",
     "tailwind-merge": "^3",
-    "detect-port": "^2",
-    "open": "^10",
-    "@uiw/react-codemirror": "^4",
-    "@codemirror/lang-markdown": "^6",
-    "@codemirror/theme-one-dark": "^6"
+    "ws": "^8"
   },
   "devDependencies": {
-    "@types/ws": "^8",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "tailwindcss": "^4",
-    "@tailwindcss/postcss": "^4",
+    "@types/ws": "^8",
     "postcss": "^8",
-    "typescript": "^5",
-    "@types/node": "^22"
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
