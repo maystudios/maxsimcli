@@ -24,7 +24,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 10: CLI UX — chalk, ora spinners, @inquirer/prompts** - Replace raw ANSI codes with chalk, add ora spinners, replace readline prompts with @inquirer/prompts (completed 2026-02-24)
 - [ ] **Phase 11: Remove Discord command and deploy website via GitHub Pages** - Remove `/maxsim:join-discord` from shipped command set, set up GitHub Actions deploy workflow for GitHub Pages
 - [x] **Phase 12: UX Polish + Core Hardening** - ASCII progress bars in `/maxsim:progress`, new `/maxsim:roadmap` read command, sanity check guard at workflow start, centralized `getPhasePattern()` helper, atomic ROADMAP.md writes, and zero silent `catch {}` blocks in `packages/core/src/` (completed 2026-02-24)
-- [x] **Phase 13: Live Project Dashboard** - Real-time web dashboard (Swiss Style Design + Aceternity UI) showing current phase, progress bars, open tasks, and inline plan editing — launchable alongside MAXSIM (completed 2026-02-24)
+- [x] **Phase 13: Live Project Dashboard** - Real-time web dashboard (Swiss Style Design + Aceternity UI) showing current phase, progress bars, open tasks, and inline plan editing — launchable alongside MAXSIM (completed 2026-02-24)
+- [ ] **Phase 14: Dashboard npm Delivery** - Ship dashboard inside maxsimcli npm package via Next.js standalone build, installable and launchable via `npx maxsimcli dashboard`
 
 ## Phase Details
 
@@ -197,6 +198,7 @@ Phases execute in dependency order: 1 → 2 → 3 → 4 → 5, with Phase 6 exec
 | 11. Remove Discord command and deploy website via GitHub Pages | 2/2 | Complete | 2026-02-24 |
 | 12. UX Polish + Core Hardening | 1/3 | In Progress | - |
 | 13. Live Project Dashboard | 8/8 | Complete   | 2026-02-24 |
+| 14. Dashboard npm Delivery | 0/3 | Not started | - |
 
 ### Phase 10: CLI UX — chalk, ora spinners, @inquirer/prompts
 
@@ -280,3 +282,26 @@ Plans:
 - [ ] 13-06-PLAN.md — Sidebar navigation, todos panel, blockers panel, and STATE.md editing
 - [ ] 13-07-PLAN.md — CLI integration: maxsim dashboard command with subprocess launch and health check
 - [ ] 13-08-PLAN.md — Integration validation and visual polish with human verification
+
+### Phase 14: Dashboard npm Delivery
+
+**Goal:** Ship the dashboard as part of the maxsimcli npm package so that `npx maxsimcli dashboard` works for end users after install — no separate packages, no additional setup. Next.js `output: "standalone"` produces a self-contained build bundled into `dist/assets/dashboard/`, copied to `.claude/dashboard/` during install, and launched via `node .claude/dashboard/server.js`.
+**Requirements**: DASH-01 through DASH-09 (internal delivery, mapped to success criteria below)
+**Depends on:** Phase 13
+**Plans:** 3 plans
+
+**Success Criteria** (what must be TRUE):
+  1. [DASH-01] `next.config.mjs` uses `output: "standalone"` for production builds (env-var guard for dev)
+  2. [DASH-02] Custom `server.ts` is bundled into the standalone output (tsdown bundle with ws, chokidar, detect-port, open)
+  3. [DASH-03] `.next/static/` is copied into `.next/standalone/.next/static/` (Next.js requirement)
+  4. [DASH-04] `copy-assets.cjs` copies standalone build to `dist/assets/dashboard/`
+  5. [DASH-05] `install.ts` copies dashboard to `.claude/dashboard/` during local install and writes `dashboard.json` with `projectCwd`
+  6. [DASH-06] `npx maxsimcli dashboard` runs `node .claude/dashboard/server.js` with correct `MAXSIM_PROJECT_CWD`
+  7. [DASH-07] `project.json` (CLI) lists dashboard as implicit dependency so NX builds it first
+  8. [DASH-08] CI `publish.yml` ensures dashboard build completes before CLI build
+  9. [DASH-09] README documents the dashboard launch command
+
+Plans:
+- [ ] 14-01-PLAN.md — Configure Next.js standalone build with env-var guard, tsdown server bundling config, and build:standalone script
+- [ ] 14-02-PLAN.md — Extend copy-assets.cjs for dashboard, add NX implicit dependency, wire install.ts dashboard copy, rework CLI launch
+- [ ] 14-03-PLAN.md — Update CI publish.yml with STANDALONE_BUILD env var, validate tarball, add dashboard section to README
