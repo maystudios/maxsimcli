@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Users run `npx maxsim@latest` and everything works — the monorepo restructure is invisible to end users
-**Current focus:** Phase 11 — Remove Discord command + GitHub Pages deployment
+**Current focus:** Phase 12 complete — milestone 1 complete
 
 ## Current Position
 
-Phase: 11 of 11 (Remove Discord command and deploy website via GitHub Pages)
-Plan: 2 of 2 in current phase
-Status: Phase 11 plan 02 complete
-Last activity: 2026-02-24 — GitHub Pages deployment setup for packages/website
+Phase: 12 of 12 (UX Polish + Core Hardening) — COMPLETE
+Plan: 3 of 3 in current phase
+Status: ALL PHASES COMPLETE — milestone ready for archive
+Last activity: 2026-02-24 — phase 12 integration validation passed, ROADMAP.md updated
 
 Progress: [██████████] 100%
 
@@ -67,6 +67,8 @@ Progress: [██████████] 100%
 | Phase 10 P01 | 10min | 3 tasks | 3 files |
 | Phase 10 P02 | 20min | 7 tasks | 1 files |
 | Phase 11 P02 | 1min | 2 tasks | 3 files |
+| Phase 12 P02 | 3min | 4 tasks | 12 files |
+| Phase 12 P03 | 4min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -128,6 +130,10 @@ Recent decisions affecting current work:
 - [10-02]: ora .start()/.succeed()/.fail() are synchronous — install() function stays synchronous
 - [11-02]: CNAME placed in public/ — Vite copies public/ contents to dist/ root automatically during build
 - [11-02]: Two-job workflow (build + deploy) required by actions/deploy-pages pattern; deploy job needs needs: build dependency
+- [12-02]: chalk added to packages/core dependencies (not devDependencies) — used at runtime in cmdProgressRender output
+- [12-02]: phase-bars branch inserted between bar and JSON else branches for clean fallthrough ordering
+- [12-02]: sanity_check inserted before <purpose> tag as first content in each workflow file
+- [12-03]: init.ts and milestone.ts comment-only catches missed by 12-01 scope; fixed during integration validation
 
 ### Roadmap Evolution
 
@@ -135,6 +141,7 @@ Recent decisions affecting current work:
 - Phase 10 added: Wir wollen auf eine richtige CLI Ui beim install und etc. wechseln mithilfe von chalk, ora (Spinner) und @inquirer/prompts
 - Phase 11 added: Remove join-discord command; deploy packages/website to GitHub Pages via GitHub Actions
 - Phase 11 added: Remove Discord command and deploy website via GitHub Actions to GitHub Pages
+- Phase 12 added: UX Polish + Core Hardening
 
 ### Pending Todos
 
@@ -149,5 +156,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 11-02-PLAN.md (GitHub Pages deployment: project.json + CNAME + deploy-website.yml)
-Resume file: .planning/phases/11-remove-discord-command-github-pages-deploy/11-02-SUMMARY.md
+Stopped at: Completed 12-03-PLAN.md (integration validation — builds green, phase-bars verified, roadmap files confirmed, catch blocks cleaned up)
+Resume file: .planning/phases/12-ux-polish-core-hardening/12-03-SUMMARY.md

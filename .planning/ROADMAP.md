@@ -20,6 +20,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Test Migration** - Port all 8 test files from node:test to Vitest 4 with correct timeout and coverage config (completed 2026-02-23)
 - [ ] **Phase 7: Wire Hooks into CLI Package** - Add @maxsim/hooks to CLI dependencies/bundledDependencies, fix hooksSrc resolution, validate tarball includes hooks
 - [x] **Phase 8: Fix commands/maxsim/ Path Resolution** - Restructure packages/templates/commands/ to include maxsim/ subdirectory, fixing install.ts ENOENT crash for all runtimes (completed 2026-02-24)
+- [x] **Phase 9: End-to-end install and publish test loop** - Self-contained e2e test script with auto-bump-publish-retry loop (completed 2026-02-24)
+- [x] **Phase 10: CLI UX — chalk, ora spinners, @inquirer/prompts** - Replace raw ANSI codes with chalk, add ora spinners, replace readline prompts with @inquirer/prompts (completed 2026-02-24)
+- [ ] **Phase 11: Remove Discord command and deploy website via GitHub Pages** - Remove `/maxsim:join-discord` from shipped command set, set up GitHub Actions deploy workflow for GitHub Pages
+- [x] **Phase 12: UX Polish + Core Hardening** - ASCII progress bars in `/maxsim:progress`, new `/maxsim:roadmap` read command, sanity check guard at workflow start, centralized `getPhasePattern()` helper, atomic ROADMAP.md writes, and zero silent `catch {}` blocks in `packages/core/src/` (completed 2026-02-24)
 
 ## Phase Details
 
@@ -175,7 +179,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in dependency order: 1 → 2 → 3 → 4 → 5, with Phase 6 executable after Phase 2 completes. Phases 3 and 4 are independent of each other and can run in any order after Phase 2.
+Phases execute in dependency order: 1 → 2 → 3 → 4 → 5, with Phase 6 executable after Phase 2 completes. Phases 3 and 4 are independent of each other and can run in any order after Phase 2. Phases 7–12 execute sequentially in dependency order.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -189,7 +193,8 @@ Phases execute in dependency order: 1 → 2 → 3 → 4 → 5, with Phase 6 exec
 | 8. Fix commands/maxsim/ Path Resolution | 1/1 | Complete   | 2026-02-24 |
 | 9. End-to-end install and publish test loop | 2/2 | Complete   | 2026-02-24 |
 | 10. CLI UX — chalk, ora, @inquirer/prompts | 2/2 | Complete | 2026-02-24 |
-| 11. Remove Discord command and deploy website via GitHub Pages | 0/2 | Not started | - |
+| 11. Remove Discord command and deploy website via GitHub Pages | 2/2 | Complete | 2026-02-24 |
+| 12. UX Polish + Core Hardening | 1/3 | In Progress | - |
 
 ### Phase 10: CLI UX — chalk, ora spinners, @inquirer/prompts
 
@@ -227,3 +232,23 @@ Plans:
 Plans:
 - [ ] 11-01-PLAN.md — Remove join-discord.md from templates; update "31" count references in CLAUDE.md, website Docs.tsx, and docs/USER-GUIDE.md; remove from help.md workflow
 - [ ] 11-02-PLAN.md — Add packages/website/project.json NX build target; create CNAME file; create .github/workflows/deploy-website.yml
+
+### Phase 12: UX Polish + Core Hardening
+
+**Goal:** Improve developer-facing UX of the `/maxsim:progress` command (ASCII phase progress bars), add a dedicated `/maxsim:roadmap` read command, add a sanity check guard at workflow start, centralize all phase regex patterns into a single `getPhasePattern()` helper in `packages/core/src/core.ts`, make all ROADMAP.md write operations atomic (build in memory, single write), and eliminate all silent `catch {}` blocks across `packages/core/src/`.
+**Depends on:** Phase 11
+**Requirements:** None new — internal quality and UX improvements
+**Success Criteria** (what must be TRUE):
+  1. `/maxsim:progress` output shows ASCII progress bars per phase (e.g. `[██████░░░░] 60%`)
+  2. `/maxsim:roadmap` command exists and renders ROADMAP.md with status icons in a readable format
+  3. A sanity check runs at the start of execute/plan workflows and warns if `.planning/` is missing or corrupt
+  4. A single `getPhasePattern(phaseNum?: string)` function in `packages/core/src/core.ts` replaces all inline phase regex literals across the codebase
+  5. ROADMAP.md updates in `phase.ts` and `roadmap.ts` use a read-modify-write helper that writes once per operation
+  6. Zero silent `catch {}` blocks remain in `packages/core/src/` — each has either a comment or a `logger.debug()` call
+  7. `nx build core` passes with 0 TypeScript errors
+**Plans:** 3 plans
+
+Plans:
+- [ ] 12-01-PLAN.md — Add `getPhasePattern()` to core.ts; replace all inline phase regex in phase.ts, roadmap.ts, verify.ts; atomic write helper; fix silent catch blocks; build green
+- [ ] 12-02-PLAN.md — Update `/maxsim:progress` workflow to render ASCII progress bars; add `/maxsim:roadmap` command file; add sanity check guard to execute/plan workflows
+- [ ] 12-03-PLAN.md — Integration validation — nx build clean, run tests, verify progress/roadmap commands render correctly

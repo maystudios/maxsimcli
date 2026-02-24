@@ -6,7 +6,21 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __esmMin = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
 var __commonJSMin = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
+var __exportAll = (all, no_symbols) => {
+	let target = {};
+	for (var name in all) {
+		__defProp(target, name, {
+			get: all[name],
+			enumerable: true
+		});
+	}
+	if (!no_symbols) {
+		__defProp(target, Symbol.toStringTag, { value: "Module" });
+	}
+	return target;
+};
 var __copyProps = (to, from, except, desc) => {
 	if (from && typeof from === "object" || typeof from === "function") {
 		for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
@@ -25,12 +39,19 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 	value: mod,
 	enumerable: true
 }) : target, mod));
+var __toCommonJS = (mod) => __hasOwnProp.call(mod, "module.exports") ? mod["module.exports"] : __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 //#endregion
 let node_fs = require("node:fs");
 node_fs = __toESM(node_fs);
 let node_path = require("node:path");
 node_path = __toESM(node_path);
+let node_os = require("node:os");
+node_os = __toESM(node_os);
+let node_process = require("node:process");
+node_process = __toESM(node_process);
+let node_tty = require("node:tty");
+node_tty = __toESM(node_tty);
 
 //#region ../core/dist/types.js
 var require_types = /* @__PURE__ */ __commonJSMin(((exports) => {
@@ -107,6 +128,7 @@ var require_core = /* @__PURE__ */ __commonJSMin(((exports) => {
 	exports.execGit = execGit;
 	exports.normalizePhaseName = normalizePhaseName;
 	exports.comparePhaseNum = comparePhaseNum;
+	exports.getPhasePattern = getPhasePattern;
 	exports.findPhaseInternal = findPhaseInternal;
 	exports.getArchivedPhaseDirs = getArchivedPhaseDirs;
 	exports.getRoadmapPhaseInternal = getRoadmapPhaseInternal;
@@ -329,6 +351,25 @@ var require_core = /* @__PURE__ */ __commonJSMin(((exports) => {
 		}
 		return (pa[3] ? parseFloat(pa[3]) : -1) - (pb[3] ? parseFloat(pb[3]) : -1);
 	}
+	/**
+	* Returns the canonical regex for matching Phase heading lines in ROADMAP.md.
+	*
+	* General form (no escapedPhaseNum):
+	*   Matches: ## Phase 03: Name Here
+	*   Group 1: phase number string (e.g. "03", "3A", "2.1")
+	*   Group 2: phase name string (e.g. "Name Here")
+	*
+	* Specific form (with escapedPhaseNum):
+	*   Matches: ## Phase 03: Name Here
+	*   Group 1: phase name string only
+	*
+	* @param escapedPhaseNum - regex-escaped phase number string to match a specific phase
+	* @param flags - regex flags (default: 'gi')
+	*/
+	function getPhasePattern(escapedPhaseNum, flags = "gi") {
+		if (escapedPhaseNum) return new RegExp(`#{2,4}\\s*Phase\\s+${escapedPhaseNum}:\\s*([^\\n]+)`, flags);
+		return new RegExp(`#{2,4}\\s*Phase\\s+(\\d+[A-Z]?(?:\\.\\d+)?)\\s*:\\s*([^\\n]+)`, flags);
+	}
 	function searchPhaseInDir(baseDir, relBase, normalized) {
 		try {
 			const match = node_fs_1$10.default.readdirSync(baseDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort((a, b) => comparePhaseNum(a, b)).find((d) => d.startsWith(normalized));
@@ -385,7 +426,9 @@ var require_core = /* @__PURE__ */ __commonJSMin(((exports) => {
 					return result;
 				}
 			}
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		return null;
 	}
 	function getArchivedPhaseDirs(cwd) {
@@ -407,7 +450,9 @@ var require_core = /* @__PURE__ */ __commonJSMin(((exports) => {
 					fullPath: node_path_1$10.default.join(archivePath, dir)
 				});
 			}
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		return results;
 	}
 	function getRoadmapPhaseInternal(cwd, phaseNum) {
@@ -416,8 +461,7 @@ var require_core = /* @__PURE__ */ __commonJSMin(((exports) => {
 		if (!node_fs_1$10.default.existsSync(roadmapPath)) return null;
 		try {
 			const content = node_fs_1$10.default.readFileSync(roadmapPath, "utf-8");
-			const escapedPhase = phaseNum.toString().replace(/\./g, "\\.");
-			const phasePattern = new RegExp(`#{2,4}\\s*Phase\\s+${escapedPhase}:\\s*([^\\n]+)`, "i");
+			const phasePattern = getPhasePattern(phaseNum.toString().replace(/\./g, "\\."), "i");
 			const headerMatch = content.match(phasePattern);
 			if (!headerMatch) return null;
 			const phaseName = headerMatch[1].trim();
@@ -968,7 +1012,9 @@ var require_state = /* @__PURE__ */ __commonJSMin(((exports) => {
 		let stateRaw = "";
 		try {
 			stateRaw = node_fs_1$7.default.readFileSync(node_path_1$7.default.join(planningDir, "STATE.md"), "utf-8");
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		const configExists = node_fs_1$7.default.existsSync(node_path_1$7.default.join(planningDir, "config.json"));
 		const roadmapExists = node_fs_1$7.default.existsSync(node_path_1$7.default.join(planningDir, "ROADMAP.md"));
 		const stateExists = stateRaw.length > 0;
@@ -1446,7 +1492,7 @@ var require_roadmap = /* @__PURE__ */ __commonJSMin(((exports) => {
 		try {
 			const content = node_fs_1$6.default.readFileSync(roadmapPath, "utf-8");
 			const escapedPhase = phaseNum.replace(/\./g, "\\.");
-			const phasePattern = new RegExp(`#{2,4}\\s*Phase\\s+${escapedPhase}:\\s*([^\\n]+)`, "i");
+			const phasePattern = (0, core_js_1.getPhasePattern)(escapedPhase, "i");
 			const headerMatch = content.match(phasePattern);
 			if (!headerMatch) {
 				const checklistPattern = new RegExp(`-\\s*\\[[ x]\\]\\s*\\*\\*Phase\\s+${escapedPhase}:\\s*([^*]+)\\*\\*`, "i");
@@ -1501,7 +1547,7 @@ var require_roadmap = /* @__PURE__ */ __commonJSMin(((exports) => {
 		}
 		const content = node_fs_1$6.default.readFileSync(roadmapPath, "utf-8");
 		const phasesDir = node_path_1$6.default.join(cwd, ".planning", "phases");
-		const phasePattern = /#{2,4}\s*Phase\s+(\d+[A-Z]?(?:\.\d+)?)\s*:\s*([^\n]+)/gi;
+		const phasePattern = (0, core_js_1.getPhasePattern)();
 		const phases = [];
 		let match;
 		while ((match = phasePattern.exec(content)) !== null) {
@@ -1536,7 +1582,9 @@ var require_roadmap = /* @__PURE__ */ __commonJSMin(((exports) => {
 					else if (hasContext) diskStatus = "discussed";
 					else diskStatus = "empty";
 				}
-			} catch {}
+			} catch (e) {
+				if (process.env.MAXSIM_DEBUG) console.error(e);
+			}
 			const checkboxPattern = new RegExp(`-\\s*\\[(x| )\\]\\s*.*Phase\\s+${phaseNum.replace(".", "\\.")}`, "i");
 			const checkboxMatch = content.match(checkboxPattern);
 			const roadmapComplete = checkboxMatch ? checkboxMatch[1] === "x" : false;
@@ -1723,9 +1771,13 @@ var require_milestone = /* @__PURE__ */ __commonJSMin(((exports) => {
 					if (fm["one-liner"]) accomplishments.push(String(fm["one-liner"]));
 					const taskMatches = content.match(/##\s*Task\s*\d+/gi) || [];
 					totalTasks += taskMatches.length;
-				} catch {}
+				} catch (e) {
+					if (process.env.MAXSIM_DEBUG) console.error(e);
+				}
 			}
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		if (node_fs_1$5.default.existsSync(roadmapPath)) {
 			const roadmapContent = node_fs_1$5.default.readFileSync(roadmapPath, "utf-8");
 			node_fs_1$5.default.writeFileSync(node_path_1$5.default.join(archiveDir, `${version}-ROADMAP.md`), roadmapContent, "utf-8");
@@ -1757,7 +1809,9 @@ var require_milestone = /* @__PURE__ */ __commonJSMin(((exports) => {
 			const phaseDirNames = node_fs_1$5.default.readdirSync(phasesDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
 			for (const dir of phaseDirNames) node_fs_1$5.default.renameSync(node_path_1$5.default.join(phasesDir, dir), node_path_1$5.default.join(phaseArchiveDir, dir));
 			phasesArchived = phaseDirNames.length > 0;
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		const result = {
 			version,
 			name: milestoneName,
@@ -1777,6 +1831,445 @@ var require_milestone = /* @__PURE__ */ __commonJSMin(((exports) => {
 		};
 		(0, core_js_1.output)(result, raw);
 	}
+}));
+
+//#endregion
+//#region ../../node_modules/.pnpm/chalk@5.6.2/node_modules/chalk/source/vendor/ansi-styles/index.js
+function assembleStyles() {
+	const codes = /* @__PURE__ */ new Map();
+	for (const [groupName, group] of Object.entries(styles$1)) {
+		for (const [styleName, style] of Object.entries(group)) {
+			styles$1[styleName] = {
+				open: `\u001B[${style[0]}m`,
+				close: `\u001B[${style[1]}m`
+			};
+			group[styleName] = styles$1[styleName];
+			codes.set(style[0], style[1]);
+		}
+		Object.defineProperty(styles$1, groupName, {
+			value: group,
+			enumerable: false
+		});
+	}
+	Object.defineProperty(styles$1, "codes", {
+		value: codes,
+		enumerable: false
+	});
+	styles$1.color.close = "\x1B[39m";
+	styles$1.bgColor.close = "\x1B[49m";
+	styles$1.color.ansi = wrapAnsi16();
+	styles$1.color.ansi256 = wrapAnsi256();
+	styles$1.color.ansi16m = wrapAnsi16m();
+	styles$1.bgColor.ansi = wrapAnsi16(ANSI_BACKGROUND_OFFSET);
+	styles$1.bgColor.ansi256 = wrapAnsi256(ANSI_BACKGROUND_OFFSET);
+	styles$1.bgColor.ansi16m = wrapAnsi16m(ANSI_BACKGROUND_OFFSET);
+	Object.defineProperties(styles$1, {
+		rgbToAnsi256: {
+			value(red, green, blue) {
+				if (red === green && green === blue) {
+					if (red < 8) return 16;
+					if (red > 248) return 231;
+					return Math.round((red - 8) / 247 * 24) + 232;
+				}
+				return 16 + 36 * Math.round(red / 255 * 5) + 6 * Math.round(green / 255 * 5) + Math.round(blue / 255 * 5);
+			},
+			enumerable: false
+		},
+		hexToRgb: {
+			value(hex) {
+				const matches = /[a-f\d]{6}|[a-f\d]{3}/i.exec(hex.toString(16));
+				if (!matches) return [
+					0,
+					0,
+					0
+				];
+				let [colorString] = matches;
+				if (colorString.length === 3) colorString = [...colorString].map((character) => character + character).join("");
+				const integer = Number.parseInt(colorString, 16);
+				return [
+					integer >> 16 & 255,
+					integer >> 8 & 255,
+					integer & 255
+				];
+			},
+			enumerable: false
+		},
+		hexToAnsi256: {
+			value: (hex) => styles$1.rgbToAnsi256(...styles$1.hexToRgb(hex)),
+			enumerable: false
+		},
+		ansi256ToAnsi: {
+			value(code) {
+				if (code < 8) return 30 + code;
+				if (code < 16) return 90 + (code - 8);
+				let red;
+				let green;
+				let blue;
+				if (code >= 232) {
+					red = ((code - 232) * 10 + 8) / 255;
+					green = red;
+					blue = red;
+				} else {
+					code -= 16;
+					const remainder = code % 36;
+					red = Math.floor(code / 36) / 5;
+					green = Math.floor(remainder / 6) / 5;
+					blue = remainder % 6 / 5;
+				}
+				const value = Math.max(red, green, blue) * 2;
+				if (value === 0) return 30;
+				let result = 30 + (Math.round(blue) << 2 | Math.round(green) << 1 | Math.round(red));
+				if (value === 2) result += 60;
+				return result;
+			},
+			enumerable: false
+		},
+		rgbToAnsi: {
+			value: (red, green, blue) => styles$1.ansi256ToAnsi(styles$1.rgbToAnsi256(red, green, blue)),
+			enumerable: false
+		},
+		hexToAnsi: {
+			value: (hex) => styles$1.ansi256ToAnsi(styles$1.hexToAnsi256(hex)),
+			enumerable: false
+		}
+	});
+	return styles$1;
+}
+var ANSI_BACKGROUND_OFFSET, wrapAnsi16, wrapAnsi256, wrapAnsi16m, styles$1, modifierNames, foregroundColorNames, backgroundColorNames, colorNames, ansiStyles;
+var init_ansi_styles = __esmMin((() => {
+	ANSI_BACKGROUND_OFFSET = 10;
+	wrapAnsi16 = (offset = 0) => (code) => `\u001B[${code + offset}m`;
+	wrapAnsi256 = (offset = 0) => (code) => `\u001B[${38 + offset};5;${code}m`;
+	wrapAnsi16m = (offset = 0) => (red, green, blue) => `\u001B[${38 + offset};2;${red};${green};${blue}m`;
+	styles$1 = {
+		modifier: {
+			reset: [0, 0],
+			bold: [1, 22],
+			dim: [2, 22],
+			italic: [3, 23],
+			underline: [4, 24],
+			overline: [53, 55],
+			inverse: [7, 27],
+			hidden: [8, 28],
+			strikethrough: [9, 29]
+		},
+		color: {
+			black: [30, 39],
+			red: [31, 39],
+			green: [32, 39],
+			yellow: [33, 39],
+			blue: [34, 39],
+			magenta: [35, 39],
+			cyan: [36, 39],
+			white: [37, 39],
+			blackBright: [90, 39],
+			gray: [90, 39],
+			grey: [90, 39],
+			redBright: [91, 39],
+			greenBright: [92, 39],
+			yellowBright: [93, 39],
+			blueBright: [94, 39],
+			magentaBright: [95, 39],
+			cyanBright: [96, 39],
+			whiteBright: [97, 39]
+		},
+		bgColor: {
+			bgBlack: [40, 49],
+			bgRed: [41, 49],
+			bgGreen: [42, 49],
+			bgYellow: [43, 49],
+			bgBlue: [44, 49],
+			bgMagenta: [45, 49],
+			bgCyan: [46, 49],
+			bgWhite: [47, 49],
+			bgBlackBright: [100, 49],
+			bgGray: [100, 49],
+			bgGrey: [100, 49],
+			bgRedBright: [101, 49],
+			bgGreenBright: [102, 49],
+			bgYellowBright: [103, 49],
+			bgBlueBright: [104, 49],
+			bgMagentaBright: [105, 49],
+			bgCyanBright: [106, 49],
+			bgWhiteBright: [107, 49]
+		}
+	};
+	modifierNames = Object.keys(styles$1.modifier);
+	foregroundColorNames = Object.keys(styles$1.color);
+	backgroundColorNames = Object.keys(styles$1.bgColor);
+	colorNames = [...foregroundColorNames, ...backgroundColorNames];
+	ansiStyles = assembleStyles();
+}));
+
+//#endregion
+//#region ../../node_modules/.pnpm/chalk@5.6.2/node_modules/chalk/source/vendor/supports-color/index.js
+function hasFlag(flag, argv = globalThis.Deno ? globalThis.Deno.args : node_process.default.argv) {
+	const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
+	const position = argv.indexOf(prefix + flag);
+	const terminatorPosition = argv.indexOf("--");
+	return position !== -1 && (terminatorPosition === -1 || position < terminatorPosition);
+}
+function envForceColor() {
+	if ("FORCE_COLOR" in env) {
+		if (env.FORCE_COLOR === "true") return 1;
+		if (env.FORCE_COLOR === "false") return 0;
+		return env.FORCE_COLOR.length === 0 ? 1 : Math.min(Number.parseInt(env.FORCE_COLOR, 10), 3);
+	}
+}
+function translateLevel(level) {
+	if (level === 0) return false;
+	return {
+		level,
+		hasBasic: true,
+		has256: level >= 2,
+		has16m: level >= 3
+	};
+}
+function _supportsColor(haveStream, { streamIsTTY, sniffFlags = true } = {}) {
+	const noFlagForceColor = envForceColor();
+	if (noFlagForceColor !== void 0) flagForceColor = noFlagForceColor;
+	const forceColor = sniffFlags ? flagForceColor : noFlagForceColor;
+	if (forceColor === 0) return 0;
+	if (sniffFlags) {
+		if (hasFlag("color=16m") || hasFlag("color=full") || hasFlag("color=truecolor")) return 3;
+		if (hasFlag("color=256")) return 2;
+	}
+	if ("TF_BUILD" in env && "AGENT_NAME" in env) return 1;
+	if (haveStream && !streamIsTTY && forceColor === void 0) return 0;
+	const min = forceColor || 0;
+	if (env.TERM === "dumb") return min;
+	if (node_process.default.platform === "win32") {
+		const osRelease = node_os.default.release().split(".");
+		if (Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) return Number(osRelease[2]) >= 14931 ? 3 : 2;
+		return 1;
+	}
+	if ("CI" in env) {
+		if ([
+			"GITHUB_ACTIONS",
+			"GITEA_ACTIONS",
+			"CIRCLECI"
+		].some((key) => key in env)) return 3;
+		if ([
+			"TRAVIS",
+			"APPVEYOR",
+			"GITLAB_CI",
+			"BUILDKITE",
+			"DRONE"
+		].some((sign) => sign in env) || env.CI_NAME === "codeship") return 1;
+		return min;
+	}
+	if ("TEAMCITY_VERSION" in env) return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0;
+	if (env.COLORTERM === "truecolor") return 3;
+	if (env.TERM === "xterm-kitty") return 3;
+	if (env.TERM === "xterm-ghostty") return 3;
+	if (env.TERM === "wezterm") return 3;
+	if ("TERM_PROGRAM" in env) {
+		const version = Number.parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
+		switch (env.TERM_PROGRAM) {
+			case "iTerm.app": return version >= 3 ? 3 : 2;
+			case "Apple_Terminal": return 2;
+		}
+	}
+	if (/-256(color)?$/i.test(env.TERM)) return 2;
+	if (/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) return 1;
+	if ("COLORTERM" in env) return 1;
+	return min;
+}
+function createSupportsColor(stream, options = {}) {
+	return translateLevel(_supportsColor(stream, {
+		streamIsTTY: stream && stream.isTTY,
+		...options
+	}));
+}
+var env, flagForceColor, supportsColor;
+var init_supports_color = __esmMin((() => {
+	({env} = node_process.default);
+	;
+	if (hasFlag("no-color") || hasFlag("no-colors") || hasFlag("color=false") || hasFlag("color=never")) flagForceColor = 0;
+	else if (hasFlag("color") || hasFlag("colors") || hasFlag("color=true") || hasFlag("color=always")) flagForceColor = 1;
+	supportsColor = {
+		stdout: createSupportsColor({ isTTY: node_tty.default.isatty(1) }),
+		stderr: createSupportsColor({ isTTY: node_tty.default.isatty(2) })
+	};
+}));
+
+//#endregion
+//#region ../../node_modules/.pnpm/chalk@5.6.2/node_modules/chalk/source/utilities.js
+function stringReplaceAll(string, substring, replacer) {
+	let index = string.indexOf(substring);
+	if (index === -1) return string;
+	const substringLength = substring.length;
+	let endIndex = 0;
+	let returnValue = "";
+	do {
+		returnValue += string.slice(endIndex, index) + substring + replacer;
+		endIndex = index + substringLength;
+		index = string.indexOf(substring, endIndex);
+	} while (index !== -1);
+	returnValue += string.slice(endIndex);
+	return returnValue;
+}
+function stringEncaseCRLFWithFirstIndex(string, prefix, postfix, index) {
+	let endIndex = 0;
+	let returnValue = "";
+	do {
+		const gotCR = string[index - 1] === "\r";
+		returnValue += string.slice(endIndex, gotCR ? index - 1 : index) + prefix + (gotCR ? "\r\n" : "\n") + postfix;
+		endIndex = index + 1;
+		index = string.indexOf("\n", endIndex);
+	} while (index !== -1);
+	returnValue += string.slice(endIndex);
+	return returnValue;
+}
+var init_utilities = __esmMin((() => {}));
+
+//#endregion
+//#region ../../node_modules/.pnpm/chalk@5.6.2/node_modules/chalk/source/index.js
+var source_exports = /* @__PURE__ */ __exportAll({
+	Chalk: () => Chalk,
+	backgroundColorNames: () => backgroundColorNames,
+	backgroundColors: () => backgroundColorNames,
+	chalkStderr: () => chalkStderr,
+	colorNames: () => colorNames,
+	colors: () => colorNames,
+	default: () => chalk,
+	foregroundColorNames: () => foregroundColorNames,
+	foregroundColors: () => foregroundColorNames,
+	modifierNames: () => modifierNames,
+	modifiers: () => modifierNames,
+	supportsColor: () => stdoutColor,
+	supportsColorStderr: () => stderrColor
+});
+function createChalk(options) {
+	return chalkFactory(options);
+}
+var stdoutColor, stderrColor, GENERATOR, STYLER, IS_EMPTY, levelMapping, styles, applyOptions, Chalk, chalkFactory, getModelAnsi, proto, createStyler, createBuilder, applyStyle, chalk, chalkStderr;
+var init_source = __esmMin((() => {
+	init_ansi_styles();
+	init_supports_color();
+	init_utilities();
+	({stdout: stdoutColor, stderr: stderrColor} = supportsColor);
+	GENERATOR = Symbol("GENERATOR");
+	STYLER = Symbol("STYLER");
+	IS_EMPTY = Symbol("IS_EMPTY");
+	levelMapping = [
+		"ansi",
+		"ansi",
+		"ansi256",
+		"ansi16m"
+	];
+	styles = Object.create(null);
+	applyOptions = (object, options = {}) => {
+		if (options.level && !(Number.isInteger(options.level) && options.level >= 0 && options.level <= 3)) throw new Error("The `level` option should be an integer from 0 to 3");
+		const colorLevel = stdoutColor ? stdoutColor.level : 0;
+		object.level = options.level === void 0 ? colorLevel : options.level;
+	};
+	Chalk = class {
+		constructor(options) {
+			return chalkFactory(options);
+		}
+	};
+	chalkFactory = (options) => {
+		const chalk = (...strings) => strings.join(" ");
+		applyOptions(chalk, options);
+		Object.setPrototypeOf(chalk, createChalk.prototype);
+		return chalk;
+	};
+	Object.setPrototypeOf(createChalk.prototype, Function.prototype);
+	for (const [styleName, style] of Object.entries(ansiStyles)) styles[styleName] = { get() {
+		const builder = createBuilder(this, createStyler(style.open, style.close, this[STYLER]), this[IS_EMPTY]);
+		Object.defineProperty(this, styleName, { value: builder });
+		return builder;
+	} };
+	styles.visible = { get() {
+		const builder = createBuilder(this, this[STYLER], true);
+		Object.defineProperty(this, "visible", { value: builder });
+		return builder;
+	} };
+	getModelAnsi = (model, level, type, ...arguments_) => {
+		if (model === "rgb") {
+			if (level === "ansi16m") return ansiStyles[type].ansi16m(...arguments_);
+			if (level === "ansi256") return ansiStyles[type].ansi256(ansiStyles.rgbToAnsi256(...arguments_));
+			return ansiStyles[type].ansi(ansiStyles.rgbToAnsi(...arguments_));
+		}
+		if (model === "hex") return getModelAnsi("rgb", level, type, ...ansiStyles.hexToRgb(...arguments_));
+		return ansiStyles[type][model](...arguments_);
+	};
+	for (const model of [
+		"rgb",
+		"hex",
+		"ansi256"
+	]) {
+		styles[model] = { get() {
+			const { level } = this;
+			return function(...arguments_) {
+				const styler = createStyler(getModelAnsi(model, levelMapping[level], "color", ...arguments_), ansiStyles.color.close, this[STYLER]);
+				return createBuilder(this, styler, this[IS_EMPTY]);
+			};
+		} };
+		const bgModel = "bg" + model[0].toUpperCase() + model.slice(1);
+		styles[bgModel] = { get() {
+			const { level } = this;
+			return function(...arguments_) {
+				const styler = createStyler(getModelAnsi(model, levelMapping[level], "bgColor", ...arguments_), ansiStyles.bgColor.close, this[STYLER]);
+				return createBuilder(this, styler, this[IS_EMPTY]);
+			};
+		} };
+	}
+	proto = Object.defineProperties(() => {}, {
+		...styles,
+		level: {
+			enumerable: true,
+			get() {
+				return this[GENERATOR].level;
+			},
+			set(level) {
+				this[GENERATOR].level = level;
+			}
+		}
+	});
+	createStyler = (open, close, parent) => {
+		let openAll;
+		let closeAll;
+		if (parent === void 0) {
+			openAll = open;
+			closeAll = close;
+		} else {
+			openAll = parent.openAll + open;
+			closeAll = close + parent.closeAll;
+		}
+		return {
+			open,
+			close,
+			openAll,
+			closeAll,
+			parent
+		};
+	};
+	createBuilder = (self, _styler, _isEmpty) => {
+		const builder = (...arguments_) => applyStyle(builder, arguments_.length === 1 ? "" + arguments_[0] : arguments_.join(" "));
+		Object.setPrototypeOf(builder, proto);
+		builder[GENERATOR] = self;
+		builder[STYLER] = _styler;
+		builder[IS_EMPTY] = _isEmpty;
+		return builder;
+	};
+	applyStyle = (self, string) => {
+		if (self.level <= 0 || !string) return self[IS_EMPTY] ? "" : string;
+		let styler = self[STYLER];
+		if (styler === void 0) return string;
+		const { openAll, closeAll } = styler;
+		if (string.includes("\x1B")) while (styler !== void 0) {
+			string = stringReplaceAll(string, styler.close, styler.open);
+			styler = styler.parent;
+		}
+		const lfIndex = string.indexOf("\n");
+		if (lfIndex !== -1) string = stringEncaseCRLFWithFirstIndex(string, closeAll, openAll, lfIndex);
+		return openAll + string + closeAll;
+	};
+	Object.defineProperties(createChalk.prototype, styles);
+	chalk = createChalk();
+	chalkStderr = createChalk({ level: stderrColor ? stderrColor.level : 0 });
 }));
 
 //#endregion
@@ -1805,6 +2298,7 @@ var require_commands = /* @__PURE__ */ __commonJSMin(((exports) => {
 	exports.cmdScaffold = cmdScaffold;
 	const node_fs_1$4 = __importDefault(require("node:fs"));
 	const node_path_1$4 = __importDefault(require("node:path"));
+	const chalk_1 = __importDefault((init_source(), __toCommonJS(source_exports)));
 	const core_js_1 = require_core();
 	const frontmatter_js_1 = require_frontmatter();
 	function cmdGenerateSlug(text, raw) {
@@ -1850,8 +2344,12 @@ var require_commands = /* @__PURE__ */ __commonJSMin(((exports) => {
 					area: todoArea,
 					path: node_path_1$4.default.join(".planning", "todos", "pending", file)
 				});
-			} catch {}
-		} catch {}
+			} catch (e) {
+				if (process.env.MAXSIM_DEBUG) console.error(e);
+			}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		const result = {
 			count,
 			todos
@@ -1896,7 +2394,9 @@ var require_commands = /* @__PURE__ */ __commonJSMin(((exports) => {
 				fullPath: node_path_1$4.default.join(phasesDir, dir),
 				milestone: null
 			});
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		if (allPhaseDirs.length === 0) {
 			(0, core_js_1.output)({
 				phases: {},
@@ -1931,7 +2431,9 @@ var require_commands = /* @__PURE__ */ __commonJSMin(((exports) => {
 					});
 					const techStack = fm["tech-stack"];
 					if (techStack && techStack.added) techStack.added.forEach((t) => digest.tech_stack.add(typeof t === "string" ? t : t.name));
-				} catch {}
+				} catch (e) {
+					if (process.env.MAXSIM_DEBUG) console.error(e);
+				}
 			}
 			const outputDigest = {
 				phases: {},
@@ -2162,7 +2664,9 @@ var require_commands = /* @__PURE__ */ __commonJSMin(((exports) => {
 					status
 				});
 			}
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		const percent = totalPlans > 0 ? Math.min(100, Math.round(totalSummaries / totalPlans * 100)) : 0;
 		if (format === "table") {
 			const barWidth = 10;
@@ -2184,6 +2688,32 @@ var require_commands = /* @__PURE__ */ __commonJSMin(((exports) => {
 				completed: totalSummaries,
 				total: totalPlans
 			}, raw, text);
+		} else if (format === "phase-bars") {
+			const doneCount = phases.filter((p) => p.status === "Complete").length;
+			const inProgressCount = phases.filter((p) => p.status === "In Progress").length;
+			const totalCount = phases.length;
+			const lines = [chalk_1.default.bold(`Milestone: ${milestone.name} — ${doneCount}/${totalCount} phases complete (${percent}%)`), ""];
+			for (const p of phases) {
+				const pPercent = p.plans > 0 ? Math.min(100, Math.round(p.summaries / p.plans * 100)) : 0;
+				const barWidth = 10;
+				const filled = Math.round(pPercent / 100 * barWidth);
+				const bar = "█".repeat(filled) + "░".repeat(barWidth - filled);
+				const phaseLabel = `Phase ${p.number.padStart(2, "0")}`;
+				const statusLabel = p.status === "Complete" ? "DONE" : p.status === "In Progress" ? "IN PROGRESS" : "PLANNED";
+				let line = `${phaseLabel} [${bar}] ${String(pPercent).padStart(3, " ")}% — ${statusLabel}`;
+				if (p.status === "Complete") line = chalk_1.default.green(line);
+				else if (p.status === "In Progress") line = chalk_1.default.yellow(line);
+				else line = chalk_1.default.dim(line);
+				lines.push(line);
+			}
+			const rendered = lines.join("\n");
+			(0, core_js_1.output)({
+				rendered,
+				done: doneCount,
+				in_progress: inProgressCount,
+				total: totalCount,
+				percent
+			}, raw, rendered);
 		} else (0, core_js_1.output)({
 			milestone_version: milestone.version,
 			milestone_name: milestone.name,
@@ -2662,7 +3192,7 @@ var require_verify = /* @__PURE__ */ __commonJSMin(((exports) => {
 		}
 		const roadmapContent = node_fs_1$3.default.readFileSync(roadmapPath, "utf-8");
 		const roadmapPhases = /* @__PURE__ */ new Set();
-		const phasePattern = /#{2,4}\s*Phase\s+(\d+[A-Z]?(?:\.\d+)?)\s*:/gi;
+		const phasePattern = (0, core_js_1.getPhasePattern)();
 		let m;
 		while ((m = phasePattern.exec(roadmapContent)) !== null) roadmapPhases.add(m[1]);
 		const diskPhases = /* @__PURE__ */ new Set();
@@ -2672,7 +3202,9 @@ var require_verify = /* @__PURE__ */ __commonJSMin(((exports) => {
 				const dm = dir.match(/^(\d+[A-Z]?(?:\.\d+)?)/i);
 				if (dm) diskPhases.add(dm[1]);
 			}
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		for (const p of roadmapPhases) if (!diskPhases.has(p) && !diskPhases.has((0, core_js_1.normalizePhaseName)(p))) warnings.push(`Phase ${p} in ROADMAP.md but no directory on disk`);
 		for (const p of diskPhases) {
 			const unpadded = String(parseInt(p, 10));
@@ -2695,7 +3227,9 @@ var require_verify = /* @__PURE__ */ __commonJSMin(((exports) => {
 				const summaryIdsSet = new Set(summaries.map((s) => s.replace("-SUMMARY.md", "")));
 				for (const sid of summaryIdsSet) if (!planIdsSet.has(sid)) warnings.push(`Summary ${sid}-SUMMARY.md in ${dir} has no matching PLAN.md`);
 			}
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		try {
 			const dirs = node_fs_1$3.default.readdirSync(phasesDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
 			for (const dir of dirs) {
@@ -2705,7 +3239,9 @@ var require_verify = /* @__PURE__ */ __commonJSMin(((exports) => {
 					if (!(0, frontmatter_js_1.extractFrontmatter)(content).wave) warnings.push(`${dir}/${plan}: missing 'wave' in frontmatter`);
 				}
 			}
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		const passed = errors.length === 0;
 		const result = {
 			passed,
@@ -2770,7 +3306,9 @@ var require_verify = /* @__PURE__ */ __commonJSMin(((exports) => {
 					const dm = e.name.match(/^(\d+(?:\.\d+)?)/);
 					if (dm) diskPhases.add(dm[1]);
 				}
-			} catch {}
+			} catch (e) {
+				if (process.env.MAXSIM_DEBUG) console.error(e);
+			}
 			for (const ref of phaseRefs) {
 				const normalizedRef = String(parseInt(ref, 10)).padStart(2, "0");
 				if (!diskPhases.has(ref) && !diskPhases.has(normalizedRef) && !diskPhases.has(String(parseInt(ref, 10)))) {
@@ -2800,7 +3338,9 @@ var require_verify = /* @__PURE__ */ __commonJSMin(((exports) => {
 		try {
 			const entries = node_fs_1$3.default.readdirSync(phasesDir, { withFileTypes: true });
 			for (const e of entries) if (e.isDirectory() && !e.name.match(/^\d{2}(?:\.\d+)?-[\w-]+$/)) addIssue("warning", "W005", `Phase directory "${e.name}" doesn't follow NN-name format`, "Rename to match pattern (e.g., 01-setup)");
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		try {
 			const entries = node_fs_1$3.default.readdirSync(phasesDir, { withFileTypes: true });
 			for (const e of entries) {
@@ -2814,11 +3354,13 @@ var require_verify = /* @__PURE__ */ __commonJSMin(((exports) => {
 					if (!summaryBases.has(planBase)) addIssue("info", "I001", `${e.name}/${plan} has no SUMMARY.md`, "May be in progress");
 				}
 			}
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		if (node_fs_1$3.default.existsSync(roadmapPath)) {
 			const roadmapContent = node_fs_1$3.default.readFileSync(roadmapPath, "utf-8");
 			const roadmapPhases = /* @__PURE__ */ new Set();
-			const phasePattern = /#{2,4}\s*Phase\s+(\d+[A-Z]?(?:\.\d+)?)\s*:/gi;
+			const phasePattern = (0, core_js_1.getPhasePattern)();
 			let m;
 			while ((m = phasePattern.exec(roadmapContent)) !== null) roadmapPhases.add(m[1]);
 			const diskPhases = /* @__PURE__ */ new Set();
@@ -2828,7 +3370,9 @@ var require_verify = /* @__PURE__ */ __commonJSMin(((exports) => {
 					const dm = e.name.match(/^(\d+[A-Z]?(?:\.\d+)?)/i);
 					if (dm) diskPhases.add(dm[1]);
 				}
-			} catch {}
+			} catch (e) {
+				if (process.env.MAXSIM_DEBUG) console.error(e);
+			}
 			for (const p of roadmapPhases) {
 				const padded = String(parseInt(p, 10)).padStart(2, "0");
 				if (!diskPhases.has(p) && !diskPhases.has(padded)) addIssue("warning", "W006", `Phase ${p} in ROADMAP.md but no directory on disk`, "Create phase directory or remove from roadmap");
@@ -3085,7 +3629,9 @@ var require_phase = /* @__PURE__ */ __commonJSMin(((exports) => {
 		try {
 			const match = node_fs_1$2.default.readdirSync(phasesDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort((a, b) => (0, core_js_1.comparePhaseNum)(a, b)).find((d) => d.startsWith(normalized));
 			if (match) phaseDir = node_path_1$2.default.join(phasesDir, match);
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		if (!phaseDir) {
 			(0, core_js_1.output)({
 				phase: normalized,
@@ -3147,7 +3693,7 @@ var require_phase = /* @__PURE__ */ __commonJSMin(((exports) => {
 		if (!node_fs_1$2.default.existsSync(roadmapPath)) (0, core_js_1.error)("ROADMAP.md not found");
 		const content = node_fs_1$2.default.readFileSync(roadmapPath, "utf-8");
 		const slug = (0, core_js_1.generateSlugInternal)(description);
-		const phasePattern = /#{2,4}\s*Phase\s+(\d+)[A-Z]?(?:\.\d+)?:/gi;
+		const phasePattern = (0, core_js_1.getPhasePattern)();
 		let maxPhase = 0;
 		let m;
 		while ((m = phasePattern.exec(content)) !== null) {
@@ -3181,7 +3727,7 @@ var require_phase = /* @__PURE__ */ __commonJSMin(((exports) => {
 		const content = node_fs_1$2.default.readFileSync(roadmapPath, "utf-8");
 		const slug = (0, core_js_1.generateSlugInternal)(description);
 		const afterPhaseEscaped = (0, core_js_1.normalizePhaseName)(afterPhase).replace(/^0+/, "").replace(/\./g, "\\.");
-		if (!new RegExp(`#{2,4}\\s*Phase\\s+0*${afterPhaseEscaped}:`, "i").test(content)) (0, core_js_1.error)(`Phase ${afterPhase} not found in ROADMAP.md`);
+		if (!(0, core_js_1.getPhasePattern)(afterPhaseEscaped, "i").test(content)) (0, core_js_1.error)(`Phase ${afterPhase} not found in ROADMAP.md`);
 		const phasesDir = node_path_1$2.default.join(cwd, ".planning", "phases");
 		const normalizedBase = (0, core_js_1.normalizePhaseName)(afterPhase);
 		const existingDecimals = [];
@@ -3192,7 +3738,9 @@ var require_phase = /* @__PURE__ */ __commonJSMin(((exports) => {
 				const dm = dir.match(decimalPattern);
 				if (dm) existingDecimals.push(parseInt(dm[1], 10));
 			}
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		const decimalPhase = `${normalizedBase}.${existingDecimals.length === 0 ? 1 : Math.max(...existingDecimals) + 1}`;
 		const dirName = `${decimalPhase}-${slug}`;
 		const dirPath = node_path_1$2.default.join(cwd, ".planning", "phases", dirName);
@@ -3228,7 +3776,9 @@ var require_phase = /* @__PURE__ */ __commonJSMin(((exports) => {
 		let targetDir = null;
 		try {
 			targetDir = node_fs_1$2.default.readdirSync(phasesDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort((a, b) => (0, core_js_1.comparePhaseNum)(a, b)).find((d) => d.startsWith(normalized + "-") || d === normalized) || null;
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		if (targetDir && !force) {
 			const targetPath = node_path_1$2.default.join(phasesDir, targetDir);
 			const summaries = node_fs_1$2.default.readdirSync(targetPath).filter((f) => f.endsWith("-SUMMARY.md") || f === "SUMMARY.md");
@@ -3277,7 +3827,9 @@ var require_phase = /* @__PURE__ */ __commonJSMin(((exports) => {
 						});
 					}
 				}
-			} catch {}
+			} catch (e) {
+				if (process.env.MAXSIM_DEBUG) console.error(e);
+			}
 		} else {
 			const removedInt = parseInt(normalized, 10);
 			try {
@@ -3323,7 +3875,9 @@ var require_phase = /* @__PURE__ */ __commonJSMin(((exports) => {
 						});
 					}
 				}
-			} catch {}
+			} catch (e) {
+				if (process.env.MAXSIM_DEBUG) console.error(e);
+			}
 		}
 		let roadmapContent = node_fs_1$2.default.readFileSync(roadmapPath, "utf-8");
 		const targetEscaped = targetPhase.replace(/\./g, "\\.");
@@ -3426,7 +3980,9 @@ var require_phase = /* @__PURE__ */ __commonJSMin(((exports) => {
 					}
 				}
 			}
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		if (node_fs_1$2.default.existsSync(statePath)) {
 			let stateContent = node_fs_1$2.default.readFileSync(statePath, "utf-8");
 			stateContent = stateContent.replace(/(\*\*Current Phase:\*\*\s*).*/, `$1${nextPhaseNum || phaseNum}`);
@@ -3734,7 +4290,9 @@ var require_init = /* @__PURE__ */ __commonJSMin(((exports) => {
 			if (verificationFile) result.verification_path = node_path_1.default.join(phaseDirectory, verificationFile);
 			const uatFile = files.find((f) => f.endsWith("-UAT.md") || f === "UAT.md");
 			if (uatFile) result.uat_path = node_path_1.default.join(phaseDirectory, uatFile);
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		return result;
 	}
 	function cmdInitExecutePhase(cwd, phase, raw) {
@@ -3832,7 +4390,9 @@ var require_init = /* @__PURE__ */ __commonJSMin(((exports) => {
 					"pipe"
 				]
 			}).trim().length > 0;
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		hasPackageFile = (0, core_js_1.pathExistsInternal)(cwd, "package.json") || (0, core_js_1.pathExistsInternal)(cwd, "requirements.txt") || (0, core_js_1.pathExistsInternal)(cwd, "Cargo.toml") || (0, core_js_1.pathExistsInternal)(cwd, "go.mod") || (0, core_js_1.pathExistsInternal)(cwd, "Package.swift");
 		const result = {
 			researcher_model: (0, core_js_1.resolveModelInternal)(cwd, "maxsim-project-researcher"),
@@ -3881,7 +4441,9 @@ var require_init = /* @__PURE__ */ __commonJSMin(((exports) => {
 		try {
 			const existing = node_fs_1.default.readdirSync(quickDir).filter((f) => /^\d+-/.test(f)).map((f) => parseInt(f.split("-")[0], 10)).filter((n) => !isNaN(n));
 			if (existing.length > 0) nextNum = Math.max(...existing) + 1;
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		const result = {
 			planner_model: (0, core_js_1.resolveModelInternal)(cwd, "maxsim-planner"),
 			executor_model: (0, core_js_1.resolveModelInternal)(cwd, "maxsim-executor"),
@@ -3905,7 +4467,9 @@ var require_init = /* @__PURE__ */ __commonJSMin(((exports) => {
 		let interruptedAgentId = null;
 		try {
 			interruptedAgentId = node_fs_1.default.readFileSync(node_path_1.default.join(cwd, ".planning", "current-agent-id.txt"), "utf-8").trim();
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		const result = {
 			state_exists: (0, core_js_1.pathExistsInternal)(cwd, ".planning/STATE.md"),
 			roadmap_exists: (0, core_js_1.pathExistsInternal)(cwd, ".planning/ROADMAP.md"),
@@ -4010,8 +4574,12 @@ var require_init = /* @__PURE__ */ __commonJSMin(((exports) => {
 					area: todoArea,
 					path: node_path_1.default.join(".planning", "todos", "pending", file)
 				});
-			} catch {}
-		} catch {}
+			} catch (e) {
+				if (process.env.MAXSIM_DEBUG) console.error(e);
+			}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		const result = {
 			commit_docs: config.commit_docs,
 			date: now.toISOString().split("T")[0],
@@ -4038,13 +4606,19 @@ var require_init = /* @__PURE__ */ __commonJSMin(((exports) => {
 			phaseCount = dirs.length;
 			for (const dir of dirs) try {
 				if (node_fs_1.default.readdirSync(node_path_1.default.join(phasesDir, dir)).some((f) => f.endsWith("-SUMMARY.md") || f === "SUMMARY.md")) completedPhases++;
-			} catch {}
-		} catch {}
+			} catch (e) {
+				if (process.env.MAXSIM_DEBUG) console.error(e);
+			}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		const archiveDir = node_path_1.default.join(cwd, ".planning", "archive");
 		let archivedMilestones = [];
 		try {
 			archivedMilestones = node_fs_1.default.readdirSync(archiveDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		const result = {
 			commit_docs: config.commit_docs,
 			milestone_version: milestone.version,
@@ -4069,7 +4643,9 @@ var require_init = /* @__PURE__ */ __commonJSMin(((exports) => {
 		let existingMaps = [];
 		try {
 			existingMaps = node_fs_1.default.readdirSync(codebaseDir).filter((f) => f.endsWith(".md"));
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		const result = {
 			mapper_model: (0, core_js_1.resolveModelInternal)(cwd, "maxsim-codebase-mapper"),
 			commit_docs: config.commit_docs,
@@ -4115,12 +4691,16 @@ var require_init = /* @__PURE__ */ __commonJSMin(((exports) => {
 				if (!currentPhase && (status === "in_progress" || status === "researched")) currentPhase = phaseInfo;
 				if (!nextPhase && status === "pending") nextPhase = phaseInfo;
 			}
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		let pausedAt = null;
 		try {
 			const pauseMatch = node_fs_1.default.readFileSync(node_path_1.default.join(cwd, ".planning", "STATE.md"), "utf-8").match(/\*\*Paused At:\*\*\s*(.+)/);
 			if (pauseMatch) pausedAt = pauseMatch[1].trim();
-		} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
 		const result = {
 			executor_model: (0, core_js_1.resolveModelInternal)(cwd, "maxsim-executor"),
 			planner_model: (0, core_js_1.resolveModelInternal)(cwd, "maxsim-planner"),
@@ -4154,8 +4734,8 @@ var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 	* @maxsim/core — Shared utilities, constants, and type definitions
 	*/
 	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.cmdRoadmapAnalyze = exports.cmdRoadmapGetPhase = exports.cmdStateSnapshot = exports.cmdStateRecordSession = exports.cmdStateResolveBlocker = exports.cmdStateAddBlocker = exports.cmdStateAddDecision = exports.cmdStateUpdateProgress = exports.cmdStateRecordMetric = exports.cmdStateAdvancePlan = exports.cmdStateUpdate = exports.cmdStatePatch = exports.cmdStateGet = exports.cmdStateLoad = exports.stateReplaceField = exports.stateExtractField = exports.cmdConfigGet = exports.cmdConfigSet = exports.cmdConfigEnsureSection = exports.cmdFrontmatterValidate = exports.cmdFrontmatterMerge = exports.cmdFrontmatterSet = exports.cmdFrontmatterGet = exports.FRONTMATTER_SCHEMAS = exports.parseMustHavesBlock = exports.spliceFrontmatter = exports.reconstructFrontmatter = exports.extractFrontmatter = exports.getMilestoneInfo = exports.generateSlugInternal = exports.pathExistsInternal = exports.resolveModelInternal = exports.getRoadmapPhaseInternal = exports.getArchivedPhaseDirs = exports.findPhaseInternal = exports.comparePhaseNum = exports.normalizePhaseName = exports.execGit = exports.isGitIgnored = exports.loadConfig = exports.safeReadFile = exports.error = exports.output = exports.MODEL_PROFILES = exports.PLANNING_CONFIG_DEFAULTS = exports.err = exports.ok = exports.phaseSlug = exports.phasePath = exports.phaseNumber = void 0;
-	exports.cmdInitProgress = exports.cmdInitMapCodebase = exports.cmdInitMilestoneOp = exports.cmdInitTodos = exports.cmdInitPhaseOp = exports.cmdInitVerifyWork = exports.cmdInitResume = exports.cmdInitQuick = exports.cmdInitNewMilestone = exports.cmdInitNewProject = exports.cmdInitPlanPhase = exports.cmdInitExecutePhase = exports.cmdTemplateFill = exports.cmdTemplateSelect = exports.cmdPhaseComplete = exports.cmdPhaseRemove = exports.cmdPhaseInsert = exports.cmdPhaseAdd = exports.cmdPhasePlanIndex = exports.cmdFindPhase = exports.cmdPhaseNextDecimal = exports.cmdPhasesList = exports.cmdValidateHealth = exports.cmdValidateConsistency = exports.cmdVerifyKeyLinks = exports.cmdVerifyArtifacts = exports.cmdVerifyCommits = exports.cmdVerifyReferences = exports.cmdVerifyPhaseCompleteness = exports.cmdVerifyPlanStructure = exports.cmdVerifySummary = exports.cmdScaffold = exports.cmdTodoComplete = exports.cmdProgressRender = exports.cmdWebsearch = exports.cmdSummaryExtract = exports.cmdCommit = exports.cmdResolveModel = exports.cmdHistoryDigest = exports.cmdVerifyPathExists = exports.cmdListTodos = exports.cmdCurrentTimestamp = exports.cmdGenerateSlug = exports.cmdMilestoneComplete = exports.cmdRequirementsMarkComplete = exports.cmdRoadmapUpdatePlanProgress = void 0;
+	exports.cmdRoadmapGetPhase = exports.cmdStateSnapshot = exports.cmdStateRecordSession = exports.cmdStateResolveBlocker = exports.cmdStateAddBlocker = exports.cmdStateAddDecision = exports.cmdStateUpdateProgress = exports.cmdStateRecordMetric = exports.cmdStateAdvancePlan = exports.cmdStateUpdate = exports.cmdStatePatch = exports.cmdStateGet = exports.cmdStateLoad = exports.stateReplaceField = exports.stateExtractField = exports.cmdConfigGet = exports.cmdConfigSet = exports.cmdConfigEnsureSection = exports.cmdFrontmatterValidate = exports.cmdFrontmatterMerge = exports.cmdFrontmatterSet = exports.cmdFrontmatterGet = exports.FRONTMATTER_SCHEMAS = exports.parseMustHavesBlock = exports.spliceFrontmatter = exports.reconstructFrontmatter = exports.extractFrontmatter = exports.getMilestoneInfo = exports.generateSlugInternal = exports.pathExistsInternal = exports.resolveModelInternal = exports.getRoadmapPhaseInternal = exports.getArchivedPhaseDirs = exports.findPhaseInternal = exports.getPhasePattern = exports.comparePhaseNum = exports.normalizePhaseName = exports.execGit = exports.isGitIgnored = exports.loadConfig = exports.safeReadFile = exports.error = exports.output = exports.MODEL_PROFILES = exports.PLANNING_CONFIG_DEFAULTS = exports.err = exports.ok = exports.phaseSlug = exports.phasePath = exports.phaseNumber = void 0;
+	exports.cmdInitProgress = exports.cmdInitMapCodebase = exports.cmdInitMilestoneOp = exports.cmdInitTodos = exports.cmdInitPhaseOp = exports.cmdInitVerifyWork = exports.cmdInitResume = exports.cmdInitQuick = exports.cmdInitNewMilestone = exports.cmdInitNewProject = exports.cmdInitPlanPhase = exports.cmdInitExecutePhase = exports.cmdTemplateFill = exports.cmdTemplateSelect = exports.cmdPhaseComplete = exports.cmdPhaseRemove = exports.cmdPhaseInsert = exports.cmdPhaseAdd = exports.cmdPhasePlanIndex = exports.cmdFindPhase = exports.cmdPhaseNextDecimal = exports.cmdPhasesList = exports.cmdValidateHealth = exports.cmdValidateConsistency = exports.cmdVerifyKeyLinks = exports.cmdVerifyArtifacts = exports.cmdVerifyCommits = exports.cmdVerifyReferences = exports.cmdVerifyPhaseCompleteness = exports.cmdVerifyPlanStructure = exports.cmdVerifySummary = exports.cmdScaffold = exports.cmdTodoComplete = exports.cmdProgressRender = exports.cmdWebsearch = exports.cmdSummaryExtract = exports.cmdCommit = exports.cmdResolveModel = exports.cmdHistoryDigest = exports.cmdVerifyPathExists = exports.cmdListTodos = exports.cmdCurrentTimestamp = exports.cmdGenerateSlug = exports.cmdMilestoneComplete = exports.cmdRequirementsMarkComplete = exports.cmdRoadmapUpdatePlanProgress = exports.cmdRoadmapAnalyze = void 0;
 	var types_js_1 = require_types();
 	Object.defineProperty(exports, "phaseNumber", {
 		enumerable: true,
@@ -4246,6 +4826,12 @@ var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 		enumerable: true,
 		get: function() {
 			return core_js_1.comparePhaseNum;
+		}
+	});
+	Object.defineProperty(exports, "getPhasePattern", {
+		enumerable: true,
+		get: function() {
+			return core_js_1.getPhasePattern;
 		}
 	});
 	Object.defineProperty(exports, "findPhaseInternal", {

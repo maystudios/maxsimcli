@@ -39,6 +39,8 @@ let node_process = require("node:process");
 node_process = __toESM(node_process);
 let node_tty = require("node:tty");
 node_tty = __toESM(node_tty);
+let figlet = require("figlet");
+figlet = __toESM(figlet);
 let node_util = require("node:util");
 let node_async_hooks = require("node:async_hooks");
 let node_readline = require("node:readline");
@@ -6483,7 +6485,7 @@ var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 var require_package = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"name": "maxsimcli",
-		"version": "1.0.8",
+		"version": "1.0.11",
 		"private": false,
 		"description": "A meta-prompting, context engineering and spec-driven development system for Claude Code, OpenCode, Gemini and Codex by MayStudios.",
 		"bin": { "maxsimcli": "dist/install.cjs" },
@@ -6517,10 +6519,12 @@ var require_package = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			"@maxsim/core": "workspace:*",
 			"@maxsim/hooks": "workspace:*",
 			"@maxsim/templates": "workspace:*",
+			"@types/figlet": "^1.7.0",
 			"@types/node": "^25.3.0",
 			"chalk": "^5.6.2",
 			"ora": "^9.3.0"
-		}
+		},
+		"dependencies": { "figlet": "^1.10.0" }
 	};
 }));
 
@@ -6593,7 +6597,7 @@ function getDirName(runtime) {
 function getOpencodeGlobalDir() {
 	return import_dist.opencodeAdapter.getGlobalDir();
 }
-const banner = "\n" + chalk.cyan("  ██╗  ██╗ █████╗ ██╗  ██╗███████╗██╗██╗  ██╗\n  ███╗███║██╔══██╗╚██╗██╔╝██╔════╝██║███╗███║\n  ██╔████╔██║███████║ ╚███╔╝ ███████╗██║██╔████╔██║\n  ██║╚██╔╝██║██╔══██║ ██╔██╗ ╚════██║██║██║╚██╔╝██║\n  ██║ ╚═╝ ██║██║  ██║██╔╝ ██╗███████║██║██║ ╚═╝ ██║\n  ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝") + "\n\n  MAXSIM " + chalk.dim("v" + pkg.version) + "\n  A meta-prompting, context engineering and spec-driven\n  development system for Claude Code, OpenCode, Gemini, and Codex.\n";
+const banner = "\n" + chalk.cyan(figlet.default.textSync("MAXSIM", { font: "ANSI Shadow" }).split("\n").map((line) => "  " + line).join("\n")) + "\n\n  MAXSIM " + chalk.dim("v" + pkg.version) + "\n  A meta-prompting, context engineering and spec-driven\n  development system for Claude Code, OpenCode, Gemini, and Codex.\n";
 function parseConfigDirArg() {
 	const configDirIndex = args.findIndex((arg) => arg === "--config-dir" || arg === "-c");
 	if (configDirIndex !== -1) {
