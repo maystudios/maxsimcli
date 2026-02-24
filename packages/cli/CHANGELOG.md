@@ -1,3 +1,15 @@
+## 1.1.2 (2026-02-24)
+
+### 🚀 Features
+
+- **13-01:** add dark theme layout, globals, utilities, types, and Aceternity config ([c8f76cb](https://github.com/maystudios/maxsim/commit/c8f76cb))
+- **13-01:** scaffold packages/dashboard NX package with Next.js 15 and dependencies ([8cb33d6](https://github.com/maystudios/maxsim/commit/8cb33d6))
+
+### ❤️ Thank You
+
+- Claude Opus 4.6
+- Sven
+
 ## 1.1.1 (2026-02-24)
 
 This was a version bump only for cli to align it with other projects, there were no code changes.
