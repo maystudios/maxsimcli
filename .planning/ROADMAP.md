@@ -13,7 +13,7 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 ## Phases
 
 - [x] **Phase 15: E2E Package Scaffold** - Create `packages/e2e` NX package with correct wiring and clean ROADMAP docs
-- [x] **Phase 16: Pack + Install + Tool Tests** - Full globalSetup pipeline plus file validation, binary smoke tests, and tool behavioral tests against a mock project fixture (completed 2026-02-24)
+- [x] **Phase 16: Pack + Install + Tool Tests** - Full globalSetup pipeline plus file validation, binary smoke tests, and tool behavioral tests against a mock project fixture (completed 2026-02-24)
 - [ ] **Phase 17: Dashboard Read Tests** - Spawn dashboard server from installed path, validate all read API endpoints against mock fixture
 - [ ] **Phase 18: Dashboard Write Tests** - Validate task checkbox toggle and STATE.md write APIs update files on disk
 - [ ] **Phase 19: CI Integration** - Wire E2E suite into GitHub Actions, gate publish on green E2E
@@ -63,7 +63,10 @@ Plans:
   3. `/api/phases` returns a JSON array with the correct phase count, names, and statuses from the mock `ROADMAP.md`
   4. `/api/state` returns data that includes decisions and blockers from the mock `STATE.md`
   5. `/api/todos` returns a JSON array that includes the pending todos from the mock `todos/` directory
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 17-01-PLAN.md — Fix mock fixture for dashboard compatibility and write dashboard.test.ts read API tests
 
 ### Phase 18: Dashboard Write Tests
 **Goal**: The dashboard write APIs mutate files on disk correctly — task checkbox toggles persist as `[x]` in plan files, and STATE.md edits persist the full updated content
@@ -95,6 +98,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 15. E2E Package Scaffold | 1/1 | Complete | 2026-02-24 |
 | 16. Pack + Install + Tool Tests | 3/3 | Complete | 2026-02-25 |
-| 17. Dashboard Read Tests | 0/TBD | Not started | - |
+| 17. Dashboard Read Tests | 0/1 | Not started | - |
 | 18. Dashboard Write Tests | 0/TBD | Not started | - |
 | 19. CI Integration | 0/TBD | Not started | - |
