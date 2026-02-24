@@ -1,3 +1,18 @@
+## 1.1.0 (2026-02-24)
+
+### 🚀 Features
+
+- **cli:** use figlet ANSI Shadow for banner instead of hardcoded Unicode escapes ([3952531](https://github.com/maystudios/maxsim/commit/3952531))
+
+### 🩹 Fixes
+
+- **ci:** remove figlet from root package.json, keep only in packages/cli ([e99c16d](https://github.com/maystudios/maxsim/commit/e99c16d))
+
+### ❤️ Thank You
+
+- Claude Sonnet 4.6
+- Sven
+
 ## 1.0.12 (2026-02-24)
 
 ### 🩹 Fixes
