@@ -6485,7 +6485,7 @@ var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 var require_package = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"name": "maxsimcli",
-		"version": "1.0.11",
+		"version": "1.1.2",
 		"private": false,
 		"description": "A meta-prompting, context engineering and spec-driven development system for Claude Code, OpenCode, Gemini and Codex by MayStudios.",
 		"bin": { "maxsimcli": "dist/install.cjs" },
@@ -6517,6 +6517,7 @@ var require_package = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			"@inquirer/prompts": "^8.3.0",
 			"@maxsim/adapters": "workspace:*",
 			"@maxsim/core": "workspace:*",
+			"@maxsim/dashboard": "workspace:*",
 			"@maxsim/hooks": "workspace:*",
 			"@maxsim/templates": "workspace:*",
 			"@types/figlet": "^1.7.0",

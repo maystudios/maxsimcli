@@ -56,7 +56,11 @@ function scanPhaseArtifacts(cwd, phaseDirectory) {
             result.uat_path = node_path_1.default.join(phaseDirectory, uatFile);
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     return result;
 }
 // ─── Init commands ──────────────────────────────────────────────────────────
@@ -169,7 +173,11 @@ function cmdInitNewProject(cwd, raw) {
         });
         hasCode = files.trim().length > 0;
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     hasPackageFile = (0, core_js_1.pathExistsInternal)(cwd, 'package.json') ||
         (0, core_js_1.pathExistsInternal)(cwd, 'requirements.txt') ||
         (0, core_js_1.pathExistsInternal)(cwd, 'Cargo.toml') ||
@@ -228,7 +236,11 @@ function cmdInitQuick(cwd, description, raw) {
             nextNum = Math.max(...existing) + 1;
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     const result = {
         planner_model: (0, core_js_1.resolveModelInternal)(cwd, 'maxsim-planner'),
         executor_model: (0, core_js_1.resolveModelInternal)(cwd, 'maxsim-executor'),
@@ -253,7 +265,11 @@ function cmdInitResume(cwd, raw) {
     try {
         interruptedAgentId = node_fs_1.default.readFileSync(node_path_1.default.join(cwd, '.planning', 'current-agent-id.txt'), 'utf-8').trim();
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     const result = {
         state_exists: (0, core_js_1.pathExistsInternal)(cwd, '.planning/STATE.md'),
         roadmap_exists: (0, core_js_1.pathExistsInternal)(cwd, '.planning/ROADMAP.md'),
@@ -367,10 +383,18 @@ function cmdInitTodos(cwd, area, raw) {
                     path: node_path_1.default.join('.planning', 'todos', 'pending', file),
                 });
             }
-            catch { /* ignore */ }
+            catch (e) {
+                /* optional op, ignore */
+                if (process.env.MAXSIM_DEBUG)
+                    console.error(e);
+            }
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     const result = {
         commit_docs: config.commit_docs,
         date: now.toISOString().split('T')[0],
@@ -403,10 +427,18 @@ function cmdInitMilestoneOp(cwd, raw) {
                 if (hasSummary)
                     completedPhases++;
             }
-            catch { /* ignore */ }
+            catch (e) {
+                /* optional op, ignore */
+                if (process.env.MAXSIM_DEBUG)
+                    console.error(e);
+            }
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     const archiveDir = node_path_1.default.join(cwd, '.planning', 'archive');
     let archivedMilestones = [];
     try {
@@ -414,7 +446,11 @@ function cmdInitMilestoneOp(cwd, raw) {
             .filter(e => e.isDirectory())
             .map(e => e.name);
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     const result = {
         commit_docs: config.commit_docs,
         milestone_version: milestone.version,
@@ -440,7 +476,11 @@ function cmdInitMapCodebase(cwd, raw) {
     try {
         existingMaps = node_fs_1.default.readdirSync(codebaseDir).filter(f => f.endsWith('.md'));
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     const result = {
         mapper_model: (0, core_js_1.resolveModelInternal)(cwd, 'maxsim-codebase-mapper'),
         commit_docs: config.commit_docs,
@@ -494,7 +534,11 @@ function cmdInitProgress(cwd, raw) {
             }
         }
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     let pausedAt = null;
     try {
         const state = node_fs_1.default.readFileSync(node_path_1.default.join(cwd, '.planning', 'STATE.md'), 'utf-8');
@@ -502,7 +546,11 @@ function cmdInitProgress(cwd, raw) {
         if (pauseMatch)
             pausedAt = pauseMatch[1].trim();
     }
-    catch { /* ignore */ }
+    catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
     const result = {
         executor_model: (0, core_js_1.resolveModelInternal)(cwd, 'maxsim-executor'),
         planner_model: (0, core_js_1.resolveModelInternal)(cwd, 'maxsim-planner'),

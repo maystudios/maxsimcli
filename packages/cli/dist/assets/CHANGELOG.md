@@ -1,3 +1,51 @@
+## 1.1.2 (2026-02-24)
+
+### 🚀 Features
+
+- **13-01:** scaffold packages/dashboard NX package with Next.js 15 and dependencies ([8cb33d6](https://github.com/maystudios/maxsim/commit/8cb33d6))
+- **13-01:** add dark theme layout, globals, utilities, types, and Aceternity config ([c8f76cb](https://github.com/maystudios/maxsim/commit/c8f76cb))
+
+### ❤️ Thank You
+
+- Claude Opus 4.6
+- Sven
+
+## 1.1.1 (2026-02-24)
+
+### 🩹 Fixes
+
+- **discuss:** enforce AskUserQuestion tool for all user interactions ([149fda4](https://github.com/maystudios/maxsim/commit/149fda4))
+
+### ❤️ Thank You
+
+- Claude Opus 4.6
+- Sven
+
+## 1.1.0 (2026-02-24)
+
+### 🚀 Features
+
+- **cli:** use figlet ANSI Shadow for banner instead of hardcoded Unicode escapes ([3952531](https://github.com/maystudios/maxsim/commit/3952531))
+
+### 🩹 Fixes
+
+- **ci:** remove figlet from root package.json, keep only in packages/cli ([e99c16d](https://github.com/maystudios/maxsim/commit/e99c16d))
+
+### ❤️ Thank You
+
+- Claude Sonnet 4.6
+- Sven
+
+## 1.0.12 (2026-02-24)
+
+### 🩹 Fixes
+
+- **core:** integration validation cleanup — build, catch blocks, regex ([7762847](https://github.com/maystudios/maxsim/commit/7762847))
+
+### ❤️ Thank You
+
+- Sven
+
 ## 1.0.11 (2026-02-24)
 
 ### 🚀 Features

@@ -46,6 +46,8 @@ let node_fs = require("node:fs");
 node_fs = __toESM(node_fs);
 let node_path = require("node:path");
 node_path = __toESM(node_path);
+let node_child_process = require("node:child_process");
+let node_module = require("node:module");
 let node_os = require("node:os");
 node_os = __toESM(node_os);
 let node_process = require("node:process");
@@ -5768,8 +5770,129 @@ async function main() {
 			}, raw);
 			break;
 		}
+		case "dashboard":
+			await handleDashboard(args.slice(1));
+			break;
 		default: (0, import_dist.error)(`Unknown command: ${command}`);
 	}
+}
+/**
+* Dashboard launch command.
+*
+* Spawns the dashboard as a detached subprocess with MAXSIM_PROJECT_CWD set.
+* If the dashboard is already running (detected via /api/health), prints the URL.
+* Supports --stop to kill a running instance.
+*/
+async function handleDashboard(args) {
+	const DEFAULT_PORT = 3333;
+	const PORT_RANGE_END = 3343;
+	const HEALTH_TIMEOUT_MS = 1500;
+	if (args.includes("--stop")) {
+		for (let port = DEFAULT_PORT; port <= PORT_RANGE_END; port++) if (await checkHealth(port, HEALTH_TIMEOUT_MS)) {
+			console.log(`Dashboard found on port ${port} — sending shutdown...`);
+			console.log(`Dashboard at http://localhost:${port} is running.`);
+			console.log(`To stop it, close the browser tab or kill the process on port ${port}.`);
+			try {
+				if (process.platform === "win32") {
+					const lines = (0, node_child_process.execSync)(`netstat -ano | findstr :${port} | findstr LISTENING`, { encoding: "utf-8" }).trim().split("\n");
+					const pids = /* @__PURE__ */ new Set();
+					for (const line of lines) {
+						const parts = line.trim().split(/\s+/);
+						const pid = parts[parts.length - 1];
+						if (pid && pid !== "0") pids.add(pid);
+					}
+					for (const pid of pids) try {
+						(0, node_child_process.execSync)(`taskkill /PID ${pid} /F`, { stdio: "ignore" });
+						console.log(`Killed process ${pid}`);
+					} catch {}
+				} else (0, node_child_process.execSync)(`lsof -i :${port} -t | xargs kill -SIGTERM 2>/dev/null`, { stdio: "ignore" });
+				console.log("Dashboard stopped.");
+			} catch {
+				console.log("Could not automatically stop the dashboard. Kill the process manually.");
+			}
+			return;
+		}
+		console.log("No running dashboard found.");
+		return;
+	}
+	for (let port = DEFAULT_PORT; port <= PORT_RANGE_END; port++) if (await checkHealth(port, HEALTH_TIMEOUT_MS)) {
+		console.log(`Dashboard already running at http://localhost:${port}`);
+		return;
+	}
+	const serverPath = resolveDashboardServer();
+	if (!serverPath) {
+		console.error("Could not find @maxsim/dashboard server entry point.");
+		console.error("Ensure @maxsim/dashboard is installed and built.");
+		process.exit(1);
+	}
+	const isTsFile = serverPath.endsWith(".ts");
+	const runner = isTsFile ? "node" : "node";
+	const runnerArgs = isTsFile ? [
+		"--import",
+		"tsx",
+		serverPath
+	] : [serverPath];
+	console.log("Dashboard starting...");
+	const child = (0, node_child_process.spawn)(runner, runnerArgs, {
+		cwd: process.cwd(),
+		detached: true,
+		stdio: "ignore",
+		env: {
+			...process.env,
+			MAXSIM_PROJECT_CWD: process.cwd(),
+			NODE_ENV: isTsFile ? "development" : "production"
+		},
+		...process.platform === "win32" ? { shell: true } : {}
+	});
+	child.unref();
+	await new Promise((resolve) => setTimeout(resolve, 3e3));
+	for (let port = DEFAULT_PORT; port <= PORT_RANGE_END; port++) if (await checkHealth(port, HEALTH_TIMEOUT_MS)) {
+		console.log(`Dashboard ready at http://localhost:${port}`);
+		return;
+	}
+	console.log(`Dashboard spawned (PID ${child.pid}). It may take a moment to start.`);
+	console.log(`Check http://localhost:${DEFAULT_PORT} once ready.`);
+}
+/**
+* Check if a dashboard health endpoint is responding on the given port.
+*/
+async function checkHealth(port, timeoutMs) {
+	try {
+		const controller = new AbortController();
+		const timer = setTimeout(() => controller.abort(), timeoutMs);
+		const res = await fetch(`http://localhost:${port}/api/health`, { signal: controller.signal });
+		clearTimeout(timer);
+		if (res.ok) return (await res.json()).status === "ok";
+		return false;
+	} catch {
+		return false;
+	}
+}
+/**
+* Resolve the dashboard server entry point path.
+* Tries: built server.js first, then source server.ts for dev mode.
+*/
+function resolveDashboardServer() {
+	try {
+		const pkgPath = (0, node_module.createRequire)(require("url").pathToFileURL(__filename).href).resolve("@maxsim/dashboard/package.json");
+		const pkgDir = node_path.dirname(pkgPath);
+		const serverJs = node_path.join(pkgDir, "server.js");
+		if (node_fs.existsSync(serverJs)) return serverJs;
+		const serverTs = node_path.join(pkgDir, "server.ts");
+		if (node_fs.existsSync(serverTs)) return serverTs;
+	} catch {}
+	try {
+		let dir = node_path.dirname(new URL(require("url").pathToFileURL(__filename).href).pathname);
+		if (process.platform === "win32" && dir.startsWith("/")) dir = dir.slice(1);
+		for (let i = 0; i < 5; i++) {
+			const candidate = node_path.join(dir, "packages", "dashboard", "server.ts");
+			if (node_fs.existsSync(candidate)) return candidate;
+			const candidateJs = node_path.join(dir, "packages", "dashboard", "server.js");
+			if (node_fs.existsSync(candidateJs)) return candidateJs;
+			dir = node_path.dirname(dir);
+		}
+	} catch {}
+	return null;
 }
 main();
 

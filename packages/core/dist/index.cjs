@@ -33,6 +33,8 @@ node_path = __toESM(node_path);
 let node_os = require("node:os");
 node_os = __toESM(node_os);
 let node_child_process = require("node:child_process");
+let chalk = require("chalk");
+chalk = __toESM(chalk);
 
 //#region src/types.ts
 function phaseNumber(value) {
@@ -1624,9 +1626,13 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
 				if (fm["one-liner"]) accomplishments.push(String(fm["one-liner"]));
 				const taskMatches = content.match(/##\s*Task\s*\d+/gi) || [];
 				totalTasks += taskMatches.length;
-			} catch {}
+			} catch (e) {
+				if (process.env.MAXSIM_DEBUG) console.error(e);
+			}
 		}
-	} catch {}
+	} catch (e) {
+		if (process.env.MAXSIM_DEBUG) console.error(e);
+	}
 	if (node_fs.default.existsSync(roadmapPath)) {
 		const roadmapContent = node_fs.default.readFileSync(roadmapPath, "utf-8");
 		node_fs.default.writeFileSync(node_path.default.join(archiveDir, `${version}-ROADMAP.md`), roadmapContent, "utf-8");
@@ -1658,7 +1664,9 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
 		const phaseDirNames = node_fs.default.readdirSync(phasesDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
 		for (const dir of phaseDirNames) node_fs.default.renameSync(node_path.default.join(phasesDir, dir), node_path.default.join(phaseArchiveDir, dir));
 		phasesArchived = phaseDirNames.length > 0;
-	} catch {}
+	} catch (e) {
+		if (process.env.MAXSIM_DEBUG) console.error(e);
+	}
 	output({
 		version,
 		name: milestoneName,
@@ -2062,6 +2070,32 @@ function cmdProgressRender(cwd, format, raw) {
 			completed: totalSummaries,
 			total: totalPlans
 		}, raw, text);
+	} else if (format === "phase-bars") {
+		const doneCount = phases.filter((p) => p.status === "Complete").length;
+		const inProgressCount = phases.filter((p) => p.status === "In Progress").length;
+		const totalCount = phases.length;
+		const lines = [chalk.default.bold(`Milestone: ${milestone.name} — ${doneCount}/${totalCount} phases complete (${percent}%)`), ""];
+		for (const p of phases) {
+			const pPercent = p.plans > 0 ? Math.min(100, Math.round(p.summaries / p.plans * 100)) : 0;
+			const barWidth = 10;
+			const filled = Math.round(pPercent / 100 * barWidth);
+			const bar = "█".repeat(filled) + "░".repeat(barWidth - filled);
+			const phaseLabel = `Phase ${p.number.padStart(2, "0")}`;
+			const statusLabel = p.status === "Complete" ? "DONE" : p.status === "In Progress" ? "IN PROGRESS" : "PLANNED";
+			let line = `${phaseLabel} [${bar}] ${String(pPercent).padStart(3, " ")}% — ${statusLabel}`;
+			if (p.status === "Complete") line = chalk.default.green(line);
+			else if (p.status === "In Progress") line = chalk.default.yellow(line);
+			else line = chalk.default.dim(line);
+			lines.push(line);
+		}
+		const rendered = lines.join("\n");
+		output({
+			rendered,
+			done: doneCount,
+			in_progress: inProgressCount,
+			total: totalCount,
+			percent
+		}, raw, rendered);
 	} else output({
 		milestone_version: milestone.version,
 		milestone_name: milestone.name,
@@ -3546,7 +3580,9 @@ function scanPhaseArtifacts(cwd, phaseDirectory) {
 		if (verificationFile) result.verification_path = node_path.default.join(phaseDirectory, verificationFile);
 		const uatFile = files.find((f) => f.endsWith("-UAT.md") || f === "UAT.md");
 		if (uatFile) result.uat_path = node_path.default.join(phaseDirectory, uatFile);
-	} catch {}
+	} catch (e) {
+		if (process.env.MAXSIM_DEBUG) console.error(e);
+	}
 	return result;
 }
 function cmdInitExecutePhase(cwd, phase, raw) {
@@ -3643,7 +3679,9 @@ function cmdInitNewProject(cwd, raw) {
 				"pipe"
 			]
 		}).trim().length > 0;
-	} catch {}
+	} catch (e) {
+		if (process.env.MAXSIM_DEBUG) console.error(e);
+	}
 	hasPackageFile = pathExistsInternal(cwd, "package.json") || pathExistsInternal(cwd, "requirements.txt") || pathExistsInternal(cwd, "Cargo.toml") || pathExistsInternal(cwd, "go.mod") || pathExistsInternal(cwd, "Package.swift");
 	output({
 		researcher_model: resolveModelInternal(cwd, "maxsim-project-researcher"),
@@ -3690,7 +3728,9 @@ function cmdInitQuick(cwd, description, raw) {
 	try {
 		const existing = node_fs.default.readdirSync(quickDir).filter((f) => /^\d+-/.test(f)).map((f) => parseInt(f.split("-")[0], 10)).filter((n) => !isNaN(n));
 		if (existing.length > 0) nextNum = Math.max(...existing) + 1;
-	} catch {}
+	} catch (e) {
+		if (process.env.MAXSIM_DEBUG) console.error(e);
+	}
 	output({
 		planner_model: resolveModelInternal(cwd, "maxsim-planner"),
 		executor_model: resolveModelInternal(cwd, "maxsim-executor"),
@@ -3713,7 +3753,9 @@ function cmdInitResume(cwd, raw) {
 	let interruptedAgentId = null;
 	try {
 		interruptedAgentId = node_fs.default.readFileSync(node_path.default.join(cwd, ".planning", "current-agent-id.txt"), "utf-8").trim();
-	} catch {}
+	} catch (e) {
+		if (process.env.MAXSIM_DEBUG) console.error(e);
+	}
 	output({
 		state_exists: pathExistsInternal(cwd, ".planning/STATE.md"),
 		roadmap_exists: pathExistsInternal(cwd, ".planning/ROADMAP.md"),
@@ -3816,8 +3858,12 @@ function cmdInitTodos(cwd, area, raw) {
 				area: todoArea,
 				path: node_path.default.join(".planning", "todos", "pending", file)
 			});
-		} catch {}
-	} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
+	} catch (e) {
+		if (process.env.MAXSIM_DEBUG) console.error(e);
+	}
 	output({
 		commit_docs: config.commit_docs,
 		date: now.toISOString().split("T")[0],
@@ -3843,13 +3889,19 @@ function cmdInitMilestoneOp(cwd, raw) {
 		phaseCount = dirs.length;
 		for (const dir of dirs) try {
 			if (node_fs.default.readdirSync(node_path.default.join(phasesDir, dir)).some((f) => f.endsWith("-SUMMARY.md") || f === "SUMMARY.md")) completedPhases++;
-		} catch {}
-	} catch {}
+		} catch (e) {
+			if (process.env.MAXSIM_DEBUG) console.error(e);
+		}
+	} catch (e) {
+		if (process.env.MAXSIM_DEBUG) console.error(e);
+	}
 	const archiveDir = node_path.default.join(cwd, ".planning", "archive");
 	let archivedMilestones = [];
 	try {
 		archivedMilestones = node_fs.default.readdirSync(archiveDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
-	} catch {}
+	} catch (e) {
+		if (process.env.MAXSIM_DEBUG) console.error(e);
+	}
 	output({
 		commit_docs: config.commit_docs,
 		milestone_version: milestone.version,
@@ -3873,7 +3925,9 @@ function cmdInitMapCodebase(cwd, raw) {
 	let existingMaps = [];
 	try {
 		existingMaps = node_fs.default.readdirSync(codebaseDir).filter((f) => f.endsWith(".md"));
-	} catch {}
+	} catch (e) {
+		if (process.env.MAXSIM_DEBUG) console.error(e);
+	}
 	output({
 		mapper_model: resolveModelInternal(cwd, "maxsim-codebase-mapper"),
 		commit_docs: config.commit_docs,
@@ -3918,12 +3972,16 @@ function cmdInitProgress(cwd, raw) {
 			if (!currentPhase && (status === "in_progress" || status === "researched")) currentPhase = phaseInfo;
 			if (!nextPhase && status === "pending") nextPhase = phaseInfo;
 		}
-	} catch {}
+	} catch (e) {
+		if (process.env.MAXSIM_DEBUG) console.error(e);
+	}
 	let pausedAt = null;
 	try {
 		const pauseMatch = node_fs.default.readFileSync(node_path.default.join(cwd, ".planning", "STATE.md"), "utf-8").match(/\*\*Paused At:\*\*\s*(.+)/);
 		if (pauseMatch) pausedAt = pauseMatch[1].trim();
-	} catch {}
+	} catch (e) {
+		if (process.env.MAXSIM_DEBUG) console.error(e);
+	}
 	output({
 		executor_model: resolveModelInternal(cwd, "maxsim-executor"),
 		planner_model: resolveModelInternal(cwd, "maxsim-planner"),
