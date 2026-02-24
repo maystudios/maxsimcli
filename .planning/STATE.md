@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 14 of 14 (Dashboard npm Delivery) — IN PROGRESS
-Plan: 1 of 3 in current phase (complete)
-Status: Plan 14-01 complete — standalone build pipeline configured
-Last activity: 2026-02-24 — next.config.mjs standalone guard, tsdown server config, build:standalone script
+Plan: 2 of 3 in current phase (complete)
+Status: Plan 14-02 complete — CLI asset pipeline and dashboard launch wired
+Last activity: 2026-02-24 — copy-assets dashboard section, install.ts dashboard copy, cli.ts standalone resolution
 
-Progress: [█████████░] 96%
+Progress: [██████████] 97%
 
 ## Performance Metrics
 
@@ -78,6 +78,7 @@ Progress: [█████████░] 96%
 | Phase 13 P06 | 4min | 2 tasks | 6 files |
 | Phase 13 P08 | 2min | 1 tasks | 25 files |
 | Phase 14 P01 | 2min | 2 tasks | 4 files |
+| Phase 14 P02 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -170,6 +171,10 @@ Recent decisions affecting current work:
 - [Phase 14]: STANDALONE_BUILD env-var guard in next.config.mjs to avoid Windows EPERM symlink errors in dev
 - [Phase 14]: tsdown config file (not inline CLI flags) for server bundling clarity and maintainability
 - [Phase 14]: NX build target switched to build:standalone so nx build dashboard produces standalone output
+- [Phase 14]: dashboard.json placed NEXT TO dashboard/ dir (not inside) so it survives overwrite on upgrade
+- [Phase 14]: Auto-install dashboard from dist/assets/ if .claude/dashboard/ missing when user runs dashboard command
+- [Phase 14]: Strategy 0 in resolveDashboardServer checks installed standalone before package resolution and monorepo
+- [Phase 14]: Standalone server cwd set to dashboard dir so Next.js can find .next/ relative to server.js
 
 ### Roadmap Evolution
 
@@ -194,5 +199,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 14-01-PLAN.md
-Resume file: .planning/phases/14-dashboard-npm-delivery/14-01-SUMMARY.md
+Stopped at: Completed 14-02-PLAN.md
+Resume file: .planning/phases/14-dashboard-npm-delivery/14-02-SUMMARY.md
