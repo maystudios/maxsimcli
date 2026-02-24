@@ -107,7 +107,7 @@ function GettingStarted() {
         <CodeBlock
           language="text"
           code={`~/.claude/
-├── commands/maxsim/   # 31 user-facing commands (/gsd:*)
+├── commands/maxsim/   # 30 user-facing commands (/gsd:*)
 ├── agents/            # 11 specialized agent prompts
 └── hooks/             # Pre/post hooks for automation`}
         />
@@ -224,7 +224,7 @@ function Architecture() {
         </DocText>
         <CodeBlock
           language="text"
-          code={`commands/maxsim/*.md       # User-facing command specs (31 files)
+          code={`commands/maxsim/*.md       # User-facing command specs (30 files)
 maxsim/workflows/*.md      # Implementation workflows
 agents/*.md                # Specialized subagent prompts (11 agents)`}
         />

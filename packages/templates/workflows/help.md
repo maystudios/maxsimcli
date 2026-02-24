@@ -336,14 +336,6 @@ Update MAXSIM to latest version with changelog preview.
 
 Usage: `/maxsim:update`
 
-**`/maxsim:join-discord`**
-Join the MAXSIM Discord community.
-
-- Get help, share what you're building, stay updated
-- Connect with other MAXSIM users
-
-Usage: `/maxsim:join-discord`
-
 ## Files & Structure
 
 ```

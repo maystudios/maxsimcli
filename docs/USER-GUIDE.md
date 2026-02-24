@@ -178,7 +178,6 @@ rapid prototyping phases where test infrastructure isn't the focus.
 | `/maxsim:pause-work` | Save context handoff | Stopping mid-phase |
 | `/maxsim:help` | Show all commands | Quick reference |
 | `/maxsim:update` | Update MAXSIM with changelog preview | Check for new versions |
-| `/maxsim:join-discord` | Open Discord community invite | Questions or community |
 
 ### Phase Management
 
