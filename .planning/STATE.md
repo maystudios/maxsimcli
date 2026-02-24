@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Users run `npx maxsim@latest` and everything works — the monorepo restructure is invisible to end users
-**Current focus:** Phase 10 — CLI UI Migration to chalk/ora/@inquirer/prompts
+**Current focus:** Phase 11 — Remove Discord command + GitHub Pages deployment
 
 ## Current Position
 
-Phase: 10 of 10 (CLI UI Migration to chalk/ora/@inquirer/prompts)
+Phase: 11 of 11 (Remove Discord command and deploy website via GitHub Pages)
 Plan: 2 of 2 in current phase
-Status: Plan 10-02 Complete — inquirer prompts + ora spinners + async IIFE
-Last activity: 2026-02-24 — Completed Plan 02 (inquirer/ora/async migration in install.ts)
+Status: Phase 11 plan 02 complete
+Last activity: 2026-02-24 — GitHub Pages deployment setup for packages/website
 
 Progress: [██████████] 100%
 
@@ -66,6 +66,7 @@ Progress: [██████████] 100%
 | Phase 09 P02 | 24 | 1 tasks | 10 files |
 | Phase 10 P01 | 10min | 3 tasks | 3 files |
 | Phase 10 P02 | 20min | 7 tasks | 1 files |
+| Phase 11 P02 | 1min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -125,11 +126,15 @@ Recent decisions affecting current work:
 - [10-02]: async IIFE pattern for top-level await in CommonJS CLI scripts
 - [10-02]: @inquirer/prompts checkbox type does not include 'instructions' field — removed from config
 - [10-02]: ora .start()/.succeed()/.fail() are synchronous — install() function stays synchronous
+- [11-02]: CNAME placed in public/ — Vite copies public/ contents to dist/ root automatically during build
+- [11-02]: Two-job workflow (build + deploy) required by actions/deploy-pages pattern; deploy job needs needs: build dependency
 
 ### Roadmap Evolution
 
 - Phase 9 added: End-to-end install and publish test loop
 - Phase 10 added: Wir wollen auf eine richtige CLI Ui beim install und etc. wechseln mithilfe von chalk, ora (Spinner) und @inquirer/prompts
+- Phase 11 added: Remove join-discord command; deploy packages/website to GitHub Pages via GitHub Actions
+- Phase 11 added: Remove Discord command and deploy website via GitHub Actions to GitHub Pages
 
 ### Pending Todos
 
@@ -144,5 +149,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 10-02-PLAN.md (inquirer prompts + ora spinners + async IIFE in install.ts)
-Resume file: .planning/phases/10-wir-wollen-auf-eine-richtige-cli-ui-beim-install-und-etc-wechseln-mithilfe-von-chalk-ora-spinner-und-inquirer-prompts/10-02-SUMMARY.md
+Stopped at: Completed 11-02-PLAN.md (GitHub Pages deployment: project.json + CNAME + deploy-website.yml)
+Resume file: .planning/phases/11-remove-discord-command-github-pages-deploy/11-02-SUMMARY.md
