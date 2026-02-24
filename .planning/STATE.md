@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Users run `npx maxsim@latest` and everything works — the monorepo restructure is invisible to end users
-**Current focus:** Phase 12 complete — milestone 1 complete
+**Current focus:** Phase 13 — Live Project Dashboard
 
 ## Current Position
 
-Phase: 12 of 12 (UX Polish + Core Hardening) — COMPLETE
-Plan: 3 of 3 in current phase
-Status: ALL PHASES COMPLETE — milestone ready for archive
-Last activity: 2026-02-24 — phase 12 integration validation passed, ROADMAP.md updated
+Phase: 13 of 13 (Live Project Dashboard) — IN PROGRESS
+Plan: 3 of 8 in current phase
+Status: Plan 13-03 complete — data layer and API routes built
+Last activity: 2026-02-24 — lib/parsers.ts and 7 API routes for dashboard data access
 
-Progress: [██████████] 100%
+Progress: [██░░░░░░░░] 25%
 
 ## Performance Metrics
 
@@ -69,6 +69,9 @@ Progress: [██████████] 100%
 | Phase 11 P02 | 1min | 2 tasks | 3 files |
 | Phase 12 P02 | 3min | 4 tasks | 12 files |
 | Phase 12 P03 | 4min | 3 tasks | 2 files |
+| Phase 13 P01 | 4min | 2 tasks | 12 files |
+| Phase 13 P03 | 4min | 3 tasks | 9 files |
+| Phase 13 P02 | 5min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -134,6 +137,14 @@ Recent decisions affecting current work:
 - [12-02]: phase-bars branch inserted between bar and JSON else branches for clean fallthrough ordering
 - [12-02]: sanity_check inserted before <purpose> tag as first content in each workflow file
 - [12-03]: init.ts and milestone.ts comment-only catches missed by 12-01 scope; fixed during integration validation
+- [Phase 13]: Standalone output commented out due to Windows EPERM symlink errors -- re-enable for production deployment
+- [Phase 13]: chokidar v4 installed (not v5 as RESEARCH.md suggested) -- v5 not yet published to npm
+- [Phase 13]: Added .next/, next-env.d.ts, *.tsbuildinfo to root .gitignore for Next.js build artifacts
+- [Phase 13]: Parser wrapper pattern: re-implement core data assembly, return objects, never call output()/process.exit()
+- [Phase 13]: All dashboard write API routes call suppressPath() before fs.writeFileSync to prevent watcher broadcast loops
+- [Phase 13]: server.ts imports use .js extensions (ESM for tsx runner) while lib files use extensionless imports (webpack compatibility)
+- [Phase 13]: watcher.ts imports use extensionless paths for Next.js webpack bundler compatibility (moduleResolution: bundler)
+- [Phase 13]: Write-suppression uses Map with TTL for automatic expiry tracking; watcher skips paths written by dashboard for 500ms
 
 ### Roadmap Evolution
 
@@ -142,6 +153,7 @@ Recent decisions affecting current work:
 - Phase 11 added: Remove join-discord command; deploy packages/website to GitHub Pages via GitHub Actions
 - Phase 11 added: Remove Discord command and deploy website via GitHub Actions to GitHub Pages
 - Phase 12 added: UX Polish + Core Hardening
+- Phase 13 added: Live Project Dashboard — real-time web dashboard (Swiss Style Design + Aceternity UI) with phase progress, open tasks, and inline plan editing
 
 ### Pending Todos
 
@@ -156,5 +168,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 12-03-PLAN.md (integration validation — builds green, phase-bars verified, roadmap files confirmed, catch blocks cleaned up)
-Resume file: .planning/phases/12-ux-polish-core-hardening/12-03-SUMMARY.md
+Stopped at: Completed 13-03-PLAN.md (data layer and 7 API routes for dashboard)
+Resume file: .planning/phases/13-live-project-dashboard/13-03-SUMMARY.md
