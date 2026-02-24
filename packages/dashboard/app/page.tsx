@@ -1,15 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useDashboardData } from "@/app/hooks/use-dashboard-data";
 import { StatsHeader } from "@/app/components/dashboard/stats-header";
 import { PhaseList } from "@/app/components/dashboard/phase-list";
+import { PhaseDetail } from "@/app/components/dashboard/phase-detail";
+import { TodosPanel } from "@/app/components/dashboard/todos-panel";
+import { BlockersPanel } from "@/app/components/dashboard/blockers-panel";
+import { AppShell } from "@/app/components/layout/app-shell";
+import { Sidebar } from "@/app/components/layout/sidebar";
 import type { DashboardPhase } from "@/lib/types";
+
+type ActiveView = "overview" | "phase" | "todos" | "blockers";
 
 /** Skeleton placeholder for loading state */
 function LoadingSkeleton() {
   return (
-    <div className="flex flex-col gap-6 p-8">
+    <div className="flex flex-col gap-6">
       {/* Stats header skeleton */}
       <div className="flex flex-col gap-4 border-b border-border pb-5">
         <div className="h-3 w-40 animate-pulse rounded-sm bg-muted" />
@@ -48,7 +55,7 @@ function LoadingSkeleton() {
 /** Error state with retry button */
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-8">
+    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4">
       <p className="font-mono text-sm text-danger">{message}</p>
       <button
         type="button"
@@ -63,23 +70,25 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 
 export default function Home() {
   const { roadmap, state, todos, loading, error } = useDashboardData();
-  const [selectedPhase, setSelectedPhase] = useState<string | null>(null);
+  const [activeView, setActiveView] = useState<ActiveView>("overview");
+  const [activePhaseId, setActivePhaseId] = useState<string | null>(null);
 
-  if (loading) {
-    return (
-      <main className="mx-auto max-w-4xl">
-        <LoadingSkeleton />
-      </main>
-    );
-  }
+  const handleNavigate = useCallback((view: ActiveView, id?: string) => {
+    setActiveView(view);
+    if (view === "phase" && id) {
+      setActivePhaseId(id);
+    }
+  }, []);
 
-  if (error) {
-    return (
-      <main className="mx-auto max-w-4xl">
-        <ErrorState message={error} onRetry={() => window.location.reload()} />
-      </main>
-    );
-  }
+  const handlePhaseClick = useCallback((phaseNumber: string) => {
+    setActiveView("phase");
+    setActivePhaseId(phaseNumber);
+  }, []);
+
+  const handleBackToOverview = useCallback(() => {
+    setActiveView("overview");
+    setActivePhaseId(null);
+  }, []);
 
   // Build phases array from roadmap data (camelCase mapping)
   const phases: DashboardPhase[] = (roadmap?.phases ?? []).map((p) => ({
@@ -97,19 +106,71 @@ export default function Home() {
 
   const currentPhase = roadmap?.current_phase ?? null;
 
-  const handlePhaseClick = (phaseNumber: string) => {
-    setSelectedPhase(phaseNumber);
-    // Phase drill-down will be implemented in Plan 05
-  };
+  /** Render the active view content */
+  function renderContent() {
+    if (loading) {
+      return <LoadingSkeleton />;
+    }
+
+    if (error) {
+      return (
+        <ErrorState message={error} onRetry={() => window.location.reload()} />
+      );
+    }
+
+    switch (activeView) {
+      case "overview":
+        return (
+          <div className="mx-auto flex max-w-4xl flex-col gap-6">
+            <StatsHeader roadmap={roadmap} state={state} todos={todos} />
+            <PhaseList
+              phases={phases}
+              currentPhase={currentPhase}
+              onPhaseClick={handlePhaseClick}
+            />
+          </div>
+        );
+
+      case "phase":
+        return activePhaseId ? (
+          <div className="mx-auto max-w-4xl">
+            <PhaseDetail
+              phaseId={activePhaseId}
+              onBack={handleBackToOverview}
+            />
+          </div>
+        ) : null;
+
+      case "todos":
+        return (
+          <div className="mx-auto max-w-3xl">
+            <TodosPanel />
+          </div>
+        );
+
+      case "blockers":
+        return (
+          <div className="mx-auto max-w-3xl">
+            <BlockersPanel />
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  }
 
   return (
-    <main className="mx-auto flex max-w-4xl flex-col gap-6 p-8">
-      <StatsHeader roadmap={roadmap} state={state} todos={todos} />
-      <PhaseList
-        phases={phases}
-        currentPhase={currentPhase}
-        onPhaseClick={handlePhaseClick}
-      />
-    </main>
+    <AppShell
+      sidebar={
+        <Sidebar
+          activeView={activeView}
+          activePhaseId={activePhaseId}
+          onNavigate={handleNavigate}
+        />
+      }
+    >
+      {renderContent()}
+    </AppShell>
   );
 }
