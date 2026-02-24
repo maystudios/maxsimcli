@@ -1,3 +1,18 @@
+## 1.3.0 (2026-02-24)
+
+### 🚀 Features
+
+- **cli:** add --version flag to install binary ([8fa087d](https://github.com/maystudios/maxsim/commit/8fa087d))
+- **e2e:** add packages/e2e NX scaffold with vitest passWithNoTests ([917aa86](https://github.com/maystudios/maxsim/commit/917aa86))
+- **e2e:** wire globalSetup in vitest.config.ts and add ProvidedContext types ([0e1e6ce](https://github.com/maystudios/maxsim/commit/0e1e6ce))
+- **e2e:** add globalSetup pack+install pipeline and mock project fixture ([473a494](https://github.com/maystudios/maxsim/commit/473a494))
+- **e2e:** add install.test.ts and tools.test.ts E2E assertion layer ([c41c616](https://github.com/maystudios/maxsim/commit/c41c616))
+
+### ❤️ Thank You
+
+- Claude Sonnet 4.6
+- Sven
+
 ## 1.2.3 (2026-02-24)
 
 ### 🩹 Fixes

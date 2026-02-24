@@ -1,3 +1,14 @@
+## 1.3.0 (2026-02-24)
+
+### 🚀 Features
+
+- **cli:** add --version flag to install binary ([8fa087d](https://github.com/maystudios/maxsim/commit/8fa087d))
+
+### ❤️ Thank You
+
+- Claude Sonnet 4.6
+- Sven
+
 ## 1.2.3 (2026-02-24)
 
 ### 🩹 Fixes
