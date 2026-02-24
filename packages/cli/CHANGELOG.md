@@ -1,3 +1,19 @@
+## 1.2.1 (2026-02-24)
+
+### 🚀 Features
+
+- **14-02:** add dashboard install-time copy and rework CLI launch command ([1199bf2](https://github.com/maystudios/maxsim/commit/1199bf2))
+- **14-02:** extend copy-assets.cjs for dashboard and add NX implicit dependency ([7352c8c](https://github.com/maystudios/maxsim/commit/7352c8c))
+
+### 🩹 Fixes
+
+- **cli:** use fs.cpSync with dereference for dashboard standalone copy ([472e123](https://github.com/maystudios/maxsim/commit/472e123))
+
+### ❤️ Thank You
+
+- Claude Sonnet 4.6
+- Sven
+
 ## 1.2.0 (2026-02-24)
 
 ### 🚀 Features

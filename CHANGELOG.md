@@ -1,3 +1,22 @@
+## 1.2.1 (2026-02-24)
+
+### 🚀 Features
+
+- **14-01:** configure Next.js standalone output with env-var guard and server bundling ([7fa5de8](https://github.com/maystudios/maxsim/commit/7fa5de8))
+- **14-01:** add build:standalone script and update NX build target ([1e573de](https://github.com/maystudios/maxsim/commit/1e573de))
+- **14-02:** extend copy-assets.cjs for dashboard and add NX implicit dependency ([7352c8c](https://github.com/maystudios/maxsim/commit/7352c8c))
+- **14-02:** add dashboard install-time copy and rework CLI launch command ([1199bf2](https://github.com/maystudios/maxsim/commit/1199bf2))
+
+### 🩹 Fixes
+
+- **cli:** use fs.cpSync with dereference for dashboard standalone copy ([472e123](https://github.com/maystudios/maxsim/commit/472e123))
+- **dashboard:** handle tsdown exit code 1 despite successful build ([b92cade](https://github.com/maystudios/maxsim/commit/b92cade))
+
+### ❤️ Thank You
+
+- Claude Sonnet 4.6
+- Sven
+
 ## 1.2.0 (2026-02-24)
 
 ### 🚀 Features
