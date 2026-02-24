@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 13 of 13 (Live Project Dashboard) — IN PROGRESS
-Plan: 5 of 8 in current phase
-Status: Plan 13-05 complete — phase detail view with plan editor and task checkboxes
-Last activity: 2026-02-24 — usePhaseDetail hook, PlanCard, TaskList, PlanEditor, PhaseDetail components
+Plan: 7 of 8 in current phase
+Status: Plan 13-07 complete — CLI integration and dashboard auto-launch
+Last activity: 2026-02-24 — dashboard CLI command, health endpoint, build pipeline, workflow auto-launch
 
-Progress: [██████░░░░] 62%
+Progress: [████████░░] 87%
 
 ## Performance Metrics
 
@@ -74,6 +74,7 @@ Progress: [██████░░░░] 62%
 | Phase 13 P02 | 5min | 2 tasks | 5 files |
 | Phase 13 P04 | 3min | 2 tasks | 6 files |
 | Phase 13 P05 | 3min | 2 tasks | 5 files |
+| Phase 13 P07 | 6min | 4 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -147,6 +148,10 @@ Recent decisions affecting current work:
 - [Phase 13]: server.ts imports use .js extensions (ESM for tsx runner) while lib files use extensionless imports (webpack compatibility)
 - [Phase 13]: watcher.ts imports use extensionless paths for Next.js webpack bundler compatibility (moduleResolution: bundler)
 - [Phase 13]: Write-suppression uses Map with TTL for automatic expiry tracking; watcher skips paths written by dashboard for 500ms
+- [Phase 13]: Dashboard command added to maxsim-tools CLI router, invoked as `node maxsim-tools.cjs dashboard` (not separate binary)
+- [Phase 13]: Health check scans port range 3333-3343 with 1.5s timeout for already-running detection
+- [Phase 13]: Server.ts compiled via tsdown to server.js using intermediate .server-build/ dir (tsdown --out-dir . incompatible with clean mode)
+- [Phase 13]: Dashboard auto-launch in execute-phase workflow is best-effort (|| true), never gates execution
 - [Phase 13-04]: useDashboardData uses useState+useEffect (not SWR/react-query) to keep dependencies minimal
 - [Phase 13-04]: Roadmap API data mapped from snake_case to DashboardPhase camelCase in page.tsx, not in the hook
 - [Phase 13-04]: @codemirror/view added as dependency to fix pre-existing build error in plan-editor.tsx
@@ -176,5 +181,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 13-05-PLAN.md (phase detail view with plan editor and task checkboxes)
-Resume file: .planning/phases/13-live-project-dashboard/13-05-SUMMARY.md
+Stopped at: Completed 13-07-PLAN.md (CLI integration and dashboard auto-launch)
+Resume file: .planning/phases/13-live-project-dashboard/13-07-SUMMARY.md
