@@ -74,22 +74,23 @@ const dashboardPublic = path.join(monorepoRoot, 'packages', 'dashboard', 'public
 const dashboardDest = path.join(distAssetsDir, 'dashboard');
 
 if (fs.existsSync(dashboardStandalone)) {
-  // Copy the standalone directory contents (server routes, traced node_modules, .next)
-  const standaloneCount = copyDir(dashboardStandalone, dashboardDest);
-  console.log(`  [assets] Copied ${standaloneCount} files -> dist/assets/dashboard/`);
+  // Use fs.cpSync for dashboard — standalone node_modules contain symlinks (pnpm)
+  // that the simple copyDir function cannot handle (EISDIR on symlinked dirs)
+  fs.cpSync(dashboardStandalone, dashboardDest, { recursive: true, dereference: true });
+  console.log(`  [assets] Copied standalone build -> dist/assets/dashboard/`);
 
   // Copy static assets into the standalone .next/static (required by Next.js)
   if (fs.existsSync(dashboardStatic)) {
     const staticDest = path.join(dashboardDest, '.next', 'static');
-    const staticCount = copyDir(dashboardStatic, staticDest);
-    console.log(`  [assets] Copied ${staticCount} static files -> dist/assets/dashboard/.next/static/`);
+    fs.cpSync(dashboardStatic, staticDest, { recursive: true });
+    console.log(`  [assets] Copied static files -> dist/assets/dashboard/.next/static/`);
   }
 
   // Copy public/ assets if they exist
   if (fs.existsSync(dashboardPublic)) {
     const publicDest = path.join(dashboardDest, 'public');
-    const publicCount = copyDir(dashboardPublic, publicDest);
-    console.log(`  [assets] Copied ${publicCount} public files -> dist/assets/dashboard/public/`);
+    fs.cpSync(dashboardPublic, publicDest, { recursive: true });
+    console.log(`  [assets] Copied public files -> dist/assets/dashboard/public/`);
   }
 } else {
   console.warn('  [warn] Dashboard standalone build not found, skipping. Run STANDALONE_BUILD=true nx build dashboard first.');
