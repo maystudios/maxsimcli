@@ -1,6 +1,6 @@
 import { watch, type FSWatcher } from "chokidar";
 import type { WebSocketServer } from "ws";
-import { broadcast } from "./websocket.js";
+import { broadcast } from "./websocket";
 
 /**
  * Set of paths recently written by the dashboard itself.
