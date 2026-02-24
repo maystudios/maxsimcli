@@ -10,6 +10,7 @@ const shared = {
   tsconfig: 'tsconfig.lib.json',
   external: [/^node:/],
   noExternal: [/^@maxsim\//],
+  inlineOnly: false,
 };
 
 export default defineConfig([
