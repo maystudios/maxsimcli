@@ -88,7 +88,7 @@ Use this instead of manually reading/parsing ROADMAP.md.
 
 ```bash
 # Get formatted progress bar
-PROGRESS_BAR=$(node ~/.claude/maxsim/bin/maxsim-tools.cjs progress bar --raw)
+PROGRESS_BAR=$(node ~/.claude/maxsim/bin/maxsim-tools.cjs progress phase-bars --raw)
 ```
 
 Present:
