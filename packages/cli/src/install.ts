@@ -1732,45 +1732,50 @@ async function installAllRuntimes(
 }
 
 // Main logic
-if (hasGlobal && hasLocal) {
-  console.error(
-    `  ${chalk.yellow('Cannot specify both --global and --local')}`,
-  );
-  process.exit(1);
-} else if (explicitConfigDir && hasLocal) {
-  console.error(
-    `  ${chalk.yellow('Cannot use --config-dir with --local')}`,
-  );
-  process.exit(1);
-} else if (hasUninstall) {
-  if (!hasGlobal && !hasLocal) {
-    console.error(
-      `  ${chalk.yellow('--uninstall requires --global or --local')}`,
-    );
+(async () => {
+  if (hasGlobal && hasLocal) {
+    console.error(chalk.yellow('Cannot specify both --global and --local'));
     process.exit(1);
-  }
-  const runtimes: RuntimeName[] =
-    selectedRuntimes.length > 0 ? selectedRuntimes : ['claude'];
-  for (const runtime of runtimes) {
-    uninstall(hasGlobal, runtime);
-  }
-} else if (selectedRuntimes.length > 0) {
-  if (!hasGlobal && !hasLocal) {
-    promptLocation(selectedRuntimes);
+  } else if (explicitConfigDir && hasLocal) {
+    console.error(chalk.yellow('Cannot use --config-dir with --local'));
+    process.exit(1);
+  } else if (hasUninstall) {
+    if (!hasGlobal && !hasLocal) {
+      console.error(chalk.yellow('--uninstall requires --global or --local'));
+      process.exit(1);
+    }
+    const runtimes: RuntimeName[] =
+      selectedRuntimes.length > 0 ? selectedRuntimes : ['claude'];
+    for (const runtime of runtimes) {
+      uninstall(hasGlobal, runtime);
+    }
+  } else if (selectedRuntimes.length > 0) {
+    if (!hasGlobal && !hasLocal) {
+      const isGlobal = await promptLocation(selectedRuntimes);
+      await installAllRuntimes(selectedRuntimes, isGlobal, true);
+    } else {
+      await installAllRuntimes(selectedRuntimes, hasGlobal, false);
+    }
+  } else if (hasGlobal || hasLocal) {
+    await installAllRuntimes(['claude'], hasGlobal, false);
   } else {
-    installAllRuntimes(selectedRuntimes, hasGlobal, false);
+    if (!process.stdin.isTTY) {
+      console.log(
+        chalk.yellow('Non-interactive terminal detected, defaulting to Claude Code global install') + '\n',
+      );
+      await installAllRuntimes(['claude'], true, false);
+    } else {
+      const runtimes = await promptRuntime();
+      const isGlobal = await promptLocation(runtimes);
+      await installAllRuntimes(runtimes, isGlobal, true);
+    }
   }
-} else if (hasGlobal || hasLocal) {
-  installAllRuntimes(['claude'], hasGlobal, false);
-} else {
-  if (!process.stdin.isTTY) {
-    console.log(
-      `  ${chalk.yellow('Non-interactive terminal detected, defaulting to Claude Code global install')}\n`,
-    );
-    installAllRuntimes(['claude'], true, false);
-  } else {
-    promptRuntime((runtimes) => {
-      promptLocation(runtimes);
-    });
+})().catch((err: unknown) => {
+  if (err instanceof Error && err.message.includes('User force closed')) {
+    // User pressed Ctrl+C during an @inquirer/prompts prompt — exit cleanly
+    console.log('\n' + chalk.yellow('Installation cancelled') + '\n');
+    process.exit(0);
   }
-}
+  console.error(chalk.red('Unexpected error:'), err);
+  process.exit(1);
+});
