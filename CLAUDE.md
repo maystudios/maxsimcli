@@ -132,13 +132,16 @@ Example: `fix(install): copy maxsim-tools.cjs to bin/ during install`
 
 ### Publishing to npm
 
-The GitHub Actions workflow (`publish.yml`) triggers on every push to `main` but **only publishes if the version in `packages/cli/package.json` differs from what's on npm**. Commit message prefixes alone do NOT trigger a publish.
+The GitHub Actions workflow (`publish.yml`) triggers on every push to `main` and is **fully automatic**:
 
-To release a new version:
-1. Bump `version` in `packages/cli/package.json` (patch → `1.0.x`, minor → `1.x.0`)
-2. Rebuild: `npx nx build cli`
-3. Commit: `chore(cli): bump version to X.Y.Z`
-4. Push → CI publishes automatically
+| Commit prefix | Version bump |
+|---------------|-------------|
+| `fix:` | patch (1.0.8 → 1.0.9) |
+| `feat:` | minor (1.0.8 → 1.1.0) |
+| `feat!:` / `fix!:` | major (1.0.8 → 2.0.0) |
+| `chore:`, `docs:`, `test:` | no bump, no publish |
+
+`nx release` analyzes commits since the last git tag, bumps `package.json`, updates `CHANGELOG.md`, creates a git commit and tag, then publishes to npm. **No manual version bumps needed.**
 
 ## Key Files for Common Tasks
 
