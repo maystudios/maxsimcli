@@ -1,10 +1,11 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import * as readline from 'node:readline';
 import * as crypto from 'node:crypto';
 
 import chalk from 'chalk';
+import ora from 'ora';
+import { select, checkbox, confirm } from '@inquirer/prompts';
 
 import type { RuntimeName, AdapterConfig } from '@maxsim/adapters';
 import {
