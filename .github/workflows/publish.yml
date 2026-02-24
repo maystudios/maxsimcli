@@ -46,6 +46,17 @@ jobs:
 
       - name: Build
         run: pnpm run build
+        env:
+          STANDALONE_BUILD: 'true'
+
+      - name: Validate tarball
+        run: |
+          cd packages/cli
+          SIZE=$(pnpm pack --dry-run 2>&1 | tail -1)
+          echo "Tarball size: $SIZE"
+          # Check dashboard files are included
+          pnpm pack --dry-run 2>&1 | grep -q "dist/assets/dashboard/server.js" || echo "WARNING: dashboard server.js not in tarball"
+          pnpm pack --dry-run 2>&1 | grep -q "dist/assets/dashboard/.next" || echo "WARNING: dashboard .next not in tarball"
 
       - name: Push release commit and tag
         run: git push --follow-tags
