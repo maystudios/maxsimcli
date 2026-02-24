@@ -1243,6 +1243,7 @@ function install(
   cleanupOrphanedFiles(targetDir);
 
   // OpenCode uses command/ (flat), Codex uses skills/, Claude/Gemini use commands/maxsim/
+  let spinner = ora({ text: 'Installing commands...', color: 'cyan' }).start();
   if (isOpencode) {
     const commandDir = path.join(targetDir, 'command');
     fs.mkdirSync(commandDir, { recursive: true });
@@ -1253,10 +1254,9 @@ function install(
       const count = fs
         .readdirSync(commandDir)
         .filter((f) => f.startsWith('maxsim-')).length;
-      console.log(
-        `  ${chalk.green('\u2713')} Installed ${count} commands to command/`,
-      );
+      spinner.succeed(chalk.green('✓') + ` Installed ${count} commands to command/`);
     } else {
+      spinner.fail('Failed to install commands');
       failures.push('command/maxsim-*');
     }
   } else if (isCodex) {
@@ -1265,10 +1265,9 @@ function install(
     copyCommandsAsCodexSkills(maxsimSrc, skillsDir, 'maxsim', pathPrefix, runtime);
     const installedSkillNames = listCodexSkillNames(skillsDir);
     if (installedSkillNames.length > 0) {
-      console.log(
-        `  ${chalk.green('\u2713')} Installed ${installedSkillNames.length} skills to skills/`,
-      );
+      spinner.succeed(chalk.green('✓') + ` Installed ${installedSkillNames.length} skills to skills/`);
     } else {
+      spinner.fail('Failed to install skills');
       failures.push('skills/maxsim-*');
     }
   } else {
@@ -1279,10 +1278,9 @@ function install(
     const maxsimDest = path.join(commandsDir, 'maxsim');
     copyWithPathReplacement(maxsimSrc, maxsimDest, pathPrefix, runtime, true);
     if (verifyInstalled(maxsimDest, 'commands/maxsim')) {
-      console.log(
-        `  ${chalk.green('\u2713')} Installed commands/maxsim`,
-      );
+      spinner.succeed(chalk.green('✓') + ' Installed commands/maxsim');
     } else {
+      spinner.fail('Failed to install commands/maxsim');
       failures.push('commands/maxsim');
     }
   }
@@ -1290,6 +1288,7 @@ function install(
   // Copy maxsim directory content (workflows, templates, references) with path replacement
   // Templates package layout: workflows/, templates/, references/ at root
   // Install target: maxsim/workflows/, maxsim/templates/, maxsim/references/
+  spinner = ora({ text: 'Installing workflows and templates...', color: 'cyan' }).start();
   const skillDest = path.join(targetDir, 'maxsim');
   const maxsimSubdirs = ['workflows', 'templates', 'references'];
   if (fs.existsSync(skillDest)) {
@@ -1304,14 +1303,16 @@ function install(
     }
   }
   if (verifyInstalled(skillDest, 'maxsim')) {
-    console.log(`  ${chalk.green('\u2713')} Installed maxsim`);
+    spinner.succeed(chalk.green('✓') + ' Installed maxsim');
   } else {
+    spinner.fail('Failed to install maxsim');
     failures.push('maxsim');
   }
 
   // Copy agents to agents directory
   const agentsSrc = path.join(src, 'agents');
   if (fs.existsSync(agentsSrc)) {
+    spinner = ora({ text: 'Installing agents...', color: 'cyan' }).start();
     const agentsDest = path.join(targetDir, 'agents');
     fs.mkdirSync(agentsDest, { recursive: true });
 
@@ -1345,8 +1346,9 @@ function install(
       }
     }
     if (verifyInstalled(agentsDest, 'agents')) {
-      console.log(`  ${chalk.green('\u2713')} Installed agents`);
+      spinner.succeed(chalk.green('✓') + ' Installed agents');
     } else {
+      spinner.fail('Failed to install agents');
       failures.push('agents');
     }
   }
@@ -1355,10 +1357,12 @@ function install(
   const changelogSrc = path.join(src, '..', 'CHANGELOG.md');
   const changelogDest = path.join(targetDir, 'maxsim', 'CHANGELOG.md');
   if (fs.existsSync(changelogSrc)) {
+    spinner = ora({ text: 'Installing CHANGELOG.md...', color: 'cyan' }).start();
     fs.copyFileSync(changelogSrc, changelogDest);
     if (verifyFileInstalled(changelogDest, 'CHANGELOG.md')) {
-      console.log(`  ${chalk.green('\u2713')} Installed CHANGELOG.md`);
+      spinner.succeed(chalk.green('✓') + ' Installed CHANGELOG.md');
     } else {
+      spinner.fail('Failed to install CHANGELOG.md');
       failures.push('CHANGELOG.md');
     }
   }
@@ -1367,10 +1371,12 @@ function install(
   const claudeMdSrc = path.join(src, 'CLAUDE.md');
   const claudeMdDest = path.join(targetDir, 'CLAUDE.md');
   if (fs.existsSync(claudeMdSrc)) {
+    spinner = ora({ text: 'Installing CLAUDE.md...', color: 'cyan' }).start();
     fs.copyFileSync(claudeMdSrc, claudeMdDest);
     if (verifyFileInstalled(claudeMdDest, 'CLAUDE.md')) {
-      console.log(`  ${chalk.green('\u2713')} Installed CLAUDE.md`);
+      spinner.succeed(chalk.green('✓') + ' Installed CLAUDE.md');
     } else {
+      spinner.fail('Failed to install CLAUDE.md');
       failures.push('CLAUDE.md');
     }
   }
@@ -1404,6 +1410,7 @@ function install(
     }
 
     if (hooksSrc) {
+      spinner = ora({ text: 'Installing hooks...', color: 'cyan' }).start();
       const hooksDest = path.join(targetDir, 'hooks');
       fs.mkdirSync(hooksDest, { recursive: true });
       const hookEntries = fs.readdirSync(hooksSrc);
@@ -1419,10 +1426,9 @@ function install(
         }
       }
       if (verifyInstalled(hooksDest, 'hooks')) {
-        console.log(
-          `  ${chalk.green('\u2713')} Installed hooks (bundled)`,
-        );
+        spinner.succeed(chalk.green('✓') + ' Installed hooks (bundled)');
       } else {
+        spinner.fail('Failed to install hooks');
         failures.push('hooks');
       }
     }
