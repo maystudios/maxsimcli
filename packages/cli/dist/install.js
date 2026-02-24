@@ -32,19 +32,18 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
 const os = __importStar(require("node:os"));
-const readline = __importStar(require("node:readline"));
 const crypto = __importStar(require("node:crypto"));
+const chalk_1 = __importDefault(require("chalk"));
+const ora_1 = __importDefault(require("ora"));
+const prompts_1 = require("@inquirer/prompts");
 const adapters_1 = require("@maxsim/adapters");
-// Colors
-const cyan = '\x1b[36m';
-const green = '\x1b[32m';
-const yellow = '\x1b[33m';
-const dim = '\x1b[2m';
-const reset = '\x1b[0m';
 // Get version from package.json
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pkg = require('../package.json');
@@ -120,21 +119,16 @@ function getOpencodeGlobalDir() {
     return adapters_1.opencodeAdapter.getGlobalDir();
 }
 const banner = '\n' +
-    cyan +
-    '  \u2588\u2588\u2557  \u2588\u2588\u2557 \u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2557  \u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2557\u2588\u2588\u2557  \u2588\u2588\u2557\n' +
-    '  \u2588\u2588\u2588\u2557\u2588\u2588\u2588\u2551\u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2557\u255a\u2588\u2588\u2557\u2588\u2588\u2554\u255d\u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255d\u2588\u2588\u2551\u2588\u2588\u2588\u2557\u2588\u2588\u2588\u2551\n' +
-    '  \u2588\u2588\u2554\u2588\u2588\u2588\u2588\u2554\u2588\u2588\u2551\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2551 \u255a\u2588\u2588\u2588\u2554\u255d \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2551\u2588\u2588\u2554\u2588\u2588\u2588\u2588\u2554\u2588\u2588\u2551\n' +
-    '  \u2588\u2588\u2551\u255a\u2588\u2588\u2554\u255d\u2588\u2588\u2551\u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2551 \u2588\u2588\u2554\u2588\u2588\u2557 \u255a\u2550\u2550\u2550\u2550\u2588\u2588\u2551\u2588\u2588\u2551\u2588\u2588\u2551\u255a\u2588\u2588\u2554\u255d\u2588\u2588\u2551\n' +
-    '  \u2588\u2588\u2551 \u255a\u2550\u255d \u2588\u2588\u2551\u2588\u2588\u2551  \u2588\u2588\u2551\u2588\u2588\u2554\u255d \u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2551\u2588\u2588\u2551\u2588\u2588\u2551 \u255a\u2550\u255d \u2588\u2588\u2551\n' +
-    '  \u255a\u2550\u255d     \u255a\u2550\u255d\u255a\u2550\u255d  \u255a\u2550\u255d\u255a\u2550\u255d  \u255a\u2550\u255d\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u255d\u255a\u2550\u255d\u255a\u2550\u255d     \u255a\u2550\u255d' +
-    reset +
+    chalk_1.default.cyan('  \u2588\u2588\u2557  \u2588\u2588\u2557 \u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2557  \u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2557\u2588\u2588\u2557  \u2588\u2588\u2557\n' +
+        '  \u2588\u2588\u2588\u2557\u2588\u2588\u2588\u2551\u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2557\u255a\u2588\u2588\u2557\u2588\u2588\u2554\u255d\u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255d\u2588\u2588\u2551\u2588\u2588\u2588\u2557\u2588\u2588\u2588\u2551\n' +
+        '  \u2588\u2588\u2554\u2588\u2588\u2588\u2588\u2554\u2588\u2588\u2551\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2551 \u255a\u2588\u2588\u2588\u2554\u255d \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2551\u2588\u2588\u2554\u2588\u2588\u2588\u2588\u2554\u2588\u2588\u2551\n' +
+        '  \u2588\u2588\u2551\u255a\u2588\u2588\u2554\u255d\u2588\u2588\u2551\u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2551 \u2588\u2588\u2554\u2588\u2588\u2557 \u255a\u2550\u2550\u2550\u2550\u2588\u2588\u2551\u2588\u2588\u2551\u2588\u2588\u2551\u255a\u2588\u2588\u2554\u255d\u2588\u2588\u2551\n' +
+        '  \u2588\u2588\u2551 \u255a\u2550\u255d \u2588\u2588\u2551\u2588\u2588\u2551  \u2588\u2588\u2551\u2588\u2588\u2554\u255d \u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2551\u2588\u2588\u2551\u2588\u2588\u2551 \u255a\u2550\u255d \u2588\u2588\u2551\n' +
+        '  \u255a\u2550\u255d     \u255a\u2550\u255d\u255a\u2550\u255d  \u255a\u2550\u255d\u255a\u2550\u255d  \u255a\u2550\u255d\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u255d\u255a\u2550\u255d\u255a\u2550\u255d     \u255a\u2550\u255d') +
     '\n' +
     '\n' +
     '  MAXSIM ' +
-    dim +
-    'v' +
-    pkg.version +
-    reset +
+    chalk_1.default.dim('v' + pkg.version) +
     '\n' +
     '  A meta-prompting, context engineering and spec-driven\n' +
     '  development system for Claude Code, OpenCode, Gemini, and Codex.\n';
@@ -144,7 +138,7 @@ function parseConfigDirArg() {
     if (configDirIndex !== -1) {
         const nextArg = args[configDirIndex + 1];
         if (!nextArg || nextArg.startsWith('-')) {
-            console.error(`  ${yellow}--config-dir requires a path argument${reset}`);
+            console.error(`  ${chalk_1.default.yellow('--config-dir requires a path argument')}`);
             process.exit(1);
         }
         return nextArg;
@@ -153,7 +147,7 @@ function parseConfigDirArg() {
     if (configDirArg) {
         const value = configDirArg.split('=')[1];
         if (!value) {
-            console.error(`  ${yellow}--config-dir requires a non-empty path${reset}`);
+            console.error(`  ${chalk_1.default.yellow('--config-dir requires a non-empty path')}`);
             process.exit(1);
         }
         return value;
@@ -166,7 +160,7 @@ const forceStatusline = args.includes('--force-statusline');
 console.log(banner);
 // Show help if requested
 if (hasHelp) {
-    console.log(`  ${yellow}Usage:${reset} npx maxsimcli [options]\n\n  ${yellow}Options:${reset}\n    ${cyan}-g, --global${reset}              Install globally (to config directory)\n    ${cyan}-l, --local${reset}               Install locally (to current directory)\n    ${cyan}--claude${reset}                  Install for Claude Code only\n    ${cyan}--opencode${reset}                Install for OpenCode only\n    ${cyan}--gemini${reset}                  Install for Gemini only\n    ${cyan}--codex${reset}                   Install for Codex only\n    ${cyan}--all${reset}                     Install for all runtimes\n    ${cyan}-u, --uninstall${reset}           Uninstall MAXSIM (remove all MAXSIM files)\n    ${cyan}-c, --config-dir <path>${reset}   Specify custom config directory\n    ${cyan}-h, --help${reset}                Show this help message\n    ${cyan}--force-statusline${reset}        Replace existing statusline config\n\n  ${yellow}Examples:${reset}\n    ${dim}# Interactive install (prompts for runtime and location)${reset}\n    npx maxsimcli\n\n    ${dim}# Install for Claude Code globally${reset}\n    npx maxsimcli --claude --global\n\n    ${dim}# Install for Gemini globally${reset}\n    npx maxsimcli --gemini --global\n\n    ${dim}# Install for Codex globally${reset}\n    npx maxsimcli --codex --global\n\n    ${dim}# Install for all runtimes globally${reset}\n    npx maxsimcli --all --global\n\n    ${dim}# Install to custom config directory${reset}\n    npx maxsimcli --codex --global --config-dir ~/.codex-work\n\n    ${dim}# Install to current project only${reset}\n    npx maxsimcli --claude --local\n\n    ${dim}# Uninstall MAXSIM from Codex globally${reset}\n    npx maxsimcli --codex --global --uninstall\n\n  ${yellow}Notes:${reset}\n    The --config-dir option is useful when you have multiple configurations.\n    It takes priority over CLAUDE_CONFIG_DIR / GEMINI_CONFIG_DIR / CODEX_HOME environment variables.\n`);
+    console.log(`  ${chalk_1.default.yellow('Usage:')} npx maxsimcli [options]\n\n  ${chalk_1.default.yellow('Options:')}\n    ${chalk_1.default.cyan('-g, --global')}              Install globally (to config directory)\n    ${chalk_1.default.cyan('-l, --local')}               Install locally (to current directory)\n    ${chalk_1.default.cyan('--claude')}                  Install for Claude Code only\n    ${chalk_1.default.cyan('--opencode')}                Install for OpenCode only\n    ${chalk_1.default.cyan('--gemini')}                  Install for Gemini only\n    ${chalk_1.default.cyan('--codex')}                   Install for Codex only\n    ${chalk_1.default.cyan('--all')}                     Install for all runtimes\n    ${chalk_1.default.cyan('-u, --uninstall')}           Uninstall MAXSIM (remove all MAXSIM files)\n    ${chalk_1.default.cyan('-c, --config-dir <path>')}   Specify custom config directory\n    ${chalk_1.default.cyan('-h, --help')}                Show this help message\n    ${chalk_1.default.cyan('--force-statusline')}        Replace existing statusline config\n\n  ${chalk_1.default.yellow('Examples:')}\n    ${chalk_1.default.dim('# Interactive install (prompts for runtime and location)')}\n    npx maxsimcli\n\n    ${chalk_1.default.dim('# Install for Claude Code globally')}\n    npx maxsimcli --claude --global\n\n    ${chalk_1.default.dim('# Install for Gemini globally')}\n    npx maxsimcli --gemini --global\n\n    ${chalk_1.default.dim('# Install for Codex globally')}\n    npx maxsimcli --codex --global\n\n    ${chalk_1.default.dim('# Install for all runtimes globally')}\n    npx maxsimcli --all --global\n\n    ${chalk_1.default.dim('# Install to custom config directory')}\n    npx maxsimcli --codex --global --config-dir ~/.codex-work\n\n    ${chalk_1.default.dim('# Install to current project only')}\n    npx maxsimcli --claude --local\n\n    ${chalk_1.default.dim('# Uninstall MAXSIM from Codex globally')}\n    npx maxsimcli --codex --global --uninstall\n\n  ${chalk_1.default.yellow('Notes:')}\n    The --config-dir option is useful when you have multiple configurations.\n    It takes priority over CLAUDE_CONFIG_DIR / GEMINI_CONFIG_DIR / CODEX_HOME environment variables.\n`);
     process.exit(0);
 }
 // Cache for attribution settings (populated once per runtime during install)
@@ -377,7 +371,7 @@ function cleanupOrphanedFiles(configDir) {
         const fullPath = path.join(configDir, relPath);
         if (fs.existsSync(fullPath)) {
             fs.unlinkSync(fullPath);
-            console.log(`  ${green}\u2713${reset} Removed orphaned ${relPath}`);
+            console.log(`  ${chalk_1.default.green('\u2713')} Removed orphaned ${relPath}`);
         }
     }
 }
@@ -414,7 +408,7 @@ function cleanupOrphanedHooks(settings) {
         }
     }
     if (cleanedHooks) {
-        console.log(`  ${green}\u2713${reset} Removed orphaned hook registrations`);
+        console.log(`  ${chalk_1.default.green('\u2713')} Removed orphaned hook registrations`);
     }
     const statusLine = settings.statusLine;
     if (statusLine &&
@@ -422,7 +416,7 @@ function cleanupOrphanedHooks(settings) {
         statusLine.command.includes('statusline.js') &&
         !statusLine.command.includes('maxsim-statusline.js')) {
         statusLine.command = statusLine.command.replace(/statusline\.js/, 'maxsim-statusline.js');
-        console.log(`  ${green}\u2713${reset} Updated statusline path (statusline.js \u2192 maxsim-statusline.js)`);
+        console.log(`  ${chalk_1.default.green('\u2713')} Updated statusline path (statusline.js \u2192 maxsim-statusline.js)`);
     }
     return settings;
 }
@@ -446,9 +440,9 @@ function uninstall(isGlobal, runtime = 'claude') {
         runtimeLabel = 'Gemini';
     if (runtime === 'codex')
         runtimeLabel = 'Codex';
-    console.log(`  Uninstalling MAXSIM from ${cyan}${runtimeLabel}${reset} at ${cyan}${locationLabel}${reset}\n`);
+    console.log(`  Uninstalling MAXSIM from ${chalk_1.default.cyan(runtimeLabel)} at ${chalk_1.default.cyan(locationLabel)}\n`);
     if (!fs.existsSync(targetDir)) {
-        console.log(`  ${yellow}\u26a0${reset} Directory does not exist: ${locationLabel}`);
+        console.log(`  ${chalk_1.default.yellow('\u26a0')} Directory does not exist: ${locationLabel}`);
         console.log(`  Nothing to uninstall.\n`);
         return;
     }
@@ -464,7 +458,7 @@ function uninstall(isGlobal, runtime = 'claude') {
                     removedCount++;
                 }
             }
-            console.log(`  ${green}\u2713${reset} Removed MAXSIM commands from command/`);
+            console.log(`  ${chalk_1.default.green('\u2713')} Removed MAXSIM commands from command/`);
         }
     }
     else if (isCodex) {
@@ -480,7 +474,7 @@ function uninstall(isGlobal, runtime = 'claude') {
             }
             if (skillCount > 0) {
                 removedCount++;
-                console.log(`  ${green}\u2713${reset} Removed ${skillCount} Codex skills`);
+                console.log(`  ${chalk_1.default.green('\u2713')} Removed ${skillCount} Codex skills`);
             }
         }
     }
@@ -489,7 +483,7 @@ function uninstall(isGlobal, runtime = 'claude') {
         if (fs.existsSync(maxsimCommandsDir)) {
             fs.rmSync(maxsimCommandsDir, { recursive: true });
             removedCount++;
-            console.log(`  ${green}\u2713${reset} Removed commands/maxsim/`);
+            console.log(`  ${chalk_1.default.green('\u2713')} Removed commands/maxsim/`);
         }
     }
     // 2. Remove maxsim directory
@@ -497,7 +491,7 @@ function uninstall(isGlobal, runtime = 'claude') {
     if (fs.existsSync(maxsimDir)) {
         fs.rmSync(maxsimDir, { recursive: true });
         removedCount++;
-        console.log(`  ${green}\u2713${reset} Removed maxsim/`);
+        console.log(`  ${chalk_1.default.green('\u2713')} Removed maxsim/`);
     }
     // 3. Remove MAXSIM agents
     const agentsDir = path.join(targetDir, 'agents');
@@ -512,7 +506,7 @@ function uninstall(isGlobal, runtime = 'claude') {
         }
         if (agentCount > 0) {
             removedCount++;
-            console.log(`  ${green}\u2713${reset} Removed ${agentCount} MAXSIM agents`);
+            console.log(`  ${chalk_1.default.green('\u2713')} Removed ${agentCount} MAXSIM agents`);
         }
     }
     // 4. Remove MAXSIM hooks
@@ -534,7 +528,7 @@ function uninstall(isGlobal, runtime = 'claude') {
         }
         if (hookCount > 0) {
             removedCount++;
-            console.log(`  ${green}\u2713${reset} Removed ${hookCount} MAXSIM hooks`);
+            console.log(`  ${chalk_1.default.green('\u2713')} Removed ${hookCount} MAXSIM hooks`);
         }
     }
     // 5. Remove MAXSIM package.json (CommonJS mode marker)
@@ -545,7 +539,7 @@ function uninstall(isGlobal, runtime = 'claude') {
             if (content === '{"type":"commonjs"}') {
                 fs.unlinkSync(pkgJsonPath);
                 removedCount++;
-                console.log(`  ${green}\u2713${reset} Removed MAXSIM package.json`);
+                console.log(`  ${chalk_1.default.green('\u2713')} Removed MAXSIM package.json`);
             }
         }
         catch {
@@ -563,7 +557,7 @@ function uninstall(isGlobal, runtime = 'claude') {
             statusLine.command.includes('maxsim-statusline')) {
             delete settings.statusLine;
             settingsModified = true;
-            console.log(`  ${green}\u2713${reset} Removed MAXSIM statusline from settings`);
+            console.log(`  ${chalk_1.default.green('\u2713')} Removed MAXSIM statusline from settings`);
         }
         const settingsHooks = settings.hooks;
         if (settingsHooks && settingsHooks.SessionStart) {
@@ -579,7 +573,7 @@ function uninstall(isGlobal, runtime = 'claude') {
             });
             if (settingsHooks.SessionStart.length < before) {
                 settingsModified = true;
-                console.log(`  ${green}\u2713${reset} Removed MAXSIM hooks from settings`);
+                console.log(`  ${chalk_1.default.green('\u2713')} Removed MAXSIM hooks from settings`);
             }
             if (settingsHooks.SessionStart.length === 0) {
                 delete settingsHooks.SessionStart;
@@ -597,7 +591,7 @@ function uninstall(isGlobal, runtime = 'claude') {
             });
             if (settingsHooks.PostToolUse.length < before) {
                 settingsModified = true;
-                console.log(`  ${green}\u2713${reset} Removed context monitor hook from settings`);
+                console.log(`  ${chalk_1.default.green('\u2713')} Removed context monitor hook from settings`);
             }
             if (settingsHooks.PostToolUse.length === 0) {
                 delete settingsHooks.PostToolUse;
@@ -644,7 +638,7 @@ function uninstall(isGlobal, runtime = 'claude') {
                 if (modified) {
                     fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n');
                     removedCount++;
-                    console.log(`  ${green}\u2713${reset} Removed MAXSIM permissions from opencode.json`);
+                    console.log(`  ${chalk_1.default.green('\u2713')} Removed MAXSIM permissions from opencode.json`);
                 }
             }
             catch {
@@ -653,10 +647,10 @@ function uninstall(isGlobal, runtime = 'claude') {
         }
     }
     if (removedCount === 0) {
-        console.log(`  ${yellow}\u26a0${reset} No MAXSIM files found to remove.`);
+        console.log(`  ${chalk_1.default.yellow('\u26a0')} No MAXSIM files found to remove.`);
     }
     console.log(`
-  ${green}Done!${reset} MAXSIM has been uninstalled from ${runtimeLabel}.
+  ${chalk_1.default.green('Done!')} MAXSIM has been uninstalled from ${runtimeLabel}.
   Your other files and settings have been preserved.
 `);
 }
@@ -729,9 +723,9 @@ function configureOpencodePermissions(isGlobal = true) {
             config = parseJsonc(content);
         }
         catch (e) {
-            console.log(`  ${yellow}\u26a0${reset} Could not parse opencode.json - skipping permission config`);
-            console.log(`    ${dim}Reason: ${e.message}${reset}`);
-            console.log(`    ${dim}Your config was NOT modified. Fix the syntax manually if needed.${reset}`);
+            console.log(`  ${chalk_1.default.yellow('\u26a0')} Could not parse opencode.json - skipping permission config`);
+            console.log(`    ${chalk_1.default.dim(`Reason: ${e.message}`)}`);
+            console.log(`    ${chalk_1.default.dim('Your config was NOT modified. Fix the syntax manually if needed.')}`);
             return;
         }
     }
@@ -763,25 +757,25 @@ function configureOpencodePermissions(isGlobal = true) {
         return;
     }
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n');
-    console.log(`  ${green}\u2713${reset} Configured read permission for MAXSIM docs`);
+    console.log(`  ${chalk_1.default.green('\u2713')} Configured read permission for MAXSIM docs`);
 }
 /**
  * Verify a directory exists and contains files
  */
 function verifyInstalled(dirPath, description) {
     if (!fs.existsSync(dirPath)) {
-        console.error(`  ${yellow}\u2717${reset} Failed to install ${description}: directory not created`);
+        console.error(`  ${chalk_1.default.yellow('\u2717')} Failed to install ${description}: directory not created`);
         return false;
     }
     try {
         const entries = fs.readdirSync(dirPath);
         if (entries.length === 0) {
-            console.error(`  ${yellow}\u2717${reset} Failed to install ${description}: directory is empty`);
+            console.error(`  ${chalk_1.default.yellow('\u2717')} Failed to install ${description}: directory is empty`);
             return false;
         }
     }
     catch (e) {
-        console.error(`  ${yellow}\u2717${reset} Failed to install ${description}: ${e.message}`);
+        console.error(`  ${chalk_1.default.yellow('\u2717')} Failed to install ${description}: ${e.message}`);
         return false;
     }
     return true;
@@ -791,7 +785,7 @@ function verifyInstalled(dirPath, description) {
  */
 function verifyFileInstalled(filePath, description) {
     if (!fs.existsSync(filePath)) {
-        console.error(`  ${yellow}\u2717${reset} Failed to install ${description}: file not created`);
+        console.error(`  ${chalk_1.default.yellow('\u2717')} Failed to install ${description}: file not created`);
         return false;
     }
     return true;
@@ -918,16 +912,14 @@ function saveLocalPatches(configDir) {
         };
         fs.writeFileSync(path.join(patchesDir, 'backup-meta.json'), JSON.stringify(meta, null, 2));
         console.log('  ' +
-            yellow +
-            'i' +
-            reset +
+            chalk_1.default.yellow('i') +
             '  Found ' +
             modified.length +
             ' locally modified MAXSIM file(s) \u2014 backed up to ' +
             PATCHES_DIR_NAME +
             '/');
         for (const f of modified) {
-            console.log('     ' + dim + f + reset);
+            console.log('     ' + chalk_1.default.dim(f));
         }
     }
     return modified;
@@ -955,25 +947,18 @@ function reportLocalPatches(configDir, runtime = 'claude') {
                 : '/maxsim:reapply-patches';
         console.log('');
         console.log('  ' +
-            yellow +
-            'Local patches detected' +
-            reset +
+            chalk_1.default.yellow('Local patches detected') +
             ' (from v' +
             meta.from_version +
             '):');
         for (const f of meta.files) {
-            console.log('     ' + cyan + f + reset);
+            console.log('     ' + chalk_1.default.cyan(f));
         }
         console.log('');
         console.log('  Your modifications are saved in ' +
-            cyan +
-            PATCHES_DIR_NAME +
-            '/' +
-            reset);
+            chalk_1.default.cyan(PATCHES_DIR_NAME + '/'));
         console.log('  Run ' +
-            cyan +
-            reapplyCommand +
-            reset +
+            chalk_1.default.cyan(reapplyCommand) +
             ' to merge them into the new version.');
         console.log('  Or manually compare and merge the files.');
         console.log('');
@@ -1002,13 +987,14 @@ function install(isGlobal, runtime = 'claude') {
         runtimeLabel = 'Gemini';
     if (isCodex)
         runtimeLabel = 'Codex';
-    console.log(`  Installing for ${cyan}${runtimeLabel}${reset} to ${cyan}${locationLabel}${reset}\n`);
+    console.log(`  Installing for ${chalk_1.default.cyan(runtimeLabel)} to ${chalk_1.default.cyan(locationLabel)}\n`);
     const failures = [];
     // Save any locally modified MAXSIM files before they get wiped
     saveLocalPatches(targetDir);
     // Clean up orphaned files from previous versions
     cleanupOrphanedFiles(targetDir);
     // OpenCode uses command/ (flat), Codex uses skills/, Claude/Gemini use commands/maxsim/
+    let spinner = (0, ora_1.default)({ text: 'Installing commands...', color: 'cyan' }).start();
     if (isOpencode) {
         const commandDir = path.join(targetDir, 'command');
         fs.mkdirSync(commandDir, { recursive: true });
@@ -1018,9 +1004,10 @@ function install(isGlobal, runtime = 'claude') {
             const count = fs
                 .readdirSync(commandDir)
                 .filter((f) => f.startsWith('maxsim-')).length;
-            console.log(`  ${green}\u2713${reset} Installed ${count} commands to command/`);
+            spinner.succeed(chalk_1.default.green('✓') + ` Installed ${count} commands to command/`);
         }
         else {
+            spinner.fail('Failed to install commands');
             failures.push('command/maxsim-*');
         }
     }
@@ -1030,9 +1017,10 @@ function install(isGlobal, runtime = 'claude') {
         copyCommandsAsCodexSkills(maxsimSrc, skillsDir, 'maxsim', pathPrefix, runtime);
         const installedSkillNames = listCodexSkillNames(skillsDir);
         if (installedSkillNames.length > 0) {
-            console.log(`  ${green}\u2713${reset} Installed ${installedSkillNames.length} skills to skills/`);
+            spinner.succeed(chalk_1.default.green('✓') + ` Installed ${installedSkillNames.length} skills to skills/`);
         }
         else {
+            spinner.fail('Failed to install skills');
             failures.push('skills/maxsim-*');
         }
     }
@@ -1043,15 +1031,17 @@ function install(isGlobal, runtime = 'claude') {
         const maxsimDest = path.join(commandsDir, 'maxsim');
         copyWithPathReplacement(maxsimSrc, maxsimDest, pathPrefix, runtime, true);
         if (verifyInstalled(maxsimDest, 'commands/maxsim')) {
-            console.log(`  ${green}\u2713${reset} Installed commands/maxsim`);
+            spinner.succeed(chalk_1.default.green('✓') + ' Installed commands/maxsim');
         }
         else {
+            spinner.fail('Failed to install commands/maxsim');
             failures.push('commands/maxsim');
         }
     }
     // Copy maxsim directory content (workflows, templates, references) with path replacement
     // Templates package layout: workflows/, templates/, references/ at root
     // Install target: maxsim/workflows/, maxsim/templates/, maxsim/references/
+    spinner = (0, ora_1.default)({ text: 'Installing workflows and templates...', color: 'cyan' }).start();
     const skillDest = path.join(targetDir, 'maxsim');
     const maxsimSubdirs = ['workflows', 'templates', 'references'];
     if (fs.existsSync(skillDest)) {
@@ -1066,14 +1056,16 @@ function install(isGlobal, runtime = 'claude') {
         }
     }
     if (verifyInstalled(skillDest, 'maxsim')) {
-        console.log(`  ${green}\u2713${reset} Installed maxsim`);
+        spinner.succeed(chalk_1.default.green('✓') + ' Installed maxsim');
     }
     else {
+        spinner.fail('Failed to install maxsim');
         failures.push('maxsim');
     }
     // Copy agents to agents directory
     const agentsSrc = path.join(src, 'agents');
     if (fs.existsSync(agentsSrc)) {
+        spinner = (0, ora_1.default)({ text: 'Installing agents...', color: 'cyan' }).start();
         const agentsDest = path.join(targetDir, 'agents');
         fs.mkdirSync(agentsDest, { recursive: true });
         // Remove old MAXSIM agents before copying new ones
@@ -1104,9 +1096,10 @@ function install(isGlobal, runtime = 'claude') {
             }
         }
         if (verifyInstalled(agentsDest, 'agents')) {
-            console.log(`  ${green}\u2713${reset} Installed agents`);
+            spinner.succeed(chalk_1.default.green('✓') + ' Installed agents');
         }
         else {
+            spinner.fail('Failed to install agents');
             failures.push('agents');
         }
     }
@@ -1114,11 +1107,13 @@ function install(isGlobal, runtime = 'claude') {
     const changelogSrc = path.join(src, '..', 'CHANGELOG.md');
     const changelogDest = path.join(targetDir, 'maxsim', 'CHANGELOG.md');
     if (fs.existsSync(changelogSrc)) {
+        spinner = (0, ora_1.default)({ text: 'Installing CHANGELOG.md...', color: 'cyan' }).start();
         fs.copyFileSync(changelogSrc, changelogDest);
         if (verifyFileInstalled(changelogDest, 'CHANGELOG.md')) {
-            console.log(`  ${green}\u2713${reset} Installed CHANGELOG.md`);
+            spinner.succeed(chalk_1.default.green('✓') + ' Installed CHANGELOG.md');
         }
         else {
+            spinner.fail('Failed to install CHANGELOG.md');
             failures.push('CHANGELOG.md');
         }
     }
@@ -1126,11 +1121,13 @@ function install(isGlobal, runtime = 'claude') {
     const claudeMdSrc = path.join(src, 'CLAUDE.md');
     const claudeMdDest = path.join(targetDir, 'CLAUDE.md');
     if (fs.existsSync(claudeMdSrc)) {
+        spinner = (0, ora_1.default)({ text: 'Installing CLAUDE.md...', color: 'cyan' }).start();
         fs.copyFileSync(claudeMdSrc, claudeMdDest);
         if (verifyFileInstalled(claudeMdDest, 'CLAUDE.md')) {
-            console.log(`  ${green}\u2713${reset} Installed CLAUDE.md`);
+            spinner.succeed(chalk_1.default.green('✓') + ' Installed CLAUDE.md');
         }
         else {
+            spinner.fail('Failed to install CLAUDE.md');
             failures.push('CLAUDE.md');
         }
     }
@@ -1138,7 +1135,7 @@ function install(isGlobal, runtime = 'claude') {
     const versionDest = path.join(targetDir, 'maxsim', 'VERSION');
     fs.writeFileSync(versionDest, pkg.version);
     if (verifyFileInstalled(versionDest, 'VERSION')) {
-        console.log(`  ${green}\u2713${reset} Wrote VERSION (${pkg.version})`);
+        console.log(`  ${chalk_1.default.green('\u2713')} Wrote VERSION (${pkg.version})`);
     }
     else {
         failures.push('VERSION');
@@ -1147,7 +1144,7 @@ function install(isGlobal, runtime = 'claude') {
         // Write package.json to force CommonJS mode for MAXSIM scripts
         const pkgJsonDest = path.join(targetDir, 'package.json');
         fs.writeFileSync(pkgJsonDest, '{"type":"commonjs"}\n');
-        console.log(`  ${green}\u2713${reset} Wrote package.json (CommonJS mode)`);
+        console.log(`  ${chalk_1.default.green('\u2713')} Wrote package.json (CommonJS mode)`);
         // Copy hooks from bundled assets directory (copied from @maxsim/hooks/dist at build time)
         let hooksSrc = null;
         const bundledHooksDir = path.resolve(__dirname, 'assets', 'hooks');
@@ -1155,9 +1152,10 @@ function install(isGlobal, runtime = 'claude') {
             hooksSrc = bundledHooksDir;
         }
         else {
-            console.warn(`  ${yellow}!${reset} bundled hooks not found - hooks will not be installed`);
+            console.warn(`  ${chalk_1.default.yellow('!')} bundled hooks not found - hooks will not be installed`);
         }
         if (hooksSrc) {
+            spinner = (0, ora_1.default)({ text: 'Installing hooks...', color: 'cyan' }).start();
             const hooksDest = path.join(targetDir, 'hooks');
             fs.mkdirSync(hooksDest, { recursive: true });
             const hookEntries = fs.readdirSync(hooksSrc);
@@ -1173,20 +1171,21 @@ function install(isGlobal, runtime = 'claude') {
                 }
             }
             if (verifyInstalled(hooksDest, 'hooks')) {
-                console.log(`  ${green}\u2713${reset} Installed hooks (bundled)`);
+                spinner.succeed(chalk_1.default.green('✓') + ' Installed hooks (bundled)');
             }
             else {
+                spinner.fail('Failed to install hooks');
                 failures.push('hooks');
             }
         }
     }
     if (failures.length > 0) {
-        console.error(`\n  ${yellow}Installation incomplete!${reset} Failed: ${failures.join(', ')}`);
+        console.error(`\n  ${chalk_1.default.yellow('Installation incomplete!')} Failed: ${failures.join(', ')}`);
         process.exit(1);
     }
     // Write file manifest for future modification detection
     writeManifest(targetDir, runtime);
-    console.log(`  ${green}\u2713${reset} Wrote file manifest (${MANIFEST_NAME})`);
+    console.log(`  ${chalk_1.default.green('\u2713')} Wrote file manifest (${MANIFEST_NAME})`);
     // Report any backed-up local patches
     reportLocalPatches(targetDir, runtime);
     if (isCodex) {
@@ -1217,7 +1216,7 @@ function install(isGlobal, runtime = 'claude') {
         const experimental = settings.experimental;
         if (!experimental.enableAgents) {
             experimental.enableAgents = true;
-            console.log(`  ${green}\u2713${reset} Enabled experimental agents`);
+            console.log(`  ${chalk_1.default.green('\u2713')} Enabled experimental agents`);
         }
     }
     // Configure SessionStart hook for update checking (skip for opencode)
@@ -1240,7 +1239,7 @@ function install(isGlobal, runtime = 'claude') {
                     },
                 ],
             });
-            console.log(`  ${green}\u2713${reset} Configured update check hook`);
+            console.log(`  ${chalk_1.default.green('\u2713')} Configured update check hook`);
         }
         // Configure PostToolUse hook for context window monitoring
         if (!installHooks.PostToolUse) {
@@ -1257,7 +1256,7 @@ function install(isGlobal, runtime = 'claude') {
                     },
                 ],
             });
-            console.log(`  ${green}\u2713${reset} Configured context window monitor hook`);
+            console.log(`  ${chalk_1.default.green('\u2713')} Configured context window monitor hook`);
         }
     }
     return { settingsPath, settings, statuslineCommand, runtime };
@@ -1273,7 +1272,7 @@ function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallS
             type: 'command',
             command: statuslineCommand,
         };
-        console.log(`  ${green}\u2713${reset} Configured statusline`);
+        console.log(`  ${chalk_1.default.green('\u2713')} Configured statusline`);
     }
     if (!isCodex && settingsPath && settings) {
         (0, adapters_1.writeSettings)(settingsPath, settings);
@@ -1294,143 +1293,91 @@ function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallS
     if (runtime === 'codex')
         command = '$maxsim-help';
     console.log(`
-  ${green}Done!${reset} Launch ${program} and run ${cyan}${command}${reset}.
+  ${chalk_1.default.green('Done!')} Launch ${program} and run ${chalk_1.default.cyan(command)}.
 
-  ${cyan}Join the community:${reset} https://discord.gg/5JJgD5svVS
+  ${chalk_1.default.cyan('Join the community:')} https://discord.gg/5JJgD5svVS
 `);
 }
 /**
- * Handle statusline configuration with optional prompt
+ * Handle statusline configuration — returns true if MAXSIM statusline should be installed
  */
-function handleStatusline(settings, isInteractive, callback) {
+async function handleStatusline(settings, isInteractive) {
     const hasExisting = settings.statusLine != null;
-    if (!hasExisting) {
-        callback(true);
-        return;
-    }
-    if (forceStatusline) {
-        callback(true);
-        return;
-    }
+    if (!hasExisting)
+        return true;
+    if (forceStatusline)
+        return true;
     if (!isInteractive) {
-        console.log(`  ${yellow}\u26a0${reset} Skipping statusline (already configured)`);
-        console.log(`    Use ${cyan}--force-statusline${reset} to replace\n`);
-        callback(false);
-        return;
+        console.log(chalk_1.default.yellow('⚠') + ' Skipping statusline (already configured)');
+        console.log('  Use ' + chalk_1.default.cyan('--force-statusline') + ' to replace\n');
+        return false;
     }
     const statusLine = settings.statusLine;
     const existingCmd = statusLine.command || statusLine.url || '(custom)';
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
+    console.log();
+    console.log(chalk_1.default.yellow('⚠  Existing statusline detected'));
+    console.log();
+    console.log('  Your current statusline:');
+    console.log('    ' + chalk_1.default.dim(`command: ${existingCmd}`));
+    console.log();
+    console.log('  MAXSIM includes a statusline showing:');
+    console.log('    • Model name');
+    console.log('    • Current task (from todo list)');
+    console.log('    • Context window usage (color-coded)');
+    console.log();
+    const shouldReplace = await (0, prompts_1.confirm)({
+        message: 'Replace with MAXSIM statusline?',
+        default: false,
     });
-    console.log(`
-  ${yellow}\u26a0${reset} Existing statusline detected\n
-  Your current statusline:
-    ${dim}command: ${existingCmd}${reset}
-
-  MAXSIM includes a statusline showing:
-    \u2022 Model name
-    \u2022 Current task (from todo list)
-    \u2022 Context window usage (color-coded)
-
-  ${cyan}1${reset}) Keep existing
-  ${cyan}2${reset}) Replace with MAXSIM statusline
-`);
-    rl.question(`  Choice ${dim}[1]${reset}: `, (answer) => {
-        rl.close();
-        const choice = answer.trim() || '1';
-        callback(choice === '2');
-    });
+    return shouldReplace;
 }
 /**
- * Prompt for runtime selection
+ * Prompt for runtime selection (multi-select)
  */
-function promptRuntime(callback) {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
+async function promptRuntime() {
+    const selected = await (0, prompts_1.checkbox)({
+        message: 'Which runtime(s) would you like to install for?',
+        choices: [
+            { name: 'Claude Code  ' + chalk_1.default.dim('(~/.claude)'), value: 'claude', checked: true },
+            { name: 'OpenCode     ' + chalk_1.default.dim('(~/.config/opencode)') + '  — open source, free models', value: 'opencode' },
+            { name: 'Gemini       ' + chalk_1.default.dim('(~/.gemini)'), value: 'gemini' },
+            { name: 'Codex        ' + chalk_1.default.dim('(~/.codex)'), value: 'codex' },
+        ],
+        validate: (choices) => choices.length > 0 || 'Please select at least one runtime',
     });
-    let answered = false;
-    rl.on('close', () => {
-        if (!answered) {
-            answered = true;
-            console.log(`\n  ${yellow}Installation cancelled${reset}\n`);
-            process.exit(0);
-        }
-    });
-    console.log(`  ${yellow}Which runtime(s) would you like to install for?${reset}\n\n  ${cyan}1${reset}) Claude Code ${dim}(~/.claude)${reset}
-  ${cyan}2${reset}) OpenCode    ${dim}(~/.config/opencode)${reset} - open source, free models
-  ${cyan}3${reset}) Gemini      ${dim}(~/.gemini)${reset}
-  ${cyan}4${reset}) Codex       ${dim}(~/.codex)${reset}
-  ${cyan}5${reset}) All
-`);
-    rl.question(`  Choice ${dim}[1]${reset}: `, (answer) => {
-        answered = true;
-        rl.close();
-        const choice = answer.trim() || '1';
-        if (choice === '5') {
-            callback(['claude', 'opencode', 'gemini', 'codex']);
-        }
-        else if (choice === '4') {
-            callback(['codex']);
-        }
-        else if (choice === '3') {
-            callback(['gemini']);
-        }
-        else if (choice === '2') {
-            callback(['opencode']);
-        }
-        else {
-            callback(['claude']);
-        }
-    });
+    return selected;
 }
 /**
  * Prompt for install location
  */
-function promptLocation(runtimes) {
+async function promptLocation(runtimes) {
     if (!process.stdin.isTTY) {
-        console.log(`  ${yellow}Non-interactive terminal detected, defaulting to global install${reset}\n`);
-        installAllRuntimes(runtimes, true, false);
-        return;
+        console.log(chalk_1.default.yellow('Non-interactive terminal detected, defaulting to global install') + '\n');
+        return true; // isGlobal
     }
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
-    let answered = false;
-    rl.on('close', () => {
-        if (!answered) {
-            answered = true;
-            console.log(`\n  ${yellow}Installation cancelled${reset}\n`);
-            process.exit(0);
-        }
-    });
     const pathExamples = runtimes
-        .map((r) => {
-        const globalPath = getGlobalDir(r, explicitConfigDir);
-        return globalPath.replace(os.homedir(), '~');
-    })
+        .map((r) => getGlobalDir(r, explicitConfigDir).replace(os.homedir(), '~'))
         .join(', ');
-    const localExamples = runtimes
-        .map((r) => `./${getDirName(r)}`)
-        .join(', ');
-    console.log(`  ${yellow}Where would you like to install?${reset}\n\n  ${cyan}1${reset}) Global ${dim}(${pathExamples})${reset} - available in all projects
-  ${cyan}2${reset}) Local  ${dim}(${localExamples})${reset} - this project only
-`);
-    rl.question(`  Choice ${dim}[1]${reset}: `, (answer) => {
-        answered = true;
-        rl.close();
-        const choice = answer.trim() || '1';
-        const isGlobal = choice !== '2';
-        installAllRuntimes(runtimes, isGlobal, true);
+    const localExamples = runtimes.map((r) => `./${getDirName(r)}`).join(', ');
+    const choice = await (0, prompts_1.select)({
+        message: 'Where would you like to install?',
+        choices: [
+            {
+                name: 'Global  ' + chalk_1.default.dim(`(${pathExamples})`) + '  — available in all projects',
+                value: 'global',
+            },
+            {
+                name: 'Local   ' + chalk_1.default.dim(`(${localExamples})`) + '  — this project only',
+                value: 'local',
+            },
+        ],
     });
+    return choice === 'global';
 }
 /**
  * Install MAXSIM for all selected runtimes
  */
-function installAllRuntimes(runtimes, isGlobal, isInteractive) {
+async function installAllRuntimes(runtimes, isGlobal, isInteractive) {
     const results = [];
     for (const runtime of runtimes) {
         const result = install(isGlobal, runtime);
@@ -1438,58 +1385,65 @@ function installAllRuntimes(runtimes, isGlobal, isInteractive) {
     }
     const statuslineRuntimes = ['claude', 'gemini'];
     const primaryStatuslineResult = results.find((r) => statuslineRuntimes.includes(r.runtime));
-    const finalize = (shouldInstallStatusline) => {
-        for (const result of results) {
-            const useStatusline = statuslineRuntimes.includes(result.runtime) && shouldInstallStatusline;
-            finishInstall(result.settingsPath, result.settings, result.statuslineCommand, useStatusline, result.runtime, isGlobal);
-        }
-    };
+    let shouldInstallStatusline = false;
     if (primaryStatuslineResult && primaryStatuslineResult.settings) {
-        handleStatusline(primaryStatuslineResult.settings, isInteractive, finalize);
+        shouldInstallStatusline = await handleStatusline(primaryStatuslineResult.settings, isInteractive);
     }
-    else {
-        finalize(false);
+    for (const result of results) {
+        const useStatusline = statuslineRuntimes.includes(result.runtime) && shouldInstallStatusline;
+        finishInstall(result.settingsPath, result.settings, result.statuslineCommand, useStatusline, result.runtime, isGlobal);
     }
 }
 // Main logic
-if (hasGlobal && hasLocal) {
-    console.error(`  ${yellow}Cannot specify both --global and --local${reset}`);
-    process.exit(1);
-}
-else if (explicitConfigDir && hasLocal) {
-    console.error(`  ${yellow}Cannot use --config-dir with --local${reset}`);
-    process.exit(1);
-}
-else if (hasUninstall) {
-    if (!hasGlobal && !hasLocal) {
-        console.error(`  ${yellow}--uninstall requires --global or --local${reset}`);
+(async () => {
+    if (hasGlobal && hasLocal) {
+        console.error(chalk_1.default.yellow('Cannot specify both --global and --local'));
         process.exit(1);
     }
-    const runtimes = selectedRuntimes.length > 0 ? selectedRuntimes : ['claude'];
-    for (const runtime of runtimes) {
-        uninstall(hasGlobal, runtime);
+    else if (explicitConfigDir && hasLocal) {
+        console.error(chalk_1.default.yellow('Cannot use --config-dir with --local'));
+        process.exit(1);
     }
-}
-else if (selectedRuntimes.length > 0) {
-    if (!hasGlobal && !hasLocal) {
-        promptLocation(selectedRuntimes);
+    else if (hasUninstall) {
+        if (!hasGlobal && !hasLocal) {
+            console.error(chalk_1.default.yellow('--uninstall requires --global or --local'));
+            process.exit(1);
+        }
+        const runtimes = selectedRuntimes.length > 0 ? selectedRuntimes : ['claude'];
+        for (const runtime of runtimes) {
+            uninstall(hasGlobal, runtime);
+        }
+    }
+    else if (selectedRuntimes.length > 0) {
+        if (!hasGlobal && !hasLocal) {
+            const isGlobal = await promptLocation(selectedRuntimes);
+            await installAllRuntimes(selectedRuntimes, isGlobal, true);
+        }
+        else {
+            await installAllRuntimes(selectedRuntimes, hasGlobal, false);
+        }
+    }
+    else if (hasGlobal || hasLocal) {
+        await installAllRuntimes(['claude'], hasGlobal, false);
     }
     else {
-        installAllRuntimes(selectedRuntimes, hasGlobal, false);
+        if (!process.stdin.isTTY) {
+            console.log(chalk_1.default.yellow('Non-interactive terminal detected, defaulting to Claude Code global install') + '\n');
+            await installAllRuntimes(['claude'], true, false);
+        }
+        else {
+            const runtimes = await promptRuntime();
+            const isGlobal = await promptLocation(runtimes);
+            await installAllRuntimes(runtimes, isGlobal, true);
+        }
     }
-}
-else if (hasGlobal || hasLocal) {
-    installAllRuntimes(['claude'], hasGlobal, false);
-}
-else {
-    if (!process.stdin.isTTY) {
-        console.log(`  ${yellow}Non-interactive terminal detected, defaulting to Claude Code global install${reset}\n`);
-        installAllRuntimes(['claude'], true, false);
+})().catch((err) => {
+    if (err instanceof Error && err.message.includes('User force closed')) {
+        // User pressed Ctrl+C during an @inquirer/prompts prompt — exit cleanly
+        console.log('\n' + chalk_1.default.yellow('Installation cancelled') + '\n');
+        process.exit(0);
     }
-    else {
-        promptRuntime((runtimes) => {
-            promptLocation(runtimes);
-        });
-    }
-}
+    console.error(chalk_1.default.red('Unexpected error:'), err);
+    process.exit(1);
+});
 //# sourceMappingURL=install.js.map

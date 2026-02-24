@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 10 of 10 (CLI UI Migration to chalk/ora/@inquirer/prompts)
-Plan: 1 of 1 in current phase
-Status: Plan 10-01 Complete — chalk migration done
-Last activity: 2026-02-24 — Completed Plan 01 (chalk migration in install.ts)
+Plan: 2 of 2 in current phase
+Status: Plan 10-02 Complete — inquirer prompts + ora spinners + async IIFE
+Last activity: 2026-02-24 — Completed Plan 02 (inquirer/ora/async migration in install.ts)
 
 Progress: [██████████] 100%
 
@@ -65,6 +65,7 @@ Progress: [██████████] 100%
 | Phase 09 P01 | 3 | 2 tasks | 2 files |
 | Phase 09 P02 | 24 | 1 tasks | 10 files |
 | Phase 10 P01 | 10min | 3 tasks | 3 files |
+| Phase 10 P02 | 20min | 7 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -120,6 +121,10 @@ Recent decisions affecting current work:
 - [Phase 09]: copy-assets.cjs post-build step copies template markdown and hook .cjs files into dist/assets/ — file assets cannot be bundled as JS, must be in tarball as files
 - [Phase 10]: chalk/ora/@inquirer/prompts go in devDependencies (not dependencies) because tsdown bundles them into the CJS output at build time
 - [Phase 10]: chalk.color('text') inside template literals is the preferred pattern for static strings; chalk.color(variable) for dynamic values
+- [10-02]: Used checkbox (multi-select) for runtime selection — allows selecting multiple runtimes in one step
+- [10-02]: async IIFE pattern for top-level await in CommonJS CLI scripts
+- [10-02]: @inquirer/prompts checkbox type does not include 'instructions' field — removed from config
+- [10-02]: ora .start()/.succeed()/.fail() are synchronous — install() function stays synchronous
 
 ### Roadmap Evolution
 
@@ -139,5 +144,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 10-01-PLAN.md (chalk migration in install.ts)
-Resume file: .planning/phases/10-wir-wollen-auf-eine-richtige-cli-ui-beim-install-und-etc-wechseln-mithilfe-von-chalk-ora-spinner-und-inquirer-prompts/10-01-SUMMARY.md
+Stopped at: Completed 10-02-PLAN.md (inquirer prompts + ora spinners + async IIFE in install.ts)
+Resume file: .planning/phases/10-wir-wollen-auf-eine-richtige-cli-ui-beim-install-und-etc-wechseln-mithilfe-von-chalk-ora-spinner-und-inquirer-prompts/10-02-SUMMARY.md
