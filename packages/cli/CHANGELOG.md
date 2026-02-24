@@ -1,3 +1,14 @@
+## 1.2.0 (2026-02-24)
+
+### 🚀 Features
+
+- **cli:** add `npx maxsimcli dashboard` command with monorepo detection ([b328544](https://github.com/maystudios/maxsim/commit/b328544))
+
+### ❤️ Thank You
+
+- Claude Opus 4.6
+- Sven
+
 ## 1.1.3 (2026-02-24)
 
 ### 🚀 Features
