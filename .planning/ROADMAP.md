@@ -12,7 +12,7 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 
 ## Phases
 
-- [ ] **Phase 15: E2E Package Scaffold** - Create `packages/e2e` NX package with correct wiring and clean ROADMAP docs
+- [x] **Phase 15: E2E Package Scaffold** - Create `packages/e2e` NX package with correct wiring and clean ROADMAP docs
 - [ ] **Phase 16: Pack + Install + Tool Tests** - Full globalSetup pipeline plus file validation, binary smoke tests, and tool behavioral tests against a mock project fixture
 - [ ] **Phase 17: Dashboard Read Tests** - Spawn dashboard server from installed path, validate all read API endpoints against mock fixture
 - [ ] **Phase 18: Dashboard Write Tests** - Validate task checkbox toggle and STATE.md write APIs update files on disk
@@ -34,19 +34,24 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 **Plans**: 1 plan
 
 Plans:
-- [ ] 15-01-PLAN.md — Create packages/e2e scaffold and verify ROADMAP.md cleanup
+- [x] 15-01-PLAN.md — Create packages/e2e scaffold and verify ROADMAP.md cleanup
 
 ### Phase 16: Pack + Install + Tool Tests
-**Goal**: The full E2E pipeline runs — `npm pack` produces a local tarball, install writes files to a temp directory, and passing assertions prove exactly 30 commands, exactly 11 agents, binary execution, and correct tool behavior against a mock project fixture
+**Goal**: The full E2E pipeline runs — `npm pack` produces a local tarball, install writes files to a temp directory, and passing assertions prove exactly 31 commands, exactly 11 agents, binary execution, and correct tool behavior against a mock project fixture
 **Depends on**: Phase 15
 **Requirements**: E2E-02, E2E-03, E2E-04, TOOL-01, TOOL-02, TOOL-03, TOOL-04, TOOL-05, TOOL-06
 **Success Criteria** (what must be TRUE):
-  1. `globalSetup.ts` runs `npm pack` from `packages/cli/dist/` and installs via local tarball to a `mkdtempSync` temp directory — registry is never contacted
-  2. `install.test.ts` asserts exactly 30 command `.md` files, exactly 11 agent `.md` files, and a known workflow directory structure in the installed temp path
-  3. `maxsimcli --version` exits 0 from the installed temp path (binary smoke test)
+  1. `globalSetup.ts` runs `npm pack` from `packages/cli/` and installs via local tarball to a `mkdtempSync` temp directory — registry is never contacted
+  2. `install.test.ts` asserts exactly 31 command `.md` files, exactly 11 agent `.md` files, and a known workflow directory structure in the installed temp path
+  3. `node install.cjs --version` exits 0 from the installed temp path (binary smoke test)
   4. `tools.test.ts` runs phase, state, roadmap, and todo commands against a mock project fixture and all exit 0 with expected output
   5. The mock project fixture is a reusable shared helper covering all command groups — any test file can import and use it without re-creating it
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 16-01-PLAN.md — Add --version flag to install.ts, wire globalSetup in vitest.config.ts, add ProvidedContext types
+- [ ] 16-02-PLAN.md — Create globalSetup.ts pack+install pipeline and mock project fixture factory
+- [ ] 16-03-PLAN.md — Create install.test.ts and tools.test.ts with all behavioral assertions
 
 ### Phase 17: Dashboard Read Tests
 **Goal**: The dashboard server boots from the installed path with `MAXSIM_PROJECT_CWD` pointing to the mock fixture, and all read-only API endpoints return data matching the mock files
@@ -88,7 +93,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 15. E2E Package Scaffold | 0/1 | Not started | - |
+| 15. E2E Package Scaffold | 1/1 | Complete | 2026-02-24 |
 | 16. Pack + Install + Tool Tests | 0/TBD | Not started | - |
 | 17. Dashboard Read Tests | 0/TBD | Not started | - |
 | 18. Dashboard Write Tests | 0/TBD | Not started | - |
