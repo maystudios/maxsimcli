@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node --import tsx server.ts",
     "build": "next build && npm run build:server",
-    "build:server": "npx tsdown server.ts --format esm --out-dir .",
+    "build:server": "npx tsdown server.ts --format esm --out-dir .server-build --no-clean && node -e \"require('fs').cpSync('.server-build/server.mjs','server.js');require('fs').rmSync('.server-build',{recursive:true,force:true})\"",
     "start": "node server.js"
   },
   "dependencies": {

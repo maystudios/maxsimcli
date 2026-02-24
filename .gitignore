@@ -18,6 +18,10 @@ commands.html
 next-env.d.ts
 *.tsbuildinfo
 
+# Dashboard compiled server output
+packages/dashboard/server.js
+packages/dashboard/.server-build/
+
 # Temp files
 tmp/
 
