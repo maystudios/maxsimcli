@@ -67,4 +67,32 @@ if (fs.existsSync(changelogSrc)) {
   console.log(`  [assets] Copied CHANGELOG.md -> dist/assets/`);
 }
 
+// 4. Copy dashboard standalone build into dist/assets/dashboard
+const dashboardStandalone = path.join(monorepoRoot, 'packages', 'dashboard', '.next', 'standalone');
+const dashboardStatic = path.join(monorepoRoot, 'packages', 'dashboard', '.next', 'static');
+const dashboardPublic = path.join(monorepoRoot, 'packages', 'dashboard', 'public');
+const dashboardDest = path.join(distAssetsDir, 'dashboard');
+
+if (fs.existsSync(dashboardStandalone)) {
+  // Copy the standalone directory contents (server routes, traced node_modules, .next)
+  const standaloneCount = copyDir(dashboardStandalone, dashboardDest);
+  console.log(`  [assets] Copied ${standaloneCount} files -> dist/assets/dashboard/`);
+
+  // Copy static assets into the standalone .next/static (required by Next.js)
+  if (fs.existsSync(dashboardStatic)) {
+    const staticDest = path.join(dashboardDest, '.next', 'static');
+    const staticCount = copyDir(dashboardStatic, staticDest);
+    console.log(`  [assets] Copied ${staticCount} static files -> dist/assets/dashboard/.next/static/`);
+  }
+
+  // Copy public/ assets if they exist
+  if (fs.existsSync(dashboardPublic)) {
+    const publicDest = path.join(dashboardDest, 'public');
+    const publicCount = copyDir(dashboardPublic, publicDest);
+    console.log(`  [assets] Copied ${publicCount} public files -> dist/assets/dashboard/public/`);
+  }
+} else {
+  console.warn('  [warn] Dashboard standalone build not found, skipping. Run STANDALONE_BUILD=true nx build dashboard first.');
+}
+
 console.log('  [assets] Done.');
