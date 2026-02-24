@@ -12,6 +12,7 @@ export function createMockProject(): MockProject {
 
   // Directory structure
   mkdirSync(join(dir, '.planning', 'phases', '01-foundation'), { recursive: true });
+  mkdirSync(join(dir, '.planning', 'phases', '02-integration'), { recursive: true });
   mkdirSync(join(dir, '.planning', 'todos', 'pending'), { recursive: true });
   mkdirSync(join(dir, '.planning', 'todos', 'completed'), { recursive: true });
 
@@ -104,6 +105,7 @@ export function createMockProject(): MockProject {
   writeFileSync(
     join(dir, '.planning', 'todos', 'pending', 'todo-001-test-task.md'),
     [
+      'title: Test Task',
       '# Todo: Test Task',
       '',
       '**Area:** general',
