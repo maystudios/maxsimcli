@@ -1653,49 +1653,21 @@ function handleStatusline(
 }
 
 /**
- * Prompt for runtime selection
+ * Prompt for runtime selection (multi-select)
  */
-function promptRuntime(callback: (runtimes: RuntimeName[]) => void): void {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
+async function promptRuntime(): Promise<RuntimeName[]> {
+  const selected = await checkbox<RuntimeName>({
+    message: 'Which runtime(s) would you like to install for?',
+    choices: [
+      { name: 'Claude Code  ' + chalk.dim('(~/.claude)'), value: 'claude', checked: true },
+      { name: 'OpenCode     ' + chalk.dim('(~/.config/opencode)') + '  — open source, free models', value: 'opencode' },
+      { name: 'Gemini       ' + chalk.dim('(~/.gemini)'), value: 'gemini' },
+      { name: 'Codex        ' + chalk.dim('(~/.codex)'), value: 'codex' },
+    ],
+    instructions: chalk.dim('  (Space to select, Enter to confirm, A to toggle all)'),
+    validate: (choices) => choices.length > 0 || 'Please select at least one runtime',
   });
-
-  let answered = false;
-
-  rl.on('close', () => {
-    if (!answered) {
-      answered = true;
-      console.log(`\n  ${chalk.yellow('Installation cancelled')}\n`);
-      process.exit(0);
-    }
-  });
-
-  console.log(
-    `  ${chalk.yellow('Which runtime(s) would you like to install for?')}\n\n  ${chalk.cyan('1')}) Claude Code ${chalk.dim('(~/.claude)')}
-  ${chalk.cyan('2')}) OpenCode    ${chalk.dim('(~/.config/opencode)')} - open source, free models
-  ${chalk.cyan('3')}) Gemini      ${chalk.dim('(~/.gemini)')}
-  ${chalk.cyan('4')}) Codex       ${chalk.dim('(~/.codex)')}
-  ${chalk.cyan('5')}) All
-`,
-  );
-
-  rl.question(`  Choice ${chalk.dim('[1]')}: `, (answer: string) => {
-    answered = true;
-    rl.close();
-    const choice = answer.trim() || '1';
-    if (choice === '5') {
-      callback(['claude', 'opencode', 'gemini', 'codex']);
-    } else if (choice === '4') {
-      callback(['codex']);
-    } else if (choice === '3') {
-      callback(['gemini']);
-    } else if (choice === '2') {
-      callback(['opencode']);
-    } else {
-      callback(['claude']);
-    }
-  });
+  return selected;
 }
 
 /**
