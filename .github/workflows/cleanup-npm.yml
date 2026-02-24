@@ -12,15 +12,12 @@ jobs:
           node-version: 22
           registry-url: https://registry.npmjs.org
 
-      - name: Unpublish all versions
+      - name: Deprecate old versions
         run: |
-          npm unpublish maxsimcli@1.0.0 || true
-          npm unpublish maxsimcli@1.0.1 || true
-          npm unpublish maxsimcli@1.0.2 || true
-          npm unpublish maxsimcli@1.0.3 || true
-          npm unpublish maxsimcli@1.0.4 || true
-          npm unpublish maxsimcli@1.0.5 || true
-          echo "Done. Remaining versions:"
+          npm deprecate maxsimcli@1.0.5 "Deprecated - use maxsimcli@latest" || true
+          npm deprecate maxsimcli@1.0.3 "Deprecated - use maxsimcli@latest" || true
+          npm deprecate maxsimcli@1.0.0 "Deprecated - use maxsimcli@latest" || true
+          echo "Done. Current versions:"
           npm view maxsimcli versions --json 2>/dev/null || echo "none"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
