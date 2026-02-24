@@ -1655,7 +1655,6 @@ async function promptRuntime(): Promise<RuntimeName[]> {
       { name: 'Gemini       ' + chalk.dim('(~/.gemini)'), value: 'gemini' },
       { name: 'Codex        ' + chalk.dim('(~/.codex)'), value: 'codex' },
     ],
-    instructions: chalk.dim('  (Space to select, Enter to confirm, A to toggle all)'),
     validate: (choices) => choices.length > 0 || 'Please select at least one runtime',
   });
   return selected;
