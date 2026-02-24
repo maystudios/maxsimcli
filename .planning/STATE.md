@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Users run `npx maxsim@latest` and everything works — the monorepo restructure is invisible to end users
-**Current focus:** Phase 13 — Live Project Dashboard
+**Current focus:** Phase 14 — Dashboard npm Delivery
 
 ## Current Position
 
-Phase: 13 of 13 (Live Project Dashboard) — IN PROGRESS
-Plan: 8 of 8 in current phase (Task 1 complete, Task 2 checkpoint pending)
-Status: Plan 13-08 Task 1 complete — build verification passed, awaiting human verification
-Last activity: 2026-02-24 — integration build verification, all dashboard components pass nx build
+Phase: 14 of 14 (Dashboard npm Delivery) — IN PROGRESS
+Plan: 1 of 3 in current phase (complete)
+Status: Plan 14-01 complete — standalone build pipeline configured
+Last activity: 2026-02-24 — next.config.mjs standalone guard, tsdown server config, build:standalone script
 
-Progress: [█████████░] 95%
+Progress: [█████████░] 96%
 
 ## Performance Metrics
 
@@ -77,6 +77,7 @@ Progress: [█████████░] 95%
 | Phase 13 P07 | 6min | 4 tasks | 6 files |
 | Phase 13 P06 | 4min | 2 tasks | 6 files |
 | Phase 13 P08 | 2min | 1 tasks | 25 files |
+| Phase 14 P01 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -166,6 +167,9 @@ Recent decisions affecting current work:
 - [Phase 13-06]: TodosPanel fetches independently from useDashboardData to allow granular WebSocket-driven refresh
 - [Phase 13-08]: No source code changes needed for integration -- all prior plan components integrate cleanly on first build
 - [Phase 13-08]: Build artifacts committed as verification of clean integration state
+- [Phase 14]: STANDALONE_BUILD env-var guard in next.config.mjs to avoid Windows EPERM symlink errors in dev
+- [Phase 14]: tsdown config file (not inline CLI flags) for server bundling clarity and maintainability
+- [Phase 14]: NX build target switched to build:standalone so nx build dashboard produces standalone output
 
 ### Roadmap Evolution
 
@@ -175,6 +179,7 @@ Recent decisions affecting current work:
 - Phase 11 added: Remove Discord command and deploy website via GitHub Actions to GitHub Pages
 - Phase 12 added: UX Polish + Core Hardening
 - Phase 13 added: Live Project Dashboard — real-time web dashboard (Swiss Style Design + Aceternity UI) with phase progress, open tasks, and inline plan editing
+- Phase 14 added: Dashboard npm Delivery — ship dashboard inside maxsimcli npm package via Next.js standalone build, `npx maxsimcli dashboard` for end users
 
 ### Pending Todos
 
@@ -189,5 +194,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Plan 13-08 Task 1 complete, awaiting checkpoint:human-verify for Task 2
-Resume file: .planning/phases/13-live-project-dashboard/13-08-SUMMARY.md
+Stopped at: Completed 14-01-PLAN.md
+Resume file: .planning/phases/14-dashboard-npm-delivery/14-01-SUMMARY.md
