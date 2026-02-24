@@ -1593,63 +1593,48 @@ function finishInstall(
 }
 
 /**
- * Handle statusline configuration with optional prompt
+ * Handle statusline configuration — returns true if MAXSIM statusline should be installed
  */
-function handleStatusline(
+async function handleStatusline(
   settings: Record<string, unknown>,
   isInteractive: boolean,
-  callback: (shouldInstall: boolean) => void,
-): void {
+): Promise<boolean> {
   const hasExisting = settings.statusLine != null;
 
-  if (!hasExisting) {
-    callback(true);
-    return;
-  }
-
-  if (forceStatusline) {
-    callback(true);
-    return;
-  }
+  if (!hasExisting) return true;
+  if (forceStatusline) return true;
 
   if (!isInteractive) {
     console.log(
-      `  ${chalk.yellow('\u26a0')} Skipping statusline (already configured)`,
+      chalk.yellow('⚠') + ' Skipping statusline (already configured)',
     );
     console.log(
-      `    Use ${chalk.cyan('--force-statusline')} to replace\n`,
+      '  Use ' + chalk.cyan('--force-statusline') + ' to replace\n',
     );
-    callback(false);
-    return;
+    return false;
   }
 
   const statusLine = settings.statusLine as { command?: string; url?: string };
   const existingCmd = statusLine.command || statusLine.url || '(custom)';
 
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
+  console.log();
+  console.log(chalk.yellow('⚠  Existing statusline detected'));
+  console.log();
+  console.log('  Your current statusline:');
+  console.log('    ' + chalk.dim(`command: ${existingCmd}`));
+  console.log();
+  console.log('  MAXSIM includes a statusline showing:');
+  console.log('    • Model name');
+  console.log('    • Current task (from todo list)');
+  console.log('    • Context window usage (color-coded)');
+  console.log();
+
+  const shouldReplace = await confirm({
+    message: 'Replace with MAXSIM statusline?',
+    default: false,
   });
 
-  console.log(`
-  ${chalk.yellow('\u26a0')} Existing statusline detected\n
-  Your current statusline:
-    ${chalk.dim(`command: ${existingCmd}`)}
-
-  MAXSIM includes a statusline showing:
-    \u2022 Model name
-    \u2022 Current task (from todo list)
-    \u2022 Context window usage (color-coded)
-
-  ${chalk.cyan('1')}) Keep existing
-  ${chalk.cyan('2')}) Replace with MAXSIM statusline
-`);
-
-  rl.question(`  Choice ${chalk.dim('[1]')}: `, (answer: string) => {
-    rl.close();
-    const choice = answer.trim() || '1';
-    callback(choice === '2');
-  });
+  return shouldReplace;
 }
 
 /**
@@ -1707,11 +1692,11 @@ async function promptLocation(runtimes: RuntimeName[]): Promise<boolean> {
 /**
  * Install MAXSIM for all selected runtimes
  */
-function installAllRuntimes(
+async function installAllRuntimes(
   runtimes: RuntimeName[],
   isGlobal: boolean,
   isInteractive: boolean,
-): void {
+): Promise<void> {
   const results: InstallResult[] = [];
 
   for (const runtime of runtimes) {
@@ -1724,29 +1709,25 @@ function installAllRuntimes(
     statuslineRuntimes.includes(r.runtime),
   );
 
-  const finalize = (shouldInstallStatusline: boolean): void => {
-    for (const result of results) {
-      const useStatusline =
-        statuslineRuntimes.includes(result.runtime) && shouldInstallStatusline;
-      finishInstall(
-        result.settingsPath,
-        result.settings,
-        result.statuslineCommand,
-        useStatusline,
-        result.runtime,
-        isGlobal,
-      );
-    }
-  };
-
+  let shouldInstallStatusline = false;
   if (primaryStatuslineResult && primaryStatuslineResult.settings) {
-    handleStatusline(
+    shouldInstallStatusline = await handleStatusline(
       primaryStatuslineResult.settings,
       isInteractive,
-      finalize,
     );
-  } else {
-    finalize(false);
+  }
+
+  for (const result of results) {
+    const useStatusline =
+      statuslineRuntimes.includes(result.runtime) && shouldInstallStatusline;
+    finishInstall(
+      result.settingsPath,
+      result.settings,
+      result.statuslineCommand,
+      useStatusline,
+      result.runtime,
+      isGlobal,
+    );
   }
 }
 
