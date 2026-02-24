@@ -60,6 +60,22 @@ if (hasAll) {
 }
 
 /**
+ * Walk up from cwd to find the MAXSIM monorepo root (has packages/dashboard)
+ */
+function findMonorepoRoot(startDir: string): string | null {
+  let dir = startDir;
+  for (let i = 0; i < 10; i++) {
+    if (fs.existsSync(path.join(dir, 'packages', 'dashboard', 'server.ts'))) {
+      return dir;
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return null;
+}
+
+/**
  * Adapter registry keyed by runtime name
  */
 const adapterMap: Record<RuntimeName, AdapterConfig> = {
@@ -1749,7 +1765,71 @@ async function installAllRuntimes(
 }
 
 // Main logic
+// Subcommand routing — intercept before install flow
+const subcommand = args.find(a => !a.startsWith('-'));
+
 (async () => {
+  // Dashboard subcommand
+  if (subcommand === 'dashboard') {
+    const { execSync: execSyncDash, spawn: spawnDash } = await import('node:child_process');
+
+    // Try to find dashboard in monorepo (development)
+    const monorepoDashboard = path.resolve(process.cwd(), 'packages', 'dashboard');
+    const monorepoRoot = findMonorepoRoot(process.cwd());
+
+    if (monorepoRoot) {
+      const dashDir = path.join(monorepoRoot, 'packages', 'dashboard');
+      if (fs.existsSync(path.join(dashDir, 'server.ts'))) {
+        console.log(chalk.blue('Starting dashboard from monorepo...'));
+        console.log(chalk.gray(`  Project: ${process.cwd()}`));
+        console.log(chalk.gray(`  Dashboard: ${dashDir}\n`));
+
+        const child = spawnDash('node', ['--import', 'tsx', 'server.ts'], {
+          cwd: dashDir,
+          stdio: 'inherit',
+          env: {
+            ...process.env,
+            MAXSIM_PROJECT_CWD: process.cwd(),
+            NODE_ENV: 'development',
+          },
+        });
+
+        child.on('exit', (code) => process.exit(code ?? 0));
+        return;
+      }
+    }
+
+    // Try to find dashboard via installed maxsim-tools
+    const toolsPaths = [
+      path.join(process.cwd(), '.claude', 'maxsim', 'bin', 'maxsim-tools.cjs'),
+      path.join(os.homedir(), '.claude', 'maxsim', 'bin', 'maxsim-tools.cjs'),
+    ];
+    for (const toolsPath of toolsPaths) {
+      if (fs.existsSync(toolsPath)) {
+        try {
+          const child = spawnDash('node', [toolsPath, 'dashboard'], {
+            cwd: process.cwd(),
+            stdio: 'inherit',
+          });
+          child.on('exit', (code) => process.exit(code ?? 0));
+          return;
+        } catch {
+          // Try next path
+        }
+      }
+    }
+
+    console.log(chalk.yellow('\n  Dashboard not found.\n'));
+    console.log('  The dashboard requires the MAXSIM monorepo.\n');
+    console.log('  ' + chalk.bold('To use the dashboard:'));
+    console.log('    1. Clone the repo: git clone https://github.com/maystudios/maxsim.git');
+    console.log('    2. Install deps:   cd maxsim && pnpm install');
+    console.log('    3. Start:          cd packages/dashboard && pnpm run dev\n');
+    console.log('  Set ' + chalk.cyan('MAXSIM_PROJECT_CWD') + ' to point at your project:\n');
+    console.log('    ' + chalk.gray('MAXSIM_PROJECT_CWD=/path/to/your/project pnpm run dev') + '\n');
+    process.exit(0);
+  }
+
   if (hasGlobal && hasLocal) {
     console.error(chalk.yellow('Cannot specify both --global and --local'));
     process.exit(1);

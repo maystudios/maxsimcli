@@ -138,19 +138,22 @@ Loop **discuss → plan → execute → verify** until done. Archive the milesto
 
 | Command | Description |
 |---------|-------------|
-| `maxsim dashboard` | Launch the live project dashboard |
-| `maxsim dashboard --stop` | Stop a running dashboard |
+| `npx maxsimcli dashboard` | Launch the live project dashboard |
 
-The dashboard is a real-time web UI that shows your project's progress as you work. It auto-launches during `/maxsim:execute-phase` or you can start it manually.
+The dashboard is a real-time web UI that shows your project's progress as you work. It also auto-launches during `/maxsim:execute-phase`.
 
 **Start the dashboard:**
 
 ```bash
-# Via CLI (recommended)
-maxsim dashboard
+# From your project directory
+npx maxsimcli dashboard
+```
 
-# Or directly for development
-cd packages/dashboard && pnpm run dev
+If you're developing MAXSIM locally:
+
+```bash
+# From the monorepo root — point at your project
+MAXSIM_PROJECT_CWD=/path/to/your/project pnpm --filter @maxsim/dashboard dev
 ```
 
 The dashboard auto-detects a free port (starting at 3333) and opens in your browser.
