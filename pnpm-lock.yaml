@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      figlet:
-        specifier: ^1.10.0
-        version: 1.10.0
     devDependencies:
       '@inquirer/prompts':
         specifier: ^8.3.0
@@ -21,9 +17,6 @@ importers:
       '@nx/vitest':
         specifier: 22.5.1
         version: 22.5.1(@babel/traverse@7.29.0)(nx@22.5.1)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.0)(jiti@2.6.1)(lightningcss@1.31.1)(yaml@2.8.2))(vitest@4.0.18(@types/node@25.3.0)(jiti@2.6.1)(lightningcss@1.31.1)(yaml@2.8.2))
-      '@types/figlet':
-        specifier: ^1.7.0
-        version: 1.7.0
       '@types/node':
         specifier: ^25.3.0
         version: 25.3.0
