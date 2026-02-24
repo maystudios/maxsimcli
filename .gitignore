@@ -2,6 +2,7 @@ node_modules/
 .DS_Store
 TO-DOS.md
 CLAUDE.md
+!/CLAUDE.md
 !packages/templates/CLAUDE.md
 /research.claude/
 commands.html
