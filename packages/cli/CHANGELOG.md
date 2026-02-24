@@ -1,3 +1,13 @@
+## 1.0.11 (2026-02-24)
+
+### 🚀 Features
+
+- **core:** add chalk dependency and phase-bars format to cmdProgressRender ([121f17c](https://github.com/maystudios/maxsim/commit/121f17c))
+
+### ❤️ Thank You
+
+- Sven
+
 ## 1.0.10 (2026-02-24)
 
 This was a version bump only for cli to align it with other projects, there were no code changes.

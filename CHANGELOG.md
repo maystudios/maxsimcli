@@ -1,3 +1,16 @@
+## 1.0.11 (2026-02-24)
+
+### 🚀 Features
+
+- **core:** add chalk dependency and phase-bars format to cmdProgressRender ([121f17c](https://github.com/maystudios/maxsim/commit/121f17c))
+- **templates:** add /maxsim:roadmap command and workflow ([372c8a3](https://github.com/maystudios/maxsim/commit/372c8a3))
+- **templates:** update progress workflow to use phase-bars format ([c9672ee](https://github.com/maystudios/maxsim/commit/c9672ee))
+- **templates:** add sanity_check guard to five major workflow files ([fca2b19](https://github.com/maystudios/maxsim/commit/fca2b19))
+
+### ❤️ Thank You
+
+- Sven
+
 ## 1.0.10 (2026-02-24)
 
 This was a version bump only, there were no code changes.
