@@ -1,3 +1,15 @@
+## 1.1.3 (2026-02-24)
+
+### 🚀 Features
+
+- **13-07:** update dashboard build pipeline with server compilation ([e4dadd2](https://github.com/maystudios/maxsim/commit/e4dadd2))
+- **13-07:** add dashboard launch command to CLI dispatch router ([a593fc4](https://github.com/maystudios/maxsim/commit/a593fc4))
+
+### ❤️ Thank You
+
+- Claude Opus 4.6
+- Sven
+
 ## 1.1.2 (2026-02-24)
 
 ### 🚀 Features
