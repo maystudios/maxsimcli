@@ -1,3 +1,14 @@
+## 1.1.1 (2026-02-24)
+
+### 🩹 Fixes
+
+- **discuss:** enforce AskUserQuestion tool for all user interactions ([149fda4](https://github.com/maystudios/maxsim/commit/149fda4))
+
+### ❤️ Thank You
+
+- Claude Opus 4.6
+- Sven
+
 ## 1.1.0 (2026-02-24)
 
 ### 🚀 Features
