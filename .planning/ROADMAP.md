@@ -13,7 +13,7 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 ## Phases
 
 - [x] **Phase 15: E2E Package Scaffold** - Create `packages/e2e` NX package with correct wiring and clean ROADMAP docs
-- [ ] **Phase 16: Pack + Install + Tool Tests** - Full globalSetup pipeline plus file validation, binary smoke tests, and tool behavioral tests against a mock project fixture
+- [x] **Phase 16: Pack + Install + Tool Tests** - Full globalSetup pipeline plus file validation, binary smoke tests, and tool behavioral tests against a mock project fixture (completed 2026-02-24)
 - [ ] **Phase 17: Dashboard Read Tests** - Spawn dashboard server from installed path, validate all read API endpoints against mock fixture
 - [ ] **Phase 18: Dashboard Write Tests** - Validate task checkbox toggle and STATE.md write APIs update files on disk
 - [ ] **Phase 19: CI Integration** - Wire E2E suite into GitHub Actions, gate publish on green E2E
@@ -93,8 +93,8 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 15. E2E Package Scaffold | 1/1 | Complete | 2020-02-24 |
-| 16. Pack + Install + Tool Tests | 2/3 | In Progress|  |
+| 15. E2E Package Scaffold | 1/1 | Complete | 2026-02-24 |
+| 16. Pack + Install + Tool Tests | 3/3 | Complete | 2026-02-25 |
 | 17. Dashboard Read Tests | 0/TBD | Not started | - |
 | 18. Dashboard Write Tests | 0/TBD | Not started | - |
 | 19. CI Integration | 0/TBD | Not started | - |
