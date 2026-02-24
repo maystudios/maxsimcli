@@ -130,10 +130,16 @@ export function cmdMilestoneComplete(
           }
           const taskMatches = content.match(/##\s*Task\s*\d+/gi) || [];
           totalTasks += taskMatches.length;
-        } catch { /* empty */ }
+        } catch (e) {
+          /* optional op, ignore */
+          if (process.env.MAXSIM_DEBUG) console.error(e);
+        }
       }
     }
-  } catch { /* empty */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   // Archive ROADMAP.md
   if (fs.existsSync(roadmapPath)) {
@@ -196,7 +202,10 @@ export function cmdMilestoneComplete(
         fs.renameSync(path.join(phasesDir, dir), path.join(phaseArchiveDir, dir));
       }
       phasesArchived = phaseDirNames.length > 0;
-    } catch { /* empty */ }
+    } catch (e) {
+      /* optional op, ignore */
+      if (process.env.MAXSIM_DEBUG) console.error(e);
+    }
   }
 
   const result: MilestoneResult = {

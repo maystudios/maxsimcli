@@ -343,7 +343,10 @@ function scanPhaseArtifacts(cwd: string, phaseDirectory: string): PhaseArtifacts
     if (uatFile) {
       result.uat_path = path.join(phaseDirectory, uatFile);
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
   return result;
 }
 
@@ -464,7 +467,10 @@ export function cmdInitNewProject(cwd: string, raw: boolean): void {
       stdio: ['pipe', 'pipe', 'pipe'],
     });
     hasCode = files.trim().length > 0;
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   hasPackageFile = pathExistsInternal(cwd, 'package.json') ||
                    pathExistsInternal(cwd, 'requirements.txt') ||
@@ -530,7 +536,10 @@ export function cmdInitQuick(cwd: string, description: string | undefined, raw: 
     if (existing.length > 0) {
       nextNum = Math.max(...existing) + 1;
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   const result: QuickContext = {
     planner_model: resolveModelInternal(cwd, 'maxsim-planner'),
@@ -558,7 +567,10 @@ export function cmdInitResume(cwd: string, raw: boolean): void {
   let interruptedAgentId: string | null = null;
   try {
     interruptedAgentId = fs.readFileSync(path.join(cwd, '.planning', 'current-agent-id.txt'), 'utf-8').trim();
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   const result: ResumeContext = {
     state_exists: pathExistsInternal(cwd, '.planning/STATE.md'),
@@ -682,9 +694,15 @@ export function cmdInitTodos(cwd: string, area: string | undefined, raw: boolean
           area: todoArea,
           path: path.join('.planning', 'todos', 'pending', file),
         });
-      } catch { /* ignore */ }
+      } catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG) console.error(e);
+      }
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   const result: TodosContext = {
     commit_docs: config.commit_docs,
@@ -720,9 +738,15 @@ export function cmdInitMilestoneOp(cwd: string, raw: boolean): void {
         const phaseFiles = fs.readdirSync(path.join(phasesDir, dir));
         const hasSummary = phaseFiles.some(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
         if (hasSummary) completedPhases++;
-      } catch { /* ignore */ }
+      } catch (e) {
+        /* optional op, ignore */
+        if (process.env.MAXSIM_DEBUG) console.error(e);
+      }
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   const archiveDir = path.join(cwd, '.planning', 'archive');
   let archivedMilestones: string[] = [];
@@ -730,7 +754,10 @@ export function cmdInitMilestoneOp(cwd: string, raw: boolean): void {
     archivedMilestones = fs.readdirSync(archiveDir, { withFileTypes: true })
       .filter(e => e.isDirectory())
       .map(e => e.name);
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   const result: MilestoneOpContext = {
     commit_docs: config.commit_docs,
@@ -759,7 +786,10 @@ export function cmdInitMapCodebase(cwd: string, raw: boolean): void {
   let existingMaps: string[] = [];
   try {
     existingMaps = fs.readdirSync(codebaseDir).filter(f => f.endsWith('.md'));
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   const result: MapCodebaseContext = {
     mapper_model: resolveModelInternal(cwd, 'maxsim-codebase-mapper'),
@@ -824,14 +854,20 @@ export function cmdInitProgress(cwd: string, raw: boolean): void {
         nextPhase = phaseInfo;
       }
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   let pausedAt: string | null = null;
   try {
     const state = fs.readFileSync(path.join(cwd, '.planning', 'STATE.md'), 'utf-8');
     const pauseMatch = state.match(/\*\*Paused At:\*\*\s*(.+)/);
     if (pauseMatch) pausedAt = pauseMatch[1].trim();
-  } catch { /* ignore */ }
+  } catch (e) {
+    /* optional op, ignore */
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
 
   const result: ProgressContext = {
     executor_model: resolveModelInternal(cwd, 'maxsim-executor'),
