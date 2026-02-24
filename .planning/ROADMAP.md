@@ -93,8 +93,8 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 15. E2E Package Scaffold | 1/1 | Complete | 2026-02-24 |
-| 16. Pack + Install + Tool Tests | 0/TBD | Not started | - |
+| 15. E2E Package Scaffold | 1/1 | Complete | 2020-02-24 |
+| 16. Pack + Install + Tool Tests | 2/3 | In Progress|  |
 | 17. Dashboard Read Tests | 0/TBD | Not started | - |
 | 18. Dashboard Write Tests | 0/TBD | Not started | - |
 | 19. CI Integration | 0/TBD | Not started | - |

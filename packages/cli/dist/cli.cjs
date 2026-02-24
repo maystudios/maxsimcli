@@ -46,10 +46,10 @@ let node_fs = require("node:fs");
 node_fs = __toESM(node_fs);
 let node_path = require("node:path");
 node_path = __toESM(node_path);
-let node_child_process = require("node:child_process");
-let node_module = require("node:module");
 let node_os = require("node:os");
 node_os = __toESM(node_os);
+let node_child_process = require("node:child_process");
+let node_module = require("node:module");
 let node_process = require("node:process");
 node_process = __toESM(node_process);
 let node_tty = require("node:tty");
@@ -5832,14 +5832,21 @@ async function handleDashboard(args) {
 		"tsx",
 		serverPath
 	] : [serverPath];
+	const serverDir = node_path.dirname(serverPath);
+	let projectCwd = process.cwd();
+	const dashboardConfigPath = node_path.join(node_path.dirname(serverDir), "dashboard.json");
+	if (node_fs.existsSync(dashboardConfigPath)) try {
+		const config = JSON.parse(node_fs.readFileSync(dashboardConfigPath, "utf8"));
+		if (config.projectCwd) projectCwd = config.projectCwd;
+	} catch {}
 	console.log("Dashboard starting...");
 	const child = (0, node_child_process.spawn)(runner, runnerArgs, {
-		cwd: process.cwd(),
+		cwd: serverDir,
 		detached: true,
 		stdio: "ignore",
 		env: {
 			...process.env,
-			MAXSIM_PROJECT_CWD: process.cwd(),
+			MAXSIM_PROJECT_CWD: projectCwd,
 			NODE_ENV: isTsFile ? "development" : "production"
 		},
 		...process.platform === "win32" ? { shell: true } : {}
@@ -5873,6 +5880,10 @@ async function checkHealth(port, timeoutMs) {
 * Tries: built server.js first, then source server.ts for dev mode.
 */
 function resolveDashboardServer() {
+	const localDashboard = node_path.join(process.cwd(), ".claude", "dashboard", "server.js");
+	if (node_fs.existsSync(localDashboard)) return localDashboard;
+	const globalDashboard = node_path.join(node_os.homedir(), ".claude", "dashboard", "server.js");
+	if (node_fs.existsSync(globalDashboard)) return globalDashboard;
 	try {
 		const pkgPath = (0, node_module.createRequire)(require("url").pathToFileURL(__filename).href).resolve("@maxsim/dashboard/package.json");
 		const pkgDir = node_path.dirname(pkgPath);

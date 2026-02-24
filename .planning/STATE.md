@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-23)
+See: .planning/PROJECT.md (updated 2026-02-24)
 
-**Core value:** Users run `npx maxsim@latest` and everything works — the monorepo restructure is invisible to end users
-**Current focus:** Phase 14 — Dashboard npm Delivery
+**Core value:** `npx maxsimcli@latest` installs a complete AI dev workflow system that works immediately — validated end-to-end from the npm consumer perspective, not the monorepo perspective
+**Current focus:** Phase 15 — E2E Package Scaffold
 
 ## Current Position
 
-Phase: 14 of 14 (Dashboard npm Delivery) — COMPLETE
-Plan: 3 of 3 in current phase (all plans complete)
-Status: Phase 14 complete — all 3 plans executed, human verification approved, ready to publish
-Last activity: 2026-02-24 — Plan 14-03 complete: CI workflow, tarball validation, README docs, human-verify approved
+Phase: 16 — Pack + Install + Tool Tests
+Plan: —
+Status: Phase 15 complete — packages/e2e scaffold wired and nx run e2e:test exits 0
+Last activity: 2026-02-24 — Phase 15 complete (E2E Package Scaffold)
 
-Progress: [██████████] 100%
+Progress: [██░░░░░░░░] 20% (1/5 phases complete)
 
 ## Performance Metrics
 
@@ -30,7 +30,7 @@ Progress: [██████████] 100%
 | 01 | 4 | ~11min | ~3min |
 
 **Recent Trend:**
-- Last 5 plans: none yet
+- Last 5 plans: none yet in v2.0.0
 - Trend: -
 
 *Updated after each plan completion*
@@ -179,16 +179,20 @@ Recent decisions affecting current work:
 - [Phase 14-03]: STANDALONE_BUILD env var added to CI Build step (not separate step) since NX implicit dependency handles build ordering
 - [Phase 14-03]: Tarball validation uses pnpm pack --dry-run with grep checks for dashboard server.js and .next files
 - [Phase 14-03]: README dashboard section updated to reflect npm-shipped dashboard (not monorepo-only)
+- [v2.0.0 Roadmap]: E2E test uses local tarball (not registry) — npm pack from packages/cli/dist/ to mkdtempSync temp dir
+- [v2.0.0 Roadmap]: Dashboard server started in beforeAll within dashboard.test.ts only — NOT in globalSetup — to prevent crash from failing all tests
+- [v2.0.0 Roadmap]: get-port (single new dep) for free port discovery before spawning dashboard server
+- [v2.0.0 Roadmap]: pollUntilReady helper (inline, no wait-on dep) for dashboard health check — never fixed-delay setTimeout
 
 ### Roadmap Evolution
 
 - Phase 9 added: End-to-end install and publish test loop
-- Phase 10 added: Wir wollen auf eine richtige CLI Ui beim install und etc. wechseln mithilfe von chalk, ora (Spinner) und @inquirer/prompts
-- Phase 11 added: Remove join-discord command; deploy packages/website to GitHub Pages via GitHub Actions
+- Phase 10 added: CLI UX — chalk, ora spinners, @inquirer/prompts
 - Phase 11 added: Remove Discord command and deploy website via GitHub Actions to GitHub Pages
 - Phase 12 added: UX Polish + Core Hardening
-- Phase 13 added: Live Project Dashboard — real-time web dashboard (Swiss Style Design + Aceternity UI) with phase progress, open tasks, and inline plan editing
-- Phase 14 added: Dashboard npm Delivery — ship dashboard inside maxsimcli npm package via Next.js standalone build, `npx maxsimcli dashboard` for end users
+- Phase 13 added: Live Project Dashboard — real-time web dashboard (Swiss Style Design + Aceternity UI)
+- Phase 14 added: Dashboard npm Delivery — ship dashboard inside maxsimcli npm package via Next.js standalone build
+- v2.0.0 Milestone: Phases 15-19 defined for E2E stabilization (E2E package scaffold, pack/install/tool tests, dashboard read tests, dashboard write tests, CI integration)
 
 ### Pending Todos
 
@@ -196,12 +200,12 @@ None yet.
 
 ### Blockers/Concerns
 
-- ~~[Phase 1]: Validate that `nx sync` auto-maintains project references correctly with `@nx/js/typescript` plugin~~ RESOLVED in 01-03: works correctly, targets tsconfig.lib.json
-- ~~[Phase 1]: Confirm tsdown `outExtension` option name in 0.20.x matches tsup behavior before Phase 2 build config~~ RESOLVED in 02-01: tsdown 0.20.3 produces .cjs/.d.cts natively with format: 'cjs'
-- [Phase 3]: OpenCode, Gemini CLI, and Codex install paths may have changed since current `bin/install.js` — validate runtime path conventions before porting adapters
+- [v2.0.0 Research]: Dashboard port discovery — verify that passing `PORT` env var overrides detect-port logic in server.ts (Phase 17 planning must confirm before implementation)
+- [v2.0.0 Research]: `pnpm pack` vs `npm pack` in workspace context — verify packages/cli/package.json has no workspace:* references in devDependencies before Phase 16 implementation
+- [v2.0.0 Research]: Dashboard build availability in E2E context — globalSetup.ts should pre-check that dist/assets/dashboard/server.js exists and fail with clear error if not
 
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 14-03-PLAN.md — Phase 14 complete
-Resume file: N/A — all phases complete
+Stopped at: v2.0.0 roadmap created (Phases 15-19 defined)
+Resume file: N/A — ready to begin Phase 15

@@ -1,3 +1,80 @@
+## 1.2.3 (2026-02-24)
+
+### 🩹 Fixes
+
+- **dashboard:** resolve standalone server startup failures ([10c3c31](https://github.com/maystudios/maxsim/commit/10c3c31))
+
+### ❤️ Thank You
+
+- Claude Sonnet 4.6
+- Sven
+
+## 1.2.2 (2026-02-24)
+
+### 🩹 Fixes
+
+- **dashboard:** use CJS format for standalone server bundle ([29f2773](https://github.com/maystudios/maxsim/commit/29f2773))
+
+### ❤️ Thank You
+
+- Claude Sonnet 4.6
+- Sven
+
+## 1.2.1 (2026-02-24)
+
+### 🚀 Features
+
+- **14-01:** configure Next.js standalone output with env-var guard and server bundling ([7fa5de8](https://github.com/maystudios/maxsim/commit/7fa5de8))
+- **14-01:** add build:standalone script and update NX build target ([1e573de](https://github.com/maystudios/maxsim/commit/1e573de))
+- **14-02:** extend copy-assets.cjs for dashboard and add NX implicit dependency ([7352c8c](https://github.com/maystudios/maxsim/commit/7352c8c))
+- **14-02:** add dashboard install-time copy and rework CLI launch command ([1199bf2](https://github.com/maystudios/maxsim/commit/1199bf2))
+
+### 🩹 Fixes
+
+- **cli:** use fs.cpSync with dereference for dashboard standalone copy ([472e123](https://github.com/maystudios/maxsim/commit/472e123))
+- **dashboard:** handle tsdown exit code 1 despite successful build ([b92cade](https://github.com/maystudios/maxsim/commit/b92cade))
+
+### ❤️ Thank You
+
+- Claude Sonnet 4.6
+- Sven
+
+## 1.2.0 (2026-02-24)
+
+### 🚀 Features
+
+- **cli:** add `npx maxsimcli dashboard` command with monorepo detection ([b328544](https://github.com/maystudios/maxsim/commit/b328544))
+
+### ❤️ Thank You
+
+- Claude Opus 4.6
+- Sven
+
+## 1.1.3 (2026-02-24)
+
+### 🚀 Features
+
+- **13-02:** create custom server with WebSocket and file watcher modules ([2ffbf0b](https://github.com/maystudios/maxsim/commit/2ffbf0b))
+- **13-02:** create WebSocket React provider with auto-reconnect ([2d3f058](https://github.com/maystudios/maxsim/commit/2d3f058))
+- **13-03:** create lib/parsers.ts with @maxsim/core wrapper functions ([896e71e](https://github.com/maystudios/maxsim/commit/896e71e))
+- **13-03:** create read-only API route handlers ([8f7ea3b](https://github.com/maystudios/maxsim/commit/8f7ea3b))
+- **13-03:** create write/mutation API route handlers ([6679731](https://github.com/maystudios/maxsim/commit/6679731))
+- **13-04:** create useDashboardData hook and StatsHeader component ([af3c50e](https://github.com/maystudios/maxsim/commit/af3c50e))
+- **13-04:** create phase list, phase progress, and wire main dashboard page ([d37d7e4](https://github.com/maystudios/maxsim/commit/d37d7e4))
+- **13-05:** add usePhaseDetail hook, plan card, and task list components ([c232dfd](https://github.com/maystudios/maxsim/commit/c232dfd))
+- **13-05:** add CodeMirror plan editor and phase detail container ([ce2d495](https://github.com/maystudios/maxsim/commit/ce2d495))
+- **13-06:** add sidebar navigation and app shell layout ([5020c73](https://github.com/maystudios/maxsim/commit/5020c73))
+- **13-06:** add todos panel, blockers panel, and state editor ([6be1847](https://github.com/maystudios/maxsim/commit/6be1847))
+- **13-07:** add dashboard launch command to CLI dispatch router ([a593fc4](https://github.com/maystudios/maxsim/commit/a593fc4))
+- **13-07:** update dashboard build pipeline with server compilation ([e4dadd2](https://github.com/maystudios/maxsim/commit/e4dadd2))
+- **13-07:** create health check API endpoint for dashboard ([99aff72](https://github.com/maystudios/maxsim/commit/99aff72))
+- **13-07:** add dashboard auto-launch to execute-phase workflow ([e639b0b](https://github.com/maystudios/maxsim/commit/e639b0b))
+
+### ❤️ Thank You
+
+- Claude Opus 4.6
+- Sven
+
 ## 1.1.2 (2026-02-24)
 
 ### 🚀 Features

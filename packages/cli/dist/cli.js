@@ -46,6 +46,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
+const os = __importStar(require("node:os"));
 const node_child_process_1 = require("node:child_process");
 const node_module_1 = require("node:module");
 const core_1 = require("@maxsim/core");
@@ -587,14 +588,30 @@ async function handleDashboard(args) {
     const isTsFile = serverPath.endsWith('.ts');
     const runner = isTsFile ? 'node' : 'node';
     const runnerArgs = isTsFile ? ['--import', 'tsx', serverPath] : [serverPath];
+    // Standalone server must run from its own directory to find .next/
+    const serverDir = path.dirname(serverPath);
+    // Read dashboard.json for projectCwd (one level up from dashboard/ dir)
+    let projectCwd = process.cwd();
+    const dashboardConfigPath = path.join(path.dirname(serverDir), 'dashboard.json');
+    if (fs.existsSync(dashboardConfigPath)) {
+        try {
+            const config = JSON.parse(fs.readFileSync(dashboardConfigPath, 'utf8'));
+            if (config.projectCwd) {
+                projectCwd = config.projectCwd;
+            }
+        }
+        catch {
+            // Use default cwd
+        }
+    }
     console.log('Dashboard starting...');
     const child = (0, node_child_process_1.spawn)(runner, runnerArgs, {
-        cwd: process.cwd(),
+        cwd: serverDir,
         detached: true,
         stdio: 'ignore',
         env: {
             ...process.env,
-            MAXSIM_PROJECT_CWD: process.cwd(),
+            MAXSIM_PROJECT_CWD: projectCwd,
             NODE_ENV: isTsFile ? 'development' : 'production',
         },
         // On Windows, use shell to ensure detached works correctly
@@ -639,6 +656,13 @@ async function checkHealth(port, timeoutMs) {
  * Tries: built server.js first, then source server.ts for dev mode.
  */
 function resolveDashboardServer() {
+    // Strategy 0: Installed standalone build (production path)
+    const localDashboard = path.join(process.cwd(), '.claude', 'dashboard', 'server.js');
+    if (fs.existsSync(localDashboard))
+        return localDashboard;
+    const globalDashboard = path.join(os.homedir(), '.claude', 'dashboard', 'server.js');
+    if (fs.existsSync(globalDashboard))
+        return globalDashboard;
     // Strategy 1: Resolve from @maxsim/dashboard package
     try {
         const require_ = (0, node_module_1.createRequire)(import.meta.url);
