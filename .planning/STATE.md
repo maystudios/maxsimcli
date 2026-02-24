@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** `npx maxsimcli@latest` installs a complete AI dev workflow system that works immediately — validated end-to-end from the npm consumer perspective, not the monorepo perspective
-**Current focus:** Phase 15 — E2E Package Scaffold
+**Current focus:** Phase 17 — Dashboard Read Tests
 
 ## Current Position
 
-Phase: 16 — Pack + Install + Tool Tests
-Plan: —
-Status: Phase 15 complete — packages/e2e scaffold wired and nx run e2e:test exits 0
-Last activity: 2026-02-24 — Phase 15 complete (E2E Package Scaffold)
+Phase: 17 — Dashboard Read Tests
+Plan: 17-01 (complete)
+Status: Phase 17 complete — dashboard.test.ts with 5 DASH-* read API tests written; mock fixture corrected
+Last activity: 2026-02-25 — Phase 17 complete (Dashboard Read Tests)
 
-Progress: [██░░░░░░░░] 20% (1/5 phases complete)
+Progress: [████░░░░░░] 40% (3/5 phases complete)
 
 ## Performance Metrics
 
