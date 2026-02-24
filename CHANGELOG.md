@@ -1,3 +1,13 @@
+## 1.0.12 (2026-02-24)
+
+### 🩹 Fixes
+
+- **core:** integration validation cleanup — build, catch blocks, regex ([7762847](https://github.com/maystudios/maxsim/commit/7762847))
+
+### ❤️ Thank You
+
+- Sven
+
 ## 1.0.11 (2026-02-24)
 
 ### 🚀 Features
