@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 
 ## Current Position
 
-Phase: 14 of 14 (Dashboard npm Delivery) — IN PROGRESS
-Plan: 2 of 3 in current phase (complete)
-Status: Plan 14-02 complete — CLI asset pipeline and dashboard launch wired
-Last activity: 2026-02-24 — copy-assets dashboard section, install.ts dashboard copy, cli.ts standalone resolution
+Phase: 14 of 14 (Dashboard npm Delivery) — COMPLETE
+Plan: 3 of 3 in current phase (all plans complete)
+Status: Phase 14 complete — all 3 plans executed, human verification approved, ready to publish
+Last activity: 2026-02-24 — Plan 14-03 complete: CI workflow, tarball validation, README docs, human-verify approved
 
-Progress: [██████████] 97%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -79,6 +79,7 @@ Progress: [██████████] 97%
 | Phase 13 P08 | 2min | 1 tasks | 25 files |
 | Phase 14 P01 | 2min | 2 tasks | 4 files |
 | Phase 14 P02 | 3min | 2 tasks | 4 files |
+| Phase 14 P03 | 3min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -175,6 +176,9 @@ Recent decisions affecting current work:
 - [Phase 14]: Auto-install dashboard from dist/assets/ if .claude/dashboard/ missing when user runs dashboard command
 - [Phase 14]: Strategy 0 in resolveDashboardServer checks installed standalone before package resolution and monorepo
 - [Phase 14]: Standalone server cwd set to dashboard dir so Next.js can find .next/ relative to server.js
+- [Phase 14-03]: STANDALONE_BUILD env var added to CI Build step (not separate step) since NX implicit dependency handles build ordering
+- [Phase 14-03]: Tarball validation uses pnpm pack --dry-run with grep checks for dashboard server.js and .next files
+- [Phase 14-03]: README dashboard section updated to reflect npm-shipped dashboard (not monorepo-only)
 
 ### Roadmap Evolution
 
@@ -199,5 +203,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 14-02-PLAN.md
-Resume file: .planning/phases/14-dashboard-npm-delivery/14-02-SUMMARY.md
+Stopped at: Completed 14-03-PLAN.md — Phase 14 complete
+Resume file: N/A — all phases complete

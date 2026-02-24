@@ -25,7 +25,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 11: Remove Discord command and deploy website via GitHub Pages** - Remove `/maxsim:join-discord` from shipped command set, set up GitHub Actions deploy workflow for GitHub Pages
 - [x] **Phase 12: UX Polish + Core Hardening** - ASCII progress bars in `/maxsim:progress`, new `/maxsim:roadmap` read command, sanity check guard at workflow start, centralized `getPhasePattern()` helper, atomic ROADMAP.md writes, and zero silent `catch {}` blocks in `packages/core/src/` (completed 2026-02-24)
 - [x] **Phase 13: Live Project Dashboard** - Real-time web dashboard (Swiss Style Design + Aceternity UI) showing current phase, progress bars, open tasks, and inline plan editing — launchable alongside MAXSIM (completed 2026-02-24)
-- [ ] **Phase 14: Dashboard npm Delivery** - Ship dashboard inside maxsimcli npm package via Next.js standalone build, installable and launchable via `npx maxsimcli dashboard`
+- [x] **Phase 14: Dashboard npm Delivery** - Ship dashboard inside maxsimcli npm package via Next.js standalone build, installable and launchable via `npx maxsimcli dashboard` (completed 2026-02-24)
 
 ## Phase Details
 
@@ -198,7 +198,7 @@ Phases execute in dependency order: 1 → 2 → 3 → 4 → 5, with Phase 6 exec
 | 11. Remove Discord command and deploy website via GitHub Pages | 2/2 | Complete | 2026-02-24 |
 | 12. UX Polish + Core Hardening | 1/3 | In Progress | - |
 | 13. Live Project Dashboard | 8/8 | Complete   | 2026-02-24 |
-| 14. Dashboard npm Delivery | 2/3 | In Progress|  |
+| 14. Dashboard npm Delivery | 3/3 | Complete | 2026-02-24 |
 
 ### Phase 10: CLI UX — chalk, ora spinners, @inquirer/prompts
 
@@ -288,7 +288,7 @@ Plans:
 **Goal:** Ship the dashboard as part of the maxsimcli npm package so that `npx maxsimcli dashboard` works for end users after install — no separate packages, no additional setup. Next.js `output: "standalone"` produces a self-contained build bundled into `dist/assets/dashboard/`, copied to `.claude/dashboard/` during install, and launched via `node .claude/dashboard/server.js`.
 **Requirements**: DASH-01 through DASH-09 (internal delivery, mapped to success criteria below)
 **Depends on:** Phase 13
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 **Success Criteria** (what must be TRUE):
   1. [DASH-01] `next.config.mjs` uses `output: "standalone"` for production builds (env-var guard for dev)
