@@ -22,6 +22,9 @@ Extract implementation decisions that downstream agents need — researcher and 
 4. Create CONTEXT.md with decisions that guide research and planning
 
 **Output:** `{phase_num}-CONTEXT.md` — decisions clear enough that downstream agents can act without asking the user again
+
+**CRITICAL — AskUserQuestion tool mandate:**
+Every single question to the user MUST use the `AskUserQuestion` tool. NEVER ask questions as plain text in your response. This includes gray area selection, deep-dive questions, continuation prompts, and any other user interaction. If you need the user's input, use `AskUserQuestion`. No exceptions.
 </objective>
 
 <execution_context>

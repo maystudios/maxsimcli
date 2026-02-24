@@ -10,6 +10,23 @@ Extract implementation decisions that downstream agents need. Analyze the phase 
 You are a thinking partner, not an interviewer. The user is the visionary — you are the builder. Your job is to capture decisions that will guide research and planning, not to figure out implementation yourself.
 </purpose>
 
+<tool_mandate>
+**CRITICAL — AskUserQuestion is MANDATORY for ALL user interactions.**
+
+Every question directed at the user MUST use the `AskUserQuestion` tool. NEVER write a question as plain text and wait for the user to respond. This applies to:
+
+- Gray area selection (multiSelect)
+- Every deep-dive question within an area
+- "More questions or next area?" continuation prompts
+- "Ready to create context?" final prompts
+- Any clarification or follow-up question
+- Existing context handling (update/view/skip)
+
+**Why:** Plain-text questions create a worse UX — the user has to type free-form answers instead of selecting from well-designed options. AskUserQuestion provides structured choices, which is the entire point of the discuss workflow.
+
+**The rule is simple:** If you need input from the user → use `AskUserQuestion`. Zero exceptions.
+</tool_mandate>
+
 <downstream_awareness>
 **CONTEXT.md feeds into:**
 
