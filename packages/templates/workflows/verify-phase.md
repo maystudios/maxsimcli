@@ -1,3 +1,9 @@
+<sanity_check>
+Before executing any step in this workflow, verify:
+1. The current directory contains a `.planning/` folder — if not, stop and tell the user to run `/maxsim:new-project` first.
+2. `.planning/ROADMAP.md` exists — if not, stop and tell the user to initialize the project.
+</sanity_check>
+
 <purpose>
 Verify phase goal achievement through goal-backward analysis. Check that the codebase delivers what the phase promised, not just that tasks completed.
 
