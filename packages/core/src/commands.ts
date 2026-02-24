@@ -7,6 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import chalk from 'chalk';
 import {
   safeReadFile,
   loadConfig,
@@ -540,6 +541,39 @@ export function cmdProgressRender(cwd: string, format: string, raw: boolean): vo
     const bar = '\u2588'.repeat(filled) + '\u2591'.repeat(barWidth - filled);
     const text = `[${bar}] ${totalSummaries}/${totalPlans} plans (${percent}%)`;
     output({ bar: text, percent, completed: totalSummaries, total: totalPlans }, raw, text);
+  } else if (format === 'phase-bars') {
+    const doneCount = phases.filter(p => p.status === 'Complete').length;
+    const inProgressCount = phases.filter(p => p.status === 'In Progress').length;
+    const totalCount = phases.length;
+    const header = chalk.bold(
+      `Milestone: ${milestone.name} — ${doneCount}/${totalCount} phases complete (${percent}%)`
+    );
+    const lines: string[] = [header, ''];
+
+    for (const p of phases) {
+      const pPercent =
+        p.plans > 0 ? Math.min(100, Math.round((p.summaries / p.plans) * 100)) : 0;
+      const barWidth = 10;
+      const filled = Math.round((pPercent / 100) * barWidth);
+      const bar = '\u2588'.repeat(filled) + '\u2591'.repeat(barWidth - filled);
+      const phaseLabel = `Phase ${p.number.padStart(2, '0')}`;
+      const statusLabel =
+        p.status === 'Complete'
+          ? 'DONE'
+          : p.status === 'In Progress'
+          ? 'IN PROGRESS'
+          : 'PLANNED';
+
+      let line = `${phaseLabel} [${bar}] ${String(pPercent).padStart(3, ' ')}% — ${statusLabel}`;
+      if (p.status === 'Complete') line = chalk.green(line);
+      else if (p.status === 'In Progress') line = chalk.yellow(line);
+      else line = chalk.dim(line);
+
+      lines.push(line);
+    }
+
+    const rendered = lines.join('\n');
+    output({ rendered, done: doneCount, in_progress: inProgressCount, total: totalCount, percent }, raw, rendered);
   } else {
     output({
       milestone_version: milestone.version,

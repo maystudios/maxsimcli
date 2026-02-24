@@ -83,6 +83,10 @@ importers:
         version: 9.3.0
 
   packages/core:
+    dependencies:
+      chalk:
+        specifier: ^5.6.2
+        version: 5.6.2
     devDependencies:
       '@types/node':
         specifier: ^25.3.0
