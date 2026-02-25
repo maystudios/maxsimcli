@@ -34,7 +34,6 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/sirv": "^3",
     "@types/ws": "^8",
     "@vitejs/plugin-react": "^4",
     "postcss": "^8",
