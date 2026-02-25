@@ -1,3 +1,13 @@
+# [2.3.0](https://github.com/maystudios/maxsim/compare/v2.2.0...v2.3.0) (2026-02-25)
+
+
+### Features
+
+* **21-03:** integrate terminal into dashboard layout ([a46ca20](https://github.com/maystudios/maxsim/commit/a46ca20dae9c058c2459deb4d228bd1770da5a77))
+* **21-04:** create QuickActionBar with confirmation and settings ([6c342ce](https://github.com/maystudios/maxsim/commit/6c342ceed893d57d014669b8715982ae71f21521))
+* **21-04:** integrate QuickActionBar into Terminal component ([bed0df1](https://github.com/maystudios/maxsim/commit/bed0df1d7767575389645c9d421ae1a49ab410be))
+* **website:** add Dashboard feature card, command, and install path info ([9488b99](https://github.com/maystudios/maxsim/commit/9488b99318d3b83612c721e2d132efa5be56580f))
+
 # [2.2.0](https://github.com/maystudios/maxsim/compare/v2.1.1...v2.2.0) (2026-02-25)
 
 
