@@ -81,6 +81,7 @@ Progress: [████░░░░░░] 40% (3/5 phases complete)
 | Phase 14 P02 | 3min | 2 tasks | 4 files |
 | Phase 14 P03 | 3min | 3 tasks | 2 files |
 | Phase 21 P01 | 4min | 2 tasks | 7 files |
+| Phase 21 P04 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -186,6 +187,7 @@ Recent decisions affecting current work:
 - [v2.0.0 Roadmap]: pollUntilReady helper (inline, no wait-on dep) for dashboard health check — never fixed-delay setTimeout
 - [Phase 21]: node-pty marked as external in tsdown (native addon cannot be bundled)
 - [Phase 21]: Terminal WebSocket at /ws/terminal separate from dashboard /api/ws
+- [Phase 21]: Confirmation popup always shown before sending quick-action commands
 
 ### Roadmap Evolution
 

@@ -143,4 +143,4 @@ Plans:
 | 18. Dashboard Write Tests | 1/1 | Complete | 2026-02-25 |
 | 19. CI Integration | 0/1 | Not started | - |
 | 20. Dashboard Migrate to Vite + Express | 0/2 | Not started | - |
-| 21. Interactive Claude Code Terminal | 2/4 | In Progress|  |
+| 21. Interactive Claude Code Terminal | 3/4 | In Progress|  |
