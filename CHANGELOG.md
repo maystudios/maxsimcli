@@ -1,3 +1,15 @@
+# [2.4.0](https://github.com/maystudios/maxsim/compare/v2.3.0...v2.4.0) (2026-02-25)
+
+
+### Bug Fixes
+
+* **21:** fix status message parsing and uptime unit mismatch ([83731b8](https://github.com/maystudios/maxsim/commit/83731b861a9e3526243d8761893a7366bd257148))
+
+
+### Features
+
+* **profiles:** add tokenburner model profile (all opus) ([ecab7e3](https://github.com/maystudios/maxsim/commit/ecab7e3f257da418314a7e87fd5c8f044ddcc4b4))
+
 # [2.3.0](https://github.com/maystudios/maxsim/compare/v2.2.0...v2.3.0) (2026-02-25)
 
 
