@@ -31,8 +31,7 @@ import { PtyManager } from './terminal/pty-manager';
 
 // ─── Logging ──────────────────────────────────────────────────────────────
 
-const dashboardDir = path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/i, '$1'));
-const logDir = path.join(dashboardDir, 'logs');
+const logDir = path.join(__dirname, 'logs');
 fs.mkdirSync(logDir, { recursive: true });
 
 const logFile = path.join(logDir, `dashboard-${new Date().toISOString().slice(0, 10)}.log`);
@@ -217,7 +216,7 @@ function parseRoadmap(cwd: string): RoadmapAnalysis | null {
   const roadmapPath = path.join(cwd, '.planning', 'ROADMAP.md');
   if (!fs.existsSync(roadmapPath)) return null;
 
-  const content = fs.readFileSync(roadmapPath, 'utf-8');
+  const content = fs.readFileSync(roadmapPath, 'utf-8').replace(/\r\n/g, '\n');
   const phasesDir = path.join(cwd, '.planning', 'phases');
   const phasePattern = getPhasePattern();
   const phases: RoadmapPhase[] = [];
@@ -334,7 +333,7 @@ function parseState(cwd: string): ParsedState | null {
   const statePath = path.join(cwd, '.planning', 'STATE.md');
   if (!fs.existsSync(statePath)) return null;
 
-  const content = fs.readFileSync(statePath, 'utf-8');
+  const content = fs.readFileSync(statePath, 'utf-8').replace(/\r\n/g, '\n');
 
   const position = stateExtractField(content, 'Current Position') || stateExtractField(content, 'Phase');
   const lastActivity = stateExtractField(content, 'Last activity') || stateExtractField(content, 'Last Activity');
@@ -434,7 +433,7 @@ function parsePhaseDetail(
     const plans: PlanFile[] = [];
     for (const planFileName of planFileNames) {
       const planPath = path.join(phaseDir, planFileName);
-      const content = fs.readFileSync(planPath, 'utf-8');
+      const content = fs.readFileSync(planPath, 'utf-8').replace(/\r\n/g, '\n');
       const frontmatter = extractFrontmatter(content) as Record<string, unknown>;
 
       const tasks: PlanTask[] = [];
@@ -564,7 +563,7 @@ app.patch('/api/roadmap', (req: Request, res: Response) => {
     return res.status(400).json({ error: 'phaseNumber and checked are required' });
   }
 
-  let content = fs.readFileSync(roadmapPath, 'utf-8');
+  let content = fs.readFileSync(roadmapPath, 'utf-8').replace(/\r\n/g, '\n');
   const escapedNum = phaseNumber.replace('.', '\\.');
   const pattern = new RegExp(`(-\\s*\\[)(x| )(\\]\\s*.*Phase\\s+${escapedNum})`, 'i');
   const match = content.match(pattern);
@@ -597,7 +596,7 @@ app.patch('/api/state', (req: Request, res: Response) => {
     return res.status(400).json({ error: 'field and value are required' });
   }
 
-  const content = fs.readFileSync(statePath, 'utf-8');
+  const content = fs.readFileSync(statePath, 'utf-8').replace(/\r\n/g, '\n');
   const updated = stateReplaceField(content, field, value);
   if (!updated) return res.status(404).json({ error: `Field "${field}" not found in STATE.md` });
 

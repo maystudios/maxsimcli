@@ -1,5 +1,3 @@
-import * as fs from 'node:fs';
-import * as path from 'node:path';
 import { WebSocket } from 'ws';
 import { SessionStore } from './session-store';
 
@@ -39,15 +37,11 @@ const DISCONNECT_TIMEOUT_MS = 60_000;
 const STATUS_INTERVAL_MS = 1_000;
 const ACTIVE_THRESHOLD_MS = 2_000;
 
-// Logging helper — writes to dashboard logs dir
-const logDir = path.join(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/i, '$1')), '..', 'logs');
+// Logging helper — writes to stderr (server.ts handles file logging)
 function ptyLog(level: string, ...args: unknown[]): void {
-  try {
-    fs.mkdirSync(logDir, { recursive: true });
-    const ts = new Date().toISOString();
-    const msg = args.map(a => typeof a === 'string' ? a : JSON.stringify(a)).join(' ');
-    fs.appendFileSync(path.join(logDir, `dashboard-${ts.slice(0, 10)}.log`), `[${ts}] [${level}] [pty-manager] ${msg}\n`);
-  } catch { /* best effort */ }
+  const ts = new Date().toISOString();
+  const msg = args.map(a => typeof a === 'string' ? a : JSON.stringify(a)).join(' ');
+  console.error(`[${ts}] [${level}] [pty-manager] ${msg}`);
 }
 
 export class PtyManager {

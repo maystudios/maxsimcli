@@ -32444,7 +32444,7 @@ var require_websocket = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const tls = require("tls");
 	const { randomBytes, createHash: createHash$1 } = require("crypto");
 	const { Duplex: Duplex$2, Readable: Readable$1 } = require("stream");
-	const { URL: URL$1 } = require("url");
+	const { URL } = require("url");
 	const PerMessageDeflate = require_permessage_deflate();
 	const Receiver = require_receiver();
 	const Sender = require_sender();
@@ -32973,9 +32973,9 @@ var require_websocket = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		websocket._closeTimeout = opts.closeTimeout;
 		if (!protocolVersions.includes(opts.protocolVersion)) throw new RangeError(`Unsupported protocol version: ${opts.protocolVersion} (supported versions: ${protocolVersions.join(", ")})`);
 		let parsedUrl;
-		if (address instanceof URL$1) parsedUrl = address;
+		if (address instanceof URL) parsedUrl = address;
 		else try {
-			parsedUrl = new URL$1(address);
+			parsedUrl = new URL(address);
 		} catch (e) {
 			throw new SyntaxError(`Invalid URL: ${address}`);
 		}
@@ -33077,7 +33077,7 @@ var require_websocket = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				req.abort();
 				let addr;
 				try {
-					addr = new URL$1(location, address);
+					addr = new URL(location, address);
 				} catch (e) {
 					emitErrorAndClose(websocket, /* @__PURE__ */ new SyntaxError(`Invalid URL: ${location}`));
 					return;
@@ -41434,14 +41434,10 @@ try {
 const DISCONNECT_TIMEOUT_MS = 6e4;
 const STATUS_INTERVAL_MS = 1e3;
 const ACTIVE_THRESHOLD_MS = 2e3;
-const logDir$1 = node_path.join(node_path.dirname(new URL(require("url").pathToFileURL(__filename).href).pathname.replace(/^\/([A-Z]:)/i, "$1")), "..", "logs");
 function ptyLog(level, ...args) {
-	try {
-		node_fs.mkdirSync(logDir$1, { recursive: true });
-		const ts = (/* @__PURE__ */ new Date()).toISOString();
-		const msg = args.map((a) => typeof a === "string" ? a : JSON.stringify(a)).join(" ");
-		node_fs.appendFileSync(node_path.join(logDir$1, `dashboard-${ts.slice(0, 10)}.log`), `[${ts}] [${level}] [pty-manager] ${msg}\n`);
-	} catch {}
+	const ts = (/* @__PURE__ */ new Date()).toISOString();
+	const msg = args.map((a) => typeof a === "string" ? a : JSON.stringify(a)).join(" ");
+	console.error(`[${ts}] [${level}] [pty-manager] ${msg}`);
 }
 var PtyManager = class PtyManager {
 	static instance = null;
@@ -41596,8 +41592,7 @@ var PtyManager = class PtyManager {
 
 //#endregion
 //#region src/server.ts
-const dashboardDir = node_path.dirname(new URL(require("url").pathToFileURL(__filename).href).pathname.replace(/^\/([A-Z]:)/i, "$1"));
-const logDir = node_path.join(dashboardDir, "logs");
+const logDir = node_path.join(__dirname, "logs");
 node_fs.mkdirSync(logDir, { recursive: true });
 const logFile = node_path.join(logDir, `dashboard-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 10)}.log`);
 const logStream = node_fs.createWriteStream(logFile, { flags: "a" });
@@ -41707,7 +41702,7 @@ function setupWatcher(cwd, wss) {
 function parseRoadmap(cwd) {
 	const roadmapPath = node_path.join(cwd, ".planning", "ROADMAP.md");
 	if (!node_fs.existsSync(roadmapPath)) return null;
-	const content = node_fs.readFileSync(roadmapPath, "utf-8");
+	const content = node_fs.readFileSync(roadmapPath, "utf-8").replace(/\r\n/g, "\n");
 	const phasesDir = node_path.join(cwd, ".planning", "phases");
 	const phasePattern = (0, import_dist.getPhasePattern)();
 	const phases = [];
@@ -41789,7 +41784,7 @@ function parseRoadmap(cwd) {
 function parseState(cwd) {
 	const statePath = node_path.join(cwd, ".planning", "STATE.md");
 	if (!node_fs.existsSync(statePath)) return null;
-	const content = node_fs.readFileSync(statePath, "utf-8");
+	const content = node_fs.readFileSync(statePath, "utf-8").replace(/\r\n/g, "\n");
 	const position = (0, import_dist.stateExtractField)(content, "Current Position") || (0, import_dist.stateExtractField)(content, "Phase");
 	const lastActivity = (0, import_dist.stateExtractField)(content, "Last activity") || (0, import_dist.stateExtractField)(content, "Last Activity");
 	const currentPhase = (0, import_dist.stateExtractField)(content, "Current Phase") || (0, import_dist.stateExtractField)(content, "Phase");
@@ -41870,7 +41865,7 @@ function parsePhaseDetail(cwd, phaseId) {
 		const plans = [];
 		for (const planFileName of planFileNames) {
 			const planPath = node_path.join(phaseDir, planFileName);
-			const content = node_fs.readFileSync(planPath, "utf-8");
+			const content = node_fs.readFileSync(planPath, "utf-8").replace(/\r\n/g, "\n");
 			const frontmatter = (0, import_dist.extractFrontmatter)(content);
 			const tasks = [];
 			const taskRegex = /<task\s+type="([^"]*)"[^>]*>\s*<name>([^<]+)<\/name>([\s\S]*?)<\/task>/g;
@@ -41976,7 +41971,7 @@ app.patch("/api/roadmap", (req, res) => {
 	if (!node_fs.existsSync(roadmapPath)) return res.status(404).json({ error: "ROADMAP.md not found" });
 	const { phaseNumber, checked } = req.body;
 	if (!phaseNumber || checked === void 0) return res.status(400).json({ error: "phaseNumber and checked are required" });
-	let content = node_fs.readFileSync(roadmapPath, "utf-8");
+	let content = node_fs.readFileSync(roadmapPath, "utf-8").replace(/\r\n/g, "\n");
 	const escapedNum = phaseNumber.replace(".", "\\.");
 	const pattern = new RegExp(`(-\\s*\\[)(x| )(\\]\\s*.*Phase\\s+${escapedNum})`, "i");
 	if (!content.match(pattern)) return res.status(404).json({ error: `Phase ${phaseNumber} checkbox not found in ROADMAP.md` });
@@ -42000,7 +41995,7 @@ app.patch("/api/state", (req, res) => {
 	if (!isWithinPlanning(projectCwd, ".planning/STATE.md")) return res.status(400).json({ error: "Invalid path" });
 	const { field, value } = req.body;
 	if (!field || value === void 0) return res.status(400).json({ error: "field and value are required" });
-	const updated = (0, import_dist.stateReplaceField)(node_fs.readFileSync(statePath, "utf-8"), field, value);
+	const updated = (0, import_dist.stateReplaceField)(node_fs.readFileSync(statePath, "utf-8").replace(/\r\n/g, "\n"), field, value);
 	if (!updated) return res.status(404).json({ error: `Field "${field}" not found in STATE.md` });
 	suppressPath(statePath);
 	node_fs.writeFileSync(statePath, updated, "utf-8");
