@@ -190,6 +190,12 @@ Plans:
   3. All 9 phase SUMMARY.md files have populated `requirements_completed` arrays
   4. VERIFICATION.md exists for phases 15, 18, 19, and 20
   5. Pre-push hook is auto-installed on fresh clones (husky prepare script or equivalent)
+**Plans**: 3 plans
+
+Plans:
+- [ ] 25-01-PLAN.md — Fix traceability table and backfill SUMMARY.md requirements_completed
+- [ ] 25-02-PLAN.md — Install Husky and create portable pre-push hook
+- [ ] 25-03-PLAN.md — Create retroactive VERIFICATION.md for phases 15, 18, 19, 20
 
 ---
 
@@ -208,5 +214,5 @@ Plans:
 | 21. Interactive Claude Code Terminal | 4/4 | Complete | 2026-02-25 |
 | 22. Fix node-pty Delivery (Lazy-Load) | 2/2 | Complete    | 2026-02-25 |
 | 23. E2E Wiring & Next.js Cleanup | 2/2 | Complete    | 2026-02-25 |
-| 24. Fix Terminal Status Parsing & Quick Actions | 1/1 | Complete   | 2026-02-25 |
-| 25. Planning Doc Hygiene | 0/0 | Pending | — |
+| 24. Fix Terminal Status Parsing & Quick Actions | 1/1 | Complete    | 2026-02-25 |
+| 25. Planning Doc Hygiene | 0/3 | In Progress | — |

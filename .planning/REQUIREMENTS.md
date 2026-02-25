@@ -88,16 +88,16 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 | TOOL-04 | Phase 16 | Satisfied |
 | TOOL-05 | Phase 16 | Satisfied |
 | TOOL-06 | Phase 16 | Satisfied |
-| DASH-01 | Phase 17 → Phase 22 | Complete |
-| DASH-02 | Phase 17 → Phase 22 | Complete |
-| DASH-03 | Phase 17 → Phase 22 | Complete |
-| DASH-04 | Phase 17 → Phase 22 | Complete |
-| DASH-05 | Phase 17 → Phase 22 | Complete |
-| DASH-06 | Phase 18 → Phase 22 | Complete |
-| DASH-07 | Phase 18 → Phase 22 | Complete |
-| CI-01 | Phase 19 → Phase 22 | Complete |
-| DASH-TERM-01 | Phase 21 → Phase 22 | Complete |
+| DASH-01 | Phase 17 → Phase 22 | Satisfied |
+| DASH-02 | Phase 17 → Phase 22 | Satisfied |
+| DASH-03 | Phase 17 → Phase 22 | Satisfied |
+| DASH-04 | Phase 17 → Phase 22 | Satisfied |
+| DASH-05 | Phase 17 → Phase 22 | Satisfied |
+| DASH-06 | Phase 18 → Phase 22 | Satisfied |
+| DASH-07 | Phase 18 → Phase 22 | Satisfied |
+| CI-01 | Phase 19 → Phase 22 | Satisfied |
+| DASH-TERM-01 | Phase 21 → Phase 22 | Satisfied |
 | DASH-TERM-02 | Phase 21 | Satisfied |
 | DASH-TERM-03 | Phase 21 | Satisfied |
-| DASH-TERM-04 | Phase 21 → Phase 24 | Complete |
+| DASH-TERM-04 | Phase 21 → Phase 24 | Satisfied |
 | DASH-TERM-05 | Phase 21 | Satisfied |
