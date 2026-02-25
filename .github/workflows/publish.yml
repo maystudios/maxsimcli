@@ -61,7 +61,7 @@ jobs:
           STANDALONE_BUILD: 'true'
 
       - name: Release
-        run: pnpm exec semantic-release
+        run: ./node_modules/.bin/semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
