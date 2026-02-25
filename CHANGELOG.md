@@ -1,3 +1,10 @@
+## [2.5.2](https://github.com/maystudios/maxsim/compare/v2.5.1...v2.5.2) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** use dedicated endpoints for decisions/blockers and add phase checkbox toggle ([16be0d1](https://github.com/maystudios/maxsim/commit/16be0d12c21e6aa5f39c3c829354e3a65081e4b1))
+
 ## [2.5.1](https://github.com/maystudios/maxsim/compare/v2.5.0...v2.5.1) (2026-02-25)
 
 
