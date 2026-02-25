@@ -92,7 +92,8 @@ export function QuickActionBar({
 
   const handleConfirm = useCallback(() => {
     if (confirmCommand) {
-      onSendCommand(confirmCommand.resolved + "\r");
+      // Use \r\n: on Windows ConPTY programmatic writes need both CR+LF to trigger Enter
+      onSendCommand(confirmCommand.resolved + "\r\n");
       setConfirmCommand(null);
     }
   }, [confirmCommand, onSendCommand]);

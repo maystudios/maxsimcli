@@ -117,6 +117,8 @@ export function Terminal({ onReady }: TerminalProps) {
 
   const handleRestart = useCallback(() => {
     spawn(skipPermissions);
+    // Restore focus to the terminal so the user can type immediately after restart
+    setTimeout(() => termRef.current?.focus(), 100);
   }, [spawn, skipPermissions]);
 
   const handleStop = useCallback(() => {
@@ -128,9 +130,11 @@ export function Terminal({ onReady }: TerminalProps) {
   }, []);
 
   return (
-    <div className="flex h-full w-full flex-col">
+    // onWheel stopPropagation: prevent parent scroll containers from stealing wheel events
+    // when the terminal is in split/compact view
+    <div className="flex h-full w-full flex-col" onWheel={(e) => e.stopPropagation()}>
       {/* Terminal area */}
-      <div className="relative flex-1">
+      <div className="relative min-h-0 flex-1 overflow-hidden">
         <div ref={containerRef} className="h-full w-full" />
 
         {/* Quick action bar */}

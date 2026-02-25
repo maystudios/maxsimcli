@@ -205,7 +205,7 @@ function DashboardApp() {
         style={{ display: isTerminalView && !splitMode ? "none" : "block" }}
         className={
           isTerminalView && splitMode
-            ? "h-1/2 overflow-auto border-b border-border p-6"
+            ? "h-1/2 min-h-0 overflow-auto border-b border-border p-6"
             : "flex-1 overflow-y-auto p-6"
         }
       >
@@ -215,7 +215,7 @@ function DashboardApp() {
       {/* Terminal: always mounted, visibility toggled via CSS */}
       <div
         style={{ display: isTerminalView ? "flex" : "none" }}
-        className={`relative flex-col ${isTerminalView && splitMode ? "h-1/2" : "flex-1"}`}
+        className={`relative min-h-0 flex-col overflow-hidden ${isTerminalView && splitMode ? "h-1/2" : "flex-1"}`}
       >
         <TerminalToggle splitMode={splitMode} onToggle={toggleSplit} />
         <Terminal />

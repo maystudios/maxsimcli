@@ -113,11 +113,21 @@ export class PtyManager {
     proc.onData((data: string) => {
       this.lastOutputTime = Date.now();
       store.append(data);
-      this.broadcastToClients({ type: 'output', data });
+      // Only broadcast if this is still the active session (guard against stale handlers after respawn)
+      if (this.session?.pid === proc.pid) {
+        this.broadcastToClients({ type: 'output', data });
+      }
     });
 
     proc.onExit(({ exitCode }: { exitCode: number }) => {
       ptyLog('INFO', `Process exited with code=${exitCode}`);
+      // Guard: only handle exit for the current session. If spawn() was called
+      // in the meantime, this.session already points to a new process — don't
+      // clear it or broadcast exit for the old (now dead) process.
+      if (this.session?.pid !== proc.pid) {
+        ptyLog('INFO', `Ignoring stale exit for old pid=${proc.pid} (current pid=${this.session?.pid ?? 'none'})`);
+        return;
+      }
       this.broadcastToClients({ type: 'exit', code: exitCode });
       this.stopStatusBroadcast();
       this.session = null;
