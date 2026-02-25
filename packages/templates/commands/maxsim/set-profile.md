@@ -1,6 +1,6 @@
 ---
 name: maxsim:set-profile
-description: Switch model profile for MAXSIM agents (quality/balanced/budget)
+description: Switch model profile for MAXSIM agents (quality/balanced/budget/tokenburner)
 argument-hint: <profile>
 allowed-tools:
   - Read
@@ -12,7 +12,7 @@ allowed-tools:
 Switch the model profile used by MAXSIM agents. Controls which Claude model each agent uses, balancing quality vs token spend.
 
 Routes to the set-profile workflow which handles:
-- Argument validation (quality/balanced/budget)
+- Argument validation (quality/balanced/budget/tokenburner)
 - Config file creation if missing
 - Profile update in config.json
 - Confirmation with model table display

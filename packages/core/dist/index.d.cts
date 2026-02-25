@@ -22,12 +22,13 @@ type Result<T> = {
 declare function ok<T>(data: T): Result<T>;
 declare function err<T = never>(error: string): Result<T>;
 type ModelTier = 'opus' | 'sonnet' | 'haiku';
-type ModelProfileName = 'quality' | 'balanced' | 'budget';
+type ModelProfileName = 'quality' | 'balanced' | 'budget' | 'tokenburner';
 type ModelResolution = 'inherit' | ModelTier;
 interface ModelProfileEntry {
   quality: ModelTier;
   balanced: ModelTier;
   budget: ModelTier;
+  tokenburner: ModelTier;
 }
 type AgentType = 'maxsim-planner' | 'maxsim-roadmapper' | 'maxsim-executor' | 'maxsim-phase-researcher' | 'maxsim-project-researcher' | 'maxsim-research-synthesizer' | 'maxsim-debugger' | 'maxsim-codebase-mapper' | 'maxsim-verifier' | 'maxsim-plan-checker' | 'maxsim-integration-checker';
 type ModelProfiles = Record<AgentType, ModelProfileEntry>;

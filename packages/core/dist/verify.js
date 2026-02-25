@@ -620,7 +620,7 @@ function cmdValidateHealth(cwd, options, raw) {
         try {
             const rawContent = node_fs_1.default.readFileSync(configPath, 'utf-8');
             const parsed = JSON.parse(rawContent);
-            const validProfiles = ['quality', 'balanced', 'budget'];
+            const validProfiles = ['quality', 'balanced', 'budget', 'tokenburner'];
             if (parsed.model_profile && !validProfiles.includes(parsed.model_profile)) {
                 addIssue('warning', 'W004', `config.json: invalid model_profile "${parsed.model_profile}"`, `Valid values: ${validProfiles.join(', ')}`);
             }

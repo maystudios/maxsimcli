@@ -21,12 +21,13 @@ export type Result<T> = {
 export declare function ok<T>(data: T): Result<T>;
 export declare function err<T = never>(error: string): Result<T>;
 export type ModelTier = 'opus' | 'sonnet' | 'haiku';
-export type ModelProfileName = 'quality' | 'balanced' | 'budget';
+export type ModelProfileName = 'quality' | 'balanced' | 'budget' | 'tokenburner';
 export type ModelResolution = 'inherit' | ModelTier;
 export interface ModelProfileEntry {
     quality: ModelTier;
     balanced: ModelTier;
     budget: ModelTier;
+    tokenburner: ModelTier;
 }
 export type AgentType = 'maxsim-planner' | 'maxsim-roadmapper' | 'maxsim-executor' | 'maxsim-phase-researcher' | 'maxsim-project-researcher' | 'maxsim-research-synthesizer' | 'maxsim-debugger' | 'maxsim-codebase-mapper' | 'maxsim-verifier' | 'maxsim-plan-checker' | 'maxsim-integration-checker';
 export type ModelProfiles = Record<AgentType, ModelProfileEntry>;

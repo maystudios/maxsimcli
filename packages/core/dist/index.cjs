@@ -89,57 +89,68 @@ const MODEL_PROFILES = {
 	"maxsim-planner": {
 		quality: "opus",
 		balanced: "opus",
-		budget: "sonnet"
+		budget: "sonnet",
+		tokenburner: "opus"
 	},
 	"maxsim-roadmapper": {
 		quality: "opus",
 		balanced: "sonnet",
-		budget: "sonnet"
+		budget: "sonnet",
+		tokenburner: "opus"
 	},
 	"maxsim-executor": {
 		quality: "opus",
 		balanced: "sonnet",
-		budget: "sonnet"
+		budget: "sonnet",
+		tokenburner: "opus"
 	},
 	"maxsim-phase-researcher": {
 		quality: "opus",
 		balanced: "sonnet",
-		budget: "haiku"
+		budget: "haiku",
+		tokenburner: "opus"
 	},
 	"maxsim-project-researcher": {
 		quality: "opus",
 		balanced: "sonnet",
-		budget: "haiku"
+		budget: "haiku",
+		tokenburner: "opus"
 	},
 	"maxsim-research-synthesizer": {
 		quality: "sonnet",
 		balanced: "sonnet",
-		budget: "haiku"
+		budget: "haiku",
+		tokenburner: "opus"
 	},
 	"maxsim-debugger": {
 		quality: "opus",
 		balanced: "sonnet",
-		budget: "sonnet"
+		budget: "sonnet",
+		tokenburner: "opus"
 	},
 	"maxsim-codebase-mapper": {
 		quality: "sonnet",
 		balanced: "haiku",
-		budget: "haiku"
+		budget: "haiku",
+		tokenburner: "opus"
 	},
 	"maxsim-verifier": {
 		quality: "sonnet",
 		balanced: "sonnet",
-		budget: "haiku"
+		budget: "haiku",
+		tokenburner: "opus"
 	},
 	"maxsim-plan-checker": {
 		quality: "sonnet",
 		balanced: "sonnet",
-		budget: "haiku"
+		budget: "haiku",
+		tokenburner: "opus"
 	},
 	"maxsim-integration-checker": {
 		quality: "sonnet",
 		balanced: "sonnet",
-		budget: "haiku"
+		budget: "haiku",
+		tokenburner: "opus"
 	}
 };
 function output(result, raw, rawValue) {
@@ -2676,7 +2687,8 @@ function cmdValidateHealth(cwd, options, raw) {
 		const validProfiles = [
 			"quality",
 			"balanced",
-			"budget"
+			"budget",
+			"tokenburner"
 		];
 		if (parsed.model_profile && !validProfiles.includes(parsed.model_profile)) addIssue("warning", "W004", `config.json: invalid model_profile "${parsed.model_profile}"`, `Valid values: ${validProfiles.join(", ")}`);
 	} catch (thrown) {
