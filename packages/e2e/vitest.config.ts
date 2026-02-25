@@ -5,6 +5,7 @@ export default defineConfig({
     passWithNoTests: true,
     testTimeout: 60_000,
     hookTimeout: 120_000,
+    fileParallelism: false,
     globalSetup: ['./src/globalSetup.ts'],
   },
 });
