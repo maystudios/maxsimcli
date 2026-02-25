@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** `npx maxsimcli@latest` installs a complete AI dev workflow system that works immediately — validated end-to-end from the npm consumer perspective, not the monorepo perspective
-**Current focus:** Phase 17 — Dashboard Read Tests
+**Current focus:** Phase 18 — Dashboard Write Tests
 
 ## Current Position
 
-Phase: 17 — Dashboard Read Tests
-Plan: 17-01 (complete)
-Status: Phase 17 complete — dashboard.test.ts with 5 DASH-* read API tests written; mock fixture corrected
-Last activity: 2026-02-25 — Phase 17 complete (Dashboard Read Tests)
+Phase: 18 — Dashboard Write Tests
+Plan: 18-01 (complete)
+Status: Phase 18 complete — DASH-06 and DASH-07 write API tests added; mock STATE.md bold-format fix; server lifecycle refactored to file-level
+Last activity: 2026-02-25 — Phase 18 complete (Dashboard Write Tests)
 
 Progress: [████░░░░░░] 40% (3/5 phases complete)
 

@@ -1,4 +1,4 @@
-name: Publish to npm
+name: Release
 
 on:
   push:
@@ -6,14 +6,39 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: publish
+  group: release
   cancel-in-progress: false
 
 permissions:
   contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
 
 jobs:
-  publish:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+        env:
+          STANDALONE_BUILD: 'true'
+
+      - name: E2E Tests
+        run: npx nx run e2e:e2e
+
+  release:
+    needs: e2e
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,50 +55,13 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Version bump (nx release)
-        id: release
-        run: |
-          # nx release analyzes conventional commits since last tag,
-          # bumps version in package.json, updates CHANGELOG, commits and tags.
-          # fix: → patch, feat: → minor, feat!:/fix!: → major
-          npx nx release --skip-publish 2>&1
-          echo "version=$(node -p "require('./packages/cli/package.json').version")" >> $GITHUB_OUTPUT
-
       - name: Build
         run: pnpm run build
         env:
           STANDALONE_BUILD: 'true'
 
-      - name: Validate tarball
-        run: |
-          cd packages/cli
-          SIZE=$(pnpm pack --dry-run 2>&1 | tail -1)
-          echo "Tarball size: $SIZE"
-          # Check dashboard files are included
-          pnpm pack --dry-run 2>&1 | grep -q "dist/assets/dashboard/server.js" || echo "WARNING: dashboard server.js not in tarball"
-          pnpm pack --dry-run 2>&1 | grep -q "dist/assets/dashboard/.next" || echo "WARNING: dashboard .next not in tarball"
-
-      - name: Push release commit and tag
-        run: git push --follow-tags
-
-      - name: Check if already published
-        id: check
-        run: |
-          NPM_VERSION=$(npm view maxsimcli version 2>/dev/null || echo "none")
-          echo "npm=$NPM_VERSION local=${{ steps.release.outputs.version }}"
-          if [ "${{ steps.release.outputs.version }}" = "$NPM_VERSION" ]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
-          else
-            echo "skip=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Publish to npm
-        if: steps.check.outputs.skip == 'false'
-        run: pnpm publish --filter maxsimcli --no-git-checks --access public
+      - name: Release
+        run: npx semantic-release
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
