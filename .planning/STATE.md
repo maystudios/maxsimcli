@@ -80,6 +80,7 @@ Progress: [████░░░░░░] 40% (3/5 phases complete)
 | Phase 14 P01 | 2min | 2 tasks | 4 files |
 | Phase 14 P02 | 3min | 2 tasks | 4 files |
 | Phase 14 P03 | 3min | 3 tasks | 2 files |
+| Phase 21 P01 | 4min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -183,6 +184,8 @@ Recent decisions affecting current work:
 - [v2.0.0 Roadmap]: Dashboard server started in beforeAll within dashboard.test.ts only — NOT in globalSetup — to prevent crash from failing all tests
 - [v2.0.0 Roadmap]: get-port (single new dep) for free port discovery before spawning dashboard server
 - [v2.0.0 Roadmap]: pollUntilReady helper (inline, no wait-on dep) for dashboard health check — never fixed-delay setTimeout
+- [Phase 21]: node-pty marked as external in tsdown (native addon cannot be bundled)
+- [Phase 21]: Terminal WebSocket at /ws/terminal separate from dashboard /api/ws
 
 ### Roadmap Evolution
 
@@ -206,6 +209,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-24
-Stopped at: v2.0.0 roadmap created (Phases 15-19 defined)
-Resume file: N/A — ready to begin Phase 15
+Last session: 2026-02-25
+Stopped at: Completed 21-01-PLAN.md (Server-Side PTY Terminal Infrastructure)
+Resume file: N/A — Phase 21 plan 01 complete. Next: 21-02 frontend terminal components.
