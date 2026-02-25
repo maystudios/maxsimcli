@@ -142,6 +142,33 @@ if (fs.existsSync(dashboardStandalone)) {
     console.log(`  [assets] Copied static files -> dist/assets/dashboard/.next/static/`);
   }
 
+  // Next.js standalone in monorepo mode does not copy all manifest files into the
+  // nested .next/ dir (packages/dashboard/.next/). Without required-server-files.json
+  // the server falls back to dev mode and fails. Copy all required files explicitly
+  // using the files[] list from required-server-files.json.
+  const dashboardAppSrc = path.join(monorepoRoot, 'packages', 'dashboard');
+  const dashboardAppDest = path.join(dashboardDest, 'packages', 'dashboard');
+  const requiredServerFilesSrc = path.join(dashboardAppSrc, '.next', 'required-server-files.json');
+  if (fs.existsSync(requiredServerFilesSrc)) {
+    const serverFilesData = JSON.parse(fs.readFileSync(requiredServerFilesSrc, 'utf8'));
+    const filesToCopy = serverFilesData.files || [];
+    let manifestCount = 0;
+    for (const relFile of filesToCopy) {
+      // Normalize path separators (Windows builds use backslashes, Linux uses forward)
+      const normalizedRel = relFile.split(/[\\/]/).join(path.sep);
+      const src = path.join(dashboardAppSrc, normalizedRel);
+      const dst = path.join(dashboardAppDest, normalizedRel);
+      if (fs.existsSync(src) && !fs.existsSync(dst)) {
+        fs.mkdirSync(path.dirname(dst), { recursive: true });
+        fs.copyFileSync(src, dst);
+        manifestCount++;
+      }
+    }
+    if (manifestCount > 0) {
+      console.log(`  [assets] Copied ${manifestCount} manifest files -> packages/dashboard/.next/`);
+    }
+  }
+
   // Copy public/ assets if they exist
   if (fs.existsSync(dashboardPublic)) {
     const publicDest = path.join(dashboardDest, 'public');

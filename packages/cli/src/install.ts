@@ -1490,6 +1490,10 @@ function install(
   if (fs.existsSync(dashboardSrc)) {
     spinner = ora({ text: 'Installing dashboard...', color: 'cyan' }).start();
     const dashboardDest = path.join(targetDir, 'dashboard');
+    // Clean existing dashboard to prevent stale files from old installs
+    if (fs.existsSync(dashboardDest)) {
+      fs.rmSync(dashboardDest, { recursive: true, force: true });
+    }
     copyDirRecursive(dashboardSrc, dashboardDest);
 
     // Write dashboard.json NEXT TO dashboard/ dir (survives overwrites on upgrade)
@@ -1822,6 +1826,11 @@ const subcommand = args.find(a => !a.startsWith('-'));
     const installDashDir = path.join(installDir, 'dashboard');
 
     if (fs.existsSync(dashboardAssetSrc)) {
+      // Clean existing dashboard dir to prevent stale files from old installs
+      // (e.g. old next/dist/server/*.js clashing with new bundle's dependencies)
+      if (fs.existsSync(installDashDir)) {
+        fs.rmSync(installDashDir, { recursive: true, force: true });
+      }
       fs.mkdirSync(installDashDir, { recursive: true });
       copyDirRecursive(dashboardAssetSrc, installDashDir);
       // Write/update dashboard.json
