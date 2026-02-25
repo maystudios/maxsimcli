@@ -215,4 +215,4 @@ Plans:
 | 22. Fix node-pty Delivery (Lazy-Load) | 2/2 | Complete    | 2026-02-25 |
 | 23. E2E Wiring & Next.js Cleanup | 2/2 | Complete    | 2026-02-25 |
 | 24. Fix Terminal Status Parsing & Quick Actions | 1/1 | Complete    | 2026-02-25 |
-| 25. Planning Doc Hygiene | 0/3 | In Progress | — |
+| 25. Planning Doc Hygiene | 1/3 | In Progress|  |
