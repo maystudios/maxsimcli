@@ -1,3 +1,10 @@
+## [2.5.3](https://github.com/maystudios/maxsim/compare/v2.5.2...v2.5.3) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** make state section append robust and add server logging ([dd19326](https://github.com/maystudios/maxsim/commit/dd193265ac694c1fe522a4b20da0e55245ca0b73))
+
 ## [2.5.2](https://github.com/maystudios/maxsim/compare/v2.5.1...v2.5.2) (2026-02-25)
 
 
