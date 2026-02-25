@@ -1,0 +1,203 @@
+import * as pty from 'node-pty';
+import type { IPty } from 'node-pty';
+import { WebSocket } from 'ws';
+import { SessionStore } from './session-store';
+
+interface PtySession {
+  process: IPty;
+  pid: number;
+  startTime: number;
+  cwd: string;
+  skipPermissions: boolean;
+  disconnectTimer: ReturnType<typeof setTimeout> | null;
+  store: SessionStore;
+}
+
+interface PtyStatus {
+  pid: number;
+  uptime: number;
+  cwd: string;
+  memoryMB: number;
+  isActive: boolean;
+  skipPermissions: boolean;
+  alive: boolean;
+}
+
+const DISCONNECT_TIMEOUT_MS = 60_000;
+const STATUS_INTERVAL_MS = 1_000;
+const ACTIVE_THRESHOLD_MS = 2_000;
+
+export class PtyManager {
+  private static instance: PtyManager | null = null;
+  private session: PtySession | null = null;
+  private connectedClients = new Set<WebSocket>();
+  private lastOutputTime = 0;
+  private statusInterval: ReturnType<typeof setInterval> | null = null;
+
+  static getInstance(): PtyManager {
+    if (!PtyManager.instance) {
+      PtyManager.instance = new PtyManager();
+    }
+    return PtyManager.instance;
+  }
+
+  spawn(opts: {
+    skipPermissions: boolean;
+    cwd: string;
+    cols?: number;
+    rows?: number;
+  }): void {
+    if (this.session) {
+      this.kill();
+    }
+
+    const shell =
+      process.platform === 'win32' ? 'claude.cmd' : 'claude';
+    const args: string[] = [];
+    if (opts.skipPermissions) {
+      args.push('--dangerously-skip-permissions');
+    }
+
+    const proc = pty.spawn(shell, args, {
+      name: 'xterm-256color',
+      cols: opts.cols ?? 120,
+      rows: opts.rows ?? 30,
+      cwd: opts.cwd,
+      env: process.env as Record<string, string>,
+    });
+
+    const store = new SessionStore();
+
+    this.session = {
+      process: proc,
+      pid: proc.pid,
+      startTime: Date.now(),
+      cwd: opts.cwd,
+      skipPermissions: opts.skipPermissions,
+      disconnectTimer: null,
+      store,
+    };
+
+    this.lastOutputTime = Date.now();
+
+    proc.onData((data: string) => {
+      this.lastOutputTime = Date.now();
+      store.append(data);
+      this.broadcastToClients({ type: 'output', data });
+    });
+
+    proc.onExit(({ exitCode }: { exitCode: number }) => {
+      this.broadcastToClients({ type: 'exit', code: exitCode });
+      this.stopStatusBroadcast();
+      this.session = null;
+    });
+
+    this.broadcastToClients({ type: 'started', pid: proc.pid });
+    this.startStatusBroadcast();
+  }
+
+  write(data: string): void {
+    if (this.session) {
+      this.session.process.write(data);
+    }
+  }
+
+  resize(cols: number, rows: number): void {
+    if (this.session) {
+      this.session.process.resize(cols, rows);
+    }
+  }
+
+  kill(): void {
+    if (this.session) {
+      this.stopStatusBroadcast();
+      try {
+        this.session.process.kill();
+      } catch {
+        // process may already be dead
+      }
+      if (this.session.disconnectTimer) {
+        clearTimeout(this.session.disconnectTimer);
+      }
+      this.session = null;
+    }
+  }
+
+  getStatus(): PtyStatus | null {
+    if (!this.session) return null;
+    return {
+      pid: this.session.pid,
+      uptime: Math.floor((Date.now() - this.session.startTime) / 1000),
+      cwd: this.session.cwd,
+      memoryMB: Math.round((process.memoryUsage().rss / 1024 / 1024) * 10) / 10,
+      isActive: Date.now() - this.lastOutputTime < ACTIVE_THRESHOLD_MS,
+      skipPermissions: this.session.skipPermissions,
+      alive: true,
+    };
+  }
+
+  addClient(ws: WebSocket): void {
+    this.connectedClients.add(ws);
+
+    // Clear disconnect timer since a client connected
+    if (this.session?.disconnectTimer) {
+      clearTimeout(this.session.disconnectTimer);
+      this.session.disconnectTimer = null;
+    }
+
+    // Send scrollback to new client
+    if (this.session) {
+      const scrollback = this.session.store.getAll();
+      if (scrollback) {
+        ws.send(JSON.stringify({ type: 'scrollback', data: scrollback }));
+      }
+
+      // Send current status
+      const status = this.getStatus();
+      if (status) {
+        ws.send(JSON.stringify({ type: 'status', ...status }));
+      }
+    }
+  }
+
+  removeClient(ws: WebSocket): void {
+    this.connectedClients.delete(ws);
+
+    if (this.connectedClients.size === 0 && this.session) {
+      this.session.disconnectTimer = setTimeout(() => {
+        console.error('[pty] No clients connected for 60s, killing process');
+        this.kill();
+      }, DISCONNECT_TIMEOUT_MS);
+    }
+  }
+
+  isAlive(): boolean {
+    return this.session !== null;
+  }
+
+  private broadcastToClients(message: Record<string, unknown>): void {
+    const data = JSON.stringify(message);
+    for (const client of this.connectedClients) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(data);
+      }
+    }
+  }
+
+  private startStatusBroadcast(): void {
+    this.stopStatusBroadcast();
+    this.statusInterval = setInterval(() => {
+      const status = this.getStatus();
+      if (status) {
+        this.broadcastToClients({ type: 'status', ...status });
+      }
+    }, STATUS_INTERVAL_MS);
+  }
+
+  private stopStatusBroadcast(): void {
+    if (this.statusInterval) {
+      clearInterval(this.statusInterval);
+      this.statusInterval = null;
+    }
+  }
+}

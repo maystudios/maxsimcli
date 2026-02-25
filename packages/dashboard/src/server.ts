@@ -27,6 +27,7 @@ import type {
 } from '@maxsim/core';
 
 import { watch, type FSWatcher } from 'chokidar';
+import { PtyManager } from './terminal/pty-manager';
 
 // ─── Config ────────────────────────────────────────────────────────────────
 
@@ -712,13 +713,59 @@ if (fs.existsSync(clientDir)) {
 
 async function main(): Promise<void> {
   const wss = createWSS();
+  const terminalWss = new WebSocketServer({ noServer: true });
+  const ptyManager = PtyManager.getInstance();
+
+  // Terminal WebSocket connections
+  terminalWss.on('connection', (ws: WebSocket) => {
+    ptyManager.addClient(ws);
+
+    ws.on('message', (raw: Buffer | string) => {
+      try {
+        const msg = JSON.parse(typeof raw === 'string' ? raw : raw.toString());
+        switch (msg.type) {
+          case 'input':
+            ptyManager.write(msg.data);
+            break;
+          case 'resize':
+            ptyManager.resize(msg.cols, msg.rows);
+            break;
+          case 'spawn':
+            ptyManager.spawn({
+              skipPermissions: !!msg.skipPermissions,
+              cwd: projectCwd,
+              cols: msg.cols,
+              rows: msg.rows,
+            });
+            break;
+          case 'kill':
+            ptyManager.kill();
+            break;
+        }
+      } catch {
+        // ignore malformed messages
+      }
+    });
+
+    ws.on('close', () => {
+      ptyManager.removeClient(ws);
+    });
+
+    ws.on('error', (err) => {
+      console.error('[terminal-ws] Client error:', err.message);
+    });
+  });
 
   const server = createServer(app);
 
-  // WebSocket upgrade at /api/ws
+  // WebSocket upgrade routing: /api/ws for dashboard, /ws/terminal for PTY
   server.on('upgrade', (req: IncomingMessage, socket: Duplex, head: Buffer) => {
     const url = req.url || '/';
-    if (url === '/api/ws' || url.startsWith('/api/ws?')) {
+    if (url === '/ws/terminal' || url.startsWith('/ws/terminal?')) {
+      terminalWss.handleUpgrade(req, socket, head, (ws) => {
+        terminalWss.emit('connection', ws, req);
+      });
+    } else if (url === '/api/ws' || url.startsWith('/api/ws?')) {
       wss.handleUpgrade(req, socket, head, (ws) => {
         wss.emit('connection', ws, req);
       });
@@ -745,7 +792,9 @@ async function main(): Promise<void> {
 
   function shutdown(): void {
     console.error('\n[server] Shutting down...');
+    ptyManager.kill();
     if (watcher) watcher.close().catch(() => {});
+    terminalWss.close(() => {});
     wss.close(() => {
       server.close(() => {
         process.exit(0);
@@ -759,6 +808,9 @@ async function main(): Promise<void> {
 
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
+  process.on('exit', () => {
+    ptyManager.kill();
+  });
 }
 
 main().catch((err) => {
