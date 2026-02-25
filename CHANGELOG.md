@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/maystudios/maxsim/compare/v2.0.1...v2.0.2) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** fix dashboard launch on Windows paths with spaces and slow cold-starts ([a811921](https://github.com/maystudios/maxsim/commit/a811921f9db63d398472339d12e6056d5c457c29))
+
 ## [2.0.1](https://github.com/maystudios/maxsim/compare/v2.0.0...v2.0.1) (2026-02-25)
 
 
