@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** `npx maxsimcli@latest` installs a complete AI dev workflow system that works immediately — validated end-to-end from the npm consumer perspective, not the monorepo perspective
-**Current focus:** Phase 22 — Fix node-pty Lazy Load
+**Current focus:** Phase 23 — E2E Wiring & Next.js Cleanup
 
 ## Current Position
 
-Phase: 22 — Fix node-pty Lazy Load
-Plan: 22-02 (complete)
-Status: Plan 02 complete — E2E test for absent node-pty
-Last activity: 2026-02-25 — Plan 22-02 complete (E2E Test for Absent node-pty)
+Phase: 23 — E2E Wiring & Next.js Cleanup
+Plan: 23-02 (in progress)
+Status: Plan 01 complete — E2E wiring fix and Next.js orphaned file cleanup
+Last activity: 2026-02-25 — Planning doc audit and pre-push consistency hook
 
 Progress: [████░░░░░░] 40% (3/5 phases complete)
 
@@ -212,12 +212,12 @@ None yet.
 
 ### Blockers/Concerns
 
-- [v2.0.0 Research]: Dashboard port discovery — verify that passing `PORT` env var overrides detect-port logic in server.ts (Phase 17 planning must confirm before implementation)
-- [v2.0.0 Research]: `pnpm pack` vs `npm pack` in workspace context — verify packages/cli/package.json has no workspace:* references in devDependencies before Phase 16 implementation
-- [v2.0.0 Research]: Dashboard build availability in E2E context — globalSetup.ts should pre-check that dist/assets/dashboard/server.js exists and fail with clear error if not
+- ~~[v2.0.0 Research]: Dashboard port discovery~~ — Resolved: Phase 17-22 implemented PORT env var handling
+- ~~[v2.0.0 Research]: `pnpm pack` vs `npm pack`~~ — Resolved: Phase 16 implemented pack pipeline successfully
+- ~~[v2.0.0 Research]: Dashboard build availability in E2E context~~ — Resolved: Phase 19 CI integration handles this
 
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 22-02-PLAN.md (E2E Test for Absent node-pty)
-Resume file: N/A — Phase 22 plan 02 complete.
+Stopped at: Executing 23-02-PLAN.md (Planning doc audit and pre-push consistency hook)
+Resume file: N/A

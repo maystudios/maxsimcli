@@ -53,9 +53,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 16-01-PLAN.md — Add --version flag to install.ts, wire globalSetup in vitest.config.ts, add ProvidedContext types
-- [ ] 16-02-PLAN.md — Create globalSetup.ts pack+install pipeline and mock project fixture factory
-- [ ] 16-03-PLAN.md — Create install.test.ts and tools.test.ts with all behavioral assertions
+- [x] 16-01-PLAN.md — Add --version flag to install.ts, wire globalSetup in vitest.config.ts, add ProvidedContext types
+- [x] 16-02-PLAN.md — Create globalSetup.ts pack+install pipeline and mock project fixture factory
+- [x] 16-03-PLAN.md — Create install.test.ts and tools.test.ts with all behavioral assertions
 
 ### Phase 17: Dashboard Read Tests
 **Goal**: The dashboard server boots from the installed path with `MAXSIM_PROJECT_CWD` pointing to the mock fixture, and all read-only API endpoints return data matching the mock files
@@ -126,10 +126,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 21-01-PLAN.md — Server-side PTY manager, session store, and terminal WebSocket endpoint
-- [ ] 21-02-PLAN.md — xterm.js Terminal React component, WebSocket hook, and status bar
-- [ ] 21-03-PLAN.md — Terminal tab integration into sidebar and App.tsx with split-panel mode
-- [ ] 21-04-PLAN.md — Quick-action button bar with confirmation, settings, and reconnection polish
+- [x] 21-01-PLAN.md — Server-side PTY manager, session store, and terminal WebSocket endpoint
+- [x] 21-02-PLAN.md — xterm.js Terminal React component, WebSocket hook, and status bar
+- [x] 21-03-PLAN.md — Terminal tab integration into sidebar and App.tsx with split-panel mode
+- [x] 21-04-PLAN.md — Quick-action button bar with confirmation, settings, and reconnection polish
 
 ### Phase 22: Fix node-pty Delivery (Lazy-Load)
 **Goal**: Dashboard server starts without node-pty native addon present; terminal features degrade gracefully with a clear message instead of crashing the entire server
@@ -144,8 +144,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 22-01-PLAN.md — Server graceful degradation + frontend error card
-- [ ] 22-02-PLAN.md — E2E test for absent node-pty
+- [x] 22-01-PLAN.md — Server graceful degradation + frontend error card
+- [x] 22-02-PLAN.md — E2E test for absent node-pty
 
 ### Phase 23: E2E Wiring & Next.js Cleanup
 **Goal**: Fix e2e package dependency wiring, remove orphaned Next.js artifacts from Phase 20 migration, and update all stale planning doc statuses
@@ -157,16 +157,17 @@ Plans:
   2. No orphaned Next.js files remain in `packages/dashboard/` (`app/`, `next.config.mjs`, `next-env.d.ts`, `postcss.config.mjs`)
   3. ROADMAP.md progress table shows correct status for all phases (19, 20 marked Complete)
   4. REQUIREMENTS.md traceability table includes DASH-TERM-01 through DASH-TERM-05 and has updated phase assignments
-**Plans**: 0 plans
+**Plans**: 2 plans
 
 Plans:
-(none yet)
+- [ ] 23-01-PLAN.md — E2E wiring fix and Next.js orphaned file cleanup
+- [ ] 23-02-PLAN.md — Planning doc audit and pre-push consistency hook
 
 ---
 
 ## Progress
 
-**Execution Order:** 15 → 16 → 17 → 18 → 19 (strict sequential — each phase depends on the previous)
+**Execution Order:** 15 → 16 → 17 → 18 → 19 → 20 → 21 → 22 → 23 (strict sequential — each phase depends on the previous)
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -178,4 +179,4 @@ Plans:
 | 20. Dashboard Migrate to Vite + Express | 2/2 | Complete | 2026-02-25 |
 | 21. Interactive Claude Code Terminal | 4/4 | Complete | 2026-02-25 |
 | 22. Fix node-pty Delivery (Lazy-Load) | 2/2 | Complete    | 2026-02-25 |
-| 23. E2E Wiring & Next.js Cleanup | 0/0 | Not started | - |
+| 23. E2E Wiring & Next.js Cleanup | 1/2 | In Progress | - |
