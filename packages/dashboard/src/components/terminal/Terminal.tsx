@@ -6,6 +6,7 @@ import { SerializeAddon } from "@xterm/addon-serialize";
 import "@xterm/xterm/css/xterm.css";
 import { useTerminal } from "@/hooks/use-terminal";
 import { TerminalStatusBar } from "./TerminalStatusBar";
+import { QuickActionBar } from "./QuickActionBar";
 
 interface TerminalProps {
   onReady?: (term: XTerm) => void;
@@ -131,8 +132,15 @@ export function Terminal({ onReady }: TerminalProps) {
       <div className="relative flex-1">
         <div ref={containerRef} className="h-full w-full" />
 
-        {/* Disconnected overlay */}
-        {!connected && (
+        {/* Quick action bar */}
+        <QuickActionBar
+          onSendCommand={writeInput}
+          isActive={status?.isActive ?? false}
+          isAlive={status?.alive ?? false}
+        />
+
+        {/* Reconnection overlay (only when disconnected, not clean exit) */}
+        {!connected && exitCode === null && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60">
             <div className="flex items-center gap-3 font-mono text-sm text-muted-foreground">
               <svg
