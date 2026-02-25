@@ -78,11 +78,11 @@ export class PtyManager {
       this.kill();
     }
 
-    const shell = this.resolveClaudePath();
-    const args: string[] = [];
-    if (opts.skipPermissions) {
-      args.push('--dangerously-skip-permissions');
-    }
+    // Spawn via the system shell so PATH resolution works exactly like the user's terminal
+    const isWin = process.platform === 'win32';
+    const shell = isWin ? 'cmd.exe' : '/bin/sh';
+    const claudeCmd = `claude${opts.skipPermissions ? ' --dangerously-skip-permissions' : ''}`;
+    const args = isWin ? ['/c', claudeCmd] : ['-c', claudeCmd];
 
     ptyLog('INFO', `Spawning: shell=${shell}, args=${JSON.stringify(args)}, cwd=${opts.cwd}, cols=${opts.cols ?? 120}, rows=${opts.rows ?? 30}`);
 
@@ -208,29 +208,6 @@ export class PtyManager {
 
   isAvailable(): boolean {
     return pty !== null;
-  }
-
-  private resolveClaudePath(): string {
-    if (process.platform !== 'win32') return 'claude';
-
-    // On Windows, node-pty needs an actual executable file.
-    // Try common names in order of preference.
-    const { execSync } = require('child_process');
-    for (const name of ['claude.exe', 'claude.cmd', 'claude']) {
-      try {
-        const result = execSync(`where ${name}`, { encoding: 'utf8', timeout: 5000 }).trim();
-        const first = result.split(/\r?\n/)[0];
-        if (first) {
-          ptyLog('INFO', `Resolved claude path: ${first}`);
-          return first;
-        }
-      } catch {
-        // not found, try next
-      }
-    }
-    // Fallback — let node-pty try to find it
-    ptyLog('WARN', 'Could not resolve claude path, falling back to "claude"');
-    return 'claude';
   }
 
   private broadcastToClients(message: Record<string, unknown>): void {
