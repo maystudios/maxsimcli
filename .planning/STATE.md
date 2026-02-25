@@ -87,6 +87,7 @@ Progress: [████░░░░░░] 40% (3/5 phases complete)
 | Phase 22 P02 | 19min | 2 tasks | 3 files |
 | Phase 23 P01 | 1min | 2 tasks | 30 files |
 | Phase 23 P02 | 3min | 2 tasks | 4 files |
+| Phase 24 P01 | 1min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -198,6 +199,7 @@ Recent decisions affecting current work:
 - [Phase 22]: curl for WebSocket upgrade verification in vitest fork workers (ws/native WebSocket hang)
 - [Phase 22]: fileParallelism: false in e2e vitest config to prevent dashboard port conflicts
 - [Phase 23]: Removed stale .next and app entries from tsconfig.json exclude during cleanup
+- [Phase 24]: isActive removed from QuickActionBar disabled condition - means activity not running state
 
 ### Roadmap Evolution
 
