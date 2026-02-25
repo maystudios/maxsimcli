@@ -15,6 +15,10 @@
         {
           "projects": "cli",
           "target": "build"
+        },
+        {
+          "projects": "dashboard",
+          "target": "build"
         }
       ]
     },

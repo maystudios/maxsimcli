@@ -177,5 +177,5 @@ Plans:
 | 19. CI Integration | 1/1 | Complete | 2026-02-25 |
 | 20. Dashboard Migrate to Vite + Express | 2/2 | Complete | 2026-02-25 |
 | 21. Interactive Claude Code Terminal | 4/4 | Complete | 2026-02-25 |
-| 22. Fix node-pty Delivery (Lazy-Load) | 2/2 | Complete   | 2026-02-25 |
+| 22. Fix node-pty Delivery (Lazy-Load) | 2/2 | Complete    | 2026-02-25 |
 | 23. E2E Wiring & Next.js Cleanup | 0/0 | Not started | - |
