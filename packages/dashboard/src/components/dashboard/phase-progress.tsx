@@ -7,8 +7,10 @@ interface PhaseProgressProps {
   completedPlans: number;
   totalPlans: number;
   status: DashboardPhase["diskStatus"];
+  roadmapComplete: boolean;
   isCurrent: boolean;
   onClick: (phaseNumber: string) => void;
+  onToggleComplete?: (phaseNumber: string, checked: boolean) => void;
 }
 
 /** Status icon for phase completion state */
@@ -64,8 +66,10 @@ export function PhaseProgress({
   completedPlans,
   totalPlans,
   status,
+  roadmapComplete,
   isCurrent,
   onClick,
+  onToggleComplete,
 }: PhaseProgressProps) {
   const pct = totalPlans > 0 ? Math.round((completedPlans / totalPlans) * 100) : 0;
 
@@ -80,7 +84,21 @@ export function PhaseProgress({
       }`}
     >
       <div className="flex items-center gap-3">
-        <StatusIcon status={status} />
+        {onToggleComplete ? (
+          <input
+            type="checkbox"
+            checked={roadmapComplete}
+            onChange={(e) => {
+              e.stopPropagation();
+              onToggleComplete(phaseNumber, e.target.checked);
+            }}
+            onClick={(e) => e.stopPropagation()}
+            className="h-3.5 w-3.5 shrink-0 cursor-pointer accent-accent"
+            title={roadmapComplete ? "Mark incomplete" : "Mark complete"}
+          />
+        ) : (
+          <StatusIcon status={status} />
+        )}
         <span
           className={`font-mono text-sm font-semibold ${
             isCurrent ? "text-accent" : "text-muted-foreground"

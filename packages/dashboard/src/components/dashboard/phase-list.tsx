@@ -5,6 +5,7 @@ interface PhaseListProps {
   phases: DashboardPhase[];
   currentPhase: string | null;
   onPhaseClick: (id: string) => void;
+  onToggleComplete?: (phaseNumber: string, checked: boolean) => void;
 }
 
 /**
@@ -12,7 +13,7 @@ interface PhaseListProps {
  *
  * Current phase is visually highlighted via PhaseProgress accent border.
  */
-export function PhaseList({ phases, currentPhase, onPhaseClick }: PhaseListProps) {
+export function PhaseList({ phases, currentPhase, onPhaseClick, onToggleComplete }: PhaseListProps) {
   return (
     <div className="flex flex-col gap-1">
       {/* Section header */}
@@ -49,8 +50,10 @@ export function PhaseList({ phases, currentPhase, onPhaseClick }: PhaseListProps
               completedPlans={phase.summaryCount}
               totalPlans={phase.planCount}
               status={phase.diskStatus}
+              roadmapComplete={phase.roadmapComplete}
               isCurrent={phase.number === currentPhase}
               onClick={onPhaseClick}
+              onToggleComplete={onToggleComplete}
             />
           ))
         )}

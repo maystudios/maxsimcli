@@ -98,6 +98,21 @@ function DashboardApp() {
     setActivePhaseId(null);
   }, []);
 
+  const handleToggleComplete = useCallback(async (phaseNumber: string, checked: boolean) => {
+    try {
+      const res = await fetch("/api/roadmap", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phaseNumber, checked }),
+      });
+      if (!res.ok) {
+        console.error("[toggle-phase]", await res.text());
+      }
+    } catch (err) {
+      console.error("[toggle-phase]", err);
+    }
+  }, []);
+
   // Build phases array from roadmap data (camelCase mapping)
   const phases: DashboardPhase[] = (roadmap?.phases ?? []).map((p) => ({
     number: p.number,
@@ -135,6 +150,7 @@ function DashboardApp() {
               phases={phases}
               currentPhase={currentPhase}
               onPhaseClick={handlePhaseClick}
+              onToggleComplete={handleToggleComplete}
             />
           </div>
         );

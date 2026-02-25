@@ -32,38 +32,31 @@ export function StateEditor({ onEntryAdded }: StateEditorProps) {
 
     try {
       if (activeTab === "decision") {
-        const phasePrefix = phase.trim() ? `[${phase.trim()}]: ` : "";
-        const decisionText = `${phasePrefix}${trimmedText}`;
-
-        const res = await fetch("/api/state", {
-          method: "PATCH",
+        const res = await fetch("/api/state/decision", {
+          method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            field: "decisions",
-            value: decisionText,
+            phase: phase.trim() || undefined,
+            text: trimmedText,
           }),
         });
 
         if (!res.ok) {
-          // If the field-replace approach fails, it means the STATE.md
-          // structure may not support direct field replacement for list items.
-          // This is expected behavior for list-based fields.
-          throw new Error("Could not add decision - STATE.md field not found");
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || "Could not add decision");
         }
 
         setSuccess("Decision added");
       } else {
-        const res = await fetch("/api/state", {
-          method: "PATCH",
+        const res = await fetch("/api/state/blocker", {
+          method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            field: "blockers",
-            value: trimmedText,
-          }),
+          body: JSON.stringify({ text: trimmedText }),
         });
 
         if (!res.ok) {
-          throw new Error("Could not add blocker - STATE.md field not found");
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || "Could not add blocker");
         }
 
         setSuccess("Blocker added");

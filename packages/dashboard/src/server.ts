@@ -534,6 +534,29 @@ app.get('/api/roadmap', (_req: Request, res: Response) => {
   return res.json(data);
 });
 
+// ── Roadmap toggle ──
+app.patch('/api/roadmap', (req: Request, res: Response) => {
+  const roadmapPath = path.join(projectCwd, '.planning', 'ROADMAP.md');
+  if (!fs.existsSync(roadmapPath)) return res.status(404).json({ error: 'ROADMAP.md not found' });
+
+  const { phaseNumber, checked } = req.body as { phaseNumber?: string; checked?: boolean };
+  if (!phaseNumber || checked === undefined) {
+    return res.status(400).json({ error: 'phaseNumber and checked are required' });
+  }
+
+  let content = fs.readFileSync(roadmapPath, 'utf-8');
+  const escapedNum = phaseNumber.replace('.', '\\.');
+  const pattern = new RegExp(`(-\\s*\\[)(x| )(\\]\\s*.*Phase\\s+${escapedNum})`, 'i');
+  const match = content.match(pattern);
+
+  if (!match) return res.status(404).json({ error: `Phase ${phaseNumber} checkbox not found in ROADMAP.md` });
+
+  content = content.replace(pattern, `$1${checked ? 'x' : ' '}$3`);
+  suppressPath(roadmapPath);
+  fs.writeFileSync(roadmapPath, content, 'utf-8');
+  return res.json({ updated: true, phaseNumber, checked });
+});
+
 // ── State ──
 app.get('/api/state', (_req: Request, res: Response) => {
   const data = parseState(projectCwd);
@@ -561,6 +584,88 @@ app.patch('/api/state', (req: Request, res: Response) => {
   suppressPath(statePath);
   fs.writeFileSync(statePath, updated, 'utf-8');
   return res.json({ updated: true, field });
+});
+
+// Helper: ensure STATE.md exists, creating a minimal one if missing
+function ensureStateMd(statePath: string): void {
+  if (fs.existsSync(statePath)) return;
+  const planningDir = path.dirname(statePath);
+  fs.mkdirSync(planningDir, { recursive: true });
+  const template = `# Project State
+
+## Current Position
+
+Phase: 1
+Status: In progress
+Last activity: ${new Date().toISOString().split('T')[0]} — State file created
+
+## Accumulated Context
+
+### Decisions
+
+None yet.
+
+### Blockers/Concerns
+
+None yet.
+`;
+  fs.writeFileSync(statePath, template, 'utf-8');
+}
+
+// Helper: append an entry to a section in STATE.md
+function appendToStateSection(
+  statePath: string,
+  sectionPattern: RegExp,
+  entry: string,
+): { success: boolean; reason?: string } {
+  let content = fs.readFileSync(statePath, 'utf-8');
+  const match = content.match(sectionPattern);
+  if (!match) return { success: false, reason: 'Section not found in STATE.md' };
+
+  let sectionBody = match[2];
+  sectionBody = sectionBody
+    .replace(/None yet\.?\s*\n?/gi, '')
+    .replace(/No decisions yet\.?\s*\n?/gi, '')
+    .replace(/None\.?\s*\n?/gi, '');
+  sectionBody = sectionBody.trimEnd() + '\n' + entry + '\n';
+  content = content.replace(sectionPattern, (_m, header: string) => `${header}${sectionBody}`);
+
+  suppressPath(statePath);
+  fs.writeFileSync(statePath, content, 'utf-8');
+  return { success: true };
+}
+
+// ── Add Decision ──
+app.post('/api/state/decision', (req: Request, res: Response) => {
+  const statePath = path.join(projectCwd, '.planning', 'STATE.md');
+  ensureStateMd(statePath);
+
+  const { phase, text } = req.body as { phase?: string; text?: string };
+  if (!text?.trim()) return res.status(400).json({ error: 'text is required' });
+
+  const phaseLabel = phase?.trim() || '?';
+  const entry = `- [Phase ${phaseLabel}]: ${text.trim()}`;
+  const sectionPattern = /(###?\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
+
+  const result = appendToStateSection(statePath, sectionPattern, entry);
+  if (!result.success) return res.status(404).json({ error: result.reason });
+  return res.json({ added: true, decision: entry });
+});
+
+// ── Add Blocker ──
+app.post('/api/state/blocker', (req: Request, res: Response) => {
+  const statePath = path.join(projectCwd, '.planning', 'STATE.md');
+  ensureStateMd(statePath);
+
+  const { text } = req.body as { text?: string };
+  if (!text?.trim()) return res.status(400).json({ error: 'text is required' });
+
+  const entry = `- ${text.trim()}`;
+  const sectionPattern = /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
+
+  const result = appendToStateSection(statePath, sectionPattern, entry);
+  if (!result.success) return res.status(404).json({ error: result.reason });
+  return res.json({ added: true, blocker: text.trim() });
 });
 
 // ── Phases ──

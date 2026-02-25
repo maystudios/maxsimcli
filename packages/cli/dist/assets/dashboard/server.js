@@ -41941,6 +41941,24 @@ app.get("/api/roadmap", (_req, res) => {
 	if (!data) return res.status(404).json({ error: "ROADMAP.md not found" });
 	return res.json(data);
 });
+app.patch("/api/roadmap", (req, res) => {
+	const roadmapPath = node_path.join(projectCwd, ".planning", "ROADMAP.md");
+	if (!node_fs.existsSync(roadmapPath)) return res.status(404).json({ error: "ROADMAP.md not found" });
+	const { phaseNumber, checked } = req.body;
+	if (!phaseNumber || checked === void 0) return res.status(400).json({ error: "phaseNumber and checked are required" });
+	let content = node_fs.readFileSync(roadmapPath, "utf-8");
+	const escapedNum = phaseNumber.replace(".", "\\.");
+	const pattern = new RegExp(`(-\\s*\\[)(x| )(\\]\\s*.*Phase\\s+${escapedNum})`, "i");
+	if (!content.match(pattern)) return res.status(404).json({ error: `Phase ${phaseNumber} checkbox not found in ROADMAP.md` });
+	content = content.replace(pattern, `$1${checked ? "x" : " "}$3`);
+	suppressPath(roadmapPath);
+	node_fs.writeFileSync(roadmapPath, content, "utf-8");
+	return res.json({
+		updated: true,
+		phaseNumber,
+		checked
+	});
+});
 app.get("/api/state", (_req, res) => {
 	const data = parseState(projectCwd);
 	if (!data) return res.status(404).json({ error: "STATE.md not found" });
@@ -41959,6 +41977,70 @@ app.patch("/api/state", (req, res) => {
 	return res.json({
 		updated: true,
 		field
+	});
+});
+function ensureStateMd(statePath) {
+	if (node_fs.existsSync(statePath)) return;
+	const planningDir = node_path.dirname(statePath);
+	node_fs.mkdirSync(planningDir, { recursive: true });
+	const template = `# Project State
+
+## Current Position
+
+Phase: 1
+Status: In progress
+Last activity: ${(/* @__PURE__ */ new Date()).toISOString().split("T")[0]} — State file created
+
+## Accumulated Context
+
+### Decisions
+
+None yet.
+
+### Blockers/Concerns
+
+None yet.
+`;
+	node_fs.writeFileSync(statePath, template, "utf-8");
+}
+function appendToStateSection(statePath, sectionPattern, entry) {
+	let content = node_fs.readFileSync(statePath, "utf-8");
+	const match = content.match(sectionPattern);
+	if (!match) return {
+		success: false,
+		reason: "Section not found in STATE.md"
+	};
+	let sectionBody = match[2];
+	sectionBody = sectionBody.replace(/None yet\.?\s*\n?/gi, "").replace(/No decisions yet\.?\s*\n?/gi, "").replace(/None\.?\s*\n?/gi, "");
+	sectionBody = sectionBody.trimEnd() + "\n" + entry + "\n";
+	content = content.replace(sectionPattern, (_m, header) => `${header}${sectionBody}`);
+	suppressPath(statePath);
+	node_fs.writeFileSync(statePath, content, "utf-8");
+	return { success: true };
+}
+app.post("/api/state/decision", (req, res) => {
+	const statePath = node_path.join(projectCwd, ".planning", "STATE.md");
+	ensureStateMd(statePath);
+	const { phase, text } = req.body;
+	if (!text?.trim()) return res.status(400).json({ error: "text is required" });
+	const entry = `- [Phase ${phase?.trim() || "?"}]: ${text.trim()}`;
+	const result = appendToStateSection(statePath, /(###?\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i, entry);
+	if (!result.success) return res.status(404).json({ error: result.reason });
+	return res.json({
+		added: true,
+		decision: entry
+	});
+});
+app.post("/api/state/blocker", (req, res) => {
+	const statePath = node_path.join(projectCwd, ".planning", "STATE.md");
+	ensureStateMd(statePath);
+	const { text } = req.body;
+	if (!text?.trim()) return res.status(400).json({ error: "text is required" });
+	const result = appendToStateSection(statePath, /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i, `- ${text.trim()}`);
+	if (!result.success) return res.status(404).json({ error: result.reason });
+	return res.json({
+		added: true,
+		blocker: text.trim()
 	});
 });
 app.get("/api/phases", (_req, res) => {
