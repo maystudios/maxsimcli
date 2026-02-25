@@ -40,6 +40,7 @@ const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
 const os = __importStar(require("node:os"));
 const crypto = __importStar(require("node:crypto"));
+const fs_extra_1 = __importDefault(require("fs-extra"));
 const chalk_1 = __importDefault(require("chalk"));
 const figlet_1 = __importDefault(require("figlet"));
 const ora_1 = __importDefault(require("ora"));
@@ -130,68 +131,16 @@ function getDirName(runtime) {
 }
 /**
  * Recursively remove a directory, handling Windows read-only file attributes.
- * fs.rmSync with { force: true } only ignores ENOENT — it does NOT remove
- * read-only files on Windows (EPERM). We chmod recursively first on EPERM.
+ * fs-extra handles cross-platform edge cases (EPERM on Windows, symlinks, etc.)
  */
 function safeRmDir(dirPath) {
-    if (!fs.existsSync(dirPath))
-        return;
-    try {
-        fs.rmSync(dirPath, { recursive: true, force: true });
-    }
-    catch (e) {
-        if (e.code === 'EPERM' && process.platform === 'win32') {
-            // Strip read-only attributes from every entry, then retry
-            const chmodRecursive = (p) => {
-                try {
-                    fs.chmodSync(p, 0o666);
-                }
-                catch {
-                    /* ignore */
-                }
-                try {
-                    for (const entry of fs.readdirSync(p, { withFileTypes: true })) {
-                        chmodRecursive(path.join(p, entry.name));
-                    }
-                }
-                catch {
-                    /* ignore */
-                }
-            };
-            chmodRecursive(dirPath);
-            fs.rmSync(dirPath, { recursive: true, force: true });
-        }
-        else {
-            throw e;
-        }
-    }
+    fs_extra_1.default.removeSync(dirPath);
 }
 /**
- * Recursively copy a directory (plain copy, no path replacement)
+ * Recursively copy a directory (dereferences symlinks)
  */
 function copyDirRecursive(src, dest) {
-    fs.mkdirSync(dest, { recursive: true });
-    for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
-        const srcPath = path.join(src, entry.name);
-        const destPath = path.join(dest, entry.name);
-        if (entry.isDirectory()) {
-            copyDirRecursive(srcPath, destPath);
-        }
-        else if (entry.isSymbolicLink()) {
-            // Dereference symlinks to avoid broken links at destination
-            const target = fs.realpathSync(srcPath);
-            const stat = fs.statSync(target);
-            if (stat.isDirectory()) {
-                copyDirRecursive(target, destPath);
-            }
-            else {
-                fs.copyFileSync(target, destPath);
-            }
-        }
-        else {
-            fs.copyFileSync(srcPath, destPath);
-        }
-    }
+    fs_extra_1.default.copySync(src, dest, { dereference: true });
 }
 /**
  * Get the global config directory for OpenCode (for JSONC permissions)

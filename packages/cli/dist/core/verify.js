@@ -22,7 +22,7 @@ const node_path_1 = __importDefault(require("node:path"));
 const core_js_1 = require("./core.js");
 const frontmatter_js_1 = require("./frontmatter.js");
 // ─── Verify Summary ──────────────────────────────────────────────────────────
-function cmdVerifySummary(cwd, summaryPath, checkFileCount, raw) {
+async function cmdVerifySummary(cwd, summaryPath, checkFileCount, raw) {
     if (!summaryPath) {
         (0, core_js_1.error)('summary-path required');
     }
@@ -72,7 +72,7 @@ function cmdVerifySummary(cwd, summaryPath, checkFileCount, raw) {
     let commitsExist = false;
     if (hashes.length > 0) {
         for (const hash of hashes.slice(0, 3)) {
-            const result = (0, core_js_1.execGit)(cwd, ['cat-file', '-t', hash]);
+            const result = await (0, core_js_1.execGit)(cwd, ['cat-file', '-t', hash]);
             if (result.exitCode === 0 && result.stdout === 'commit') {
                 commitsExist = true;
                 break;
@@ -265,14 +265,14 @@ function cmdVerifyReferences(cwd, filePath, raw) {
     (0, core_js_1.output)(result, raw, missing.length === 0 ? 'valid' : 'invalid');
 }
 // ─── Verify Commits ──────────────────────────────────────────────────────────
-function cmdVerifyCommits(cwd, hashes, raw) {
+async function cmdVerifyCommits(cwd, hashes, raw) {
     if (!hashes || hashes.length === 0) {
         (0, core_js_1.error)('At least one commit hash required');
     }
     const valid = [];
     const invalid = [];
     for (const hash of hashes) {
-        const result = (0, core_js_1.execGit)(cwd, ['cat-file', '-t', hash]);
+        const result = await (0, core_js_1.execGit)(cwd, ['cat-file', '-t', hash]);
         if (result.exitCode === 0 && result.stdout.trim() === 'commit') {
             valid.push(hash);
         }

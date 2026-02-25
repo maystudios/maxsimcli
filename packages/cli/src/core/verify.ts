@@ -147,12 +147,12 @@ interface HealthOptions {
 
 // ─── Verify Summary ──────────────────────────────────────────────────────────
 
-export function cmdVerifySummary(
+export async function cmdVerifySummary(
   cwd: string,
   summaryPath: string | null,
   checkFileCount: number | null,
   raw: boolean,
-): void {
+): Promise<void> {
   if (!summaryPath) {
     error('summary-path required');
   }
@@ -209,7 +209,7 @@ export function cmdVerifySummary(
   let commitsExist = false;
   if (hashes.length > 0) {
     for (const hash of hashes.slice(0, 3)) {
-      const result = execGit(cwd, ['cat-file', '-t', hash]);
+      const result = await execGit(cwd, ['cat-file', '-t', hash]);
       if (result.exitCode === 0 && result.stdout === 'commit') {
         commitsExist = true;
         break;
@@ -418,7 +418,7 @@ export function cmdVerifyReferences(cwd: string, filePath: string | null, raw: b
 
 // ─── Verify Commits ──────────────────────────────────────────────────────────
 
-export function cmdVerifyCommits(cwd: string, hashes: string[], raw: boolean): void {
+export async function cmdVerifyCommits(cwd: string, hashes: string[], raw: boolean): Promise<void> {
   if (!hashes || hashes.length === 0) {
     error('At least one commit hash required');
   }
@@ -426,7 +426,7 @@ export function cmdVerifyCommits(cwd: string, hashes: string[], raw: boolean): v
   const valid: string[] = [];
   const invalid: string[] = [];
   for (const hash of hashes) {
-    const result = execGit(cwd, ['cat-file', '-t', hash]);
+    const result = await execGit(cwd, ['cat-file', '-t', hash]);
     if (result.exitCode === 0 && result.stdout.trim() === 'commit') {
       valid.push(hash);
     } else {

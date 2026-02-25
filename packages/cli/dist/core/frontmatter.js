@@ -2,7 +2,7 @@
 /**
  * Frontmatter — YAML frontmatter parsing, serialization, and CRUD commands
  *
- * Ported from maxsim/bin/lib/frontmatter.cjs
+ * Uses the `yaml` npm package instead of a hand-rolled parser.
  */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -19,156 +19,42 @@ exports.cmdFrontmatterMerge = cmdFrontmatterMerge;
 exports.cmdFrontmatterValidate = cmdFrontmatterValidate;
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
+const yaml_1 = __importDefault(require("yaml"));
 const core_js_1 = require("./core.js");
+// ─── Parsing engine ───────────────────────────────────────────────────────────
 /**
  * Extract YAML frontmatter from markdown content into a typed object.
  */
 function extractFrontmatter(content) {
-    const frontmatter = {};
     const match = content.match(/^---\n([\s\S]+?)\n---/);
     if (!match)
-        return frontmatter;
-    const yaml = match[1];
-    const lines = yaml.split('\n');
-    const stack = [{ obj: frontmatter, key: null, indent: -1 }];
-    for (const line of lines) {
-        if (line.trim() === '')
-            continue;
-        const indentMatch = line.match(/^(\s*)/);
-        const indent = indentMatch ? indentMatch[1].length : 0;
-        // Pop stack back to appropriate level
-        while (stack.length > 1 && indent <= stack[stack.length - 1].indent) {
-            stack.pop();
-        }
-        const current = stack[stack.length - 1];
-        // Check for key: value pattern
-        const keyMatch = line.match(/^(\s*)([a-zA-Z0-9_-]+):\s*(.*)/);
-        if (keyMatch) {
-            const key = keyMatch[2];
-            const value = keyMatch[3].trim();
-            if (value === '' || value === '[') {
-                // Key with no value or opening bracket
-                const newObj = value === '[' ? [] : {};
-                current.obj[key] = newObj;
-                current.key = null;
-                stack.push({ obj: newObj, key: null, indent });
-            }
-            else if (value.startsWith('[') && value.endsWith(']')) {
-                // Inline array: key: [a, b, c]
-                current.obj[key] = value
-                    .slice(1, -1)
-                    .split(',')
-                    .map(s => s.trim().replace(/^["']|["']$/g, ''))
-                    .filter(Boolean);
-                current.key = null;
-            }
-            else {
-                // Simple key: value
-                current.obj[key] = value.replace(/^["']|["']$/g, '');
-                current.key = null;
-            }
-        }
-        else if (line.trim().startsWith('- ')) {
-            // Array item
-            const itemValue = line.trim().slice(2).replace(/^["']|["']$/g, '');
-            if (typeof current.obj === 'object' &&
-                !Array.isArray(current.obj) &&
-                Object.keys(current.obj).length === 0) {
-                // Convert empty object to array
-                const parent = stack.length > 1 ? stack[stack.length - 2] : null;
-                if (parent && !Array.isArray(parent.obj)) {
-                    for (const k of Object.keys(parent.obj)) {
-                        if (parent.obj[k] === current.obj) {
-                            const arr = [itemValue];
-                            parent.obj[k] = arr;
-                            current.obj = arr;
-                            break;
-                        }
-                    }
-                }
-            }
-            else if (Array.isArray(current.obj)) {
-                current.obj.push(itemValue);
-            }
-        }
+        return {};
+    try {
+        const parsed = yaml_1.default.parse(match[1]);
+        return (parsed && typeof parsed === 'object' && !Array.isArray(parsed))
+            ? parsed
+            : {};
     }
-    return frontmatter;
+    catch {
+        return {};
+    }
 }
 /**
  * Reconstruct YAML frontmatter string from an object.
  */
 function reconstructFrontmatter(obj) {
-    const lines = [];
+    // Filter out null/undefined values
+    const cleaned = {};
     for (const [key, value] of Object.entries(obj)) {
-        if (value === null || value === undefined)
-            continue;
-        if (Array.isArray(value)) {
-            formatArray(lines, key, value, 0);
-        }
-        else if (typeof value === 'object') {
-            lines.push(`${key}:`);
-            for (const [subkey, subval] of Object.entries(value)) {
-                if (subval === null || subval === undefined)
-                    continue;
-                if (Array.isArray(subval)) {
-                    formatArray(lines, subkey, subval, 2);
-                }
-                else if (typeof subval === 'object') {
-                    lines.push(`  ${subkey}:`);
-                    for (const [subsubkey, subsubval] of Object.entries(subval)) {
-                        if (subsubval === null || subsubval === undefined)
-                            continue;
-                        if (Array.isArray(subsubval)) {
-                            if (subsubval.length === 0) {
-                                lines.push(`    ${subsubkey}: []`);
-                            }
-                            else {
-                                lines.push(`    ${subsubkey}:`);
-                                for (const item of subsubval) {
-                                    lines.push(`      - ${item}`);
-                                }
-                            }
-                        }
-                        else {
-                            lines.push(`    ${subsubkey}: ${subsubval}`);
-                        }
-                    }
-                }
-                else {
-                    const sv = String(subval);
-                    lines.push(`  ${subkey}: ${sv.includes(':') || sv.includes('#') ? `"${sv}"` : sv}`);
-                }
-            }
-        }
-        else {
-            const sv = String(value);
-            if (sv.includes(':') || sv.includes('#') || sv.startsWith('[') || sv.startsWith('{')) {
-                lines.push(`${key}: "${sv}"`);
-            }
-            else {
-                lines.push(`${key}: ${sv}`);
-            }
+        if (value !== null && value !== undefined) {
+            cleaned[key] = value;
         }
     }
-    return lines.join('\n');
-}
-function formatArray(lines, key, value, indentLevel) {
-    const prefix = ' '.repeat(indentLevel);
-    if (value.length === 0) {
-        lines.push(`${prefix}${key}: []`);
-    }
-    else if (value.every(v => typeof v === 'string') &&
-        value.length <= 3 &&
-        value.join(', ').length < 60) {
-        lines.push(`${prefix}${key}: [${value.join(', ')}]`);
-    }
-    else {
-        lines.push(`${prefix}${key}:`);
-        for (const item of value) {
-            const itemStr = String(item);
-            lines.push(`${prefix}  - ${typeof item === 'string' && (itemStr.includes(':') || itemStr.includes('#')) ? `"${itemStr}"` : itemStr}`);
-        }
-    }
+    return yaml_1.default.stringify(cleaned, {
+        lineWidth: 0, // Don't wrap long lines
+        defaultKeyType: 'PLAIN',
+        defaultStringType: 'PLAIN',
+    }).trimEnd();
 }
 /**
  * Replace or insert frontmatter in markdown content.
@@ -182,63 +68,18 @@ function spliceFrontmatter(content, newObj) {
     return `---\n${yamlStr}\n---\n\n` + content;
 }
 /**
- * Parse a specific block from must_haves in raw frontmatter YAML.
+ * Parse a specific block from must_haves in frontmatter.
+ * With the yaml package, this is just object traversal.
  */
 function parseMustHavesBlock(content, blockName) {
-    const fmMatch = content.match(/^---\n([\s\S]+?)\n---/);
-    if (!fmMatch)
+    const fm = extractFrontmatter(content);
+    const mustHaves = fm.must_haves;
+    if (!mustHaves || typeof mustHaves !== 'object')
         return [];
-    const yaml = fmMatch[1];
-    const blockPattern = new RegExp(`^\\s{4}${blockName}:\\s*$`, 'm');
-    const blockStart = yaml.search(blockPattern);
-    if (blockStart === -1)
+    const block = mustHaves[blockName];
+    if (!Array.isArray(block))
         return [];
-    const afterBlock = yaml.slice(blockStart);
-    const blockLines = afterBlock.split('\n').slice(1);
-    const items = [];
-    let current = null;
-    for (const line of blockLines) {
-        if (line.trim() === '')
-            continue;
-        const indent = line.match(/^(\s*)/)[1].length;
-        if (indent <= 4 && line.trim() !== '')
-            break;
-        if (line.match(/^\s{6}-\s+/)) {
-            if (current !== null)
-                items.push(current);
-            current = {};
-            const simpleMatch = line.match(/^\s{6}-\s+"?([^"]+)"?\s*$/);
-            if (simpleMatch && !line.includes(':')) {
-                current = simpleMatch[1];
-            }
-            else {
-                const kvMatch = line.match(/^\s{6}-\s+(\w+):\s*"?([^"]*)"?\s*$/);
-                if (kvMatch) {
-                    current = { [kvMatch[1]]: kvMatch[2] };
-                }
-            }
-        }
-        else if (current !== null && typeof current === 'object') {
-            const kvMatch = line.match(/^\s{8,}(\w+):\s*"?([^"]*)"?\s*$/);
-            if (kvMatch) {
-                const val = kvMatch[2];
-                current[kvMatch[1]] = /^\d+$/.test(val) ? parseInt(val, 10) : val;
-            }
-            const arrMatch = line.match(/^\s{10,}-\s+"?([^"]+)"?\s*$/);
-            if (arrMatch) {
-                const keys = Object.keys(current);
-                const lastKey = keys[keys.length - 1];
-                if (lastKey && !Array.isArray(current[lastKey])) {
-                    current[lastKey] = current[lastKey] ? [String(current[lastKey])] : [];
-                }
-                if (lastKey)
-                    current[lastKey].push(arrMatch[1]);
-            }
-        }
-    }
-    if (current !== null)
-        items.push(current);
-    return items;
+    return block;
 }
 // ─── Frontmatter schema validation ──────────────────────────────────────────
 exports.FRONTMATTER_SCHEMAS = {

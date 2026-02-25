@@ -43,13 +43,17 @@
   "devDependencies": {
     "@inquirer/prompts": "^8.3.0",
     "@types/figlet": "^1.7.0",
+    "@types/fs-extra": "^11.0.4",
     "@types/node": "^25.3.0",
     "chalk": "^5.6.2",
     "esbuild": "^0.24.0",
+    "fs-extra": "^11.3.3",
     "ora": "^9.3.0",
+    "simple-git": "^3.32.2",
     "tsdown": "^0.20.3",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "yaml": "^2.8.2"
   },
   "dependencies": {
     "figlet": "^1.10.0"

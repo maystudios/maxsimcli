@@ -9,8 +9,8 @@ export declare function output(result: unknown, raw?: boolean, rawValue?: unknow
 export declare function error(message: string): never;
 export declare function safeReadFile(filePath: string): string | null;
 export declare function loadConfig(cwd: string): AppConfig;
-export declare function isGitIgnored(cwd: string, targetPath: string): boolean;
-export declare function execGit(cwd: string, args: string[]): GitResult;
+export declare function isGitIgnored(cwd: string, targetPath: string): Promise<boolean>;
+export declare function execGit(cwd: string, args: string[]): Promise<GitResult>;
 export declare function normalizePhaseName(phase: string): string;
 export declare function comparePhaseNum(a: string | number, b: string | number): number;
 /**

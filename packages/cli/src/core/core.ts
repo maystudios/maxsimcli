@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { execSync } from 'node:child_process';
+import { simpleGit } from 'simple-git';
 
 import type {
   ModelProfiles,
@@ -135,36 +135,29 @@ export function loadConfig(cwd: string): AppConfig {
 
 // ─── Git utilities ───────────────────────────────────────────────────────────
 
-export function isGitIgnored(cwd: string, targetPath: string): boolean {
+export async function isGitIgnored(cwd: string, targetPath: string): Promise<boolean> {
   try {
-    execSync('git check-ignore -q -- ' + targetPath.replace(/[^a-zA-Z0-9._\-/]/g, ''), {
-      cwd,
-      stdio: 'pipe',
-    });
-    return true;
+    const git = simpleGit(cwd);
+    const result = await git.checkIgnore(targetPath);
+    return result.length > 0;
   } catch {
     return false;
   }
 }
 
-export function execGit(cwd: string, args: string[]): GitResult {
+export async function execGit(cwd: string, args: string[]): Promise<GitResult> {
   try {
-    const escaped = args.map(a => {
-      if (/^[a-zA-Z0-9._\-/=:@]+$/.test(a)) return a;
-      return "'" + a.replace(/'/g, "'\\''") + "'";
-    });
-    const stdout = execSync('git ' + escaped.join(' '), {
-      cwd,
-      stdio: 'pipe',
-      encoding: 'utf-8',
-    });
-    return { exitCode: 0, stdout: stdout.trim(), stderr: '' };
+    const git = simpleGit(cwd);
+    const stdout = await git.raw(args);
+    return { exitCode: 0, stdout: (stdout ?? '').trim(), stderr: '' };
   } catch (thrown: unknown) {
-    const err = thrown as { status?: number; stdout?: string | Buffer; stderr?: string | Buffer };
+    const err = thrown as { message?: string };
+    // simple-git throws on non-zero exit — extract what we can
+    const message = err.message ?? '';
     return {
-      exitCode: err.status ?? 1,
-      stdout: (err.stdout ?? '').toString().trim(),
-      stderr: (err.stderr ?? '').toString().trim(),
+      exitCode: 1,
+      stdout: '',
+      stderr: message,
     };
   }
 }

@@ -19,18 +19,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
+          cache: npm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Build website
-        run: npx nx build website
+        run: cd packages/website && npm run build
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

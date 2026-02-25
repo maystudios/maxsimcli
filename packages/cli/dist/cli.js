@@ -2,13 +2,7 @@
 /**
  * MAXSIM Tools — CLI utility for MAXSIM workflow operations
  *
- * Replaces repetitive inline bash patterns across ~50 MAXSIM command/workflow/agent files.
- * Centralizes: config parsing, model resolution, phase lookup, git commits, summary verification.
- *
  * Usage: node maxsim-tools.cjs <command> [args] [--raw]
- *
- * This is a direct TypeScript port of maxsim/bin/maxsim-tools.cjs.
- * All imports resolve through @maxsim/core barrel export.
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -50,23 +44,280 @@ const os = __importStar(require("node:os"));
 const node_child_process_1 = require("node:child_process");
 const node_module_1 = require("node:module");
 const index_js_1 = require("./core/index.js");
-/** Helper: extract a named flag's value from args, returning null if absent */
+// ─── Arg parsing utilities ───────────────────────────────────────────────────
+/** Extract a single named flag's value from args */
 function getFlag(args, flag) {
     const idx = args.indexOf(flag);
-    return idx !== -1 ? args[idx + 1] : null;
+    return idx !== -1 ? args[idx + 1] ?? null : null;
 }
-// Namespace groupings for readability (mirrors original CJS structure)
-const state = { cmdStateLoad: index_js_1.cmdStateLoad, cmdStateGet: index_js_1.cmdStateGet, cmdStatePatch: index_js_1.cmdStatePatch, cmdStateUpdate: index_js_1.cmdStateUpdate, cmdStateAdvancePlan: index_js_1.cmdStateAdvancePlan, cmdStateRecordMetric: index_js_1.cmdStateRecordMetric, cmdStateUpdateProgress: index_js_1.cmdStateUpdateProgress, cmdStateAddDecision: index_js_1.cmdStateAddDecision, cmdStateAddBlocker: index_js_1.cmdStateAddBlocker, cmdStateResolveBlocker: index_js_1.cmdStateResolveBlocker, cmdStateRecordSession: index_js_1.cmdStateRecordSession, cmdStateSnapshot: index_js_1.cmdStateSnapshot, stateExtractField: index_js_1.stateExtractField, stateReplaceField: index_js_1.stateReplaceField };
-const phase = { cmdPhasesList: index_js_1.cmdPhasesList, cmdPhaseNextDecimal: index_js_1.cmdPhaseNextDecimal, cmdFindPhase: index_js_1.cmdFindPhase, cmdPhasePlanIndex: index_js_1.cmdPhasePlanIndex, cmdPhaseAdd: index_js_1.cmdPhaseAdd, cmdPhaseInsert: index_js_1.cmdPhaseInsert, cmdPhaseRemove: index_js_1.cmdPhaseRemove, cmdPhaseComplete: index_js_1.cmdPhaseComplete };
-const roadmap = { cmdRoadmapGetPhase: index_js_1.cmdRoadmapGetPhase, cmdRoadmapAnalyze: index_js_1.cmdRoadmapAnalyze, cmdRoadmapUpdatePlanProgress: index_js_1.cmdRoadmapUpdatePlanProgress };
-const verify = { cmdVerifySummary: index_js_1.cmdVerifySummary, cmdVerifyPlanStructure: index_js_1.cmdVerifyPlanStructure, cmdVerifyPhaseCompleteness: index_js_1.cmdVerifyPhaseCompleteness, cmdVerifyReferences: index_js_1.cmdVerifyReferences, cmdVerifyCommits: index_js_1.cmdVerifyCommits, cmdVerifyArtifacts: index_js_1.cmdVerifyArtifacts, cmdVerifyKeyLinks: index_js_1.cmdVerifyKeyLinks, cmdValidateConsistency: index_js_1.cmdValidateConsistency, cmdValidateHealth: index_js_1.cmdValidateHealth };
-const config = { cmdConfigEnsureSection: index_js_1.cmdConfigEnsureSection, cmdConfigSet: index_js_1.cmdConfigSet, cmdConfigGet: index_js_1.cmdConfigGet };
-const template = { cmdTemplateSelect: index_js_1.cmdTemplateSelect, cmdTemplateFill: index_js_1.cmdTemplateFill };
-const milestone = { cmdRequirementsMarkComplete: index_js_1.cmdRequirementsMarkComplete, cmdMilestoneComplete: index_js_1.cmdMilestoneComplete };
-const commands = { cmdGenerateSlug: index_js_1.cmdGenerateSlug, cmdCurrentTimestamp: index_js_1.cmdCurrentTimestamp, cmdListTodos: index_js_1.cmdListTodos, cmdVerifyPathExists: index_js_1.cmdVerifyPathExists, cmdHistoryDigest: index_js_1.cmdHistoryDigest, cmdResolveModel: index_js_1.cmdResolveModel, cmdCommit: index_js_1.cmdCommit, cmdSummaryExtract: index_js_1.cmdSummaryExtract, cmdWebsearch: index_js_1.cmdWebsearch, cmdProgressRender: index_js_1.cmdProgressRender, cmdTodoComplete: index_js_1.cmdTodoComplete, cmdScaffold: index_js_1.cmdScaffold };
-const init = { cmdInitExecutePhase: index_js_1.cmdInitExecutePhase, cmdInitPlanPhase: index_js_1.cmdInitPlanPhase, cmdInitNewProject: index_js_1.cmdInitNewProject, cmdInitNewMilestone: index_js_1.cmdInitNewMilestone, cmdInitQuick: index_js_1.cmdInitQuick, cmdInitResume: index_js_1.cmdInitResume, cmdInitVerifyWork: index_js_1.cmdInitVerifyWork, cmdInitPhaseOp: index_js_1.cmdInitPhaseOp, cmdInitTodos: index_js_1.cmdInitTodos, cmdInitMilestoneOp: index_js_1.cmdInitMilestoneOp, cmdInitMapCodebase: index_js_1.cmdInitMapCodebase, cmdInitProgress: index_js_1.cmdInitProgress };
-const frontmatter = { cmdFrontmatterGet: index_js_1.cmdFrontmatterGet, cmdFrontmatterSet: index_js_1.cmdFrontmatterSet, cmdFrontmatterMerge: index_js_1.cmdFrontmatterMerge, cmdFrontmatterValidate: index_js_1.cmdFrontmatterValidate, extractFrontmatter: index_js_1.extractFrontmatter, reconstructFrontmatter: index_js_1.reconstructFrontmatter, spliceFrontmatter: index_js_1.spliceFrontmatter, parseMustHavesBlock: index_js_1.parseMustHavesBlock, FRONTMATTER_SCHEMAS: index_js_1.FRONTMATTER_SCHEMAS };
-// ─── CLI Router ───────────────────────────────────────────────────────────────
+/** Extract multiple named flags at once. Keys are flag names without -- prefix. */
+function getFlags(args, ...flags) {
+    const result = {};
+    for (const flag of flags) {
+        const idx = args.indexOf(`--${flag}`);
+        result[flag] = idx !== -1 ? args[idx + 1] ?? null : null;
+    }
+    return result;
+}
+/** Check if a boolean flag is present */
+function hasFlag(args, flag) {
+    return args.includes(`--${flag}`);
+}
+// ─── Subcommand handlers ─────────────────────────────────────────────────────
+const handleState = (args, cwd, raw) => {
+    const sub = args[1];
+    const handlers = {
+        'update': () => (0, index_js_1.cmdStateUpdate)(cwd, args[2], args[3]),
+        'get': () => (0, index_js_1.cmdStateGet)(cwd, args[2], raw),
+        'patch': () => {
+            const patches = {};
+            for (let i = 2; i < args.length; i += 2) {
+                const key = args[i].replace(/^--/, '');
+                const value = args[i + 1];
+                if (key && value !== undefined)
+                    patches[key] = value;
+            }
+            (0, index_js_1.cmdStatePatch)(cwd, patches, raw);
+        },
+        'advance-plan': () => (0, index_js_1.cmdStateAdvancePlan)(cwd, raw),
+        'record-metric': () => {
+            const f = getFlags(args, 'phase', 'plan', 'duration', 'tasks', 'files');
+            (0, index_js_1.cmdStateRecordMetric)(cwd, {
+                phase: f.phase ?? '', plan: f.plan ?? '', duration: f.duration ?? '',
+                tasks: f.tasks ?? undefined, files: f.files ?? undefined,
+            }, raw);
+        },
+        'update-progress': () => (0, index_js_1.cmdStateUpdateProgress)(cwd, raw),
+        'add-decision': () => {
+            const f = getFlags(args, 'phase', 'summary', 'summary-file', 'rationale', 'rationale-file');
+            (0, index_js_1.cmdStateAddDecision)(cwd, {
+                phase: f.phase ?? undefined, summary: f.summary ?? undefined,
+                summary_file: f['summary-file'] ?? undefined,
+                rationale: f.rationale ?? '', rationale_file: f['rationale-file'] ?? undefined,
+            }, raw);
+        },
+        'add-blocker': () => {
+            const f = getFlags(args, 'text', 'text-file');
+            (0, index_js_1.cmdStateAddBlocker)(cwd, { text: f.text ?? undefined, text_file: f['text-file'] ?? undefined }, raw);
+        },
+        'resolve-blocker': () => (0, index_js_1.cmdStateResolveBlocker)(cwd, getFlag(args, '--text'), raw),
+        'record-session': () => {
+            const f = getFlags(args, 'stopped-at', 'resume-file');
+            (0, index_js_1.cmdStateRecordSession)(cwd, {
+                stopped_at: f['stopped-at'] ?? undefined,
+                resume_file: f['resume-file'] ?? 'None',
+            }, raw);
+        },
+    };
+    const handler = sub ? handlers[sub] : undefined;
+    if (handler)
+        return handler();
+    (0, index_js_1.cmdStateLoad)(cwd, raw);
+};
+const handleTemplate = (args, cwd, raw) => {
+    const sub = args[1];
+    if (sub === 'select') {
+        (0, index_js_1.cmdTemplateSelect)(cwd, args[2], raw);
+    }
+    else if (sub === 'fill') {
+        const f = getFlags(args, 'phase', 'plan', 'name', 'type', 'wave', 'fields');
+        (0, index_js_1.cmdTemplateFill)(cwd, args[2], {
+            phase: f.phase ?? '', plan: f.plan ?? undefined, name: f.name ?? undefined,
+            type: f.type ?? 'execute', wave: f.wave ?? '1',
+            fields: f.fields ? JSON.parse(f.fields) : {},
+        }, raw);
+    }
+    else {
+        (0, index_js_1.error)('Unknown template subcommand. Available: select, fill');
+    }
+};
+const handleFrontmatter = (args, cwd, raw) => {
+    const sub = args[1];
+    const file = args[2];
+    const handlers = {
+        'get': () => (0, index_js_1.cmdFrontmatterGet)(cwd, file, getFlag(args, '--field'), raw),
+        'set': () => (0, index_js_1.cmdFrontmatterSet)(cwd, file, getFlag(args, '--field'), getFlag(args, '--value') ?? undefined, raw),
+        'merge': () => (0, index_js_1.cmdFrontmatterMerge)(cwd, file, getFlag(args, '--data'), raw),
+        'validate': () => (0, index_js_1.cmdFrontmatterValidate)(cwd, file, getFlag(args, '--schema'), raw),
+    };
+    const handler = sub ? handlers[sub] : undefined;
+    if (handler)
+        return handler();
+    (0, index_js_1.error)('Unknown frontmatter subcommand. Available: get, set, merge, validate');
+};
+const handleVerify = async (args, cwd, raw) => {
+    const sub = args[1];
+    const handlers = {
+        'plan-structure': () => (0, index_js_1.cmdVerifyPlanStructure)(cwd, args[2], raw),
+        'phase-completeness': () => (0, index_js_1.cmdVerifyPhaseCompleteness)(cwd, args[2], raw),
+        'references': () => (0, index_js_1.cmdVerifyReferences)(cwd, args[2], raw),
+        'commits': () => (0, index_js_1.cmdVerifyCommits)(cwd, args.slice(2), raw),
+        'artifacts': () => (0, index_js_1.cmdVerifyArtifacts)(cwd, args[2], raw),
+        'key-links': () => (0, index_js_1.cmdVerifyKeyLinks)(cwd, args[2], raw),
+    };
+    const handler = sub ? handlers[sub] : undefined;
+    if (handler)
+        return handler();
+    (0, index_js_1.error)('Unknown verify subcommand. Available: plan-structure, phase-completeness, references, commits, artifacts, key-links');
+};
+const handlePhases = (args, cwd, raw) => {
+    const sub = args[1];
+    if (sub === 'list') {
+        const f = getFlags(args, 'type', 'phase');
+        (0, index_js_1.cmdPhasesList)(cwd, { type: f.type, phase: f.phase, includeArchived: hasFlag(args, 'include-archived') }, raw);
+    }
+    else {
+        (0, index_js_1.error)('Unknown phases subcommand. Available: list');
+    }
+};
+const handleRoadmap = (args, cwd, raw) => {
+    const sub = args[1];
+    const handlers = {
+        'get-phase': () => (0, index_js_1.cmdRoadmapGetPhase)(cwd, args[2], raw),
+        'analyze': () => (0, index_js_1.cmdRoadmapAnalyze)(cwd, raw),
+        'update-plan-progress': () => (0, index_js_1.cmdRoadmapUpdatePlanProgress)(cwd, args[2], raw),
+    };
+    const handler = sub ? handlers[sub] : undefined;
+    if (handler)
+        return handler();
+    (0, index_js_1.error)('Unknown roadmap subcommand. Available: get-phase, analyze, update-plan-progress');
+};
+const handlePhase = (args, cwd, raw) => {
+    const sub = args[1];
+    const handlers = {
+        'next-decimal': () => (0, index_js_1.cmdPhaseNextDecimal)(cwd, args[2], raw),
+        'add': () => (0, index_js_1.cmdPhaseAdd)(cwd, args.slice(2).join(' '), raw),
+        'insert': () => (0, index_js_1.cmdPhaseInsert)(cwd, args[2], args.slice(3).join(' '), raw),
+        'remove': () => (0, index_js_1.cmdPhaseRemove)(cwd, args[2], { force: hasFlag(args, 'force') }, raw),
+        'complete': () => (0, index_js_1.cmdPhaseComplete)(cwd, args[2], raw),
+    };
+    const handler = sub ? handlers[sub] : undefined;
+    if (handler)
+        return handler();
+    (0, index_js_1.error)('Unknown phase subcommand. Available: next-decimal, add, insert, remove, complete');
+};
+const handleMilestone = (args, cwd, raw) => {
+    const sub = args[1];
+    if (sub === 'complete') {
+        const nameIndex = args.indexOf('--name');
+        let milestoneName = null;
+        if (nameIndex !== -1) {
+            const nameArgs = [];
+            for (let i = nameIndex + 1; i < args.length; i++) {
+                if (args[i].startsWith('--'))
+                    break;
+                nameArgs.push(args[i]);
+            }
+            milestoneName = nameArgs.join(' ') || null;
+        }
+        (0, index_js_1.cmdMilestoneComplete)(cwd, args[2], {
+            name: milestoneName ?? undefined,
+            archivePhases: hasFlag(args, 'archive-phases'),
+        }, raw);
+    }
+    else {
+        (0, index_js_1.error)('Unknown milestone subcommand. Available: complete');
+    }
+};
+const handleValidate = (args, cwd, raw) => {
+    const sub = args[1];
+    const handlers = {
+        'consistency': () => (0, index_js_1.cmdValidateConsistency)(cwd, raw),
+        'health': () => (0, index_js_1.cmdValidateHealth)(cwd, { repair: hasFlag(args, 'repair') }, raw),
+    };
+    const handler = sub ? handlers[sub] : undefined;
+    if (handler)
+        return handler();
+    (0, index_js_1.error)('Unknown validate subcommand. Available: consistency, health');
+};
+const handleInit = (args, cwd, raw) => {
+    const workflow = args[1];
+    const handlers = {
+        'execute-phase': () => (0, index_js_1.cmdInitExecutePhase)(cwd, args[2], raw),
+        'plan-phase': () => (0, index_js_1.cmdInitPlanPhase)(cwd, args[2], raw),
+        'new-project': () => (0, index_js_1.cmdInitNewProject)(cwd, raw),
+        'new-milestone': () => (0, index_js_1.cmdInitNewMilestone)(cwd, raw),
+        'quick': () => (0, index_js_1.cmdInitQuick)(cwd, args.slice(2).join(' '), raw),
+        'resume': () => (0, index_js_1.cmdInitResume)(cwd, raw),
+        'verify-work': () => (0, index_js_1.cmdInitVerifyWork)(cwd, args[2], raw),
+        'phase-op': () => (0, index_js_1.cmdInitPhaseOp)(cwd, args[2], raw),
+        'todos': () => (0, index_js_1.cmdInitTodos)(cwd, args[2], raw),
+        'milestone-op': () => (0, index_js_1.cmdInitMilestoneOp)(cwd, raw),
+        'map-codebase': () => (0, index_js_1.cmdInitMapCodebase)(cwd, raw),
+        'progress': () => (0, index_js_1.cmdInitProgress)(cwd, raw),
+    };
+    const handler = workflow ? handlers[workflow] : undefined;
+    if (handler)
+        return handler();
+    (0, index_js_1.error)(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, progress`);
+};
+// ─── Command registry ────────────────────────────────────────────────────────
+const COMMANDS = {
+    'state': handleState,
+    'resolve-model': (args, cwd, raw) => (0, index_js_1.cmdResolveModel)(cwd, args[1], raw),
+    'find-phase': (args, cwd, raw) => (0, index_js_1.cmdFindPhase)(cwd, args[1], raw),
+    'commit': async (args, cwd, raw) => {
+        const files = args.indexOf('--files') !== -1
+            ? args.slice(args.indexOf('--files') + 1).filter(a => !a.startsWith('--'))
+            : [];
+        await (0, index_js_1.cmdCommit)(cwd, args[1], files, raw, hasFlag(args, 'amend'));
+    },
+    'verify-summary': async (args, cwd, raw) => {
+        const countIndex = args.indexOf('--check-count');
+        const checkCount = countIndex !== -1 ? parseInt(args[countIndex + 1], 10) : 2;
+        await (0, index_js_1.cmdVerifySummary)(cwd, args[1], checkCount, raw);
+    },
+    'template': handleTemplate,
+    'frontmatter': handleFrontmatter,
+    'verify': handleVerify,
+    'generate-slug': (args, _cwd, raw) => (0, index_js_1.cmdGenerateSlug)(args[1], raw),
+    'current-timestamp': (args, _cwd, raw) => (0, index_js_1.cmdCurrentTimestamp)((args[1] || 'full'), raw),
+    'list-todos': (args, cwd, raw) => (0, index_js_1.cmdListTodos)(cwd, args[1], raw),
+    'verify-path-exists': (args, cwd, raw) => (0, index_js_1.cmdVerifyPathExists)(cwd, args[1], raw),
+    'config-ensure-section': (_args, cwd, raw) => (0, index_js_1.cmdConfigEnsureSection)(cwd, raw),
+    'config-set': (args, cwd, raw) => (0, index_js_1.cmdConfigSet)(cwd, args[1], args[2], raw),
+    'config-get': (args, cwd, raw) => (0, index_js_1.cmdConfigGet)(cwd, args[1], raw),
+    'history-digest': (_args, cwd, raw) => (0, index_js_1.cmdHistoryDigest)(cwd, raw),
+    'phases': handlePhases,
+    'roadmap': handleRoadmap,
+    'requirements': (args, cwd, raw) => {
+        if (args[1] === 'mark-complete')
+            (0, index_js_1.cmdRequirementsMarkComplete)(cwd, args.slice(2), raw);
+        else
+            (0, index_js_1.error)('Unknown requirements subcommand. Available: mark-complete');
+    },
+    'phase': handlePhase,
+    'milestone': handleMilestone,
+    'validate': handleValidate,
+    'progress': (args, cwd, raw) => (0, index_js_1.cmdProgressRender)(cwd, args[1] || 'json', raw),
+    'todo': (args, cwd, raw) => {
+        if (args[1] === 'complete')
+            (0, index_js_1.cmdTodoComplete)(cwd, args[2], raw);
+        else
+            (0, index_js_1.error)('Unknown todo subcommand. Available: complete');
+    },
+    'scaffold': (args, cwd, raw) => {
+        const f = getFlags(args, 'phase', 'name');
+        (0, index_js_1.cmdScaffold)(cwd, args[1], { phase: f.phase, name: f.name ? args.slice(args.indexOf('--name') + 1).join(' ') : null }, raw);
+    },
+    'init': handleInit,
+    'phase-plan-index': (args, cwd, raw) => (0, index_js_1.cmdPhasePlanIndex)(cwd, args[1], raw),
+    'state-snapshot': (_args, cwd, raw) => (0, index_js_1.cmdStateSnapshot)(cwd, raw),
+    'summary-extract': (args, cwd, raw) => {
+        const fieldsIndex = args.indexOf('--fields');
+        const fields = fieldsIndex !== -1 ? args[fieldsIndex + 1].split(',') : null;
+        (0, index_js_1.cmdSummaryExtract)(cwd, args[1], fields, raw);
+    },
+    'websearch': async (args, _cwd, raw) => {
+        const f = getFlags(args, 'limit', 'freshness');
+        await (0, index_js_1.cmdWebsearch)(args[1], {
+            limit: f.limit ? parseInt(f.limit, 10) : 10,
+            freshness: f.freshness ?? undefined,
+        }, raw);
+    },
+    'dashboard': (args) => handleDashboard(args.slice(1)),
+};
+// ─── Main ────────────────────────────────────────────────────────────────────
 async function main() {
     const args = process.argv.slice(2);
     // Optional cwd override for sandboxed subagents running outside project root.
@@ -96,422 +347,15 @@ async function main() {
         args.splice(rawIndex, 1);
     const command = args[0];
     if (!command) {
-        (0, index_js_1.error)('Usage: maxsim-tools <command> [args] [--raw] [--cwd <path>]\nCommands: state, resolve-model, find-phase, commit, verify-summary, verify, frontmatter, template, generate-slug, current-timestamp, list-todos, verify-path-exists, config-ensure-section, init');
+        (0, index_js_1.error)(`Usage: maxsim-tools <command> [args] [--raw] [--cwd <path>]\nCommands: ${Object.keys(COMMANDS).join(', ')}`);
     }
-    switch (command) {
-        case 'state': {
-            const subcommand = args[1];
-            if (subcommand === 'update') {
-                state.cmdStateUpdate(cwd, args[2], args[3]);
-            }
-            else if (subcommand === 'get') {
-                state.cmdStateGet(cwd, args[2], raw);
-            }
-            else if (subcommand === 'patch') {
-                const patches = {};
-                for (let i = 2; i < args.length; i += 2) {
-                    const key = args[i].replace(/^--/, '');
-                    const value = args[i + 1];
-                    if (key && value !== undefined) {
-                        patches[key] = value;
-                    }
-                }
-                state.cmdStatePatch(cwd, patches, raw);
-            }
-            else if (subcommand === 'advance-plan') {
-                state.cmdStateAdvancePlan(cwd, raw);
-            }
-            else if (subcommand === 'record-metric') {
-                const phaseIdx = args.indexOf('--phase');
-                const planIdx = args.indexOf('--plan');
-                const durationIdx = args.indexOf('--duration');
-                const tasksIdx = args.indexOf('--tasks');
-                const filesIdx = args.indexOf('--files');
-                state.cmdStateRecordMetric(cwd, {
-                    phase: phaseIdx !== -1 ? args[phaseIdx + 1] : '',
-                    plan: planIdx !== -1 ? args[planIdx + 1] : '',
-                    duration: durationIdx !== -1 ? args[durationIdx + 1] : '',
-                    tasks: tasksIdx !== -1 ? args[tasksIdx + 1] : undefined,
-                    files: filesIdx !== -1 ? args[filesIdx + 1] : undefined,
-                }, raw);
-            }
-            else if (subcommand === 'update-progress') {
-                state.cmdStateUpdateProgress(cwd, raw);
-            }
-            else if (subcommand === 'add-decision') {
-                const phaseIdx = args.indexOf('--phase');
-                const summaryIdx = args.indexOf('--summary');
-                const summaryFileIdx = args.indexOf('--summary-file');
-                const rationaleIdx = args.indexOf('--rationale');
-                const rationaleFileIdx = args.indexOf('--rationale-file');
-                state.cmdStateAddDecision(cwd, {
-                    phase: phaseIdx !== -1 ? args[phaseIdx + 1] : undefined,
-                    summary: summaryIdx !== -1 ? args[summaryIdx + 1] : undefined,
-                    summary_file: summaryFileIdx !== -1 ? args[summaryFileIdx + 1] : undefined,
-                    rationale: rationaleIdx !== -1 ? args[rationaleIdx + 1] : '',
-                    rationale_file: rationaleFileIdx !== -1 ? args[rationaleFileIdx + 1] : undefined,
-                }, raw);
-            }
-            else if (subcommand === 'add-blocker') {
-                const textIdx = args.indexOf('--text');
-                const textFileIdx = args.indexOf('--text-file');
-                state.cmdStateAddBlocker(cwd, {
-                    text: textIdx !== -1 ? args[textIdx + 1] : undefined,
-                    text_file: textFileIdx !== -1 ? args[textFileIdx + 1] : undefined,
-                }, raw);
-            }
-            else if (subcommand === 'resolve-blocker') {
-                const textIdx = args.indexOf('--text');
-                state.cmdStateResolveBlocker(cwd, textIdx !== -1 ? args[textIdx + 1] : null, raw);
-            }
-            else if (subcommand === 'record-session') {
-                const stoppedIdx = args.indexOf('--stopped-at');
-                const resumeIdx = args.indexOf('--resume-file');
-                state.cmdStateRecordSession(cwd, {
-                    stopped_at: stoppedIdx !== -1 ? args[stoppedIdx + 1] : undefined,
-                    resume_file: resumeIdx !== -1 ? args[resumeIdx + 1] : 'None',
-                }, raw);
-            }
-            else {
-                state.cmdStateLoad(cwd, raw);
-            }
-            break;
-        }
-        case 'resolve-model': {
-            commands.cmdResolveModel(cwd, args[1], raw);
-            break;
-        }
-        case 'find-phase': {
-            phase.cmdFindPhase(cwd, args[1], raw);
-            break;
-        }
-        case 'commit': {
-            const amend = args.includes('--amend');
-            const message = args[1];
-            // Parse --files flag (collect args after --files, stopping at other flags)
-            const filesIndex = args.indexOf('--files');
-            const files = filesIndex !== -1 ? args.slice(filesIndex + 1).filter(a => !a.startsWith('--')) : [];
-            commands.cmdCommit(cwd, message, files, raw, amend);
-            break;
-        }
-        case 'verify-summary': {
-            const summaryPath = args[1];
-            const countIndex = args.indexOf('--check-count');
-            const checkCount = countIndex !== -1 ? parseInt(args[countIndex + 1], 10) : 2;
-            verify.cmdVerifySummary(cwd, summaryPath, checkCount, raw);
-            break;
-        }
-        case 'template': {
-            const subcommand = args[1];
-            if (subcommand === 'select') {
-                template.cmdTemplateSelect(cwd, args[2], raw);
-            }
-            else if (subcommand === 'fill') {
-                const templateType = args[2];
-                const phaseIdx = args.indexOf('--phase');
-                const planIdx = args.indexOf('--plan');
-                const nameIdx = args.indexOf('--name');
-                const typeIdx = args.indexOf('--type');
-                const waveIdx = args.indexOf('--wave');
-                const fieldsIdx = args.indexOf('--fields');
-                template.cmdTemplateFill(cwd, templateType, {
-                    phase: phaseIdx !== -1 ? args[phaseIdx + 1] : '',
-                    plan: planIdx !== -1 ? args[planIdx + 1] : undefined,
-                    name: nameIdx !== -1 ? args[nameIdx + 1] : undefined,
-                    type: typeIdx !== -1 ? args[typeIdx + 1] : 'execute',
-                    wave: waveIdx !== -1 ? args[waveIdx + 1] : '1',
-                    fields: fieldsIdx !== -1 ? JSON.parse(args[fieldsIdx + 1]) : {},
-                }, raw);
-            }
-            else {
-                (0, index_js_1.error)('Unknown template subcommand. Available: select, fill');
-            }
-            break;
-        }
-        case 'frontmatter': {
-            const subcommand = args[1];
-            const file = args[2];
-            if (subcommand === 'get') {
-                const fieldIdx = args.indexOf('--field');
-                frontmatter.cmdFrontmatterGet(cwd, file, getFlag(args, '--field'), raw);
-            }
-            else if (subcommand === 'set') {
-                frontmatter.cmdFrontmatterSet(cwd, file, getFlag(args, '--field'), getFlag(args, '--value') ?? undefined, raw);
-            }
-            else if (subcommand === 'merge') {
-                frontmatter.cmdFrontmatterMerge(cwd, file, getFlag(args, '--data'), raw);
-            }
-            else if (subcommand === 'validate') {
-                frontmatter.cmdFrontmatterValidate(cwd, file, getFlag(args, '--schema'), raw);
-            }
-            else {
-                (0, index_js_1.error)('Unknown frontmatter subcommand. Available: get, set, merge, validate');
-            }
-            break;
-        }
-        case 'verify': {
-            const subcommand = args[1];
-            if (subcommand === 'plan-structure') {
-                verify.cmdVerifyPlanStructure(cwd, args[2], raw);
-            }
-            else if (subcommand === 'phase-completeness') {
-                verify.cmdVerifyPhaseCompleteness(cwd, args[2], raw);
-            }
-            else if (subcommand === 'references') {
-                verify.cmdVerifyReferences(cwd, args[2], raw);
-            }
-            else if (subcommand === 'commits') {
-                verify.cmdVerifyCommits(cwd, args.slice(2), raw);
-            }
-            else if (subcommand === 'artifacts') {
-                verify.cmdVerifyArtifacts(cwd, args[2], raw);
-            }
-            else if (subcommand === 'key-links') {
-                verify.cmdVerifyKeyLinks(cwd, args[2], raw);
-            }
-            else {
-                (0, index_js_1.error)('Unknown verify subcommand. Available: plan-structure, phase-completeness, references, commits, artifacts, key-links');
-            }
-            break;
-        }
-        case 'generate-slug': {
-            commands.cmdGenerateSlug(args[1], raw);
-            break;
-        }
-        case 'current-timestamp': {
-            commands.cmdCurrentTimestamp((args[1] || 'full'), raw);
-            break;
-        }
-        case 'list-todos': {
-            commands.cmdListTodos(cwd, args[1], raw);
-            break;
-        }
-        case 'verify-path-exists': {
-            commands.cmdVerifyPathExists(cwd, args[1], raw);
-            break;
-        }
-        case 'config-ensure-section': {
-            config.cmdConfigEnsureSection(cwd, raw);
-            break;
-        }
-        case 'config-set': {
-            config.cmdConfigSet(cwd, args[1], args[2], raw);
-            break;
-        }
-        case 'config-get': {
-            config.cmdConfigGet(cwd, args[1], raw);
-            break;
-        }
-        case 'history-digest': {
-            commands.cmdHistoryDigest(cwd, raw);
-            break;
-        }
-        case 'phases': {
-            const subcommand = args[1];
-            if (subcommand === 'list') {
-                const typeIndex = args.indexOf('--type');
-                const phaseIndex = args.indexOf('--phase');
-                const options = {
-                    type: typeIndex !== -1 ? args[typeIndex + 1] : null,
-                    phase: phaseIndex !== -1 ? args[phaseIndex + 1] : null,
-                    includeArchived: args.includes('--include-archived'),
-                };
-                phase.cmdPhasesList(cwd, options, raw);
-            }
-            else {
-                (0, index_js_1.error)('Unknown phases subcommand. Available: list');
-            }
-            break;
-        }
-        case 'roadmap': {
-            const subcommand = args[1];
-            if (subcommand === 'get-phase') {
-                roadmap.cmdRoadmapGetPhase(cwd, args[2], raw);
-            }
-            else if (subcommand === 'analyze') {
-                roadmap.cmdRoadmapAnalyze(cwd, raw);
-            }
-            else if (subcommand === 'update-plan-progress') {
-                roadmap.cmdRoadmapUpdatePlanProgress(cwd, args[2], raw);
-            }
-            else {
-                (0, index_js_1.error)('Unknown roadmap subcommand. Available: get-phase, analyze, update-plan-progress');
-            }
-            break;
-        }
-        case 'requirements': {
-            const subcommand = args[1];
-            if (subcommand === 'mark-complete') {
-                milestone.cmdRequirementsMarkComplete(cwd, args.slice(2), raw);
-            }
-            else {
-                (0, index_js_1.error)('Unknown requirements subcommand. Available: mark-complete');
-            }
-            break;
-        }
-        case 'phase': {
-            const subcommand = args[1];
-            if (subcommand === 'next-decimal') {
-                phase.cmdPhaseNextDecimal(cwd, args[2], raw);
-            }
-            else if (subcommand === 'add') {
-                phase.cmdPhaseAdd(cwd, args.slice(2).join(' '), raw);
-            }
-            else if (subcommand === 'insert') {
-                phase.cmdPhaseInsert(cwd, args[2], args.slice(3).join(' '), raw);
-            }
-            else if (subcommand === 'remove') {
-                const forceFlag = args.includes('--force');
-                phase.cmdPhaseRemove(cwd, args[2], { force: forceFlag }, raw);
-            }
-            else if (subcommand === 'complete') {
-                phase.cmdPhaseComplete(cwd, args[2], raw);
-            }
-            else {
-                (0, index_js_1.error)('Unknown phase subcommand. Available: next-decimal, add, insert, remove, complete');
-            }
-            break;
-        }
-        case 'milestone': {
-            const subcommand = args[1];
-            if (subcommand === 'complete') {
-                const nameIndex = args.indexOf('--name');
-                const archivePhases = args.includes('--archive-phases');
-                // Collect --name value (everything after --name until next flag or end)
-                let milestoneName = null;
-                if (nameIndex !== -1) {
-                    const nameArgs = [];
-                    for (let i = nameIndex + 1; i < args.length; i++) {
-                        if (args[i].startsWith('--'))
-                            break;
-                        nameArgs.push(args[i]);
-                    }
-                    milestoneName = nameArgs.join(' ') || null;
-                }
-                milestone.cmdMilestoneComplete(cwd, args[2], { name: milestoneName ?? undefined, archivePhases }, raw);
-            }
-            else {
-                (0, index_js_1.error)('Unknown milestone subcommand. Available: complete');
-            }
-            break;
-        }
-        case 'validate': {
-            const subcommand = args[1];
-            if (subcommand === 'consistency') {
-                verify.cmdValidateConsistency(cwd, raw);
-            }
-            else if (subcommand === 'health') {
-                const repairFlag = args.includes('--repair');
-                verify.cmdValidateHealth(cwd, { repair: repairFlag }, raw);
-            }
-            else {
-                (0, index_js_1.error)('Unknown validate subcommand. Available: consistency, health');
-            }
-            break;
-        }
-        case 'progress': {
-            const subcommand = args[1] || 'json';
-            commands.cmdProgressRender(cwd, subcommand, raw);
-            break;
-        }
-        case 'todo': {
-            const subcommand = args[1];
-            if (subcommand === 'complete') {
-                commands.cmdTodoComplete(cwd, args[2], raw);
-            }
-            else {
-                (0, index_js_1.error)('Unknown todo subcommand. Available: complete');
-            }
-            break;
-        }
-        case 'scaffold': {
-            const scaffoldType = args[1];
-            const phaseIndex = args.indexOf('--phase');
-            const nameIndex = args.indexOf('--name');
-            const scaffoldOptions = {
-                phase: phaseIndex !== -1 ? args[phaseIndex + 1] : null,
-                name: nameIndex !== -1 ? args.slice(nameIndex + 1).join(' ') : null,
-            };
-            commands.cmdScaffold(cwd, scaffoldType, scaffoldOptions, raw);
-            break;
-        }
-        case 'init': {
-            const workflow = args[1];
-            switch (workflow) {
-                case 'execute-phase':
-                    init.cmdInitExecutePhase(cwd, args[2], raw);
-                    break;
-                case 'plan-phase':
-                    init.cmdInitPlanPhase(cwd, args[2], raw);
-                    break;
-                case 'new-project':
-                    init.cmdInitNewProject(cwd, raw);
-                    break;
-                case 'new-milestone':
-                    init.cmdInitNewMilestone(cwd, raw);
-                    break;
-                case 'quick':
-                    init.cmdInitQuick(cwd, args.slice(2).join(' '), raw);
-                    break;
-                case 'resume':
-                    init.cmdInitResume(cwd, raw);
-                    break;
-                case 'verify-work':
-                    init.cmdInitVerifyWork(cwd, args[2], raw);
-                    break;
-                case 'phase-op':
-                    init.cmdInitPhaseOp(cwd, args[2], raw);
-                    break;
-                case 'todos':
-                    init.cmdInitTodos(cwd, args[2], raw);
-                    break;
-                case 'milestone-op':
-                    init.cmdInitMilestoneOp(cwd, raw);
-                    break;
-                case 'map-codebase':
-                    init.cmdInitMapCodebase(cwd, raw);
-                    break;
-                case 'progress':
-                    init.cmdInitProgress(cwd, raw);
-                    break;
-                default:
-                    (0, index_js_1.error)(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, progress`);
-            }
-            break;
-        }
-        case 'phase-plan-index': {
-            phase.cmdPhasePlanIndex(cwd, args[1], raw);
-            break;
-        }
-        case 'state-snapshot': {
-            state.cmdStateSnapshot(cwd, raw);
-            break;
-        }
-        case 'summary-extract': {
-            const summaryPath = args[1];
-            const fieldsIndex = args.indexOf('--fields');
-            const fields = fieldsIndex !== -1 ? args[fieldsIndex + 1].split(',') : null;
-            commands.cmdSummaryExtract(cwd, summaryPath, fields, raw);
-            break;
-        }
-        case 'websearch': {
-            const query = args[1];
-            const limitIdx = args.indexOf('--limit');
-            const freshnessIdx = args.indexOf('--freshness');
-            await commands.cmdWebsearch(query, {
-                limit: limitIdx !== -1 ? parseInt(args[limitIdx + 1], 10) : 10,
-                freshness: freshnessIdx !== -1 ? args[freshnessIdx + 1] : undefined,
-            }, raw);
-            break;
-        }
-        case 'dashboard': {
-            await handleDashboard(args.slice(1));
-            break;
-        }
-        default:
-            (0, index_js_1.error)(`Unknown command: ${command}`);
+    const handler = COMMANDS[command];
+    if (!handler) {
+        (0, index_js_1.error)(`Unknown command: ${command}`);
     }
+    await handler(args, cwd, raw);
 }
+// ─── Dashboard ───────────────────────────────────────────────────────────────
 /**
  * Dashboard launch command.
  *
@@ -529,11 +373,8 @@ async function handleDashboard(args) {
             const running = await checkHealth(port, HEALTH_TIMEOUT_MS);
             if (running) {
                 console.log(`Dashboard found on port ${port} — sending shutdown...`);
-                // Try to reach a shutdown endpoint, or just inform user
                 console.log(`Dashboard at http://localhost:${port} is running.`);
                 console.log(`To stop it, close the browser tab or kill the process on port ${port}.`);
-                // On Windows: netstat -ano | findstr :PORT, then taskkill /PID
-                // On Unix: lsof -i :PORT | awk 'NR>1 {print $2}' | xargs kill
                 try {
                     if (process.platform === 'win32') {
                         const result = (0, node_child_process_1.execSync)(`netstat -ano | findstr :${port} | findstr LISTENING`, { encoding: 'utf-8' }).trim();
@@ -586,7 +427,7 @@ async function handleDashboard(args) {
     }
     // Determine runner: if .ts file, use tsx; if .js file, use node
     const isTsFile = serverPath.endsWith('.ts');
-    const runner = isTsFile ? 'node' : 'node';
+    const runner = 'node';
     const runnerArgs = isTsFile ? ['--import', 'tsx', serverPath] : [serverPath];
     // Standalone server must run from its own directory to find .next/
     const serverDir = path.dirname(serverPath);
@@ -684,11 +525,9 @@ function resolveDashboardServer() {
         const require_ = (0, node_module_1.createRequire)(import.meta.url);
         const pkgPath = require_.resolve('@maxsim/dashboard/package.json');
         const pkgDir = path.dirname(pkgPath);
-        // Prefer built server.js for production
         const serverJs = path.join(pkgDir, 'server.js');
         if (fs.existsSync(serverJs))
             return serverJs;
-        // Fall back to source server.ts for dev (requires tsx)
         const serverTs = path.join(pkgDir, 'server.ts');
         if (fs.existsSync(serverTs))
             return serverTs;

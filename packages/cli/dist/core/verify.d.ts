@@ -114,11 +114,11 @@ interface RepairAction {
 interface HealthOptions {
     repair?: boolean;
 }
-export declare function cmdVerifySummary(cwd: string, summaryPath: string | null, checkFileCount: number | null, raw: boolean): void;
+export declare function cmdVerifySummary(cwd: string, summaryPath: string | null, checkFileCount: number | null, raw: boolean): Promise<void>;
 export declare function cmdVerifyPlanStructure(cwd: string, filePath: string | null, raw: boolean): void;
 export declare function cmdVerifyPhaseCompleteness(cwd: string, phase: string | null, raw: boolean): void;
 export declare function cmdVerifyReferences(cwd: string, filePath: string | null, raw: boolean): void;
-export declare function cmdVerifyCommits(cwd: string, hashes: string[], raw: boolean): void;
+export declare function cmdVerifyCommits(cwd: string, hashes: string[], raw: boolean): Promise<void>;
 export declare function cmdVerifyArtifacts(cwd: string, planFilePath: string | null, raw: boolean): void;
 export declare function cmdVerifyKeyLinks(cwd: string, planFilePath: string | null, raw: boolean): void;
 export declare function cmdValidateConsistency(cwd: string, raw: boolean): void;

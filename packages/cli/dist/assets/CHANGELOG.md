@@ -1,3 +1,10 @@
+## [2.5.6](https://github.com/maystudios/maxsim/compare/v2.5.5...v2.5.6) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** spawn claude via system shell for reliable PATH resolution ([0030283](https://github.com/maystudios/maxsim/commit/0030283ac800d966a02290983455ec591557e55e))
+
 ## [2.5.5](https://github.com/maystudios/maxsim/compare/v2.5.4...v2.5.5) (2026-02-25)
 
 

@@ -7,7 +7,7 @@ const shared = {
   banner: { js: '#!/usr/bin/env node' },
   dts: { build: true },
   sourcemap: true,
-  tsconfig: 'tsconfig.lib.json',
+  tsconfig: 'tsconfig.json',
   external: [/^node:/],
 };
 
@@ -16,7 +16,7 @@ const hookShared = {
   platform: 'node' as const,
   target: 'es2022' as const,
   sourcemap: true,
-  tsconfig: 'tsconfig.lib.json',
+  tsconfig: 'tsconfig.json',
   external: [/^node:/],
   outDir: 'dist/assets/hooks',
 };

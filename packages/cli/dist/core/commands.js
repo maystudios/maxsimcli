@@ -236,7 +236,7 @@ function cmdResolveModel(cwd, agentType, raw) {
     (0, core_js_1.output)(result, raw, model);
 }
 // ─── Commit ─────────────────────────────────────────────────────────────────
-function cmdCommit(cwd, message, files, raw, amend) {
+async function cmdCommit(cwd, message, files, raw, amend) {
     if (!message && !amend) {
         (0, core_js_1.error)('commit message required');
     }
@@ -248,7 +248,7 @@ function cmdCommit(cwd, message, files, raw, amend) {
         return;
     }
     // Check if .planning is gitignored
-    if ((0, core_js_1.isGitIgnored)(cwd, '.planning')) {
+    if (await (0, core_js_1.isGitIgnored)(cwd, '.planning')) {
         const result = { committed: false, hash: null, reason: 'skipped_gitignored' };
         (0, core_js_1.output)(result, raw, 'skipped');
         return;
@@ -256,11 +256,11 @@ function cmdCommit(cwd, message, files, raw, amend) {
     // Stage files
     const filesToStage = files && files.length > 0 ? files : ['.planning/'];
     for (const file of filesToStage) {
-        (0, core_js_1.execGit)(cwd, ['add', file]);
+        await (0, core_js_1.execGit)(cwd, ['add', file]);
     }
     // Commit
     const commitArgs = amend ? ['commit', '--amend', '--no-edit'] : ['commit', '-m', message];
-    const commitResult = (0, core_js_1.execGit)(cwd, commitArgs);
+    const commitResult = await (0, core_js_1.execGit)(cwd, commitArgs);
     if (commitResult.exitCode !== 0) {
         if (commitResult.stdout.includes('nothing to commit') || commitResult.stderr.includes('nothing to commit')) {
             const result = { committed: false, hash: null, reason: 'nothing_to_commit' };
@@ -272,7 +272,7 @@ function cmdCommit(cwd, message, files, raw, amend) {
         return;
     }
     // Get short hash
-    const hashResult = (0, core_js_1.execGit)(cwd, ['rev-parse', '--short', 'HEAD']);
+    const hashResult = await (0, core_js_1.execGit)(cwd, ['rev-parse', '--short', 'HEAD']);
     const hash = hashResult.exitCode === 0 ? hashResult.stdout : null;
     const result = { committed: true, hash, reason: 'committed' };
     (0, core_js_1.output)(result, raw, hash || 'committed');

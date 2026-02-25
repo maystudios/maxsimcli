@@ -2,6 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
 import * as crypto from 'node:crypto';
+import fsExtra from 'fs-extra';
 
 import chalk from 'chalk';
 import figlet from 'figlet';
@@ -115,61 +116,17 @@ function getDirName(runtime: RuntimeName): string {
 
 /**
  * Recursively remove a directory, handling Windows read-only file attributes.
- * fs.rmSync with { force: true } only ignores ENOENT — it does NOT remove
- * read-only files on Windows (EPERM). We chmod recursively first on EPERM.
+ * fs-extra handles cross-platform edge cases (EPERM on Windows, symlinks, etc.)
  */
 function safeRmDir(dirPath: string): void {
-  if (!fs.existsSync(dirPath)) return;
-  try {
-    fs.rmSync(dirPath, { recursive: true, force: true });
-  } catch (e: any) {
-    if (e.code === 'EPERM' && process.platform === 'win32') {
-      // Strip read-only attributes from every entry, then retry
-      const chmodRecursive = (p: string) => {
-        try {
-          fs.chmodSync(p, 0o666);
-        } catch {
-          /* ignore */
-        }
-        try {
-          for (const entry of fs.readdirSync(p, { withFileTypes: true })) {
-            chmodRecursive(path.join(p, entry.name));
-          }
-        } catch {
-          /* ignore */
-        }
-      };
-      chmodRecursive(dirPath);
-      fs.rmSync(dirPath, { recursive: true, force: true });
-    } else {
-      throw e;
-    }
-  }
+  fsExtra.removeSync(dirPath);
 }
 
 /**
- * Recursively copy a directory (plain copy, no path replacement)
+ * Recursively copy a directory (dereferences symlinks)
  */
 function copyDirRecursive(src: string, dest: string): void {
-  fs.mkdirSync(dest, { recursive: true });
-  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-    if (entry.isDirectory()) {
-      copyDirRecursive(srcPath, destPath);
-    } else if (entry.isSymbolicLink()) {
-      // Dereference symlinks to avoid broken links at destination
-      const target = fs.realpathSync(srcPath);
-      const stat = fs.statSync(target);
-      if (stat.isDirectory()) {
-        copyDirRecursive(target, destPath);
-      } else {
-        fs.copyFileSync(target, destPath);
-      }
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
-  }
+  fsExtra.copySync(src, dest, { dereference: true });
 }
 
 /**

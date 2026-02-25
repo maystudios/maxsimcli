@@ -1,7 +1,7 @@
 /**
  * Frontmatter — YAML frontmatter parsing, serialization, and CRUD commands
  *
- * Ported from maxsim/bin/lib/frontmatter.cjs
+ * Uses the `yaml` npm package instead of a hand-rolled parser.
  */
 import type { FrontmatterData, FrontmatterSchema } from './types.js';
 /**
@@ -20,7 +20,8 @@ interface MustHaveItem {
     [key: string]: string | number | string[];
 }
 /**
- * Parse a specific block from must_haves in raw frontmatter YAML.
+ * Parse a specific block from must_haves in frontmatter.
+ * With the yaml package, this is just object traversal.
  */
 export declare function parseMustHavesBlock(content: string, blockName: string): (string | MustHaveItem)[];
 export declare const FRONTMATTER_SCHEMAS: Record<string, FrontmatterSchema>;

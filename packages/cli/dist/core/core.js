@@ -28,7 +28,7 @@ exports.getMilestoneInfo = getMilestoneInfo;
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
 const node_os_1 = __importDefault(require("node:os"));
-const node_child_process_1 = require("node:child_process");
+const simple_git_1 = require("simple-git");
 // ─── Model Profile Table ─────────────────────────────────────────────────────
 exports.MODEL_PROFILES = {
     'maxsim-planner': { quality: 'opus', balanced: 'opus', budget: 'sonnet', tokenburner: 'opus' },
@@ -135,38 +135,30 @@ function loadConfig(cwd) {
     }
 }
 // ─── Git utilities ───────────────────────────────────────────────────────────
-function isGitIgnored(cwd, targetPath) {
+async function isGitIgnored(cwd, targetPath) {
     try {
-        (0, node_child_process_1.execSync)('git check-ignore -q -- ' + targetPath.replace(/[^a-zA-Z0-9._\-/]/g, ''), {
-            cwd,
-            stdio: 'pipe',
-        });
-        return true;
+        const git = (0, simple_git_1.simpleGit)(cwd);
+        const result = await git.checkIgnore(targetPath);
+        return result.length > 0;
     }
     catch {
         return false;
     }
 }
-function execGit(cwd, args) {
+async function execGit(cwd, args) {
     try {
-        const escaped = args.map(a => {
-            if (/^[a-zA-Z0-9._\-/=:@]+$/.test(a))
-                return a;
-            return "'" + a.replace(/'/g, "'\\''") + "'";
-        });
-        const stdout = (0, node_child_process_1.execSync)('git ' + escaped.join(' '), {
-            cwd,
-            stdio: 'pipe',
-            encoding: 'utf-8',
-        });
-        return { exitCode: 0, stdout: stdout.trim(), stderr: '' };
+        const git = (0, simple_git_1.simpleGit)(cwd);
+        const stdout = await git.raw(args);
+        return { exitCode: 0, stdout: (stdout ?? '').trim(), stderr: '' };
     }
     catch (thrown) {
         const err = thrown;
+        // simple-git throws on non-zero exit — extract what we can
+        const message = err.message ?? '';
         return {
-            exitCode: err.status ?? 1,
-            stdout: (err.stdout ?? '').toString().trim(),
-            stderr: (err.stderr ?? '').toString().trim(),
+            exitCode: 1,
+            stdout: '',
+            stderr: message,
         };
     }
 }
