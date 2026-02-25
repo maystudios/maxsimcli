@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/maystudios/maxsim/compare/v2.4.0...v2.4.1) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** lazy-load node-pty to prevent server crash when unavailable ([7d5b8c2](https://github.com/maystudios/maxsim/commit/7d5b8c20bfcce04082a0df93bfd2cf8d3e83d4c9))
+
 # [2.4.0](https://github.com/maystudios/maxsim/compare/v2.3.0...v2.4.0) (2026-02-25)
 
 
