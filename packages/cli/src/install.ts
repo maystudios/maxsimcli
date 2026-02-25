@@ -1918,62 +1918,55 @@ const subcommand = args.find(a => !a.startsWith('-'));
     console.log(chalk.gray(`  Project: ${projectCwd}`));
     console.log(chalk.gray(`  Server:  ${serverPath}\n`));
 
-    // Use process.execPath (absolute path to the current node binary) to avoid
-    // shell: true which does not quote args and breaks paths with spaces (DEP0190).
+    // Use stdio: 'ignore' (fully detached) — a piped stderr causes the server to crash on
+    // Windows when the read-end is closed after the parent reads the ready message (EPIPE).
     const child = spawnDash(process.execPath, [serverPath], {
       cwd: dashboardDir,
       detached: true,
-      stdio: ['ignore', 'ignore', 'pipe'],
+      stdio: 'ignore',
       env: {
         ...process.env,
         MAXSIM_PROJECT_CWD: projectCwd,
         NODE_ENV: 'production',
       },
     });
+    child.unref();
 
-    // Wait for server to announce its URL via stderr ("Dashboard ready at <url>")
-    // or fail (process exit / error). Timeout after 20s for slow Windows cold-starts.
-    const result = await new Promise<{ url: string | null; stderr: string }>((resolve) => {
-      let stderrData = '';
-      let resolved = false;
+    // Poll /api/health until the server is ready (or 20s timeout).
+    // Health polling avoids any pipe between parent and child, so the server
+    // process stays alive after the parent exits.
+    const POLL_INTERVAL_MS = 500;
+    const POLL_TIMEOUT_MS = 20000;
+    const HEALTH_TIMEOUT_MS = 1000;
+    const DEFAULT_PORT = 3333;
+    const PORT_RANGE_END = 3343;
+    let foundUrl: string | null = null;
+    const deadline = Date.now() + POLL_TIMEOUT_MS;
 
-      function done(url: string | null) {
-        if (resolved) return;
-        resolved = true;
-        resolve({ url, stderr: stderrData });
+    while (Date.now() < deadline) {
+      await new Promise<void>(r => setTimeout(r, POLL_INTERVAL_MS));
+      for (let p = DEFAULT_PORT; p <= PORT_RANGE_END; p++) {
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), HEALTH_TIMEOUT_MS);
+          const res = await fetch(`http://localhost:${p}/api/health`, { signal: controller.signal });
+          clearTimeout(timer);
+          if (res.ok) {
+            const data = await res.json() as { status?: string };
+            if (data.status === 'ok') {
+              foundUrl = `http://localhost:${p}`;
+              break;
+            }
+          }
+        } catch { /* not ready yet */ }
       }
+      if (foundUrl) break;
+    }
 
-      child.on('error', () => done(null));
-      child.on('exit', (code) => { if (code !== null && code !== 0) done(null); });
-
-      if (child.stderr) {
-        child.stderr.setEncoding('utf8');
-        child.stderr.on('data', (chunk: string) => {
-          stderrData += chunk;
-          // Server writes: "Dashboard ready at http://localhost:<port>"
-          const match = stderrData.match(/Dashboard ready at (https?:\/\/[^\s]+)/);
-          if (match) done(match[1]);
-        });
-      }
-
-      // Hard timeout — Next.js standalone can be slow on Windows first cold-start
-      setTimeout(() => done(null), 20000);
-    });
-
-    if (result.url) {
-      child.unref();
-      if (child.stderr) child.stderr.destroy();
-      console.log(chalk.green(`  Dashboard ready at ${result.url}`));
+    if (foundUrl) {
+      console.log(chalk.green(`  Dashboard ready at ${foundUrl}`));
     } else {
-      // Show error info if server failed
-      if (result.stderr.trim()) {
-        console.log(chalk.red('\n  Dashboard failed to start:\n'));
-        console.log(chalk.gray('  ' + result.stderr.trim().split('\n').join('\n  ')));
-      } else {
-        console.log(chalk.yellow('\n  Dashboard did not respond after 20s. Run with DEBUG=1 for details.'));
-      }
-      child.unref();
-      if (child.stderr) child.stderr.destroy();
+      console.log(chalk.yellow('\n  Dashboard did not respond after 20s. The server may still be starting — check http://localhost:3333'));
     }
     process.exit(0);
   }

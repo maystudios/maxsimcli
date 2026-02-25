@@ -45,9 +45,9 @@ const figlet_1 = __importDefault(require("figlet"));
 const ora_1 = __importDefault(require("ora"));
 const prompts_1 = require("@inquirer/prompts");
 const adapters_1 = require("@maxsim/adapters");
-// Get version from package.json
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pkg = require('../package.json');
+// Get version from package.json — read at runtime so semantic-release's version bump
+// is reflected without needing to rebuild dist/install.cjs after the version bump.
+const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'package.json'), 'utf-8'));
 // Resolve template asset root — bundled into dist/assets/templates at publish time
 const templatesRoot = path.resolve(__dirname, 'assets', 'templates');
 // Parse args
@@ -80,12 +80,12 @@ else {
         selectedRuntimes.push('codex');
 }
 /**
- * Walk up from cwd to find the MAXSIM monorepo root (has packages/dashboard)
+ * Walk up from cwd to find the MAXSIM monorepo root (has packages/dashboard/src/server.ts)
  */
 function findMonorepoRoot(startDir) {
     let dir = startDir;
     for (let i = 0; i < 10; i++) {
-        if (fs.existsSync(path.join(dir, 'packages', 'dashboard', 'server.ts'))) {
+        if (fs.existsSync(path.join(dir, 'packages', 'dashboard', 'src', 'server.ts'))) {
             return dir;
         }
         const parent = path.dirname(dir);
@@ -129,6 +129,44 @@ function getDirName(runtime) {
     return getAdapter(runtime).dirName;
 }
 /**
+ * Recursively remove a directory, handling Windows read-only file attributes.
+ * fs.rmSync with { force: true } only ignores ENOENT — it does NOT remove
+ * read-only files on Windows (EPERM). We chmod recursively first on EPERM.
+ */
+function safeRmDir(dirPath) {
+    if (!fs.existsSync(dirPath))
+        return;
+    try {
+        fs.rmSync(dirPath, { recursive: true, force: true });
+    }
+    catch (e) {
+        if (e.code === 'EPERM' && process.platform === 'win32') {
+            // Strip read-only attributes from every entry, then retry
+            const chmodRecursive = (p) => {
+                try {
+                    fs.chmodSync(p, 0o666);
+                }
+                catch {
+                    /* ignore */
+                }
+                try {
+                    for (const entry of fs.readdirSync(p, { withFileTypes: true })) {
+                        chmodRecursive(path.join(p, entry.name));
+                    }
+                }
+                catch {
+                    /* ignore */
+                }
+            };
+            chmodRecursive(dirPath);
+            fs.rmSync(dirPath, { recursive: true, force: true });
+        }
+        else {
+            throw e;
+        }
+    }
+}
+/**
  * Recursively copy a directory (plain copy, no path replacement)
  */
 function copyDirRecursive(src, dest) {
@@ -140,8 +178,7 @@ function copyDirRecursive(src, dest) {
             copyDirRecursive(srcPath, destPath);
         }
         else if (entry.isSymbolicLink()) {
-            // Dereference symlinks so pnpm virtual-store links become real files/dirs.
-            // This matters for dashboard node_modules which may use pnpm's .pnpm/ store.
+            // Dereference symlinks to avoid broken links at destination
             const target = fs.realpathSync(srcPath);
             const stat = fs.statSync(target);
             if (stat.isDirectory()) {
@@ -153,54 +190,6 @@ function copyDirRecursive(src, dest) {
         }
         else {
             fs.copyFileSync(srcPath, destPath);
-        }
-    }
-}
-/**
- * After copying a dashboard directory, hoist packages from the pnpm virtual
- * store (.pnpm/) to the top-level node_modules/ so that require() can find
- * them. Next.js standalone builds on pnpm omit the top-level hoisted symlinks
- * (e.g. node_modules/styled-jsx) so we recreate them as real directories.
- */
-function hoistPnpmPackages(nodeModulesDir) {
-    const pnpmDir = path.join(nodeModulesDir, '.pnpm');
-    if (!fs.existsSync(pnpmDir))
-        return;
-    for (const storeEntry of fs.readdirSync(pnpmDir)) {
-        const innerNM = path.join(pnpmDir, storeEntry, 'node_modules');
-        if (!fs.existsSync(innerNM))
-            continue;
-        for (const pkg of fs.readdirSync(innerNM)) {
-            if (pkg === '.pnpm')
-                continue;
-            const pkgSrc = path.join(innerNM, pkg);
-            const pkgDest = path.join(nodeModulesDir, pkg);
-            // Skip if already present at top level (first match wins)
-            if (fs.existsSync(pkgDest))
-                continue;
-            try {
-                // Resolve symlinks before checking / copying
-                const realSrc = fs.existsSync(pkgSrc) ? fs.realpathSync(pkgSrc) : pkgSrc;
-                if (!fs.existsSync(realSrc))
-                    continue;
-                const stat = fs.statSync(realSrc);
-                if (pkg.startsWith('@') && stat.isDirectory()) {
-                    // Scoped package: one level deeper
-                    for (const scopedPkg of fs.readdirSync(realSrc)) {
-                        const scopedSrc = path.join(realSrc, scopedPkg);
-                        const scopedDest = path.join(pkgDest, scopedPkg);
-                        if (!fs.existsSync(scopedDest) && fs.statSync(scopedSrc).isDirectory()) {
-                            fs.cpSync(scopedSrc, scopedDest, { recursive: true, dereference: true });
-                        }
-                    }
-                }
-                else if (stat.isDirectory()) {
-                    fs.cpSync(realSrc, pkgDest, { recursive: true, dereference: true });
-                }
-            }
-            catch {
-                // Non-fatal: skip packages that can't be hoisted
-            }
         }
     }
 }
@@ -1289,19 +1278,16 @@ function install(isGlobal, runtime = 'claude') {
             }
         }
     }
-    // Copy dashboard standalone build (if bundled in dist/assets/dashboard/)
+    // Copy dashboard Vite+Express build (if bundled in dist/assets/dashboard/)
+    // The dashboard now ships as: server.js (tsdown-bundled Express) + client/ (Vite static)
+    // No node_modules/ needed at destination — all server deps are bundled inline.
     const dashboardSrc = path.resolve(__dirname, 'assets', 'dashboard');
     if (fs.existsSync(dashboardSrc)) {
         spinner = (0, ora_1.default)({ text: 'Installing dashboard...', color: 'cyan' }).start();
         const dashboardDest = path.join(targetDir, 'dashboard');
         // Clean existing dashboard to prevent stale files from old installs
-        if (fs.existsSync(dashboardDest)) {
-            fs.rmSync(dashboardDest, { recursive: true, force: true });
-        }
+        safeRmDir(dashboardDest);
         copyDirRecursive(dashboardSrc, dashboardDest);
-        // Hoist any pnpm virtual-store packages that were not at the top level in the
-        // bundle (e.g. styled-jsx in v2.0.2 was only in .pnpm/, not node_modules/).
-        hoistPnpmPackages(path.join(dashboardDest, 'node_modules'));
         // Write dashboard.json NEXT TO dashboard/ dir (survives overwrites on upgrade)
         const dashboardConfigDest = path.join(targetDir, 'dashboard.json');
         const projectCwd = isGlobal ? targetDir : process.cwd();
@@ -1542,15 +1528,11 @@ const subcommand = args.find(a => !a.startsWith('-'));
         const installDashDir = path.join(installDir, 'dashboard');
         if (fs.existsSync(dashboardAssetSrc)) {
             // Clean existing dashboard dir to prevent stale files from old installs
-            // (e.g. old next/dist/server/*.js clashing with new bundle's dependencies)
-            if (fs.existsSync(installDashDir)) {
-                fs.rmSync(installDashDir, { recursive: true, force: true });
-            }
+            safeRmDir(installDashDir);
             fs.mkdirSync(installDashDir, { recursive: true });
+            // Dashboard is now Vite+Express: server.js (self-contained) + client/ (static)
+            // No node_modules/ hoisting needed — all deps are bundled into server.js by tsdown.
             copyDirRecursive(dashboardAssetSrc, installDashDir);
-            // Hoist pnpm virtual-store packages (e.g. styled-jsx) that may be missing
-            // from the top-level node_modules/ in older npm bundle versions.
-            hoistPnpmPackages(path.join(installDashDir, 'node_modules'));
             // Write/update dashboard.json
             const dashConfigPath = path.join(installDir, 'dashboard.json');
             if (!fs.existsSync(dashConfigPath)) {
@@ -1590,63 +1572,55 @@ const subcommand = args.find(a => !a.startsWith('-'));
         console.log(chalk_1.default.blue('Starting dashboard...'));
         console.log(chalk_1.default.gray(`  Project: ${projectCwd}`));
         console.log(chalk_1.default.gray(`  Server:  ${serverPath}\n`));
-        // Use process.execPath (absolute path to the current node binary) to avoid
-        // shell: true which does not quote args and breaks paths with spaces (DEP0190).
+        // Use stdio: 'ignore' (fully detached) — a piped stderr causes the server to crash on
+        // Windows when the read-end is closed after the parent reads the ready message (EPIPE).
         const child = spawnDash(process.execPath, [serverPath], {
             cwd: dashboardDir,
             detached: true,
-            stdio: ['ignore', 'ignore', 'pipe'],
+            stdio: 'ignore',
             env: {
                 ...process.env,
                 MAXSIM_PROJECT_CWD: projectCwd,
                 NODE_ENV: 'production',
             },
         });
-        // Wait for server to announce its URL via stderr ("Dashboard ready at <url>")
-        // or fail (process exit / error). Timeout after 20s for slow Windows cold-starts.
-        const result = await new Promise((resolve) => {
-            let stderrData = '';
-            let resolved = false;
-            function done(url) {
-                if (resolved)
-                    return;
-                resolved = true;
-                resolve({ url, stderr: stderrData });
+        child.unref();
+        // Poll /api/health until the server is ready (or 20s timeout).
+        // Health polling avoids any pipe between parent and child, so the server
+        // process stays alive after the parent exits.
+        const POLL_INTERVAL_MS = 500;
+        const POLL_TIMEOUT_MS = 20000;
+        const HEALTH_TIMEOUT_MS = 1000;
+        const DEFAULT_PORT = 3333;
+        const PORT_RANGE_END = 3343;
+        let foundUrl = null;
+        const deadline = Date.now() + POLL_TIMEOUT_MS;
+        while (Date.now() < deadline) {
+            await new Promise(r => setTimeout(r, POLL_INTERVAL_MS));
+            for (let p = DEFAULT_PORT; p <= PORT_RANGE_END; p++) {
+                try {
+                    const controller = new AbortController();
+                    const timer = setTimeout(() => controller.abort(), HEALTH_TIMEOUT_MS);
+                    const res = await fetch(`http://localhost:${p}/api/health`, { signal: controller.signal });
+                    clearTimeout(timer);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.status === 'ok') {
+                            foundUrl = `http://localhost:${p}`;
+                            break;
+                        }
+                    }
+                }
+                catch { /* not ready yet */ }
             }
-            child.on('error', () => done(null));
-            child.on('exit', (code) => { if (code !== null && code !== 0)
-                done(null); });
-            if (child.stderr) {
-                child.stderr.setEncoding('utf8');
-                child.stderr.on('data', (chunk) => {
-                    stderrData += chunk;
-                    // Server writes: "Dashboard ready at http://localhost:<port>"
-                    const match = stderrData.match(/Dashboard ready at (https?:\/\/[^\s]+)/);
-                    if (match)
-                        done(match[1]);
-                });
-            }
-            // Hard timeout — Next.js standalone can be slow on Windows first cold-start
-            setTimeout(() => done(null), 20000);
-        });
-        if (result.url) {
-            child.unref();
-            if (child.stderr)
-                child.stderr.destroy();
-            console.log(chalk_1.default.green(`  Dashboard ready at ${result.url}`));
+            if (foundUrl)
+                break;
+        }
+        if (foundUrl) {
+            console.log(chalk_1.default.green(`  Dashboard ready at ${foundUrl}`));
         }
         else {
-            // Show error info if server failed
-            if (result.stderr.trim()) {
-                console.log(chalk_1.default.red('\n  Dashboard failed to start:\n'));
-                console.log(chalk_1.default.gray('  ' + result.stderr.trim().split('\n').join('\n  ')));
-            }
-            else {
-                console.log(chalk_1.default.yellow('\n  Dashboard did not respond after 20s. Run with DEBUG=1 for details.'));
-            }
-            child.unref();
-            if (child.stderr)
-                child.stderr.destroy();
+            console.log(chalk_1.default.yellow('\n  Dashboard did not respond after 20s. The server may still be starting — check http://localhost:3333'));
         }
         process.exit(0);
     }

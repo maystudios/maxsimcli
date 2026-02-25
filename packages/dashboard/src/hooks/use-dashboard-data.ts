@@ -36,21 +36,22 @@ export function useDashboardData(): DashboardData {
         fetch("/api/todos"),
       ]);
 
-      if (!roadmapRes.ok) {
+      // 404 means the file doesn't exist yet (fresh project) — treat as null, not an error
+      if (!roadmapRes.ok && roadmapRes.status !== 404) {
         throw new Error(`Roadmap fetch failed: ${roadmapRes.status}`);
       }
-      if (!stateRes.ok) {
+      if (!stateRes.ok && stateRes.status !== 404) {
         throw new Error(`State fetch failed: ${stateRes.status}`);
       }
       if (!todosRes.ok) {
         throw new Error(`Todos fetch failed: ${todosRes.status}`);
       }
 
-      const [roadmapData, stateData, todosData] = await Promise.all([
-        roadmapRes.json() as Promise<RoadmapAnalysis>,
-        stateRes.json() as Promise<ParsedState>,
-        todosRes.json() as Promise<{ pending: TodoItem[]; completed: TodoItem[] }>,
-      ]);
+      const roadmapData = roadmapRes.ok ? await roadmapRes.json() as RoadmapAnalysis : null;
+      const stateData = stateRes.ok ? await stateRes.json() as ParsedState : null;
+      const todosData = todosRes.ok
+        ? await todosRes.json() as { pending: TodoItem[]; completed: TodoItem[] }
+        : { pending: [], completed: [] };
 
       setRoadmap(roadmapData);
       setState(stateData);

@@ -6481,59 +6481,9 @@ var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region package.json
-var require_package = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	module.exports = {
-		"name": "maxsimcli",
-		"version": "2.0.2",
-		"private": false,
-		"description": "A meta-prompting, context engineering and spec-driven development system for Claude Code, OpenCode, Gemini and Codex by MayStudios.",
-		"bin": { "maxsimcli": "dist/install.cjs" },
-		"main": "./dist/cli.cjs",
-		"types": "./dist/cli.d.cts",
-		"files": ["dist", "README.md"],
-		"scripts": { "prepublishOnly": "node -e \"require('fs').copyFileSync('../../README.md', './README.md')\"" },
-		"engines": { "node": ">=22.0.0" },
-		"keywords": [
-			"claude",
-			"claude-code",
-			"ai",
-			"meta-prompting",
-			"context-engineering",
-			"spec-driven-development",
-			"gemini",
-			"gemini-cli",
-			"codex",
-			"codex-cli"
-		],
-		"author": "MayStudios",
-		"license": "MIT",
-		"repository": {
-			"type": "git",
-			"url": "git+https://github.com/maystudios/maxsim.git"
-		},
-		"homepage": "https://github.com/maystudios/maxsim",
-		"bugs": { "url": "https://github.com/maystudios/maxsim/issues" },
-		"devDependencies": {
-			"@inquirer/prompts": "^8.3.0",
-			"@maxsim/adapters": "workspace:*",
-			"@maxsim/core": "workspace:*",
-			"@maxsim/dashboard": "workspace:*",
-			"@maxsim/hooks": "workspace:*",
-			"@maxsim/templates": "workspace:*",
-			"@types/figlet": "^1.7.0",
-			"@types/node": "^25.3.0",
-			"chalk": "^5.6.2",
-			"ora": "^9.3.0"
-		},
-		"dependencies": { "figlet": "^1.10.0" }
-	};
-}));
-
-//#endregion
 //#region src/install.ts
 var import_dist = require_dist();
-const pkg = require_package();
+const pkg = JSON.parse(node_fs.readFileSync(node_path.resolve(__dirname, "..", "package.json"), "utf-8"));
 const templatesRoot = node_path.resolve(__dirname, "assets", "templates");
 const args = process.argv.slice(2);
 const hasGlobal = args.includes("--global") || args.includes("-g");
@@ -6593,29 +6543,33 @@ function getDirName(runtime) {
 	return getAdapter(runtime).dirName;
 }
 /**
- * Recursively remove a directory, handling Windows read-only file attributes.
- * fs.rmSync with { force: true } only ignores ENOENT — it does NOT remove
- * read-only files on Windows (EPERM). We chmod recursively first on EPERM.
- */
+* Recursively remove a directory, handling Windows read-only file attributes.
+* fs.rmSync with { force: true } only ignores ENOENT — it does NOT remove
+* read-only files on Windows (EPERM). We chmod recursively first on EPERM.
+*/
 function safeRmDir(dirPath) {
 	if (!node_fs.existsSync(dirPath)) return;
 	try {
-		node_fs.rmSync(dirPath, { recursive: true, force: true });
+		node_fs.rmSync(dirPath, {
+			recursive: true,
+			force: true
+		});
 	} catch (e) {
-		if (e.code === 'EPERM' && process.platform === 'win32') {
+		if (e.code === "EPERM" && process.platform === "win32") {
 			const chmodRecursive = (p) => {
-				try { node_fs.chmodSync(p, 0o666); } catch {}
 				try {
-					for (const entry of node_fs.readdirSync(p, { withFileTypes: true })) {
-						chmodRecursive(node_path.join(p, entry.name));
-					}
+					node_fs.chmodSync(p, 438);
+				} catch {}
+				try {
+					for (const entry of node_fs.readdirSync(p, { withFileTypes: true })) chmodRecursive(node_path.join(p, entry.name));
 				} catch {}
 			};
 			chmodRecursive(dirPath);
-			node_fs.rmSync(dirPath, { recursive: true, force: true });
-		} else {
-			throw e;
-		}
+			node_fs.rmSync(dirPath, {
+				recursive: true,
+				force: true
+			});
+		} else throw e;
 	}
 }
 /**
@@ -6632,43 +6586,6 @@ function copyDirRecursive(src, dest) {
 			if (node_fs.statSync(target).isDirectory()) copyDirRecursive(target, destPath);
 			else node_fs.copyFileSync(target, destPath);
 		} else node_fs.copyFileSync(srcPath, destPath);
-	}
-}
-/**
-* After copying a dashboard directory, hoist packages from the pnpm virtual
-* store (.pnpm/) to the top-level node_modules/ so that require() can find
-* them. Next.js standalone builds on pnpm omit the top-level hoisted symlinks
-* (e.g. node_modules/styled-jsx) so we recreate them as real directories.
-*/
-function hoistPnpmPackages(nodeModulesDir) {
-	const pnpmDir = node_path.join(nodeModulesDir, ".pnpm");
-	if (!node_fs.existsSync(pnpmDir)) return;
-	for (const storeEntry of node_fs.readdirSync(pnpmDir)) {
-		const innerNM = node_path.join(pnpmDir, storeEntry, "node_modules");
-		if (!node_fs.existsSync(innerNM)) continue;
-		for (const pkg of node_fs.readdirSync(innerNM)) {
-			if (pkg === ".pnpm") continue;
-			const pkgSrc = node_path.join(innerNM, pkg);
-			const pkgDest = node_path.join(nodeModulesDir, pkg);
-			if (node_fs.existsSync(pkgDest)) continue;
-			try {
-				const realSrc = node_fs.existsSync(pkgSrc) ? node_fs.realpathSync(pkgSrc) : pkgSrc;
-				if (!node_fs.existsSync(realSrc)) continue;
-				const stat = node_fs.statSync(realSrc);
-				if (pkg.startsWith("@") && stat.isDirectory()) for (const scopedPkg of node_fs.readdirSync(realSrc)) {
-					const scopedSrc = node_path.join(realSrc, scopedPkg);
-					const scopedDest = node_path.join(pkgDest, scopedPkg);
-					if (!node_fs.existsSync(scopedDest) && node_fs.statSync(scopedSrc).isDirectory()) node_fs.cpSync(scopedSrc, scopedDest, {
-						recursive: true,
-						dereference: true
-					});
-				}
-				else if (stat.isDirectory()) node_fs.cpSync(realSrc, pkgDest, {
-					recursive: true,
-					dereference: true
-				});
-			} catch {}
-		}
 	}
 }
 /**
@@ -7465,7 +7382,6 @@ function install(isGlobal, runtime = "claude") {
 		const dashboardDest = node_path.join(targetDir, "dashboard");
 		safeRmDir(dashboardDest);
 		copyDirRecursive(dashboardSrc, dashboardDest);
-		hoistPnpmPackages(node_path.join(dashboardDest, "node_modules"));
 		const dashboardConfigDest = node_path.join(targetDir, "dashboard.json");
 		const projectCwd = isGlobal ? targetDir : process.cwd();
 		node_fs.writeFileSync(dashboardConfigDest, JSON.stringify({ projectCwd }, null, 2) + "\n");
@@ -7660,7 +7576,6 @@ const subcommand = args.find((a) => !a.startsWith("-"));
 			safeRmDir(installDashDir);
 			node_fs.mkdirSync(installDashDir, { recursive: true });
 			copyDirRecursive(dashboardAssetSrc, installDashDir);
-			hoistPnpmPackages(node_path.join(installDashDir, "node_modules"));
 			const dashConfigPath = node_path.join(installDir, "dashboard.json");
 			if (!node_fs.existsSync(dashConfigPath)) node_fs.writeFileSync(dashConfigPath, JSON.stringify({ projectCwd: process.cwd() }, null, 2) + "\n");
 		}
@@ -7684,57 +7599,41 @@ const subcommand = args.find((a) => !a.startsWith("-"));
 		console.log(chalk.blue("Starting dashboard..."));
 		console.log(chalk.gray(`  Project: ${projectCwd}`));
 		console.log(chalk.gray(`  Server:  ${serverPath}\n`));
-		const child = spawnDash(process.execPath, [serverPath], {
+		spawnDash(process.execPath, [serverPath], {
 			cwd: dashboardDir,
 			detached: true,
-			stdio: [
-				"ignore",
-				"ignore",
-				"pipe"
-			],
+			stdio: "ignore",
 			env: {
 				...process.env,
 				MAXSIM_PROJECT_CWD: projectCwd,
 				NODE_ENV: "production"
 			}
-		});
-		const result = await new Promise((resolve) => {
-			let stderrData = "";
-			let resolved = false;
-			function done(url) {
-				if (resolved) return;
-				resolved = true;
-				resolve({
-					url,
-					stderr: stderrData
-				});
-			}
-			child.on("error", () => done(null));
-			child.on("exit", (code) => {
-				if (code !== null && code !== 0) done(null);
-			});
-			if (child.stderr) {
-				child.stderr.setEncoding("utf8");
-				child.stderr.on("data", (chunk) => {
-					stderrData += chunk;
-					const match = stderrData.match(/Dashboard ready at (https?:\/\/[^\s]+)/);
-					if (match) done(match[1]);
-				});
-			}
-			setTimeout(() => done(null), 2e4);
-		});
-		if (result.url) {
-			child.unref();
-			if (child.stderr) child.stderr.destroy();
-			console.log(chalk.green(`  Dashboard ready at ${result.url}`));
-		} else {
-			if (result.stderr.trim()) {
-				console.log(chalk.red("\n  Dashboard failed to start:\n"));
-				console.log(chalk.gray("  " + result.stderr.trim().split("\n").join("\n  ")));
-			} else console.log(chalk.yellow("\n  Dashboard did not respond after 20s. Run with DEBUG=1 for details."));
-			child.unref();
-			if (child.stderr) child.stderr.destroy();
+		}).unref();
+		const POLL_INTERVAL_MS = 500;
+		const POLL_TIMEOUT_MS = 2e4;
+		const HEALTH_TIMEOUT_MS = 1e3;
+		const DEFAULT_PORT = 3333;
+		const PORT_RANGE_END = 3343;
+		let foundUrl = null;
+		const deadline = Date.now() + POLL_TIMEOUT_MS;
+		while (Date.now() < deadline) {
+			await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+			for (let p = DEFAULT_PORT; p <= PORT_RANGE_END; p++) try {
+				const controller = new AbortController();
+				const timer = setTimeout(() => controller.abort(), HEALTH_TIMEOUT_MS);
+				const res = await fetch(`http://localhost:${p}/api/health`, { signal: controller.signal });
+				clearTimeout(timer);
+				if (res.ok) {
+					if ((await res.json()).status === "ok") {
+						foundUrl = `http://localhost:${p}`;
+						break;
+					}
+				}
+			} catch {}
+			if (foundUrl) break;
 		}
+		if (foundUrl) console.log(chalk.green(`  Dashboard ready at ${foundUrl}`));
+		else console.log(chalk.yellow("\n  Dashboard did not respond after 20s. The server may still be starting — check http://localhost:3333"));
 		process.exit(0);
 	}
 	if (hasGlobal && hasLocal) {
