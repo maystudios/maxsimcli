@@ -15,7 +15,7 @@ All 42 v1.0 requirements (NX-01 through PUB-04) are satisfied. See `.planning/v1
 
 ### E2E Infrastructure
 
-- [ ] **E2E-01**: `packages/e2e` NX package exists with `private: true`, `implicitDependencies: ["cli", "dashboard"]`, `dependsOn: cli:build`, `cache: false`, and an `e2e` NX target that runs Vitest with the E2E config
+- [x] **E2E-01**: `packages/e2e` NX package exists with `private: true`, `implicitDependencies: ["cli", "dashboard"]`, `dependsOn: cli:build`, `cache: false`, and an `e2e` NX target that runs Vitest with the E2E config
 - [x] **E2E-02**: globalSetup runs `npm pack` from `packages/cli/dist/` and installs via local tarball to a `mkdtempSync` temp directory — never hits the npm registry
 - [x] **E2E-03**: install.test.ts validates exact file counts post-install: exactly 31 command `.md` files, exactly 11 agent `.md` files, known workflow directory structure
 - [x] **E2E-04**: Binary smoke test: `maxsimcli --version` exits 0 from the installed temp path

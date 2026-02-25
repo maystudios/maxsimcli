@@ -85,6 +85,7 @@ Progress: [████░░░░░░] 40% (3/5 phases complete)
 | Phase 21 P03 | 2min | 1 tasks | 4 files |
 | Phase 22 P01 | 2min | 2 tasks | 4 files |
 | Phase 22 P02 | 19min | 2 tasks | 3 files |
+| Phase 23 P01 | 1min | 2 tasks | 30 files |
 
 ## Accumulated Context
 
@@ -195,6 +196,7 @@ Recent decisions affecting current work:
 - [Phase 21]: Confirmation popup always shown before sending quick-action commands
 - [Phase 22]: curl for WebSocket upgrade verification in vitest fork workers (ws/native WebSocket hang)
 - [Phase 22]: fileParallelism: false in e2e vitest config to prevent dashboard port conflicts
+- [Phase 23]: Removed stale .next and app entries from tsconfig.json exclude during cleanup
 
 ### Roadmap Evolution
 

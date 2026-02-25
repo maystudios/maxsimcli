@@ -160,7 +160,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 23-01-PLAN.md — E2E wiring fix and Next.js orphaned file cleanup
+- [x] 23-01-PLAN.md — E2E wiring fix and Next.js orphaned file cleanup
 - [ ] 23-02-PLAN.md — Planning doc audit and pre-push consistency hook
 
 ---
@@ -179,4 +179,4 @@ Plans:
 | 20. Dashboard Migrate to Vite + Express | 2/2 | Complete | 2026-02-25 |
 | 21. Interactive Claude Code Terminal | 4/4 | Complete | 2026-02-25 |
 | 22. Fix node-pty Delivery (Lazy-Load) | 2/2 | Complete    | 2026-02-25 |
-| 23. E2E Wiring & Next.js Cleanup | 1/2 | In Progress | - |
+| 23. E2E Wiring & Next.js Cleanup | 1/2 | In Progress|  |
