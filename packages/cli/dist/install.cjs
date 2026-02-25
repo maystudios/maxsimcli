@@ -7589,14 +7589,19 @@ async function installAllRuntimes(runtimes, isGlobal, isInteractive) {
 const subcommand = args.find((a) => !a.startsWith("-"));
 (async () => {
 	if (subcommand === "dashboard") {
-		const { spawn: spawnDash } = await import("node:child_process");
+		const { spawn: spawnDash, execSync: execSyncDash } = await import("node:child_process");
 		const dashboardAssetSrc = node_path.resolve(__dirname, "assets", "dashboard");
 		const installDir = node_path.join(process.cwd(), ".claude");
 		const installDashDir = node_path.join(installDir, "dashboard");
 		if (node_fs.existsSync(dashboardAssetSrc)) {
+			const nodeModulesDir = node_path.join(installDashDir, "node_modules");
+			const nodeModulesTmp = node_path.join(installDir, "_dashboard_node_modules_tmp");
+			const hadNodeModules = node_fs.existsSync(nodeModulesDir);
+			if (hadNodeModules) node_fs.renameSync(nodeModulesDir, nodeModulesTmp);
 			safeRmDir(installDashDir);
 			node_fs.mkdirSync(installDashDir, { recursive: true });
 			copyDirRecursive(dashboardAssetSrc, installDashDir);
+			if (hadNodeModules && node_fs.existsSync(nodeModulesTmp)) node_fs.renameSync(nodeModulesTmp, nodeModulesDir);
 			const dashConfigPath = node_path.join(installDir, "dashboard.json");
 			if (!node_fs.existsSync(dashConfigPath)) node_fs.writeFileSync(dashConfigPath, JSON.stringify({ projectCwd: process.cwd() }, null, 2) + "\n");
 		}
@@ -7617,6 +7622,22 @@ const subcommand = args.find((a) => !a.startsWith("-"));
 			const config = JSON.parse(node_fs.readFileSync(dashboardConfigPath, "utf8"));
 			if (config.projectCwd) projectCwd = config.projectCwd;
 		} catch {}
+		const dashDirForPty = node_path.dirname(serverPath);
+		const ptyModulePath = node_path.join(dashDirForPty, "node_modules", "node-pty");
+		if (!node_fs.existsSync(ptyModulePath)) {
+			console.log(chalk.gray("  Installing node-pty for terminal support..."));
+			try {
+				const dashPkgPath = node_path.join(dashDirForPty, "package.json");
+				if (!node_fs.existsSync(dashPkgPath)) node_fs.writeFileSync(dashPkgPath, "{\"private\":true}\n");
+				execSyncDash("npm install node-pty --save-optional --no-audit --no-fund --loglevel=error", {
+					cwd: dashDirForPty,
+					stdio: "inherit",
+					timeout: 12e4
+				});
+			} catch {
+				console.warn(chalk.yellow("  node-pty installation failed — terminal will be unavailable."));
+			}
+		}
 		console.log(chalk.blue("Starting dashboard..."));
 		console.log(chalk.gray(`  Project: ${projectCwd}`));
 		console.log(chalk.gray(`  Server:  ${serverPath}\n`));

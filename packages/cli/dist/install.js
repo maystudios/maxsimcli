@@ -1545,19 +1545,30 @@ const subcommand = args.find(a => !a.startsWith('-'));
 (async () => {
     // Dashboard subcommand
     if (subcommand === 'dashboard') {
-        const { spawn: spawnDash } = await import('node:child_process');
+        const { spawn: spawnDash, execSync: execSyncDash } = await import('node:child_process');
         // Always refresh dashboard from bundled assets before launching.
         // This ensures users get the latest version (fixes broken ESM builds, etc.)
         const dashboardAssetSrc = path.resolve(__dirname, 'assets', 'dashboard');
         const installDir = path.join(process.cwd(), '.claude');
         const installDashDir = path.join(installDir, 'dashboard');
         if (fs.existsSync(dashboardAssetSrc)) {
+            // Preserve node_modules (contains native addons like node-pty) across refreshes
+            const nodeModulesDir = path.join(installDashDir, 'node_modules');
+            const nodeModulesTmp = path.join(installDir, '_dashboard_node_modules_tmp');
+            const hadNodeModules = fs.existsSync(nodeModulesDir);
+            if (hadNodeModules) {
+                fs.renameSync(nodeModulesDir, nodeModulesTmp);
+            }
             // Clean existing dashboard dir to prevent stale files from old installs
             safeRmDir(installDashDir);
             fs.mkdirSync(installDashDir, { recursive: true });
             // Dashboard is now Vite+Express: server.js (self-contained) + client/ (static)
             // No node_modules/ hoisting needed — all deps are bundled into server.js by tsdown.
             copyDirRecursive(dashboardAssetSrc, installDashDir);
+            // Restore node_modules if it was preserved
+            if (hadNodeModules && fs.existsSync(nodeModulesTmp)) {
+                fs.renameSync(nodeModulesTmp, nodeModulesDir);
+            }
             // Write/update dashboard.json
             const dashConfigPath = path.join(installDir, 'dashboard.json');
             if (!fs.existsSync(dashConfigPath)) {
@@ -1592,6 +1603,27 @@ const subcommand = args.find(a => !a.startsWith('-'));
             }
             catch {
                 // Use default cwd
+            }
+        }
+        // node-pty is a native addon that cannot be bundled — auto-install if missing
+        const dashDirForPty = path.dirname(serverPath);
+        const ptyModulePath = path.join(dashDirForPty, 'node_modules', 'node-pty');
+        if (!fs.existsSync(ptyModulePath)) {
+            console.log(chalk_1.default.gray('  Installing node-pty for terminal support...'));
+            try {
+                // Ensure a package.json exists so npm install works in the dashboard dir
+                const dashPkgPath = path.join(dashDirForPty, 'package.json');
+                if (!fs.existsSync(dashPkgPath)) {
+                    fs.writeFileSync(dashPkgPath, '{"private":true}\n');
+                }
+                execSyncDash('npm install node-pty --save-optional --no-audit --no-fund --loglevel=error', {
+                    cwd: dashDirForPty,
+                    stdio: 'inherit',
+                    timeout: 120_000,
+                });
+            }
+            catch {
+                console.warn(chalk_1.default.yellow('  node-pty installation failed — terminal will be unavailable.'));
             }
         }
         console.log(chalk_1.default.blue('Starting dashboard...'));
