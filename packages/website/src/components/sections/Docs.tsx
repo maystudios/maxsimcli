@@ -107,7 +107,7 @@ function GettingStarted() {
         <CodeBlock
           language="text"
           code={`~/.claude/
-├── commands/maxsim/   # 30 user-facing commands (/gsd:*)
+├── commands/maxsim/   # 31 user-facing commands (/maxsim:*)
 ├── agents/            # 11 specialized agent prompts
 └── hooks/             # Pre/post hooks for automation`}
         />
@@ -122,7 +122,7 @@ function GettingStarted() {
         <CodeBlock
           language="bash"
           code={`# In your project directory, use the slash command:
-/gsd:new-project`}
+/maxsim:new-project`}
         />
       </div>
     </div>
@@ -142,39 +142,39 @@ interface CommandDef {
 const commands: CommandDef[] = [
   {
     name: "new-project",
-    signature: "/gsd:new-project",
+    signature: "/maxsim:new-project",
     description: "Initialize a new project with deep context gathering. Creates PROJECT.md, REQUIREMENTS.md, and a phased ROADMAP.md.",
-    example: `/gsd:new-project`,
+    example: `/maxsim:new-project`,
   },
   {
     name: "plan-phase",
-    signature: "/gsd:plan-phase",
+    signature: "/maxsim:plan-phase",
     description: "Research, plan, and verify a phase before execution. Spawns researcher, planner, and plan-checker agents.",
-    example: `/gsd:plan-phase`,
+    example: `/maxsim:plan-phase`,
   },
   {
     name: "execute-phase",
-    signature: "/gsd:execute-phase",
+    signature: "/maxsim:execute-phase",
     description: "Execute all plans in a phase with wave-based parallelization, atomic commits, and state tracking.",
-    example: `/gsd:execute-phase`,
+    example: `/maxsim:execute-phase`,
   },
   {
     name: "progress",
-    signature: "/gsd:progress",
+    signature: "/maxsim:progress",
     description: "Check project progress, show context, and route to the next action — either execute or plan.",
-    example: `/gsd:progress`,
+    example: `/maxsim:progress`,
   },
   {
     name: "debug",
-    signature: "/gsd:debug",
+    signature: "/maxsim:debug",
     description: "Systematic debugging with persistent state across context resets. Uses scientific method and checkpoints.",
-    example: `/gsd:debug`,
+    example: `/maxsim:debug`,
   },
   {
     name: "verify-work",
-    signature: "/gsd:verify-work",
+    signature: "/maxsim:verify-work",
     description: "Validate built features through conversational user acceptance testing.",
-    example: `/gsd:verify-work`,
+    example: `/maxsim:verify-work`,
   },
 ];
 
@@ -224,7 +224,7 @@ function Architecture() {
         </DocText>
         <CodeBlock
           language="text"
-          code={`commands/maxsim/*.md       # User-facing command specs (30 files)
+          code={`commands/maxsim/*.md       # User-facing command specs (31 files)
 maxsim/workflows/*.md      # Implementation workflows
 agents/*.md                # Specialized subagent prompts (11 agents)`}
         />
@@ -307,7 +307,7 @@ budget     → Haiku for everything`}
         <DocSubheading>Change profile</DocSubheading>
         <CodeBlock
           language="bash"
-          code={`/gsd:set-profile quality`}
+          code={`/maxsim:set-profile quality`}
         />
       </div>
     </div>
