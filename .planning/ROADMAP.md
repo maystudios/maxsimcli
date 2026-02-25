@@ -141,10 +141,11 @@ Plans:
   2. All non-terminal API routes (`/api/health`, `/api/project`, `/api/phases`, `/api/state`, `/api/todos`) respond normally
   3. Terminal WebSocket endpoint returns a graceful error message when node-pty is unavailable instead of crashing
   4. When node-pty IS available, terminal features work exactly as before
-**Plans**: 0 plans
+**Plans**: 2 plans
 
 Plans:
-(none yet)
+- [ ] 22-01-PLAN.md — Server graceful degradation + frontend error card
+- [ ] 22-02-PLAN.md — E2E test for absent node-pty
 
 ### Phase 23: E2E Wiring & Next.js Cleanup
 **Goal**: Fix e2e package dependency wiring, remove orphaned Next.js artifacts from Phase 20 migration, and update all stale planning doc statuses
@@ -176,5 +177,5 @@ Plans:
 | 19. CI Integration | 1/1 | Complete | 2026-02-25 |
 | 20. Dashboard Migrate to Vite + Express | 2/2 | Complete | 2026-02-25 |
 | 21. Interactive Claude Code Terminal | 4/4 | Complete | 2026-02-25 |
-| 22. Fix node-pty Delivery (Lazy-Load) | 0/0 | Not started | - |
+| 22. Fix node-pty Delivery (Lazy-Load) | 1/2 | In Progress|  |
 | 23. E2E Wiring & Next.js Cleanup | 0/0 | Not started | - |

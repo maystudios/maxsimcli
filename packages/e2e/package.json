@@ -1,5 +1,9 @@
 {
   "name": "@maxsim/e2e",
   "version": "0.0.1",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "ws": "^8.18.0",
+    "@types/ws": "^8.5.13"
+  }
 }

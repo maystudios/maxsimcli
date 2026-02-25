@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** `npx maxsimcli@latest` installs a complete AI dev workflow system that works immediately — validated end-to-end from the npm consumer perspective, not the monorepo perspective
-**Current focus:** Phase 21 — Interactive Claude Code Terminal
+**Current focus:** Phase 22 — Fix node-pty Lazy Load
 
 ## Current Position
 
-Phase: 21 — Interactive Claude Code Terminal
-Plan: 21-03 (complete)
-Status: Plan 03 complete — Terminal integrated into dashboard layout with sidebar nav, split/full-height toggle, persistent mount
-Last activity: 2026-02-25 — Plan 21-03 complete (Terminal Dashboard Layout Integration)
+Phase: 22 — Fix node-pty Lazy Load
+Plan: 22-01 (complete)
+Status: Plan 01 complete — Server graceful degradation + frontend error card when node-pty absent
+Last activity: 2026-02-25 — Plan 22-01 complete (Server Graceful Degradation + Frontend Error Card)
 
 Progress: [████░░░░░░] 40% (3/5 phases complete)
 
@@ -83,6 +83,7 @@ Progress: [████░░░░░░] 40% (3/5 phases complete)
 | Phase 21 P01 | 4min | 2 tasks | 7 files |
 | Phase 21 P04 | 2min | 2 tasks | 2 files |
 | Phase 21 P03 | 2min | 1 tasks | 4 files |
+| Phase 22 P01 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -215,5 +216,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 21-03-PLAN.md (Terminal Dashboard Layout Integration)
-Resume file: N/A — Phase 21 plan 03 complete. Next: 21-04 or remaining terminal plans.
+Stopped at: Completed 22-01-PLAN.md (Server Graceful Degradation + Frontend Error Card)
+Resume file: N/A — Phase 22 plan 01 complete.

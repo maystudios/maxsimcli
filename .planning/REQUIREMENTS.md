@@ -35,20 +35,20 @@ All tests use a shared **mock project fixture** — a temp directory with realis
 
 Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture. Tests assert API responses match the mock data files.
 
-- [ ] **DASH-01**: Dashboard server spawns from installed path, starts without errors, `/api/health` returns `{ status: 'ok' }` within 30s
-- [ ] **DASH-02**: `/api/project` returns data matching mock PROJECT.md (project name, core value present)
-- [ ] **DASH-03**: `/api/phases` returns phases array matching mock ROADMAP.md (correct phase count, names, statuses)
-- [ ] **DASH-04**: `/api/state` returns data matching mock STATE.md (decisions, blockers present)
-- [ ] **DASH-05**: `/api/todos` returns todos array matching mock `todos/` directory (pending todos present)
+- [x] **DASH-01**: Dashboard server spawns from installed path, starts without errors, `/api/health` returns `{ status: 'ok' }` within 30s
+- [x] **DASH-02**: `/api/project` returns data matching mock PROJECT.md (project name, core value present)
+- [x] **DASH-03**: `/api/phases` returns phases array matching mock ROADMAP.md (correct phase count, names, statuses)
+- [x] **DASH-04**: `/api/state` returns data matching mock STATE.md (decisions, blockers present)
+- [x] **DASH-05**: `/api/todos` returns todos array matching mock `todos/` directory (pending todos present)
 
 ### Dashboard Write Tests
 
-- [ ] **DASH-06**: Task checkbox toggle via dashboard API (e.g. PATCH /api/phases/:id/tasks/:taskId) updates the corresponding plan `.md` file on disk with `[x]` marking
-- [ ] **DASH-07**: STATE.md edit via dashboard API (PUT /api/state) writes updated content to the mock STATE.md file on disk
+- [x] **DASH-06**: Task checkbox toggle via dashboard API (e.g. PATCH /api/phases/:id/tasks/:taskId) updates the corresponding plan `.md` file on disk with `[x]` marking
+- [x] **DASH-07**: STATE.md edit via dashboard API (PUT /api/state) writes updated content to the mock STATE.md file on disk
 
 ### Dashboard Terminal
 
-- [ ] **DASH-TERM-01**: Terminal tab spawns Claude Code as PTY child process on the server with configurable `--dangerously-skip-permissions` flag
+- [x] **DASH-TERM-01**: Terminal tab spawns Claude Code as PTY child process on the server with configurable `--dangerously-skip-permissions` flag
 - [ ] **DASH-TERM-02**: All stdout/stderr including ANSI escape codes streamed via WebSocket and rendered in xterm.js
 - [ ] **DASH-TERM-03**: Keyboard input forwarded from browser to server process stdin in real-time
 - [ ] **DASH-TERM-04**: Quick-action buttons send predefined MAXSIM slash commands to the running process
@@ -88,15 +88,15 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 | TOOL-04 | Phase 16 | Satisfied |
 | TOOL-05 | Phase 16 | Satisfied |
 | TOOL-06 | Phase 16 | Satisfied |
-| DASH-01 | Phase 17 → Phase 22 | Pending |
-| DASH-02 | Phase 17 → Phase 22 | Pending |
-| DASH-03 | Phase 17 → Phase 22 | Pending |
-| DASH-04 | Phase 17 → Phase 22 | Pending |
-| DASH-05 | Phase 17 → Phase 22 | Pending |
-| DASH-06 | Phase 18 → Phase 22 | Pending |
-| DASH-07 | Phase 18 → Phase 22 | Pending |
+| DASH-01 | Phase 17 → Phase 22 | Complete |
+| DASH-02 | Phase 17 → Phase 22 | Complete |
+| DASH-03 | Phase 17 → Phase 22 | Complete |
+| DASH-04 | Phase 17 → Phase 22 | Complete |
+| DASH-05 | Phase 17 → Phase 22 | Complete |
+| DASH-06 | Phase 18 → Phase 22 | Complete |
+| DASH-07 | Phase 18 → Phase 22 | Complete |
 | CI-01 | Phase 19 → Phase 22 | Pending |
-| DASH-TERM-01 | Phase 21 → Phase 22 | Pending |
+| DASH-TERM-01 | Phase 21 → Phase 22 | Complete |
 | DASH-TERM-02 | Phase 21 | Satisfied |
 | DASH-TERM-03 | Phase 21 | Satisfied |
 | DASH-TERM-04 | Phase 21 | Satisfied |
