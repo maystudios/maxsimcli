@@ -1,3 +1,10 @@
+## [2.0.5](https://github.com/maystudios/maxsim/compare/v2.0.4...v2.0.5) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** copy static assets to packages/dashboard/.next/static/ ([59aa764](https://github.com/maystudios/maxsim/commit/59aa7640aa8a0f1eafc02c55989dc2a11bfb5c49))
+
 ## [2.0.4](https://github.com/maystudios/maxsim/compare/v2.0.3...v2.0.4) (2026-02-25)
 
 
