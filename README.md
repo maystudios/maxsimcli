@@ -192,6 +192,10 @@ Switch with `/maxsim:set-profile <profile>`.
 
 ---
 
+## Acknowledgments
+
+Inspired by [GSD (Get Shit Done)](https://github.com/gsd-build/get-shit-done).
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
