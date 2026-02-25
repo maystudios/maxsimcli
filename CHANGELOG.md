@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/maystudios/maxsim/compare/v2.0.0...v2.0.1) (2026-02-25)
+
+
+### Bug Fixes
+
+* **ci:** remove custom GIT_COMMITTER env vars that break semantic-release GitHub plugin ([ad5a5a6](https://github.com/maystudios/maxsim/commit/ad5a5a6bffa473f633f7719cf2d48635bb28401b))
+
 # [2.0.0](https://github.com/maystudios/maxsim/compare/v1.3.0...v2.0.0) (2026-02-25)
 
 
