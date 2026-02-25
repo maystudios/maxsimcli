@@ -88,6 +88,7 @@ Progress: [████░░░░░░] 40% (3/5 phases complete)
 | Phase 23 P01 | 1min | 2 tasks | 30 files |
 | Phase 23 P02 | 3min | 2 tasks | 4 files |
 | Phase 24 P01 | 1min | 2 tasks | 1 files |
+| Phase 25 P02 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -200,6 +201,7 @@ Recent decisions affecting current work:
 - [Phase 22]: fileParallelism: false in e2e vitest config to prevent dashboard port conflicts
 - [Phase 23]: Removed stale .next and app entries from tsconfig.json exclude during cleanup
 - [Phase 24]: isActive removed from QuickActionBar disabled condition - means activity not running state
+- [Phase 25]: Biome linter enabled with recommended:false; formatter disabled initially for existing codebase compatibility
 
 ### Roadmap Evolution
 
