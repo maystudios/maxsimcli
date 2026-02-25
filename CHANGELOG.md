@@ -1,3 +1,23 @@
+# [2.5.0](https://github.com/maystudios/maxsim/compare/v2.4.2...v2.5.0) (2026-02-25)
+
+
+### Bug Fixes
+
+* **24-01:** remove isActive from QuickActionBar disabled logic ([53a2f9f](https://github.com/maystudios/maxsim/commit/53a2f9f9e0aee4ee713ce16326bed32d2d9f1a44))
+* **25-01:** normalize traceability table statuses to Satisfied ([d177b84](https://github.com/maystudios/maxsim/commit/d177b84c32c37a1302e48517ed020e8dc1626c4a))
+* add missing 25-02-SUMMARY.md to fix pre-push doc consistency check in CI ([19870af](https://github.com/maystudios/maxsim/commit/19870af249308bbab0039dd5ee025a9be114d1e6))
+* handle padding mismatch in phase insert and fix nx test input ([b032abc](https://github.com/maystudios/maxsim/commit/b032abc48c234e22a9a032b6069fc55cb6b07a01))
+
+
+### Features
+
+* **22-01:** add frontend unavailable state, error card, and disabled quick actions ([98014ad](https://github.com/maystudios/maxsim/commit/98014ad43be2d3d6404202406702ea2d7fbde9a7))
+* **22-01:** add server-side graceful degradation when node-pty absent ([f3c4f55](https://github.com/maystudios/maxsim/commit/f3c4f557af57106614ce20805f7654d47b896a12))
+* **23-01:** add dashboard:build to e2e dependsOn ([330a162](https://github.com/maystudios/maxsim/commit/330a1623ef45962adf8959ffff6289d1d7adc800))
+* **23-02:** add pre-push doc consistency hook ([d3d5f8e](https://github.com/maystudios/maxsim/commit/d3d5f8eea5811130da42babdacd34e238a1addde))
+* **25-01:** backfill requirements_completed into v2.0.0 SUMMARY files ([aa687cd](https://github.com/maystudios/maxsim/commit/aa687cd24fd9c10193db7231f3404240cbe7d63d))
+* **25-02:** create pre-push hook with build, lint, docs-check, tests ([b7fead7](https://github.com/maystudios/maxsim/commit/b7fead7f78dea31a189abd529c96965c9ff10459))
+
 ## [2.4.2](https://github.com/maystudios/maxsim/compare/v2.4.1...v2.4.2) (2026-02-25)
 
 
