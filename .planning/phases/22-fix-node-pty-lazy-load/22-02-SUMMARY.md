@@ -23,6 +23,7 @@ decisions:
 metrics:
   duration: "19min"
   completed: "2026-02-25"
+requirements_completed: []
 ---
 
 # Phase 22 Plan 02: E2E Test for Absent node-pty Summary

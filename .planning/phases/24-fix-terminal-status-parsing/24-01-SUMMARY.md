@@ -28,6 +28,7 @@ decisions:
 metrics:
   duration: 1min
   completed: 2026-02-25
+requirements_completed: [DASH-TERM-04]
 ---
 
 # Phase 24 Plan 01: Fix QuickActionBar Disabled Logic Summary

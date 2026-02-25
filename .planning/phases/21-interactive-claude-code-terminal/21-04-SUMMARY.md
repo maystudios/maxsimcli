@@ -30,6 +30,7 @@ requirements-completed: [DASH-TERM-04, DASH-TERM-05]
 
 duration: 2min
 completed: 2026-02-25
+requirements_completed: [DASH-TERM-04, DASH-TERM-05]
 ---
 
 # Phase 21 Plan 04: Quick-Action Bar and Reconnection UX Summary

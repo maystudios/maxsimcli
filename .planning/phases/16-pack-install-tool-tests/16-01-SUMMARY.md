@@ -6,6 +6,7 @@ completed: 2026-02-25
 duration: 5min
 tasks_completed: 2
 files_modified: 3
+requirements_completed: [E2E-02, E2E-04]
 ---
 
 # Plan 16-01 Summary: --version flag + vitest wiring

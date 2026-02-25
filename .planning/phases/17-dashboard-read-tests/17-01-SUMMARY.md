@@ -6,6 +6,7 @@ completed: 2026-02-25
 tasks_total: 2
 tasks_completed: 2
 commits: 2
+requirements_completed: [DASH-01, DASH-02, DASH-03, DASH-04, DASH-05]
 ---
 
 # Summary: Phase 17-01 — Fix Fixture + Write Dashboard E2E Tests

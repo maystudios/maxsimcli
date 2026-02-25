@@ -35,6 +35,7 @@ requirements-completed: [DASH-TERM-02, DASH-TERM-03]
 
 duration: 2min
 completed: 2026-02-25
+requirements_completed: [DASH-TERM-02, DASH-TERM-03]
 ---
 
 # Phase 21 Plan 02: Frontend Terminal Components Summary
