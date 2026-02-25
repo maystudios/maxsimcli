@@ -1,3 +1,17 @@
+# [2.1.0](https://github.com/maystudios/maxsim/compare/v2.0.5...v2.1.0) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** remove non-existent @types/sirv and update lockfile ([b928c4e](https://github.com/maystudios/maxsim/commit/b928c4ea185260f48783d32229446cfb78c82e0c))
+* **dashboard:** rename server.cjs to server.js after tsdown build ([0f9a82f](https://github.com/maystudios/maxsim/commit/0f9a82f6c75317e2fb0ba08adb256fc5b6890e4b))
+* **dashboard:** rename tsdown config to .mts to fix ESM parse error in CI ([a0ee56d](https://github.com/maystudios/maxsim/commit/a0ee56d80d81542c8337f51aa08d147587cf2af7))
+
+
+### Features
+
+* **dashboard:** migrate from Next.js standalone to Vite + Express ([c1f8b0d](https://github.com/maystudios/maxsim/commit/c1f8b0d39e9d4656ae06257be1cddcc3a68aed80))
+
 ## [2.0.5](https://github.com/maystudios/maxsim/compare/v2.0.4...v2.0.5) (2026-02-25)
 
 
