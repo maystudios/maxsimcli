@@ -9,8 +9,12 @@
   "main": "./dist/cli.cjs",
   "types": "./dist/cli.d.cts",
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
+  "scripts": {
+    "prepublishOnly": "node -e \"require('fs').copyFileSync('../../README.md', './README.md')\""
+  },
   "engines": {
     "node": ">=22.0.0"
   },

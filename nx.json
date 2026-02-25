@@ -14,20 +14,6 @@
       }
     },
   ],
-  "release": {
-    "projects": ["cli"],
-    "version": {
-      "conventionalCommits": true,
-      "fallbackCurrentVersionResolver": "disk"
-    },
-    "changelog": {
-      "projectChangelogs": true
-    },
-    "git": {
-      "commit": true,
-      "tag": true
-    }
-  },
   "targetDefaults": {
     "build": {
       "dependsOn": ["^build"],

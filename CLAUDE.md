@@ -141,7 +141,9 @@ The GitHub Actions workflow (`publish.yml`) triggers on every push to `main` and
 | `feat!:` / `fix!:` | major (1.0.8 → 2.0.0) |
 | `chore:`, `docs:`, `test:` | no bump, no publish |
 
-`nx release` analyzes commits since the last git tag, bumps `package.json`, updates `CHANGELOG.md`, creates a git commit and tag, then publishes to npm. **No manual version bumps needed.**
+`semantic-release` analyzes commits since the last git tag, bumps `packages/cli/package.json`, updates `CHANGELOG.md`, creates a GitHub release and git tag, then publishes to npm. **No manual version bumps needed.**
+
+The README at the repo root is automatically copied into `packages/cli/` during `prepublishOnly` so it appears on the npm package page.
 
 ## Key Files for Common Tasks
 
