@@ -146,57 +146,68 @@ var require_core = /* @__PURE__ */ __commonJSMin(((exports) => {
 		"maxsim-planner": {
 			quality: "opus",
 			balanced: "opus",
-			budget: "sonnet"
+			budget: "sonnet",
+			tokenburner: "opus"
 		},
 		"maxsim-roadmapper": {
 			quality: "opus",
 			balanced: "sonnet",
-			budget: "sonnet"
+			budget: "sonnet",
+			tokenburner: "opus"
 		},
 		"maxsim-executor": {
 			quality: "opus",
 			balanced: "sonnet",
-			budget: "sonnet"
+			budget: "sonnet",
+			tokenburner: "opus"
 		},
 		"maxsim-phase-researcher": {
 			quality: "opus",
 			balanced: "sonnet",
-			budget: "haiku"
+			budget: "haiku",
+			tokenburner: "opus"
 		},
 		"maxsim-project-researcher": {
 			quality: "opus",
 			balanced: "sonnet",
-			budget: "haiku"
+			budget: "haiku",
+			tokenburner: "opus"
 		},
 		"maxsim-research-synthesizer": {
 			quality: "sonnet",
 			balanced: "sonnet",
-			budget: "haiku"
+			budget: "haiku",
+			tokenburner: "opus"
 		},
 		"maxsim-debugger": {
 			quality: "opus",
 			balanced: "sonnet",
-			budget: "sonnet"
+			budget: "sonnet",
+			tokenburner: "opus"
 		},
 		"maxsim-codebase-mapper": {
 			quality: "sonnet",
 			balanced: "haiku",
-			budget: "haiku"
+			budget: "haiku",
+			tokenburner: "opus"
 		},
 		"maxsim-verifier": {
 			quality: "sonnet",
 			balanced: "sonnet",
-			budget: "haiku"
+			budget: "haiku",
+			tokenburner: "opus"
 		},
 		"maxsim-plan-checker": {
 			quality: "sonnet",
 			balanced: "sonnet",
-			budget: "haiku"
+			budget: "haiku",
+			tokenburner: "opus"
 		},
 		"maxsim-integration-checker": {
 			quality: "sonnet",
 			balanced: "sonnet",
-			budget: "haiku"
+			budget: "haiku",
+			tokenburner: "opus"
 		}
 	};
 	function output(result, raw, rawValue) {
@@ -3330,7 +3341,8 @@ var require_verify = /* @__PURE__ */ __commonJSMin(((exports) => {
 			const validProfiles = [
 				"quality",
 				"balanced",
-				"budget"
+				"budget",
+				"tokenburner"
 			];
 			if (parsed.model_profile && !validProfiles.includes(parsed.model_profile)) addIssue("warning", "W004", `config.json: invalid model_profile "${parsed.model_profile}"`, `Valid values: ${validProfiles.join(", ")}`);
 		} catch (thrown) {
@@ -5839,6 +5851,19 @@ async function handleDashboard(args) {
 		const config = JSON.parse(node_fs.readFileSync(dashboardConfigPath, "utf8"));
 		if (config.projectCwd) projectCwd = config.projectCwd;
 	} catch {}
+	const ptyModulePath = node_path.join(serverDir, "node_modules", "node-pty");
+	if (!node_fs.existsSync(ptyModulePath)) {
+		console.log("Installing node-pty for terminal support...");
+		try {
+			(0, node_child_process.execSync)("npm install node-pty --save-optional --no-audit --no-fund --loglevel=error", {
+				cwd: serverDir,
+				stdio: "inherit",
+				timeout: 12e4
+			});
+		} catch {
+			console.warn("node-pty installation failed — terminal will be unavailable.");
+		}
+	}
 	console.log("Dashboard starting...");
 	const child = (0, node_child_process.spawn)(runner, runnerArgs, {
 		cwd: serverDir,

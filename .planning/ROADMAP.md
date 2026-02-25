@@ -18,7 +18,9 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 - [x] **Phase 18: Dashboard Write Tests** - Validate task checkbox toggle and STATE.md write APIs update files on disk (completed 2026-02-25)
 - [x] **Phase 19: CI Integration** - Wire E2E suite into GitHub Actions, gate publish on green E2E (completed 2026-02-25)
 - [x] **Phase 20: Dashboard Migrate to Vite + Express** - Replace Next.js standalone with Vite (client build) + tsdown-bundled Express server for reliable npm packaging (completed 2026-02-25)
-- [x] **Phase 21: Interactive Claude Code Terminal** - Browser-based terminal in the dashboard that spawns and controls Claude Code via PTY + WebSocket with xterm.js rendering and session persistence (completed 2026-02-25)
+- [x] **Phase 21: Interactive Claude Code Terminal** - Browser-based terminal in the dashboard that spawns and controls Claude Code via PTY + WebSocket with xterm.js rendering and session persistence (completed 2026-02-25)
+- [ ] **Phase 22: Fix node-pty Delivery (Lazy-Load)** - Lazy-load node-pty so dashboard server starts without native addon; terminal degrades gracefully
+- [ ] **Phase 23: E2E Wiring & Next.js Cleanup** - Add dashboard:build to e2e dependsOn, remove orphaned Next.js files, fix ROADMAP/REQUIREMENTS staleness
 
 ---
 
@@ -129,6 +131,36 @@ Plans:
 - [ ] 21-03-PLAN.md — Terminal tab integration into sidebar and App.tsx with split-panel mode
 - [ ] 21-04-PLAN.md — Quick-action button bar with confirmation, settings, and reconnection polish
 
+### Phase 22: Fix node-pty Delivery (Lazy-Load)
+**Goal**: Dashboard server starts without node-pty native addon present; terminal features degrade gracefully with a clear message instead of crashing the entire server
+**Depends on**: Phase 21
+**Requirements**: DASH-TERM-01, DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06, DASH-07, CI-01
+**Gap Closure**: Closes critical blocker from v2.0 audit — all dashboard functionality broken for end users
+**Success Criteria** (what must be TRUE):
+  1. `node server.js` starts successfully even when `node-pty` is not installed — no crash, no unhandled exception
+  2. All non-terminal API routes (`/api/health`, `/api/project`, `/api/phases`, `/api/state`, `/api/todos`) respond normally
+  3. Terminal WebSocket endpoint returns a graceful error message when node-pty is unavailable instead of crashing
+  4. When node-pty IS available, terminal features work exactly as before
+**Plans**: 0 plans
+
+Plans:
+(none yet)
+
+### Phase 23: E2E Wiring & Next.js Cleanup
+**Goal**: Fix e2e package dependency wiring, remove orphaned Next.js artifacts from Phase 20 migration, and update all stale planning doc statuses
+**Depends on**: Phase 22
+**Requirements**: E2E-01, DOCS-01
+**Gap Closure**: Closes integration and tech debt gaps from v2.0 audit
+**Success Criteria** (what must be TRUE):
+  1. `packages/e2e/project.json` has `dependsOn` including both `cli:build` and `dashboard:build`
+  2. No orphaned Next.js files remain in `packages/dashboard/` (`app/`, `next.config.mjs`, `next-env.d.ts`, `postcss.config.mjs`)
+  3. ROADMAP.md progress table shows correct status for all phases (19, 20 marked Complete)
+  4. REQUIREMENTS.md traceability table includes DASH-TERM-01 through DASH-TERM-05 and has updated phase assignments
+**Plans**: 0 plans
+
+Plans:
+(none yet)
+
 ---
 
 ## Progress
@@ -141,6 +173,8 @@ Plans:
 | 16. Pack + Install + Tool Tests | 3/3 | Complete | 2026-02-25 |
 | 17. Dashboard Read Tests | 1/1 | Complete    | 2026-02-24 |
 | 18. Dashboard Write Tests | 1/1 | Complete | 2026-02-25 |
-| 19. CI Integration | 0/1 | Not started | - |
-| 20. Dashboard Migrate to Vite + Express | 0/2 | Not started | - |
-| 21. Interactive Claude Code Terminal | 4/4 | Complete   | 2026-02-25 |
+| 19. CI Integration | 1/1 | Complete | 2026-02-25 |
+| 20. Dashboard Migrate to Vite + Express | 2/2 | Complete | 2026-02-25 |
+| 21. Interactive Claude Code Terminal | 4/4 | Complete | 2026-02-25 |
+| 22. Fix node-pty Delivery (Lazy-Load) | 0/0 | Not started | - |
+| 23. E2E Wiring & Next.js Cleanup | 0/0 | Not started | - |

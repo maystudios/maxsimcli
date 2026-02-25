@@ -46,6 +46,14 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 - [ ] **DASH-06**: Task checkbox toggle via dashboard API (e.g. PATCH /api/phases/:id/tasks/:taskId) updates the corresponding plan `.md` file on disk with `[x]` marking
 - [ ] **DASH-07**: STATE.md edit via dashboard API (PUT /api/state) writes updated content to the mock STATE.md file on disk
 
+### Dashboard Terminal
+
+- [ ] **DASH-TERM-01**: Terminal tab spawns Claude Code as PTY child process on the server with configurable `--dangerously-skip-permissions` flag
+- [ ] **DASH-TERM-02**: All stdout/stderr including ANSI escape codes streamed via WebSocket and rendered in xterm.js
+- [ ] **DASH-TERM-03**: Keyboard input forwarded from browser to server process stdin in real-time
+- [ ] **DASH-TERM-04**: Quick-action buttons send predefined MAXSIM slash commands to the running process
+- [ ] **DASH-TERM-05**: WebSocket reconnection within 60 seconds reattaches to still-running process with scrollback preserved
+
 ### Planning Cleanup
 
 - [ ] **DOCS-01**: ROADMAP.md phase statuses match actual codebase state — all completed phases marked `[x]`, no stale "In Progress" entries that have shipped
@@ -67,24 +75,29 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 
 ## Traceability
 
-| REQ-ID | Phase | Plans |
-|--------|-------|-------|
-| E2E-01 | Phase 15 | TBD |
-| DOCS-01 | Phase 15 | TBD |
-| E2E-02 | Phase 16 | TBD |
-| E2E-03 | Phase 16 | TBD |
-| E2E-04 | Phase 16 | TBD |
-| TOOL-01 | Phase 16 | TBD |
-| TOOL-02 | Phase 16 | TBD |
-| TOOL-03 | Phase 16 | TBD |
-| TOOL-04 | Phase 16 | TBD |
-| TOOL-05 | Phase 16 | TBD |
-| TOOL-06 | Phase 16 | TBD |
-| DASH-01 | Phase 17 | TBD |
-| DASH-02 | Phase 17 | TBD |
-| DASH-03 | Phase 17 | TBD |
-| DASH-04 | Phase 17 | TBD |
-| DASH-05 | Phase 17 | TBD |
-| DASH-06 | Phase 18 | TBD |
-| DASH-07 | Phase 18 | TBD |
-| CI-01 | Phase 19 | TBD |
+| REQ-ID | Phase | Status |
+|--------|-------|--------|
+| E2E-01 | Phase 15 → Phase 23 | Pending |
+| DOCS-01 | Phase 15 → Phase 23 | Pending |
+| E2E-02 | Phase 16 | Satisfied |
+| E2E-03 | Phase 16 | Satisfied |
+| E2E-04 | Phase 16 | Satisfied |
+| TOOL-01 | Phase 16 | Satisfied |
+| TOOL-02 | Phase 16 | Satisfied |
+| TOOL-03 | Phase 16 | Satisfied |
+| TOOL-04 | Phase 16 | Satisfied |
+| TOOL-05 | Phase 16 | Satisfied |
+| TOOL-06 | Phase 16 | Satisfied |
+| DASH-01 | Phase 17 → Phase 22 | Pending |
+| DASH-02 | Phase 17 → Phase 22 | Pending |
+| DASH-03 | Phase 17 → Phase 22 | Pending |
+| DASH-04 | Phase 17 → Phase 22 | Pending |
+| DASH-05 | Phase 17 → Phase 22 | Pending |
+| DASH-06 | Phase 18 → Phase 22 | Pending |
+| DASH-07 | Phase 18 → Phase 22 | Pending |
+| CI-01 | Phase 19 → Phase 22 | Pending |
+| DASH-TERM-01 | Phase 21 → Phase 22 | Pending |
+| DASH-TERM-02 | Phase 21 | Satisfied |
+| DASH-TERM-03 | Phase 21 | Satisfied |
+| DASH-TERM-04 | Phase 21 | Satisfied |
+| DASH-TERM-05 | Phase 21 | Satisfied |
