@@ -1,3 +1,22 @@
+# [3.0.0](https://github.com/maystudios/maxsim/compare/v2.5.6...v3.0.0) (2026-02-25)
+
+
+* refactor!: flatten monorepo — merge core/adapters/hooks/templates/e2e into cli, remove Nx, switch pnpm to npm ([78f37ad](https://github.com/maystudios/maxsim/commit/78f37ada467876fa7f353fefceb85a503642c82a))
+
+
+### Bug Fixes
+
+* add GSD attribution to README and LICENSE ([44b0b5f](https://github.com/maystudios/maxsim/commit/44b0b5f56f2cec7ea9ff18d4e9abf4517bfa3984))
+* **build:** suppress tsdown inlineOnly warning causing CI exit code 1 ([4aaf606](https://github.com/maystudios/maxsim/commit/4aaf606cfc1051e47571b4cad4fcecb2eba90164))
+* **ci:** update husky pre-push hook from pnpm to npm ([2882c94](https://github.com/maystudios/maxsim/commit/2882c94498e560b6567020e55bf2dec108fe4fbe))
+
+
+### BREAKING CHANGES
+
+* Development now requires npm instead of pnpm. No user-facing changes.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+
 ## [2.5.6](https://github.com/maystudios/maxsim/compare/v2.5.5...v2.5.6) (2026-02-25)
 
 
