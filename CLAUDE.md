@@ -112,7 +112,9 @@ describe('feature', () => {
 
 ## Git Workflow
 
-Always **commit and push** after completing a change. Never leave work only committed locally.
+Always **commit and push** after completing every change — fixes, features, refactors. Never leave work only committed locally. Every push to `main` triggers the CI/CD pipeline which publishes to npm (if the commit prefix warrants a version bump). This is intentional: users install via `npx maxsimcli@latest` and need fixes delivered immediately.
+
+**Rule: No fix or improvement is done until it is pushed and published.**
 
 ### Conventional Commits
 

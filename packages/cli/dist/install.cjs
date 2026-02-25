@@ -6593,6 +6593,32 @@ function getDirName(runtime) {
 	return getAdapter(runtime).dirName;
 }
 /**
+ * Recursively remove a directory, handling Windows read-only file attributes.
+ * fs.rmSync with { force: true } only ignores ENOENT — it does NOT remove
+ * read-only files on Windows (EPERM). We chmod recursively first on EPERM.
+ */
+function safeRmDir(dirPath) {
+	if (!node_fs.existsSync(dirPath)) return;
+	try {
+		node_fs.rmSync(dirPath, { recursive: true, force: true });
+	} catch (e) {
+		if (e.code === 'EPERM' && process.platform === 'win32') {
+			const chmodRecursive = (p) => {
+				try { node_fs.chmodSync(p, 0o666); } catch {}
+				try {
+					for (const entry of node_fs.readdirSync(p, { withFileTypes: true })) {
+						chmodRecursive(node_path.join(p, entry.name));
+					}
+				} catch {}
+			};
+			chmodRecursive(dirPath);
+			node_fs.rmSync(dirPath, { recursive: true, force: true });
+		} else {
+			throw e;
+		}
+	}
+}
+/**
 * Recursively copy a directory (plain copy, no path replacement)
 */
 function copyDirRecursive(src, dest) {
@@ -7437,10 +7463,7 @@ function install(isGlobal, runtime = "claude") {
 			color: "cyan"
 		}).start();
 		const dashboardDest = node_path.join(targetDir, "dashboard");
-		if (node_fs.existsSync(dashboardDest)) node_fs.rmSync(dashboardDest, {
-			recursive: true,
-			force: true
-		});
+		safeRmDir(dashboardDest);
 		copyDirRecursive(dashboardSrc, dashboardDest);
 		hoistPnpmPackages(node_path.join(dashboardDest, "node_modules"));
 		const dashboardConfigDest = node_path.join(targetDir, "dashboard.json");
@@ -7634,10 +7657,7 @@ const subcommand = args.find((a) => !a.startsWith("-"));
 		const installDir = node_path.join(process.cwd(), ".claude");
 		const installDashDir = node_path.join(installDir, "dashboard");
 		if (node_fs.existsSync(dashboardAssetSrc)) {
-			if (node_fs.existsSync(installDashDir)) node_fs.rmSync(installDashDir, {
-				recursive: true,
-				force: true
-			});
+			safeRmDir(installDashDir);
 			node_fs.mkdirSync(installDashDir, { recursive: true });
 			copyDirRecursive(dashboardAssetSrc, installDashDir);
 			hoistPnpmPackages(node_path.join(installDashDir, "node_modules"));

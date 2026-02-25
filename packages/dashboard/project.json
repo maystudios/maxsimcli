@@ -6,10 +6,10 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm run build:standalone",
+        "command": "pnpm run build",
         "cwd": "packages/dashboard"
       },
-      "outputs": ["{projectRoot}/.next", "{projectRoot}/.next/standalone"]
+      "outputs": ["{projectRoot}/dist"]
     },
     "dev": {
       "executor": "nx:run-commands",

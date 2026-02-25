@@ -2,13 +2,12 @@
   "name": "@maxsim/dashboard",
   "version": "0.0.1",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
-    "dev": "node --import tsx server.ts",
-    "build": "next build && npm run build:server",
-    "build:server": "npx tsdown server.ts --format esm --out-dir .server-build --no-clean && node -e \"require('fs').cpSync('.server-build/server.mjs','server.js');require('fs').rmSync('.server-build',{recursive:true,force:true})\"",
-    "build:standalone": "STANDALONE_BUILD=true next build && node -e \"const fs=require('fs');fs.cpSync('.next/static','.next/standalone/.next/static',{recursive:true});if(fs.existsSync('public'))fs.cpSync('public','.next/standalone/public',{recursive:true})\" && (npx tsdown --config tsdown.config.server.ts || test -f .server-build/server.cjs) && node -e \"require('fs').cpSync('.server-build/server.cjs','.next/standalone/server.js');require('fs').rmSync('.server-build',{recursive:true,force:true})\"",
-    "start": "node server.js"
+    "dev": "vite",
+    "build": "vite build && npm run build:server",
+    "build:server": "tsdown --config tsdown.config.server.ts",
+    "start": "node dist/server.js"
   },
   "dependencies": {
     "@codemirror/lang-markdown": "^6",
@@ -19,22 +18,28 @@
     "chokidar": "^4",
     "clsx": "^2",
     "detect-port": "^2",
+    "express": "^4",
     "motion": "^12",
-    "next": "^15",
     "open": "^10",
     "react": "^19",
     "react-dom": "^19",
+    "sirv": "^3",
     "tailwind-merge": "^3",
     "ws": "^8"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@tailwindcss/vite": "^4",
+    "@types/express": "^4",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sirv": "^3",
     "@types/ws": "^8",
+    "@vitejs/plugin-react": "^4",
     "postcss": "^8",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^6"
   }
 }

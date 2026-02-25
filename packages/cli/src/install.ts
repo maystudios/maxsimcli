@@ -27,9 +27,9 @@ import {
   convertClaudeToGeminiAgent,
 } from '@maxsim/adapters';
 
-// Get version from package.json
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pkg = require('../package.json') as { version: string };
+// Get version from package.json — read at runtime so semantic-release's version bump
+// is reflected without needing to rebuild dist/install.cjs after the version bump.
+const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'package.json'), 'utf-8')) as { version: string };
 
 // Resolve template asset root — bundled into dist/assets/templates at publish time
 const templatesRoot = path.resolve(__dirname, 'assets', 'templates');
@@ -60,12 +60,12 @@ if (hasAll) {
 }
 
 /**
- * Walk up from cwd to find the MAXSIM monorepo root (has packages/dashboard)
+ * Walk up from cwd to find the MAXSIM monorepo root (has packages/dashboard/src/server.ts)
  */
 function findMonorepoRoot(startDir: string): string | null {
   let dir = startDir;
   for (let i = 0; i < 10; i++) {
-    if (fs.existsSync(path.join(dir, 'packages', 'dashboard', 'server.ts'))) {
+    if (fs.existsSync(path.join(dir, 'packages', 'dashboard', 'src', 'server.ts'))) {
       return dir;
     }
     const parent = path.dirname(dir);
@@ -114,6 +114,40 @@ function getDirName(runtime: RuntimeName): string {
 }
 
 /**
+ * Recursively remove a directory, handling Windows read-only file attributes.
+ * fs.rmSync with { force: true } only ignores ENOENT — it does NOT remove
+ * read-only files on Windows (EPERM). We chmod recursively first on EPERM.
+ */
+function safeRmDir(dirPath: string): void {
+  if (!fs.existsSync(dirPath)) return;
+  try {
+    fs.rmSync(dirPath, { recursive: true, force: true });
+  } catch (e: any) {
+    if (e.code === 'EPERM' && process.platform === 'win32') {
+      // Strip read-only attributes from every entry, then retry
+      const chmodRecursive = (p: string) => {
+        try {
+          fs.chmodSync(p, 0o666);
+        } catch {
+          /* ignore */
+        }
+        try {
+          for (const entry of fs.readdirSync(p, { withFileTypes: true })) {
+            chmodRecursive(path.join(p, entry.name));
+          }
+        } catch {
+          /* ignore */
+        }
+      };
+      chmodRecursive(dirPath);
+      fs.rmSync(dirPath, { recursive: true, force: true });
+    } else {
+      throw e;
+    }
+  }
+}
+
+/**
  * Recursively copy a directory (plain copy, no path replacement)
  */
 function copyDirRecursive(src: string, dest: string): void {
@@ -124,8 +158,7 @@ function copyDirRecursive(src: string, dest: string): void {
     if (entry.isDirectory()) {
       copyDirRecursive(srcPath, destPath);
     } else if (entry.isSymbolicLink()) {
-      // Dereference symlinks so pnpm virtual-store links become real files/dirs.
-      // This matters for dashboard node_modules which may use pnpm's .pnpm/ store.
+      // Dereference symlinks to avoid broken links at destination
       const target = fs.realpathSync(srcPath);
       const stat = fs.statSync(target);
       if (stat.isDirectory()) {
@@ -135,54 +168,6 @@ function copyDirRecursive(src: string, dest: string): void {
       }
     } else {
       fs.copyFileSync(srcPath, destPath);
-    }
-  }
-}
-
-/**
- * After copying a dashboard directory, hoist packages from the pnpm virtual
- * store (.pnpm/) to the top-level node_modules/ so that require() can find
- * them. Next.js standalone builds on pnpm omit the top-level hoisted symlinks
- * (e.g. node_modules/styled-jsx) so we recreate them as real directories.
- */
-function hoistPnpmPackages(nodeModulesDir: string): void {
-  const pnpmDir = path.join(nodeModulesDir, '.pnpm');
-  if (!fs.existsSync(pnpmDir)) return;
-
-  for (const storeEntry of fs.readdirSync(pnpmDir)) {
-    const innerNM = path.join(pnpmDir, storeEntry, 'node_modules');
-    if (!fs.existsSync(innerNM)) continue;
-
-    for (const pkg of fs.readdirSync(innerNM)) {
-      if (pkg === '.pnpm') continue;
-
-      const pkgSrc = path.join(innerNM, pkg);
-      const pkgDest = path.join(nodeModulesDir, pkg);
-
-      // Skip if already present at top level (first match wins)
-      if (fs.existsSync(pkgDest)) continue;
-
-      try {
-        // Resolve symlinks before checking / copying
-        const realSrc = fs.existsSync(pkgSrc) ? fs.realpathSync(pkgSrc) : pkgSrc;
-        if (!fs.existsSync(realSrc)) continue;
-        const stat = fs.statSync(realSrc);
-
-        if (pkg.startsWith('@') && stat.isDirectory()) {
-          // Scoped package: one level deeper
-          for (const scopedPkg of fs.readdirSync(realSrc)) {
-            const scopedSrc = path.join(realSrc, scopedPkg);
-            const scopedDest = path.join(pkgDest, scopedPkg);
-            if (!fs.existsSync(scopedDest) && fs.statSync(scopedSrc).isDirectory()) {
-              fs.cpSync(scopedSrc, scopedDest, { recursive: true, dereference: true });
-            }
-          }
-        } else if (stat.isDirectory()) {
-          fs.cpSync(realSrc, pkgDest, { recursive: true, dereference: true });
-        }
-      } catch {
-        // Non-fatal: skip packages that can't be hoisted
-      }
     }
   }
 }
@@ -1543,19 +1528,16 @@ function install(
     }
   }
 
-  // Copy dashboard standalone build (if bundled in dist/assets/dashboard/)
+  // Copy dashboard Vite+Express build (if bundled in dist/assets/dashboard/)
+  // The dashboard now ships as: server.js (tsdown-bundled Express) + client/ (Vite static)
+  // No node_modules/ needed at destination — all server deps are bundled inline.
   const dashboardSrc = path.resolve(__dirname, 'assets', 'dashboard');
   if (fs.existsSync(dashboardSrc)) {
     spinner = ora({ text: 'Installing dashboard...', color: 'cyan' }).start();
     const dashboardDest = path.join(targetDir, 'dashboard');
     // Clean existing dashboard to prevent stale files from old installs
-    if (fs.existsSync(dashboardDest)) {
-      fs.rmSync(dashboardDest, { recursive: true, force: true });
-    }
+    safeRmDir(dashboardDest);
     copyDirRecursive(dashboardSrc, dashboardDest);
-    // Hoist any pnpm virtual-store packages that were not at the top level in the
-    // bundle (e.g. styled-jsx in v2.0.2 was only in .pnpm/, not node_modules/).
-    hoistPnpmPackages(path.join(dashboardDest, 'node_modules'));
 
     // Write dashboard.json NEXT TO dashboard/ dir (survives overwrites on upgrade)
     const dashboardConfigDest = path.join(targetDir, 'dashboard.json');
@@ -1888,15 +1870,11 @@ const subcommand = args.find(a => !a.startsWith('-'));
 
     if (fs.existsSync(dashboardAssetSrc)) {
       // Clean existing dashboard dir to prevent stale files from old installs
-      // (e.g. old next/dist/server/*.js clashing with new bundle's dependencies)
-      if (fs.existsSync(installDashDir)) {
-        fs.rmSync(installDashDir, { recursive: true, force: true });
-      }
+      safeRmDir(installDashDir);
       fs.mkdirSync(installDashDir, { recursive: true });
+      // Dashboard is now Vite+Express: server.js (self-contained) + client/ (static)
+      // No node_modules/ hoisting needed — all deps are bundled into server.js by tsdown.
       copyDirRecursive(dashboardAssetSrc, installDashDir);
-      // Hoist pnpm virtual-store packages (e.g. styled-jsx) that may be missing
-      // from the top-level node_modules/ in older npm bundle versions.
-      hoistPnpmPackages(path.join(installDashDir, 'node_modules'));
       // Write/update dashboard.json
       const dashConfigPath = path.join(installDir, 'dashboard.json');
       if (!fs.existsSync(dashConfigPath)) {

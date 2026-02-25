@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowJs": true,
@@ -11,14 +11,9 @@
     "resolveJsonModule": true,
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
       ]
     },
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "lib": [
       "dom",
       "dom.iterable",
@@ -26,16 +21,14 @@
     ]
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "app/**/*",
-    "lib/**/*",
-    "next-env.d.ts",
-    "server.ts",
-    ".next/types/**/*.ts"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "index.html"
   ],
   "exclude": [
     "node_modules",
+    "dist",
+    "app",
     ".next"
   ]
 }

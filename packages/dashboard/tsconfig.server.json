@@ -1,0 +1,26 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "allowJs": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "resolveJsonModule": true,
+    "lib": [
+      "esnext"
+    ]
+  },
+  "include": [
+    "src/server.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/main.tsx",
+    "src/App.tsx",
+    "src/components",
+    "src/hooks"
+  ]
+}

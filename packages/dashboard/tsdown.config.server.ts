@@ -1,28 +1,33 @@
 import { defineConfig } from 'tsdown';
 
 /**
- * Server bundling config for standalone dashboard deployment.
+ * Server bundling config for Vite + Express dashboard deployment.
  *
- * Inlines all custom server dependencies (ws, chokidar, detect-port, open)
- * into a single server.cjs file. Marks `next` as external because it is
- * provided by the standalone-traced node_modules.
+ * Bundles src/server.ts and ALL its dependencies (express, sirv, ws,
+ * chokidar, detect-port, open, @maxsim/core) into a single server.js file.
  *
- * IMPORTANT: Must output CJS format because Next.js standalone places a
- * package.json with "type": "commonjs" in .next/standalone/. ESM output
- * renamed to .js would fail with "Cannot use import statement".
+ * No external dependencies — the output is fully self-contained.
+ * Users run: node dist/server.js
+ * No node_modules/ required at the install destination.
  *
- * Output goes to .server-build/ (intermediate dir) because tsdown cannot
- * use --out-dir . with clean mode without deleting project files.
- * The build:standalone script copies the output to .next/standalone/server.js.
+ * Output goes directly to dist/server.js. The dist/client/ folder (produced
+ * by vite build) is referenced at runtime via path.join(__dirname, 'client').
  */
 export default defineConfig({
-  entry: { server: 'server.ts' },
+  entry: { server: 'src/server.ts' },
   format: 'cjs',
   platform: 'node',
   target: 'es2022',
-  external: ['next'],
-  noExternal: ['ws', 'chokidar', 'detect-port', 'open'],
-  inlineOnly: false,
-  outDir: '.server-build',
+  outDir: 'dist',
   clean: false,
+  tsconfig: 'tsconfig.server.json',
+  noExternal: [
+    'express',
+    'sirv',
+    'ws',
+    'chokidar',
+    'detect-port',
+    'open',
+    '@maxsim/core',
+  ],
 });
