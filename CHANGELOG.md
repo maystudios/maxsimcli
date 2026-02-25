@@ -1,3 +1,10 @@
+## [2.5.4](https://github.com/maystudios/maxsim/compare/v2.5.3...v2.5.4) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** cross-platform compatibility fixes ([9101d90](https://github.com/maystudios/maxsim/commit/9101d90de233ea563227d9477721ac1fb1f39115))
+
 ## [2.5.3](https://github.com/maystudios/maxsim/compare/v2.5.2...v2.5.3) (2026-02-25)
 
 
