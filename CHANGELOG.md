@@ -1,3 +1,10 @@
+## [2.5.1](https://github.com/maystudios/maxsim/compare/v2.5.0...v2.5.1) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** auto-install node-pty and preserve it across refreshes ([12c15a8](https://github.com/maystudios/maxsim/commit/12c15a86b53f3cd62d435142b52c161c9dffc21e))
+
 # [2.5.0](https://github.com/maystudios/maxsim/compare/v2.4.2...v2.5.0) (2026-02-25)
 
 
