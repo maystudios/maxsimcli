@@ -44,7 +44,7 @@ const chalk_1 = __importDefault(require("chalk"));
 const figlet_1 = __importDefault(require("figlet"));
 const ora_1 = __importDefault(require("ora"));
 const prompts_1 = require("@inquirer/prompts");
-const adapters_1 = require("@maxsim/adapters");
+const index_js_1 = require("./adapters/index.js");
 // Get version from package.json — read at runtime so semantic-release's version bump
 // is reflected without needing to rebuild dist/install.cjs after the version bump.
 const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'package.json'), 'utf-8'));
@@ -99,10 +99,10 @@ function findMonorepoRoot(startDir) {
  * Adapter registry keyed by runtime name
  */
 const adapterMap = {
-    claude: adapters_1.claudeAdapter,
-    opencode: adapters_1.opencodeAdapter,
-    gemini: adapters_1.geminiAdapter,
-    codex: adapters_1.codexAdapter,
+    claude: index_js_1.claudeAdapter,
+    opencode: index_js_1.opencodeAdapter,
+    gemini: index_js_1.geminiAdapter,
+    codex: index_js_1.codexAdapter,
 };
 /**
  * Get adapter for a runtime
@@ -198,7 +198,7 @@ function copyDirRecursive(src, dest) {
  * OpenCode follows XDG Base Directory spec
  */
 function getOpencodeGlobalDir() {
-    return adapters_1.opencodeAdapter.getGlobalDir();
+    return index_js_1.opencodeAdapter.getGlobalDir();
 }
 const banner = '\n' +
     chalk_1.default.cyan(figlet_1.default.textSync('MAXSIM', { font: 'ANSI Shadow' })
@@ -261,14 +261,14 @@ function getCommitAttribution(runtime) {
     }
     let result;
     if (runtime === 'opencode') {
-        const config = (0, adapters_1.readSettings)(path.join(getGlobalDir('opencode', null), 'opencode.json'));
+        const config = (0, index_js_1.readSettings)(path.join(getGlobalDir('opencode', null), 'opencode.json'));
         result =
             config.disable_ai_attribution === true
                 ? null
                 : undefined;
     }
     else if (runtime === 'gemini') {
-        const settings = (0, adapters_1.readSettings)(path.join(getGlobalDir('gemini', explicitConfigDir), 'settings.json'));
+        const settings = (0, index_js_1.readSettings)(path.join(getGlobalDir('gemini', explicitConfigDir), 'settings.json'));
         const attr = settings.attribution;
         if (!attr || attr.commit === undefined) {
             result = undefined;
@@ -281,7 +281,7 @@ function getCommitAttribution(runtime) {
         }
     }
     else if (runtime === 'claude') {
-        const settings = (0, adapters_1.readSettings)(path.join(getGlobalDir('claude', explicitConfigDir), 'settings.json'));
+        const settings = (0, index_js_1.readSettings)(path.join(getGlobalDir('claude', explicitConfigDir), 'settings.json'));
         const attr = settings.attribution;
         if (!attr || attr.commit === undefined) {
             result = undefined;
@@ -335,8 +335,8 @@ function copyFlattenedCommands(srcDir, destDir, prefix, pathPrefix, runtime) {
             content = content.replace(globalClaudeRegex, pathPrefix);
             content = content.replace(localClaudeRegex, `./${getDirName(runtime)}/`);
             content = content.replace(opencodeDirRegex, pathPrefix);
-            content = (0, adapters_1.processAttribution)(content, getCommitAttribution(runtime));
-            content = (0, adapters_1.convertClaudeToOpencodeFrontmatter)(content);
+            content = (0, index_js_1.processAttribution)(content, getCommitAttribution(runtime));
+            content = (0, index_js_1.convertClaudeToOpencodeFrontmatter)(content);
             fs.writeFileSync(destPath, content);
         }
     }
@@ -384,8 +384,8 @@ function copyCommandsAsCodexSkills(srcDir, skillsDir, prefix, pathPrefix, runtim
             content = content.replace(globalClaudeRegex, pathPrefix);
             content = content.replace(localClaudeRegex, `./${getDirName(runtime)}/`);
             content = content.replace(codexDirRegex, pathPrefix);
-            content = (0, adapters_1.processAttribution)(content, getCommitAttribution(runtime));
-            content = (0, adapters_1.convertClaudeCommandToCodexSkill)(content, skillName);
+            content = (0, index_js_1.processAttribution)(content, getCommitAttribution(runtime));
+            content = (0, index_js_1.convertClaudeCommandToCodexSkill)(content, skillName);
             fs.writeFileSync(path.join(skillDir, 'SKILL.md'), content);
         }
     }
@@ -416,15 +416,15 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix, runtime, isCommand
             const localClaudeRegex = /\.\/\.claude\//g;
             content = content.replace(globalClaudeRegex, pathPrefix);
             content = content.replace(localClaudeRegex, `./${dirName}/`);
-            content = (0, adapters_1.processAttribution)(content, getCommitAttribution(runtime));
+            content = (0, index_js_1.processAttribution)(content, getCommitAttribution(runtime));
             if (isOpencode) {
-                content = (0, adapters_1.convertClaudeToOpencodeFrontmatter)(content);
+                content = (0, index_js_1.convertClaudeToOpencodeFrontmatter)(content);
                 fs.writeFileSync(destPath, content);
             }
             else if (runtime === 'gemini') {
                 if (isCommand) {
-                    content = (0, adapters_1.stripSubTags)(content);
-                    const tomlContent = (0, adapters_1.convertClaudeToGeminiToml)(content);
+                    content = (0, index_js_1.stripSubTags)(content);
+                    const tomlContent = (0, index_js_1.convertClaudeToGeminiToml)(content);
                     const tomlPath = destPath.replace(/\.md$/, '.toml');
                     fs.writeFileSync(tomlPath, tomlContent);
                 }
@@ -433,7 +433,7 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix, runtime, isCommand
                 }
             }
             else if (isCodex) {
-                content = (0, adapters_1.convertClaudeToCodexMarkdown)(content);
+                content = (0, index_js_1.convertClaudeToCodexMarkdown)(content);
                 fs.writeFileSync(destPath, content);
             }
             else {
@@ -635,7 +635,7 @@ function uninstall(isGlobal, runtime = 'claude') {
     // 6. Clean up settings.json
     const settingsPath = path.join(targetDir, 'settings.json');
     if (fs.existsSync(settingsPath)) {
-        const settings = (0, adapters_1.readSettings)(settingsPath);
+        const settings = (0, index_js_1.readSettings)(settingsPath);
         let settingsModified = false;
         const statusLine = settings.statusLine;
         if (statusLine &&
@@ -687,7 +687,7 @@ function uninstall(isGlobal, runtime = 'claude') {
             delete settings.hooks;
         }
         if (settingsModified) {
-            (0, adapters_1.writeSettings)(settingsPath, settings);
+            (0, index_js_1.writeSettings)(settingsPath, settings);
             removedCount++;
         }
     }
@@ -1168,15 +1168,15 @@ function install(isGlobal, runtime = 'claude') {
                 let content = fs.readFileSync(path.join(agentsSrc, entry.name), 'utf8');
                 const dirRegex = /~\/\.claude\//g;
                 content = content.replace(dirRegex, pathPrefix);
-                content = (0, adapters_1.processAttribution)(content, getCommitAttribution(runtime));
+                content = (0, index_js_1.processAttribution)(content, getCommitAttribution(runtime));
                 if (isOpencode) {
-                    content = (0, adapters_1.convertClaudeToOpencodeFrontmatter)(content);
+                    content = (0, index_js_1.convertClaudeToOpencodeFrontmatter)(content);
                 }
                 else if (isGemini) {
-                    content = (0, adapters_1.convertClaudeToGeminiAgent)(content);
+                    content = (0, index_js_1.convertClaudeToGeminiAgent)(content);
                 }
                 else if (isCodex) {
-                    content = (0, adapters_1.convertClaudeToCodexMarkdown)(content);
+                    content = (0, index_js_1.convertClaudeToCodexMarkdown)(content);
                 }
                 fs.writeFileSync(path.join(agentsDest, entry.name), content);
             }
@@ -1318,15 +1318,15 @@ function install(isGlobal, runtime = 'claude') {
     }
     // Configure statusline and hooks in settings.json
     const settingsPath = path.join(targetDir, 'settings.json');
-    const settings = cleanupOrphanedHooks((0, adapters_1.readSettings)(settingsPath));
+    const settings = cleanupOrphanedHooks((0, index_js_1.readSettings)(settingsPath));
     const statuslineCommand = isGlobal
-        ? (0, adapters_1.buildHookCommand)(targetDir, 'maxsim-statusline.js')
+        ? (0, index_js_1.buildHookCommand)(targetDir, 'maxsim-statusline.js')
         : 'node ' + dirName + '/hooks/maxsim-statusline.js';
     const updateCheckCommand = isGlobal
-        ? (0, adapters_1.buildHookCommand)(targetDir, 'maxsim-check-update.js')
+        ? (0, index_js_1.buildHookCommand)(targetDir, 'maxsim-check-update.js')
         : 'node ' + dirName + '/hooks/maxsim-check-update.js';
     const contextMonitorCommand = isGlobal
-        ? (0, adapters_1.buildHookCommand)(targetDir, 'maxsim-context-monitor.js')
+        ? (0, index_js_1.buildHookCommand)(targetDir, 'maxsim-context-monitor.js')
         : 'node ' + dirName + '/hooks/maxsim-context-monitor.js';
     // Enable experimental agents for Gemini CLI
     if (isGemini) {
@@ -1395,7 +1395,7 @@ function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallS
         console.log(`  ${chalk_1.default.green('\u2713')} Configured statusline`);
     }
     if (!isCodex && settingsPath && settings) {
-        (0, adapters_1.writeSettings)(settingsPath, settings);
+        (0, index_js_1.writeSettings)(settingsPath, settings);
     }
     if (isOpencode) {
         configureOpencodePermissions(isGlobal);

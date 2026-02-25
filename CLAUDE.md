@@ -9,19 +9,46 @@ MAXSIM is a meta-prompting, context engineering, and spec-driven development sys
 ## Commands
 
 ```bash
-# Run all tests
+# Build all (cli + dashboard) — required before pushing
+npm run build
+
+# Build CLI only
+npm run build:cli
+
+# Build dashboard only
+npm run build:dashboard
+
+# Run unit tests
 npm test
 
-# Run a single test file
-node --test tests/phase.test.cjs
+# Run e2e tests (requires build first)
+cd packages/cli && npx vitest run --config vitest.e2e.config.ts
 
-# Build compiled hooks (required before publishing)
-npm run build:hooks
+# Run a single test file
+cd packages/cli && npx vitest run tests/pack.test.ts
+
+# Lint (Biome)
+npm run lint
+
+# Run dashboard dev server
+cd packages/dashboard && npm run dev
 ```
 
-Tests use Node.js built-in `node:test` — no test framework to install.
+Tests use Vitest. The `packages/cli` package contains all test suites.
 
 ## Architecture
+
+### Monorepo Structure
+
+This is an **npm workspaces** monorepo with 3 packages:
+
+| Package | Role |
+|---------|------|
+| `packages/cli` | Main package, published as `maxsimcli` to npm. Contains all core logic, adapters, hooks, CLI router, and installer. |
+| `packages/dashboard` | Vite+React frontend + Express backend. Bundled into cli's `dist/assets/dashboard/` at build time. |
+| `packages/website` | Marketing website (separate, not part of npm publish). |
+
+Static assets (markdown commands, agents, workflows) live in `templates/` at the repo root.
 
 ### Delivery Mechanism
 
@@ -34,32 +61,50 @@ The "runtime" for MAXSIM commands is the AI itself — commands are markdown pro
 ### Three-Layer Structure
 
 ```
-commands/maxsim/*.md       ← User-facing command specs (30 files, user types /maxsim:*)
-maxsim/workflows/*.md      ← Implementation workflows (loaded via @path references)
-agents/*.md                ← Specialized subagent prompts (11 agents)
+templates/commands/maxsim/*.md  ← User-facing command specs (30+ files, user types /maxsim:*)
+templates/workflows/*.md        ← Implementation workflows (loaded via @path references)
+templates/agents/*.md           ← Specialized subagent prompts (11 agents)
 ```
 
-Commands load workflows which spawn agents. Agents call `maxsim-tools.cjs` via the Bash tool.
+Commands load workflows which spawn agents. Agents call `cli.cjs` (the tools router) via the Bash tool.
 
-### The Tools Layer
+### CLI Source Layout
 
-`maxsim/bin/maxsim-tools.cjs` is the main CLI router — it dispatches to 11 lib modules:
+All business logic lives in `packages/cli/src/`:
+
+```
+src/
+├── cli.ts           ← Tools router (150+ commands, dispatches to core modules)
+├── install.ts       ← npm install orchestration (runtime selection, file copying)
+├── core/            ← Shared utilities (types, config, state, phase, roadmap, verify, etc.)
+├── adapters/        ← Runtime adapters (Claude, OpenCode, Gemini, Codex)
+└── hooks/           ← Compiled CLI hooks (statusline, context monitor, update check)
+```
+
+The core modules in `src/core/`:
 
 | Module | Responsibility |
 |--------|---------------|
-| `core.cjs` | Constants, git helpers, model resolution, phase sorting |
-| `state.cjs` | STATE.md CRUD, decisions, blockers, metrics |
-| `phase.cjs` | Phase add/insert/remove/complete lifecycle |
-| `roadmap.cjs` | Roadmap parsing, phase analysis |
-| `verify.cjs` | Plan structure and completeness checks |
-| `config.cjs` | `.planning/config.json` loading with defaults |
-| `init.cjs` | Context assembly for each workflow type |
-| `template.cjs` | Template scaffolding and filling |
-| `milestone.cjs` | Milestone completion and archiving |
-| `commands.cjs` | Utilities: slugs, timestamps, todos, history |
-| `frontmatter.cjs` | YAML frontmatter parsing |
+| `core.ts` | Constants, git helpers, model resolution, phase sorting |
+| `state.ts` | STATE.md CRUD, decisions, blockers, metrics |
+| `phase.ts` | Phase add/insert/remove/complete lifecycle |
+| `roadmap.ts` | Roadmap parsing, phase analysis |
+| `verify.ts` | Plan structure and completeness checks |
+| `config.ts` | `.planning/config.json` loading with defaults |
+| `init.ts` | Context assembly for each workflow type |
+| `template.ts` | Template scaffolding and filling |
+| `milestone.ts` | Milestone completion and archiving |
+| `commands.ts` | Utilities: slugs, timestamps, todos, history |
+| `frontmatter.ts` | YAML frontmatter parsing |
 
 Large outputs (>50KB) are written to a tmpfile and returned as `@file:/path` — this prevents overflow of the Claude Code Bash buffer.
+
+### Build Pipeline
+
+1. **tsdown** bundles `src/install.ts` → `dist/install.cjs` and `src/cli.ts` → `dist/cli.cjs`
+2. **tsdown** also builds hooks from `src/hooks/` → `dist/assets/hooks/*.cjs`
+3. **copy-assets.cjs** copies templates, dashboard build, CHANGELOG, and README into `dist/assets/`
+4. Dashboard builds separately: Vite (client) + tsdown (server) → `dist/client/` + `dist/server.js`
 
 ### Data Structure in User Projects
 
@@ -85,40 +130,28 @@ MAXSIM creates a `.planning/` directory in user projects:
 
 ### Phase Numbering
 
-Phases support decimal and letter suffixes: `01`, `01A`, `01B`, `01.1`, `01.2`. Sort order: `01 < 01A < 01B < 01.1`. The `normalizePhaseName()` and `comparePhaseNum()` functions in `core.cjs` handle this.
+Phases support decimal and letter suffixes: `01`, `01A`, `01B`, `01.1`, `01.2`. Sort order: `01 < 01A < 01B < 01.1`. The `normalizePhaseName()` and `comparePhaseNum()` functions in `core.ts` handle this.
+
+### Dashboard Package
+
+`packages/dashboard` is a Vite+React frontend with an Express backend (`server.ts`). It bundles to `dist/assets/dashboard/` in the CLI package and is served by `node .claude/dashboard/server.js` after install. It uses xterm.js for terminal emulation and WebSockets for real-time updates. Dashboard resolves `@maxsim/core` via path alias to `../cli/src/core/`.
 
 ### Model Profiles
 
-Config `model_profile` maps to Claude models per agent type. Defined in `core.cjs` as `MODEL_PROFILES`. Three tiers: `quality`, `balanced`, `budget`. Orchestrators use leaner models; planners/executors/debuggers use heavier models.
+Config `model_profile` maps to Claude models per agent type. Defined in `core.ts` as `MODEL_PROFILES`. Three tiers: `quality`, `balanced`, `budget`. Orchestrators use leaner models; planners/executors/debuggers use heavier models.
 
 ## Testing Patterns
 
-Tests use `createTempProject()` from `tests/helpers.cjs` which creates a temp dir with `.planning/phases/`. Tests call `runMaxsimTools(args, cwd)` which executes `maxsim/bin/maxsim-tools.cjs` directly via `execSync`.
-
-```javascript
-const { runMaxsimTools, createTempProject, cleanup } = require('./helpers.cjs');
-
-describe('feature', () => {
-  let tmpDir;
-  beforeEach(() => { tmpDir = createTempProject(); });
-  afterEach(() => { cleanup(tmpDir); });
-
-  test('does something', () => {
-    const result = runMaxsimTools('command args', tmpDir);
-    assert.ok(result.success);
-  });
-});
-```
+Tests live in `packages/cli/tests/` and use Vitest:
+- **Unit tests** (`vitest.config.ts`): `pack.test.ts` validates npm tarball contents
+- **E2E tests** (`vitest.e2e.config.ts`): install, tools, and dashboard integration tests in `tests/e2e/`
 
 ## Pre-Push Build Verification
 
-**MANDATORY: Always run `pnpm run build` locally and confirm it succeeds before pushing to `main`.**
-
-The CI pipeline runs `pnpm run build` before publishing. If the build fails in CI, the release is blocked and users get broken versions. Catching failures locally is always faster.
+**MANDATORY: Always run `npm run build` locally and confirm it succeeds before pushing to `main`.**
 
 ```bash
-# Run before every push — must complete with "Successfully ran target build for N projects"
-pnpm run build
+npm run build
 ```
 
 If the build fails: fix the issue, re-run the build to confirm it passes, then push.
@@ -158,13 +191,12 @@ The GitHub Actions workflow (`publish.yml`) triggers on every push to `main` and
 
 `semantic-release` analyzes commits since the last git tag, bumps `packages/cli/package.json`, updates `CHANGELOG.md`, creates a GitHub release and git tag, then publishes to npm. **No manual version bumps needed.**
 
-The README at the repo root is automatically copied into `packages/cli/` during `prepublishOnly` so it appears on the npm package page.
-
 ## Key Files for Common Tasks
 
-- **Adding a new tool command:** `maxsim/bin/maxsim-tools.cjs` (dispatch switch), then the relevant lib module
-- **Adding a new workflow:** `maxsim/workflows/`, reference it from `commands/maxsim/`
-- **Adding a new agent:** `agents/` directory
-- **Changing model assignments:** `MODEL_PROFILES` in `maxsim/bin/lib/core.cjs`
-- **Changing install behavior:** `bin/install.js`
-- **Hook compilation:** `scripts/build-hooks.js` → outputs to `hooks/dist/`
+- **Adding a new tool command:** `packages/cli/src/cli.ts` (dispatch switch), then the relevant module in `src/core/`
+- **Adding a new workflow:** `templates/workflows/`, reference it from `templates/commands/maxsim/`
+- **Adding a new agent:** `templates/agents/` directory
+- **Changing model assignments:** `MODEL_PROFILES` in `packages/cli/src/core/core.ts`
+- **Changing install behavior:** `packages/cli/src/install.ts`
+- **Adding/modifying hooks:** `packages/cli/src/hooks/`
+- **Dashboard development:** `packages/dashboard/src/`

@@ -12,6 +12,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@maxsim/core": [
+        "../cli/src/core/index.ts"
       ]
     },
     "lib": [

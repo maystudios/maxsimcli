@@ -34,4 +34,7 @@ export default defineConfig({
     'open',
     '@maxsim/core',
   ],
+  alias: {
+    '@maxsim/core': '../cli/src/core/index.ts',
+  },
 });

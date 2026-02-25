@@ -4,15 +4,6 @@
   "files": [],
   "references": [
     {
-      "path": "./packages/adapters"
-    },
-    {
-      "path": "./packages/hooks"
-    },
-    {
-      "path": "./packages/core"
-    },
-    {
       "path": "./packages/cli"
     }
   ]

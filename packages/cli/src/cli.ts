@@ -16,7 +16,7 @@ import * as os from 'node:os';
 import { spawn, execSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 
-import type { TimestampFormat } from '@maxsim/core';
+import type { TimestampFormat } from './core/index.js';
 
 import {
   // Core
@@ -105,7 +105,7 @@ import {
   cmdInitMilestoneOp,
   cmdInitMapCodebase,
   cmdInitProgress,
-} from '@maxsim/core';
+} from './core/index.js';
 
 /** Helper: extract a named flag's value from args, returning null if absent */
 function getFlag(args: string[], flag: string): string | null {

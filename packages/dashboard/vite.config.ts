@@ -19,6 +19,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
+      '@maxsim/core': path.resolve(__dirname, '../cli/src/core/index.ts'),
     },
   },
 });

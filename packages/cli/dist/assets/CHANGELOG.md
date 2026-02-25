@@ -1,3 +1,24 @@
+## [2.5.5](https://github.com/maystudios/maxsim/compare/v2.5.4...v2.5.5) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** resolve claude executable path on Windows ([18261ea](https://github.com/maystudios/maxsim/commit/18261eafb20dfab82bc4d864d35dcbb550320027))
+
+## [2.5.4](https://github.com/maystudios/maxsim/compare/v2.5.3...v2.5.4) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** cross-platform compatibility fixes ([9101d90](https://github.com/maystudios/maxsim/commit/9101d90de233ea563227d9477721ac1fb1f39115))
+
+## [2.5.3](https://github.com/maystudios/maxsim/compare/v2.5.2...v2.5.3) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** make state section append robust and add server logging ([dd19326](https://github.com/maystudios/maxsim/commit/dd193265ac694c1fe522a4b20da0e55245ca0b73))
+
 ## [2.5.2](https://github.com/maystudios/maxsim/compare/v2.5.1...v2.5.2) (2026-02-25)
 
 

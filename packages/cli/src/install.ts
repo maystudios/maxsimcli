@@ -8,7 +8,7 @@ import figlet from 'figlet';
 import ora from 'ora';
 import { select, checkbox, confirm } from '@inquirer/prompts';
 
-import type { RuntimeName, AdapterConfig } from '@maxsim/adapters';
+import type { RuntimeName, AdapterConfig } from './adapters/index.js';
 import {
   claudeAdapter,
   opencodeAdapter,
@@ -25,7 +25,7 @@ import {
   convertClaudeToCodexMarkdown,
   stripSubTags,
   convertClaudeToGeminiAgent,
-} from '@maxsim/adapters';
+} from './adapters/index.js';
 
 // Get version from package.json — read at runtime so semantic-release's version bump
 // is reflected without needing to rebuild dist/install.cjs after the version bump.

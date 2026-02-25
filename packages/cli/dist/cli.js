@@ -49,23 +49,23 @@ const path = __importStar(require("node:path"));
 const os = __importStar(require("node:os"));
 const node_child_process_1 = require("node:child_process");
 const node_module_1 = require("node:module");
-const core_1 = require("@maxsim/core");
+const index_js_1 = require("./core/index.js");
 /** Helper: extract a named flag's value from args, returning null if absent */
 function getFlag(args, flag) {
     const idx = args.indexOf(flag);
     return idx !== -1 ? args[idx + 1] : null;
 }
 // Namespace groupings for readability (mirrors original CJS structure)
-const state = { cmdStateLoad: core_1.cmdStateLoad, cmdStateGet: core_1.cmdStateGet, cmdStatePatch: core_1.cmdStatePatch, cmdStateUpdate: core_1.cmdStateUpdate, cmdStateAdvancePlan: core_1.cmdStateAdvancePlan, cmdStateRecordMetric: core_1.cmdStateRecordMetric, cmdStateUpdateProgress: core_1.cmdStateUpdateProgress, cmdStateAddDecision: core_1.cmdStateAddDecision, cmdStateAddBlocker: core_1.cmdStateAddBlocker, cmdStateResolveBlocker: core_1.cmdStateResolveBlocker, cmdStateRecordSession: core_1.cmdStateRecordSession, cmdStateSnapshot: core_1.cmdStateSnapshot, stateExtractField: core_1.stateExtractField, stateReplaceField: core_1.stateReplaceField };
-const phase = { cmdPhasesList: core_1.cmdPhasesList, cmdPhaseNextDecimal: core_1.cmdPhaseNextDecimal, cmdFindPhase: core_1.cmdFindPhase, cmdPhasePlanIndex: core_1.cmdPhasePlanIndex, cmdPhaseAdd: core_1.cmdPhaseAdd, cmdPhaseInsert: core_1.cmdPhaseInsert, cmdPhaseRemove: core_1.cmdPhaseRemove, cmdPhaseComplete: core_1.cmdPhaseComplete };
-const roadmap = { cmdRoadmapGetPhase: core_1.cmdRoadmapGetPhase, cmdRoadmapAnalyze: core_1.cmdRoadmapAnalyze, cmdRoadmapUpdatePlanProgress: core_1.cmdRoadmapUpdatePlanProgress };
-const verify = { cmdVerifySummary: core_1.cmdVerifySummary, cmdVerifyPlanStructure: core_1.cmdVerifyPlanStructure, cmdVerifyPhaseCompleteness: core_1.cmdVerifyPhaseCompleteness, cmdVerifyReferences: core_1.cmdVerifyReferences, cmdVerifyCommits: core_1.cmdVerifyCommits, cmdVerifyArtifacts: core_1.cmdVerifyArtifacts, cmdVerifyKeyLinks: core_1.cmdVerifyKeyLinks, cmdValidateConsistency: core_1.cmdValidateConsistency, cmdValidateHealth: core_1.cmdValidateHealth };
-const config = { cmdConfigEnsureSection: core_1.cmdConfigEnsureSection, cmdConfigSet: core_1.cmdConfigSet, cmdConfigGet: core_1.cmdConfigGet };
-const template = { cmdTemplateSelect: core_1.cmdTemplateSelect, cmdTemplateFill: core_1.cmdTemplateFill };
-const milestone = { cmdRequirementsMarkComplete: core_1.cmdRequirementsMarkComplete, cmdMilestoneComplete: core_1.cmdMilestoneComplete };
-const commands = { cmdGenerateSlug: core_1.cmdGenerateSlug, cmdCurrentTimestamp: core_1.cmdCurrentTimestamp, cmdListTodos: core_1.cmdListTodos, cmdVerifyPathExists: core_1.cmdVerifyPathExists, cmdHistoryDigest: core_1.cmdHistoryDigest, cmdResolveModel: core_1.cmdResolveModel, cmdCommit: core_1.cmdCommit, cmdSummaryExtract: core_1.cmdSummaryExtract, cmdWebsearch: core_1.cmdWebsearch, cmdProgressRender: core_1.cmdProgressRender, cmdTodoComplete: core_1.cmdTodoComplete, cmdScaffold: core_1.cmdScaffold };
-const init = { cmdInitExecutePhase: core_1.cmdInitExecutePhase, cmdInitPlanPhase: core_1.cmdInitPlanPhase, cmdInitNewProject: core_1.cmdInitNewProject, cmdInitNewMilestone: core_1.cmdInitNewMilestone, cmdInitQuick: core_1.cmdInitQuick, cmdInitResume: core_1.cmdInitResume, cmdInitVerifyWork: core_1.cmdInitVerifyWork, cmdInitPhaseOp: core_1.cmdInitPhaseOp, cmdInitTodos: core_1.cmdInitTodos, cmdInitMilestoneOp: core_1.cmdInitMilestoneOp, cmdInitMapCodebase: core_1.cmdInitMapCodebase, cmdInitProgress: core_1.cmdInitProgress };
-const frontmatter = { cmdFrontmatterGet: core_1.cmdFrontmatterGet, cmdFrontmatterSet: core_1.cmdFrontmatterSet, cmdFrontmatterMerge: core_1.cmdFrontmatterMerge, cmdFrontmatterValidate: core_1.cmdFrontmatterValidate, extractFrontmatter: core_1.extractFrontmatter, reconstructFrontmatter: core_1.reconstructFrontmatter, spliceFrontmatter: core_1.spliceFrontmatter, parseMustHavesBlock: core_1.parseMustHavesBlock, FRONTMATTER_SCHEMAS: core_1.FRONTMATTER_SCHEMAS };
+const state = { cmdStateLoad: index_js_1.cmdStateLoad, cmdStateGet: index_js_1.cmdStateGet, cmdStatePatch: index_js_1.cmdStatePatch, cmdStateUpdate: index_js_1.cmdStateUpdate, cmdStateAdvancePlan: index_js_1.cmdStateAdvancePlan, cmdStateRecordMetric: index_js_1.cmdStateRecordMetric, cmdStateUpdateProgress: index_js_1.cmdStateUpdateProgress, cmdStateAddDecision: index_js_1.cmdStateAddDecision, cmdStateAddBlocker: index_js_1.cmdStateAddBlocker, cmdStateResolveBlocker: index_js_1.cmdStateResolveBlocker, cmdStateRecordSession: index_js_1.cmdStateRecordSession, cmdStateSnapshot: index_js_1.cmdStateSnapshot, stateExtractField: index_js_1.stateExtractField, stateReplaceField: index_js_1.stateReplaceField };
+const phase = { cmdPhasesList: index_js_1.cmdPhasesList, cmdPhaseNextDecimal: index_js_1.cmdPhaseNextDecimal, cmdFindPhase: index_js_1.cmdFindPhase, cmdPhasePlanIndex: index_js_1.cmdPhasePlanIndex, cmdPhaseAdd: index_js_1.cmdPhaseAdd, cmdPhaseInsert: index_js_1.cmdPhaseInsert, cmdPhaseRemove: index_js_1.cmdPhaseRemove, cmdPhaseComplete: index_js_1.cmdPhaseComplete };
+const roadmap = { cmdRoadmapGetPhase: index_js_1.cmdRoadmapGetPhase, cmdRoadmapAnalyze: index_js_1.cmdRoadmapAnalyze, cmdRoadmapUpdatePlanProgress: index_js_1.cmdRoadmapUpdatePlanProgress };
+const verify = { cmdVerifySummary: index_js_1.cmdVerifySummary, cmdVerifyPlanStructure: index_js_1.cmdVerifyPlanStructure, cmdVerifyPhaseCompleteness: index_js_1.cmdVerifyPhaseCompleteness, cmdVerifyReferences: index_js_1.cmdVerifyReferences, cmdVerifyCommits: index_js_1.cmdVerifyCommits, cmdVerifyArtifacts: index_js_1.cmdVerifyArtifacts, cmdVerifyKeyLinks: index_js_1.cmdVerifyKeyLinks, cmdValidateConsistency: index_js_1.cmdValidateConsistency, cmdValidateHealth: index_js_1.cmdValidateHealth };
+const config = { cmdConfigEnsureSection: index_js_1.cmdConfigEnsureSection, cmdConfigSet: index_js_1.cmdConfigSet, cmdConfigGet: index_js_1.cmdConfigGet };
+const template = { cmdTemplateSelect: index_js_1.cmdTemplateSelect, cmdTemplateFill: index_js_1.cmdTemplateFill };
+const milestone = { cmdRequirementsMarkComplete: index_js_1.cmdRequirementsMarkComplete, cmdMilestoneComplete: index_js_1.cmdMilestoneComplete };
+const commands = { cmdGenerateSlug: index_js_1.cmdGenerateSlug, cmdCurrentTimestamp: index_js_1.cmdCurrentTimestamp, cmdListTodos: index_js_1.cmdListTodos, cmdVerifyPathExists: index_js_1.cmdVerifyPathExists, cmdHistoryDigest: index_js_1.cmdHistoryDigest, cmdResolveModel: index_js_1.cmdResolveModel, cmdCommit: index_js_1.cmdCommit, cmdSummaryExtract: index_js_1.cmdSummaryExtract, cmdWebsearch: index_js_1.cmdWebsearch, cmdProgressRender: index_js_1.cmdProgressRender, cmdTodoComplete: index_js_1.cmdTodoComplete, cmdScaffold: index_js_1.cmdScaffold };
+const init = { cmdInitExecutePhase: index_js_1.cmdInitExecutePhase, cmdInitPlanPhase: index_js_1.cmdInitPlanPhase, cmdInitNewProject: index_js_1.cmdInitNewProject, cmdInitNewMilestone: index_js_1.cmdInitNewMilestone, cmdInitQuick: index_js_1.cmdInitQuick, cmdInitResume: index_js_1.cmdInitResume, cmdInitVerifyWork: index_js_1.cmdInitVerifyWork, cmdInitPhaseOp: index_js_1.cmdInitPhaseOp, cmdInitTodos: index_js_1.cmdInitTodos, cmdInitMilestoneOp: index_js_1.cmdInitMilestoneOp, cmdInitMapCodebase: index_js_1.cmdInitMapCodebase, cmdInitProgress: index_js_1.cmdInitProgress };
+const frontmatter = { cmdFrontmatterGet: index_js_1.cmdFrontmatterGet, cmdFrontmatterSet: index_js_1.cmdFrontmatterSet, cmdFrontmatterMerge: index_js_1.cmdFrontmatterMerge, cmdFrontmatterValidate: index_js_1.cmdFrontmatterValidate, extractFrontmatter: index_js_1.extractFrontmatter, reconstructFrontmatter: index_js_1.reconstructFrontmatter, spliceFrontmatter: index_js_1.spliceFrontmatter, parseMustHavesBlock: index_js_1.parseMustHavesBlock, FRONTMATTER_SCHEMAS: index_js_1.FRONTMATTER_SCHEMAS };
 // ─── CLI Router ───────────────────────────────────────────────────────────────
 async function main() {
     const args = process.argv.slice(2);
@@ -76,19 +76,19 @@ async function main() {
     if (cwdEqArg) {
         const value = cwdEqArg.slice('--cwd='.length).trim();
         if (!value)
-            (0, core_1.error)('Missing value for --cwd');
+            (0, index_js_1.error)('Missing value for --cwd');
         args.splice(args.indexOf(cwdEqArg), 1);
         cwd = path.resolve(value);
     }
     else if (cwdIdx !== -1) {
         const value = args[cwdIdx + 1];
         if (!value || value.startsWith('--'))
-            (0, core_1.error)('Missing value for --cwd');
+            (0, index_js_1.error)('Missing value for --cwd');
         args.splice(cwdIdx, 2);
         cwd = path.resolve(value);
     }
     if (!fs.existsSync(cwd) || !fs.statSync(cwd).isDirectory()) {
-        (0, core_1.error)(`Invalid --cwd: ${cwd}`);
+        (0, index_js_1.error)(`Invalid --cwd: ${cwd}`);
     }
     const rawIndex = args.indexOf('--raw');
     const raw = rawIndex !== -1;
@@ -96,7 +96,7 @@ async function main() {
         args.splice(rawIndex, 1);
     const command = args[0];
     if (!command) {
-        (0, core_1.error)('Usage: maxsim-tools <command> [args] [--raw] [--cwd <path>]\nCommands: state, resolve-model, find-phase, commit, verify-summary, verify, frontmatter, template, generate-slug, current-timestamp, list-todos, verify-path-exists, config-ensure-section, init');
+        (0, index_js_1.error)('Usage: maxsim-tools <command> [args] [--raw] [--cwd <path>]\nCommands: state, resolve-model, find-phase, commit, verify-summary, verify, frontmatter, template, generate-slug, current-timestamp, list-todos, verify-path-exists, config-ensure-section, init');
     }
     switch (command) {
         case 'state': {
@@ -224,7 +224,7 @@ async function main() {
                 }, raw);
             }
             else {
-                (0, core_1.error)('Unknown template subcommand. Available: select, fill');
+                (0, index_js_1.error)('Unknown template subcommand. Available: select, fill');
             }
             break;
         }
@@ -245,7 +245,7 @@ async function main() {
                 frontmatter.cmdFrontmatterValidate(cwd, file, getFlag(args, '--schema'), raw);
             }
             else {
-                (0, core_1.error)('Unknown frontmatter subcommand. Available: get, set, merge, validate');
+                (0, index_js_1.error)('Unknown frontmatter subcommand. Available: get, set, merge, validate');
             }
             break;
         }
@@ -270,7 +270,7 @@ async function main() {
                 verify.cmdVerifyKeyLinks(cwd, args[2], raw);
             }
             else {
-                (0, core_1.error)('Unknown verify subcommand. Available: plan-structure, phase-completeness, references, commits, artifacts, key-links');
+                (0, index_js_1.error)('Unknown verify subcommand. Available: plan-structure, phase-completeness, references, commits, artifacts, key-links');
             }
             break;
         }
@@ -319,7 +319,7 @@ async function main() {
                 phase.cmdPhasesList(cwd, options, raw);
             }
             else {
-                (0, core_1.error)('Unknown phases subcommand. Available: list');
+                (0, index_js_1.error)('Unknown phases subcommand. Available: list');
             }
             break;
         }
@@ -335,7 +335,7 @@ async function main() {
                 roadmap.cmdRoadmapUpdatePlanProgress(cwd, args[2], raw);
             }
             else {
-                (0, core_1.error)('Unknown roadmap subcommand. Available: get-phase, analyze, update-plan-progress');
+                (0, index_js_1.error)('Unknown roadmap subcommand. Available: get-phase, analyze, update-plan-progress');
             }
             break;
         }
@@ -345,7 +345,7 @@ async function main() {
                 milestone.cmdRequirementsMarkComplete(cwd, args.slice(2), raw);
             }
             else {
-                (0, core_1.error)('Unknown requirements subcommand. Available: mark-complete');
+                (0, index_js_1.error)('Unknown requirements subcommand. Available: mark-complete');
             }
             break;
         }
@@ -368,7 +368,7 @@ async function main() {
                 phase.cmdPhaseComplete(cwd, args[2], raw);
             }
             else {
-                (0, core_1.error)('Unknown phase subcommand. Available: next-decimal, add, insert, remove, complete');
+                (0, index_js_1.error)('Unknown phase subcommand. Available: next-decimal, add, insert, remove, complete');
             }
             break;
         }
@@ -391,7 +391,7 @@ async function main() {
                 milestone.cmdMilestoneComplete(cwd, args[2], { name: milestoneName ?? undefined, archivePhases }, raw);
             }
             else {
-                (0, core_1.error)('Unknown milestone subcommand. Available: complete');
+                (0, index_js_1.error)('Unknown milestone subcommand. Available: complete');
             }
             break;
         }
@@ -405,7 +405,7 @@ async function main() {
                 verify.cmdValidateHealth(cwd, { repair: repairFlag }, raw);
             }
             else {
-                (0, core_1.error)('Unknown validate subcommand. Available: consistency, health');
+                (0, index_js_1.error)('Unknown validate subcommand. Available: consistency, health');
             }
             break;
         }
@@ -420,7 +420,7 @@ async function main() {
                 commands.cmdTodoComplete(cwd, args[2], raw);
             }
             else {
-                (0, core_1.error)('Unknown todo subcommand. Available: complete');
+                (0, index_js_1.error)('Unknown todo subcommand. Available: complete');
             }
             break;
         }
@@ -475,7 +475,7 @@ async function main() {
                     init.cmdInitProgress(cwd, raw);
                     break;
                 default:
-                    (0, core_1.error)(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, progress`);
+                    (0, index_js_1.error)(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, progress`);
             }
             break;
         }
@@ -509,7 +509,7 @@ async function main() {
             break;
         }
         default:
-            (0, core_1.error)(`Unknown command: ${command}`);
+            (0, index_js_1.error)(`Unknown command: ${command}`);
     }
 }
 /**

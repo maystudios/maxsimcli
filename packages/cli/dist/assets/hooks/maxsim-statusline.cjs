@@ -34,7 +34,7 @@ node_path = __toESM(node_path);
 let node_os = require("node:os");
 node_os = __toESM(node_os);
 
-//#region src/shared.ts
+//#region src/hooks/shared.ts
 /**
 * Shared utilities for MAXSIM hooks.
 */
@@ -58,7 +58,7 @@ function readStdinJson(callback) {
 const CLAUDE_DIR = ".claude";
 
 //#endregion
-//#region src/maxsim-statusline.ts
+//#region src/hooks/maxsim-statusline.ts
 /**
 * Claude Code Statusline - MAXSIM Edition
 * Shows: model | current task | directory | context usage

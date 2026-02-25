@@ -13,7 +13,6 @@
     "@codemirror/lang-markdown": "^6",
     "@codemirror/theme-one-dark": "^6",
     "@codemirror/view": "6",
-    "@maxsim/core": "workspace:*",
     "@uiw/react-codemirror": "^4",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/addon-serialize": "^0.14.0",
@@ -43,6 +42,7 @@
     "@vitejs/plugin-react": "^4",
     "postcss": "^8",
     "tailwindcss": "^4",
+    "tsdown": "^0.20.3",
     "typescript": "^5",
     "vite": "^6"
   }

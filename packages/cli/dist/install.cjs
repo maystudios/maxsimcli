@@ -46,7 +46,7 @@ let node_async_hooks = require("node:async_hooks");
 let node_readline = require("node:readline");
 node_readline = __toESM(node_readline);
 
-//#region ../../node_modules/.pnpm/chalk@5.6.2/node_modules/chalk/source/vendor/ansi-styles/index.js
+//#region ../../node_modules/chalk/source/vendor/ansi-styles/index.js
 const ANSI_BACKGROUND_OFFSET = 10;
 const wrapAnsi16 = (offset = 0) => (code) => `\u001B[${code + offset}m`;
 const wrapAnsi256 = (offset = 0) => (code) => `\u001B[${38 + offset};5;${code}m`;
@@ -211,7 +211,7 @@ function assembleStyles() {
 const ansiStyles = assembleStyles();
 
 //#endregion
-//#region ../../node_modules/.pnpm/chalk@5.6.2/node_modules/chalk/source/vendor/supports-color/index.js
+//#region ../../node_modules/chalk/source/vendor/supports-color/index.js
 function hasFlag(flag, argv = globalThis.Deno ? globalThis.Deno.args : node_process.default.argv) {
 	const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
 	const position = argv.indexOf(prefix + flag);
@@ -300,7 +300,7 @@ const supportsColor = {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/chalk@5.6.2/node_modules/chalk/source/utilities.js
+//#region ../../node_modules/chalk/source/utilities.js
 function stringReplaceAll(string, substring, replacer) {
 	let index = string.indexOf(substring);
 	if (index === -1) return string;
@@ -329,7 +329,7 @@ function stringEncaseCRLFWithFirstIndex(string, prefix, postfix, index) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/chalk@5.6.2/node_modules/chalk/source/index.js
+//#region ../../node_modules/chalk/source/index.js
 const { stdout: stdoutColor, stderr: stderrColor } = supportsColor;
 const GENERATOR = Symbol("GENERATOR");
 const STYLER = Symbol("STYLER");
@@ -452,7 +452,7 @@ const chalk = createChalk();
 const chalkStderr = createChalk({ level: stderrColor ? stderrColor.level : 0 });
 
 //#endregion
-//#region ../../node_modules/.pnpm/mimic-function@5.0.1/node_modules/mimic-function/index.js
+//#region ../../node_modules/mimic-function/index.js
 const copyProperty = (to, from, property, ignoreNonConfigurable) => {
 	if (property === "length" || property === "prototype") return;
 	if (property === "arguments" || property === "caller") return;
@@ -493,7 +493,7 @@ function mimicFunction(to, from, { ignoreNonConfigurable = false } = {}) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/onetime@7.0.0/node_modules/onetime/index.js
+//#region ../../node_modules/restore-cursor/node_modules/onetime/index.js
 const calledFunctions = /* @__PURE__ */ new WeakMap();
 const onetime = (function_, options = {}) => {
 	if (typeof function_ !== "function") throw new TypeError("Expected a function");
@@ -518,7 +518,7 @@ onetime.callCount = (function_) => {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/signal-exit@4.1.0/node_modules/signal-exit/dist/mjs/signals.js
+//#region ../../node_modules/restore-cursor/node_modules/signal-exit/dist/mjs/signals.js
 /**
 * This is not the set of all possible signals.
 *
@@ -545,18 +545,18 @@ onetime.callCount = (function_) => {
 * state from which it is not safe to try and enter JS
 * listeners.
 */
-const signals = [];
-signals.push("SIGHUP", "SIGINT", "SIGTERM");
-if (process.platform !== "win32") signals.push("SIGALRM", "SIGABRT", "SIGVTALRM", "SIGXCPU", "SIGXFSZ", "SIGUSR2", "SIGTRAP", "SIGSYS", "SIGQUIT", "SIGIOT");
-if (process.platform === "linux") signals.push("SIGIO", "SIGPOLL", "SIGPWR", "SIGSTKFLT");
+const signals$1 = [];
+signals$1.push("SIGHUP", "SIGINT", "SIGTERM");
+if (process.platform !== "win32") signals$1.push("SIGALRM", "SIGABRT", "SIGVTALRM", "SIGXCPU", "SIGXFSZ", "SIGUSR2", "SIGTRAP", "SIGSYS", "SIGQUIT", "SIGIOT");
+if (process.platform === "linux") signals$1.push("SIGIO", "SIGPOLL", "SIGPWR", "SIGSTKFLT");
 
 //#endregion
-//#region ../../node_modules/.pnpm/signal-exit@4.1.0/node_modules/signal-exit/dist/mjs/index.js
-const processOk = (process) => !!process && typeof process === "object" && typeof process.removeListener === "function" && typeof process.emit === "function" && typeof process.reallyExit === "function" && typeof process.listeners === "function" && typeof process.kill === "function" && typeof process.pid === "number" && typeof process.on === "function";
-const kExitEmitter = Symbol.for("signal-exit emitter");
-const global = globalThis;
-const ObjectDefineProperty = Object.defineProperty.bind(Object);
-var Emitter = class {
+//#region ../../node_modules/restore-cursor/node_modules/signal-exit/dist/mjs/index.js
+const processOk$1 = (process) => !!process && typeof process === "object" && typeof process.removeListener === "function" && typeof process.emit === "function" && typeof process.reallyExit === "function" && typeof process.listeners === "function" && typeof process.kill === "function" && typeof process.pid === "number" && typeof process.on === "function";
+const kExitEmitter$1 = Symbol.for("signal-exit emitter");
+const global$1 = globalThis;
+const ObjectDefineProperty$1 = Object.defineProperty.bind(Object);
+var Emitter$1 = class {
 	emitted = {
 		afterExit: false,
 		exit: false
@@ -568,8 +568,8 @@ var Emitter = class {
 	count = 0;
 	id = Math.random();
 	constructor() {
-		if (global[kExitEmitter]) return global[kExitEmitter];
-		ObjectDefineProperty(global, kExitEmitter, {
+		if (global$1[kExitEmitter$1]) return global$1[kExitEmitter$1];
+		ObjectDefineProperty$1(global$1, kExitEmitter$1, {
 			value: this,
 			writable: false,
 			enumerable: false,
@@ -597,8 +597,8 @@ var Emitter = class {
 		return ret;
 	}
 };
-var SignalExitBase = class {};
-const signalExitWrap = (handler) => {
+var SignalExitBase$1 = class {};
+const signalExitWrap$1 = (handler) => {
 	return {
 		onExit(cb, opts) {
 			return handler.onExit(cb, opts);
@@ -611,18 +611,18 @@ const signalExitWrap = (handler) => {
 		}
 	};
 };
-var SignalExitFallback = class extends SignalExitBase {
+var SignalExitFallback$1 = class extends SignalExitBase$1 {
 	onExit() {
 		return () => {};
 	}
 	load() {}
 	unload() {}
 };
-var SignalExit = class extends SignalExitBase {
+var SignalExit$1 = class extends SignalExitBase$1 {
 	/* c8 ignore start */
-	#hupSig = process$7.platform === "win32" ? "SIGINT" : "SIGHUP";
+	#hupSig = process$8.platform === "win32" ? "SIGINT" : "SIGHUP";
 	/* c8 ignore stop */
-	#emitter = new Emitter();
+	#emitter = new Emitter$1();
 	#process;
 	#originalProcessEmit;
 	#originalProcessReallyExit;
@@ -632,7 +632,7 @@ var SignalExit = class extends SignalExitBase {
 		super();
 		this.#process = process;
 		this.#sigListeners = {};
-		for (const sig of signals) this.#sigListeners[sig] = () => {
+		for (const sig of signals$1) this.#sigListeners[sig] = () => {
 			const listeners = this.#process.listeners(sig);
 			let { count } = this.#emitter;
 			/* c8 ignore start */
@@ -652,7 +652,7 @@ var SignalExit = class extends SignalExitBase {
 	}
 	onExit(cb, opts) {
 		/* c8 ignore start */
-		if (!processOk(this.#process)) return () => {};
+		if (!processOk$1(this.#process)) return () => {};
 		/* c8 ignore stop */
 		if (this.#loaded === false) this.load();
 		const ev = opts?.alwaysLast ? "afterExit" : "exit";
@@ -666,7 +666,7 @@ var SignalExit = class extends SignalExitBase {
 		if (this.#loaded) return;
 		this.#loaded = true;
 		this.#emitter.count += 1;
-		for (const sig of signals) try {
+		for (const sig of signals$1) try {
 			const fn = this.#sigListeners[sig];
 			if (fn) this.#process.on(sig, fn);
 		} catch (_) {}
@@ -680,7 +680,7 @@ var SignalExit = class extends SignalExitBase {
 	unload() {
 		if (!this.#loaded) return;
 		this.#loaded = false;
-		signals.forEach((sig) => {
+		signals$1.forEach((sig) => {
 			const listener = this.#sigListeners[sig];
 			/* c8 ignore start */
 			if (!listener) throw new Error("Listener not defined for signal: " + sig);
@@ -696,7 +696,7 @@ var SignalExit = class extends SignalExitBase {
 	}
 	#processReallyExit(code) {
 		/* c8 ignore start */
-		if (!processOk(this.#process)) return 0;
+		if (!processOk$1(this.#process)) return 0;
 		this.#process.exitCode = code || 0;
 		/* c8 ignore stop */
 		this.#emitter.emit("exit", this.#process.exitCode, null);
@@ -704,7 +704,7 @@ var SignalExit = class extends SignalExitBase {
 	}
 	#processEmit(ev, ...args) {
 		const og = this.#originalProcessEmit;
-		if (ev === "exit" && processOk(this.#process)) {
+		if (ev === "exit" && processOk$1(this.#process)) {
 			if (typeof args[0] === "number") this.#process.exitCode = args[0];
 			/* c8 ignore start */
 			const ret = og.call(this.#process, ev, ...args);
@@ -715,20 +715,20 @@ var SignalExit = class extends SignalExitBase {
 		} else return og.call(this.#process, ev, ...args);
 	}
 };
-const process$7 = globalThis.process;
-const { onExit, load, unload } = signalExitWrap(processOk(process$7) ? new SignalExit(process$7) : new SignalExitFallback());
+const process$8 = globalThis.process;
+const { onExit: onExit$1, load: load$1, unload: unload$1 } = signalExitWrap$1(processOk$1(process$8) ? new SignalExit$1(process$8) : new SignalExitFallback$1());
 
 //#endregion
-//#region ../../node_modules/.pnpm/restore-cursor@5.1.0/node_modules/restore-cursor/index.js
+//#region ../../node_modules/restore-cursor/index.js
 const terminal = node_process.default.stderr.isTTY ? node_process.default.stderr : node_process.default.stdout.isTTY ? node_process.default.stdout : void 0;
 const restoreCursor = terminal ? onetime(() => {
-	onExit(() => {
+	onExit$1(() => {
 		terminal.write("\x1B[?25h");
 	}, { alwaysLast: true });
 }) : () => {};
 
 //#endregion
-//#region ../../node_modules/.pnpm/cli-cursor@5.0.0/node_modules/cli-cursor/index.js
+//#region ../../node_modules/cli-cursor/index.js
 let isHidden = false;
 const cliCursor = {};
 cliCursor.show = (writableStream = node_process.default.stderr) => {
@@ -749,7 +749,7 @@ cliCursor.toggle = (force, writableStream) => {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/cli-spinners@3.4.0/node_modules/cli-spinners/spinners.json
+//#region ../../node_modules/cli-spinners/spinners.json
 var spinners_default = {
 	dots: {
 		"interval": 80,
@@ -2407,12 +2407,12 @@ var spinners_default = {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/cli-spinners@3.4.0/node_modules/cli-spinners/index.js
+//#region ../../node_modules/cli-spinners/index.js
 var cli_spinners_default = spinners_default;
 const spinnersList = Object.keys(spinners_default);
 
 //#endregion
-//#region ../../node_modules/.pnpm/yoctocolors@2.1.2/node_modules/yoctocolors/base.js
+//#region ../../node_modules/yoctocolors/base.js
 const hasColors = node_tty.default?.WriteStream?.prototype?.hasColors?.() ?? false;
 const format = (open, close) => {
 	if (!hasColors) return (input) => input;
@@ -2477,7 +2477,7 @@ const bgCyanBright = format(106, 49);
 const bgWhiteBright = format(107, 49);
 
 //#endregion
-//#region ../../node_modules/.pnpm/is-unicode-supported@2.1.0/node_modules/is-unicode-supported/index.js
+//#region ../../node_modules/is-unicode-supported/index.js
 function isUnicodeSupported$1() {
 	const { env } = node_process.default;
 	const { TERM, TERM_PROGRAM } = env;
@@ -2486,7 +2486,7 @@ function isUnicodeSupported$1() {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/log-symbols@7.0.1/node_modules/log-symbols/symbols.js
+//#region ../../node_modules/log-symbols/symbols.js
 const _isUnicodeSupported = isUnicodeSupported$1();
 const info = blue(_isUnicodeSupported ? "ℹ" : "i");
 const success = green(_isUnicodeSupported ? "✔" : "√");
@@ -2494,13 +2494,13 @@ const warning = yellow(_isUnicodeSupported ? "⚠" : "‼");
 const error = red(_isUnicodeSupported ? "✖" : "×");
 
 //#endregion
-//#region ../../node_modules/.pnpm/ansi-regex@6.2.2/node_modules/ansi-regex/index.js
+//#region ../../node_modules/ansi-regex/index.js
 function ansiRegex({ onlyFirst = false } = {}) {
 	return new RegExp(`(?:\\u001B\\][\\s\\S]*?(?:\\u0007|\\u001B\\u005C|\\u009C))|[\\u001B\\u009B][[\\]()#;?]*(?:\\d{1,4}(?:[;:]\\d{0,4})*)?[\\dA-PR-TZcf-nq-uy=><~]`, onlyFirst ? void 0 : "g");
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/strip-ansi@7.1.2/node_modules/strip-ansi/index.js
+//#region ../../node_modules/ora/node_modules/strip-ansi/index.js
 const regex = ansiRegex();
 function stripAnsi(string) {
 	if (typeof string !== "string") throw new TypeError(`Expected a \`string\`, got \`${typeof string}\``);
@@ -2508,7 +2508,7 @@ function stripAnsi(string) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/get-east-asian-width@1.5.0/node_modules/get-east-asian-width/lookup-data.js
+//#region ../../node_modules/get-east-asian-width/lookup-data.js
 const ambiguousRanges = [
 	161,
 	161,
@@ -3157,7 +3157,7 @@ const wideRanges = [
 ];
 
 //#endregion
-//#region ../../node_modules/.pnpm/get-east-asian-width@1.5.0/node_modules/get-east-asian-width/utilities.js
+//#region ../../node_modules/get-east-asian-width/utilities.js
 /**
 Binary search on a sorted flat array of [start, end] pairs.
 
@@ -3179,7 +3179,7 @@ const isInRange = (ranges, codePoint) => {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/get-east-asian-width@1.5.0/node_modules/get-east-asian-width/lookup.js
+//#region ../../node_modules/get-east-asian-width/lookup.js
 const minimumAmbiguousCodePoint = ambiguousRanges[0];
 const maximumAmbiguousCodePoint = ambiguousRanges.at(-1);
 const minimumFullWidthCodePoint = fullwidthRanges[0];
@@ -3221,7 +3221,7 @@ const isWide = (codePoint) => {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/get-east-asian-width@1.5.0/node_modules/get-east-asian-width/index.js
+//#region ../../node_modules/get-east-asian-width/index.js
 function validate(codePoint) {
 	if (!Number.isSafeInteger(codePoint)) throw new TypeError(`Expected a code point, got \`${typeof codePoint}\`.`);
 }
@@ -3232,7 +3232,7 @@ function eastAsianWidth(codePoint, { ambiguousAsWide = false } = {}) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/string-width@8.2.0/node_modules/string-width/index.js
+//#region ../../node_modules/ora/node_modules/string-width/index.js
 /**
 Logic:
 - Segment graphemes to match how terminals render clusters.
@@ -3293,13 +3293,13 @@ function stringWidth(input, options = {}) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/is-interactive@2.0.0/node_modules/is-interactive/index.js
+//#region ../../node_modules/is-interactive/index.js
 function isInteractive({ stream = process.stdout } = {}) {
 	return Boolean(stream && stream.isTTY && process.env.TERM !== "dumb" && !("CI" in process.env));
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/stdin-discarder@0.3.1/node_modules/stdin-discarder/index.js
+//#region ../../node_modules/stdin-discarder/index.js
 const ASCII_ETX_CODE = 3;
 var StdinDiscarder = class {
 	#activeCount = 0;
@@ -3347,7 +3347,7 @@ const stdinDiscarder = new StdinDiscarder();
 var stdin_discarder_default = Object.freeze(stdinDiscarder);
 
 //#endregion
-//#region ../../node_modules/.pnpm/ora@9.3.0/node_modules/ora/index.js
+//#region ../../node_modules/ora/index.js
 const RENDER_DEFERRAL_TIMEOUT = 200;
 const SYNCHRONIZED_OUTPUT_ENABLE = "\x1B[?2026h";
 const SYNCHRONIZED_OUTPUT_DISABLE = "\x1B[?2026l";
@@ -3716,7 +3716,7 @@ function ora(options) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/key.js
+//#region ../../node_modules/@inquirer/core/dist/lib/key.js
 const isUpKey = (key, keybindings = []) => key.name === "up" || keybindings.includes("vim") && key.name === "k" || keybindings.includes("emacs") && key.ctrl && key.name === "p";
 const isDownKey = (key, keybindings = []) => key.name === "down" || keybindings.includes("vim") && key.name === "j" || keybindings.includes("emacs") && key.ctrl && key.name === "n";
 const isSpaceKey = (key) => key.name === "space";
@@ -3726,7 +3726,7 @@ const isNumberKey = (key) => "1234567890".includes(key.name);
 const isEnterKey = (key) => key.name === "enter" || key.name === "return";
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/errors.js
+//#region ../../node_modules/@inquirer/core/dist/lib/errors.js
 var AbortPromptError = class extends Error {
 	name = "AbortPromptError";
 	message = "Prompt was aborted";
@@ -3750,7 +3750,7 @@ var ValidationError = class extends Error {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/hook-engine.js
+//#region ../../node_modules/@inquirer/core/dist/lib/hook-engine.js
 const hookStorage = new node_async_hooks.AsyncLocalStorage();
 function createStore(rl) {
 	return {
@@ -3847,7 +3847,7 @@ const effectScheduler = {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/use-state.js
+//#region ../../node_modules/@inquirer/core/dist/lib/use-state.js
 function useState(defaultValue) {
 	return withPointer((pointer) => {
 		const setState = node_async_hooks.AsyncResource.bind(function setState(newValue) {
@@ -3864,7 +3864,7 @@ function useState(defaultValue) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/use-effect.js
+//#region ../../node_modules/@inquirer/core/dist/lib/use-effect.js
 function useEffect(cb, depArray) {
 	withPointer((pointer) => {
 		const oldDeps = pointer.get();
@@ -3874,7 +3874,7 @@ function useEffect(cb, depArray) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+figures@2.0.3/node_modules/@inquirer/figures/dist/index.js
+//#region ../../node_modules/@inquirer/figures/dist/index.js
 function isUnicodeSupported() {
 	if (node_process.default.platform !== "win32") return node_process.default.env["TERM"] !== "linux";
 	return Boolean(node_process.default.env["WT_SESSION"]) || Boolean(node_process.default.env["TERMINUS_SUBLIME"]) || node_process.default.env["ConEmuTask"] === "{cmd::Cmder}" || node_process.default.env["TERM_PROGRAM"] === "Terminus-Sublime" || node_process.default.env["TERM_PROGRAM"] === "vscode" || node_process.default.env["TERM"] === "xterm-256color" || node_process.default.env["TERM"] === "alacritty" || node_process.default.env["TERMINAL_EMULATOR"] === "JetBrains-JediTerm";
@@ -4160,7 +4160,7 @@ const figures = shouldUseMain ? mainSymbols : fallbackSymbols;
 const replacements = Object.entries(specialMainSymbols);
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/theme.js
+//#region ../../node_modules/@inquirer/core/dist/lib/theme.js
 const defaultTheme = {
 	prefix: {
 		idle: (0, node_util.styleText)("blue", "?"),
@@ -4193,7 +4193,7 @@ const defaultTheme = {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/make-theme.js
+//#region ../../node_modules/@inquirer/core/dist/lib/make-theme.js
 function isPlainObject(value) {
 	if (typeof value !== "object" || value === null) return false;
 	let proto = value;
@@ -4213,7 +4213,7 @@ function makeTheme(...themes) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/use-prefix.js
+//#region ../../node_modules/@inquirer/core/dist/lib/use-prefix.js
 function usePrefix({ status = "idle", theme }) {
 	const [showLoader, setShowLoader] = useState(false);
 	const [tick, setTick] = useState(0);
@@ -4240,7 +4240,7 @@ function usePrefix({ status = "idle", theme }) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/use-memo.js
+//#region ../../node_modules/@inquirer/core/dist/lib/use-memo.js
 function useMemo(fn, dependencies) {
 	return withPointer((pointer) => {
 		const prev = pointer.get();
@@ -4257,13 +4257,13 @@ function useMemo(fn, dependencies) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/use-ref.js
+//#region ../../node_modules/@inquirer/core/dist/lib/use-ref.js
 function useRef(val) {
 	return useState({ current: val })[0];
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/use-keypress.js
+//#region ../../node_modules/@inquirer/core/dist/lib/use-keypress.js
 function useKeypress(userHandler) {
 	const signal = useRef(userHandler);
 	signal.current = userHandler;
@@ -4282,7 +4282,7 @@ function useKeypress(userHandler) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/cli-width@4.1.0/node_modules/cli-width/index.js
+//#region ../../node_modules/cli-width/index.js
 var require_cli_width = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = cliWidth;
 	function normalizeOpts(options) {
@@ -4311,7 +4311,7 @@ var require_cli_width = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/.pnpm/fast-string-truncated-width@3.0.3/node_modules/fast-string-truncated-width/dist/utils.js
+//#region ../../node_modules/fast-string-truncated-width/dist/utils.js
 const getCodePointsLength = (() => {
 	const SURROGATE_PAIR_RE = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
 	return (input) => {
@@ -4329,7 +4329,7 @@ const isWideNotCJKTNotEmoji = (x) => {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/fast-string-truncated-width@3.0.3/node_modules/fast-string-truncated-width/dist/index.js
+//#region ../../node_modules/fast-string-truncated-width/dist/index.js
 const ANSI_RE = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]|\u001b\]8;[^;]*;.*?(?:\u0007|\u001b\u005c)/y;
 const CONTROL_RE = /[\x00-\x08\x0A-\x1F\x7F-\x9F]{1,1000}/y;
 const CJKT_WIDE_RE = /(?:(?![\uFF61-\uFF9F\uFF00-\uFFEF])[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Script=Tangut}]){1,1000}/uy;
@@ -4420,7 +4420,7 @@ const getStringTruncatedWidth = (input, truncationOptions = {}, widthOptions = {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/fast-string-width@3.0.2/node_modules/fast-string-width/dist/index.js
+//#region ../../node_modules/fast-string-width/dist/index.js
 const NO_TRUNCATION = {
 	limit: Infinity,
 	ellipsis: "",
@@ -4431,7 +4431,7 @@ const fastStringWidth = (input, options = {}) => {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/fast-wrap-ansi@0.2.0/node_modules/fast-wrap-ansi/lib/main.js
+//#region ../../node_modules/fast-wrap-ansi/lib/main.js
 const ESC$1 = "\x1B";
 const CSI = "";
 const END_CODE = 39;
@@ -4597,7 +4597,7 @@ function wrapAnsi(string, columns, options) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/utils.js
+//#region ../../node_modules/@inquirer/core/dist/lib/utils.js
 var import_cli_width = /* @__PURE__ */ __toESM(require_cli_width(), 1);
 /**
 * Force line returns at specific width. This function is ANSI code friendly and it'll
@@ -4624,7 +4624,7 @@ function readlineWidth() {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/pagination/use-pagination.js
+//#region ../../node_modules/@inquirer/core/dist/lib/pagination/use-pagination.js
 function usePointerPosition({ active, renderedItems, pageSize, loop }) {
 	const state = useRef({
 		lastPointer: active,
@@ -4708,7 +4708,7 @@ function usePagination({ items, active, renderItem, pageSize, loop = true }) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/mute-stream@3.0.0/node_modules/mute-stream/lib/index.js
+//#region ../../node_modules/mute-stream/lib/index.js
 var require_lib = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const Stream = require("stream");
 	var MuteStream = class extends Stream {
@@ -4805,7 +4805,208 @@ var require_lib = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+ansi@2.0.3/node_modules/@inquirer/ansi/dist/index.js
+//#region ../../node_modules/@inquirer/core/node_modules/signal-exit/dist/mjs/signals.js
+/**
+* This is not the set of all possible signals.
+*
+* It IS, however, the set of all signals that trigger
+* an exit on either Linux or BSD systems.  Linux is a
+* superset of the signal names supported on BSD, and
+* the unknown signals just fail to register, so we can
+* catch that easily enough.
+*
+* Windows signals are a different set, since there are
+* signals that terminate Windows processes, but don't
+* terminate (or don't even exist) on Posix systems.
+*
+* Don't bother with SIGKILL.  It's uncatchable, which
+* means that we can't fire any callbacks anyway.
+*
+* If a user does happen to register a handler on a non-
+* fatal signal like SIGWINCH or something, and then
+* exit, it'll end up firing `process.emit('exit')`, so
+* the handler will be fired anyway.
+*
+* SIGBUS, SIGFPE, SIGSEGV and SIGILL, when not raised
+* artificially, inherently leave the process in a
+* state from which it is not safe to try and enter JS
+* listeners.
+*/
+const signals = [];
+signals.push("SIGHUP", "SIGINT", "SIGTERM");
+if (process.platform !== "win32") signals.push("SIGALRM", "SIGABRT", "SIGVTALRM", "SIGXCPU", "SIGXFSZ", "SIGUSR2", "SIGTRAP", "SIGSYS", "SIGQUIT", "SIGIOT");
+if (process.platform === "linux") signals.push("SIGIO", "SIGPOLL", "SIGPWR", "SIGSTKFLT");
+
+//#endregion
+//#region ../../node_modules/@inquirer/core/node_modules/signal-exit/dist/mjs/index.js
+const processOk = (process) => !!process && typeof process === "object" && typeof process.removeListener === "function" && typeof process.emit === "function" && typeof process.reallyExit === "function" && typeof process.listeners === "function" && typeof process.kill === "function" && typeof process.pid === "number" && typeof process.on === "function";
+const kExitEmitter = Symbol.for("signal-exit emitter");
+const global = globalThis;
+const ObjectDefineProperty = Object.defineProperty.bind(Object);
+var Emitter = class {
+	emitted = {
+		afterExit: false,
+		exit: false
+	};
+	listeners = {
+		afterExit: [],
+		exit: []
+	};
+	count = 0;
+	id = Math.random();
+	constructor() {
+		if (global[kExitEmitter]) return global[kExitEmitter];
+		ObjectDefineProperty(global, kExitEmitter, {
+			value: this,
+			writable: false,
+			enumerable: false,
+			configurable: false
+		});
+	}
+	on(ev, fn) {
+		this.listeners[ev].push(fn);
+	}
+	removeListener(ev, fn) {
+		const list = this.listeners[ev];
+		const i = list.indexOf(fn);
+		/* c8 ignore start */
+		if (i === -1) return;
+		/* c8 ignore stop */
+		if (i === 0 && list.length === 1) list.length = 0;
+		else list.splice(i, 1);
+	}
+	emit(ev, code, signal) {
+		if (this.emitted[ev]) return false;
+		this.emitted[ev] = true;
+		let ret = false;
+		for (const fn of this.listeners[ev]) ret = fn(code, signal) === true || ret;
+		if (ev === "exit") ret = this.emit("afterExit", code, signal) || ret;
+		return ret;
+	}
+};
+var SignalExitBase = class {};
+const signalExitWrap = (handler) => {
+	return {
+		onExit(cb, opts) {
+			return handler.onExit(cb, opts);
+		},
+		load() {
+			return handler.load();
+		},
+		unload() {
+			return handler.unload();
+		}
+	};
+};
+var SignalExitFallback = class extends SignalExitBase {
+	onExit() {
+		return () => {};
+	}
+	load() {}
+	unload() {}
+};
+var SignalExit = class extends SignalExitBase {
+	/* c8 ignore start */
+	#hupSig = process$1.platform === "win32" ? "SIGINT" : "SIGHUP";
+	/* c8 ignore stop */
+	#emitter = new Emitter();
+	#process;
+	#originalProcessEmit;
+	#originalProcessReallyExit;
+	#sigListeners = {};
+	#loaded = false;
+	constructor(process) {
+		super();
+		this.#process = process;
+		this.#sigListeners = {};
+		for (const sig of signals) this.#sigListeners[sig] = () => {
+			const listeners = this.#process.listeners(sig);
+			let { count } = this.#emitter;
+			/* c8 ignore start */
+			const p = process;
+			if (typeof p.__signal_exit_emitter__ === "object" && typeof p.__signal_exit_emitter__.count === "number") count += p.__signal_exit_emitter__.count;
+			/* c8 ignore stop */
+			if (listeners.length === count) {
+				this.unload();
+				const ret = this.#emitter.emit("exit", null, sig);
+				/* c8 ignore start */
+				const s = sig === "SIGHUP" ? this.#hupSig : sig;
+				if (!ret) process.kill(process.pid, s);
+			}
+		};
+		this.#originalProcessReallyExit = process.reallyExit;
+		this.#originalProcessEmit = process.emit;
+	}
+	onExit(cb, opts) {
+		/* c8 ignore start */
+		if (!processOk(this.#process)) return () => {};
+		/* c8 ignore stop */
+		if (this.#loaded === false) this.load();
+		const ev = opts?.alwaysLast ? "afterExit" : "exit";
+		this.#emitter.on(ev, cb);
+		return () => {
+			this.#emitter.removeListener(ev, cb);
+			if (this.#emitter.listeners["exit"].length === 0 && this.#emitter.listeners["afterExit"].length === 0) this.unload();
+		};
+	}
+	load() {
+		if (this.#loaded) return;
+		this.#loaded = true;
+		this.#emitter.count += 1;
+		for (const sig of signals) try {
+			const fn = this.#sigListeners[sig];
+			if (fn) this.#process.on(sig, fn);
+		} catch (_) {}
+		this.#process.emit = (ev, ...a) => {
+			return this.#processEmit(ev, ...a);
+		};
+		this.#process.reallyExit = (code) => {
+			return this.#processReallyExit(code);
+		};
+	}
+	unload() {
+		if (!this.#loaded) return;
+		this.#loaded = false;
+		signals.forEach((sig) => {
+			const listener = this.#sigListeners[sig];
+			/* c8 ignore start */
+			if (!listener) throw new Error("Listener not defined for signal: " + sig);
+			/* c8 ignore stop */
+			try {
+				this.#process.removeListener(sig, listener);
+			} catch (_) {}
+			/* c8 ignore stop */
+		});
+		this.#process.emit = this.#originalProcessEmit;
+		this.#process.reallyExit = this.#originalProcessReallyExit;
+		this.#emitter.count -= 1;
+	}
+	#processReallyExit(code) {
+		/* c8 ignore start */
+		if (!processOk(this.#process)) return 0;
+		this.#process.exitCode = code || 0;
+		/* c8 ignore stop */
+		this.#emitter.emit("exit", this.#process.exitCode, null);
+		return this.#originalProcessReallyExit.call(this.#process, this.#process.exitCode);
+	}
+	#processEmit(ev, ...args) {
+		const og = this.#originalProcessEmit;
+		if (ev === "exit" && processOk(this.#process)) {
+			if (typeof args[0] === "number") this.#process.exitCode = args[0];
+			/* c8 ignore start */
+			const ret = og.call(this.#process, ev, ...args);
+			/* c8 ignore start */
+			this.#emitter.emit("exit", this.#process.exitCode, null);
+			/* c8 ignore stop */
+			return ret;
+		} else return og.call(this.#process, ev, ...args);
+	}
+};
+const process$1 = globalThis.process;
+const { onExit, load, unload } = signalExitWrap(processOk(process$1) ? new SignalExit(process$1) : new SignalExitFallback());
+
+//#endregion
+//#region ../../node_modules/@inquirer/ansi/dist/index.js
 const ESC = "\x1B[";
 /** Move cursor to first column */
 const cursorLeft = ESC + "G";
@@ -4827,7 +5028,7 @@ const eraseLine = ESC + "2K";
 const eraseLines = (lines) => lines > 0 ? (eraseLine + cursorUp(1)).repeat(lines - 1) + eraseLine + cursorLeft : "";
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/screen-manager.js
+//#region ../../node_modules/@inquirer/core/dist/lib/screen-manager.js
 const height = (content) => content.split("\n").length;
 const lastLine = (content) => content.split("\n").pop() ?? "";
 var ScreenManager = class {
@@ -4883,7 +5084,7 @@ var ScreenManager = class {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/promise-polyfill.js
+//#region ../../node_modules/@inquirer/core/dist/lib/promise-polyfill.js
 var PromisePolyfill = class extends Promise {
 	static withResolver() {
 		let resolve;
@@ -4900,7 +5101,7 @@ var PromisePolyfill = class extends Promise {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/create-prompt.js
+//#region ../../node_modules/@inquirer/core/dist/lib/create-prompt.js
 var import_lib = /* @__PURE__ */ __toESM(require_lib(), 1);
 const nativeSetImmediate = globalThis.setImmediate;
 function getCallSites() {
@@ -4994,7 +5195,7 @@ function createPrompt(view) {
 }
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+core@11.1.5_@types+node@25.3.0/node_modules/@inquirer/core/dist/lib/Separator.js
+//#region ../../node_modules/@inquirer/core/dist/lib/Separator.js
 /**
 * Separator object
 * Used to space/separate choices group
@@ -5011,7 +5212,7 @@ var Separator = class {
 };
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+checkbox@5.1.0_@types+node@25.3.0/node_modules/@inquirer/checkbox/dist/index.js
+//#region ../../node_modules/@inquirer/checkbox/dist/index.js
 const checkboxTheme = {
 	icon: {
 		checked: (0, node_util.styleText)("green", figures.circleFilled),
@@ -5192,7 +5393,7 @@ var dist_default$2 = createPrompt((config, done) => {
 });
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+confirm@6.0.8_@types+node@25.3.0/node_modules/@inquirer/confirm/dist/index.js
+//#region ../../node_modules/@inquirer/confirm/dist/index.js
 function getBooleanValue(value, defaultValue) {
 	let answer = defaultValue !== false;
 	if (/^(y|yes)/i.test(value)) answer = true;
@@ -5233,7 +5434,7 @@ var dist_default$1 = createPrompt((config, done) => {
 });
 
 //#endregion
-//#region ../../node_modules/.pnpm/@inquirer+select@5.1.0_@types+node@25.3.0/node_modules/@inquirer/select/dist/index.js
+//#region ../../node_modules/@inquirer/select/dist/index.js
 const selectTheme = {
 	icon: { cursor: figures.pointer },
 	style: {
@@ -5389,565 +5590,428 @@ var dist_default = createPrompt((config, done) => {
 });
 
 //#endregion
-//#region ../adapters/dist/base.js
-var require_base = /* @__PURE__ */ __commonJSMin(((exports) => {
-	/**
-	* @maxsim/adapters — Shared base utilities extracted from bin/install.js
-	*/
-	var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
-		if (k2 === void 0) k2 = k;
-		var desc = Object.getOwnPropertyDescriptor(m, k);
-		if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) desc = {
-			enumerable: true,
-			get: function() {
-				return m[k];
-			}
-		};
-		Object.defineProperty(o, k2, desc);
-	}) : (function(o, m, k, k2) {
-		if (k2 === void 0) k2 = k;
-		o[k2] = m[k];
-	}));
-	var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
-		Object.defineProperty(o, "default", {
-			enumerable: true,
-			value: v
-		});
-	}) : function(o, v) {
-		o["default"] = v;
-	});
-	var __importStar = exports && exports.__importStar || (function() {
-		var ownKeys = function(o) {
-			ownKeys = Object.getOwnPropertyNames || function(o) {
-				var ar = [];
-				for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-				return ar;
-			};
-			return ownKeys(o);
-		};
-		return function(mod) {
-			if (mod && mod.__esModule) return mod;
-			var result = {};
-			if (mod != null) {
-				for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-			}
-			__setModuleDefault(result, mod);
-			return result;
-		};
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.expandTilde = expandTilde;
-	exports.extractFrontmatterAndBody = extractFrontmatterAndBody;
-	exports.processAttribution = processAttribution;
-	exports.buildHookCommand = buildHookCommand;
-	exports.readSettings = readSettings;
-	exports.writeSettings = writeSettings;
-	const path$4 = __importStar(require("node:path"));
-	const os$4 = __importStar(require("node:os"));
-	const fs = __importStar(require("node:fs"));
-	/**
-	* Expand ~ to home directory (shell doesn't expand in env vars passed to node)
-	*/
-	function expandTilde(filePath) {
-		if (filePath && filePath.startsWith("~/")) return path$4.join(os$4.homedir(), filePath.slice(2));
-		return filePath;
-	}
-	/**
-	* Extract YAML frontmatter and body from markdown content.
-	* Returns null frontmatter if content doesn't start with ---.
-	*/
-	function extractFrontmatterAndBody(content) {
-		if (!content.startsWith("---")) return {
-			frontmatter: null,
-			body: content
-		};
-		const endIndex = content.indexOf("---", 3);
-		if (endIndex === -1) return {
-			frontmatter: null,
-			body: content
-		};
-		return {
-			frontmatter: content.substring(3, endIndex).trim(),
-			body: content.substring(endIndex + 3)
-		};
-	}
-	/**
-	* Process Co-Authored-By lines based on attribution setting.
-	* @param content - File content to process
-	* @param attribution - null=remove, undefined=keep default, string=replace
-	*/
-	function processAttribution(content, attribution) {
-		if (attribution === null) return content.replace(/(\r?\n){2}Co-Authored-By:.*$/gim, "");
-		if (attribution === void 0) return content;
-		const safeAttribution = attribution.replace(/\$/g, "$$$$");
-		return content.replace(/Co-Authored-By:.*$/gim, `Co-Authored-By: ${safeAttribution}`);
-	}
-	/**
-	* Build a hook command path using forward slashes for cross-platform compatibility.
-	*/
-	function buildHookCommand(configDir, hookName) {
-		return `node "${configDir.replace(/\\/g, "/") + "/hooks/" + hookName}"`;
-	}
-	/**
-	* Read and parse settings.json, returning empty object if it doesn't exist.
-	*/
-	function readSettings(settingsPath) {
-		if (fs.existsSync(settingsPath)) try {
-			return JSON.parse(fs.readFileSync(settingsPath, "utf8"));
-		} catch {
-			return {};
-		}
+//#region src/adapters/base.ts
+/**
+* @maxsim/adapters — Shared base utilities extracted from bin/install.js
+*/
+/**
+* Expand ~ to home directory (shell doesn't expand in env vars passed to node)
+*/
+function expandTilde(filePath) {
+	if (filePath && filePath.startsWith("~/")) return node_path.join(node_os.homedir(), filePath.slice(2));
+	return filePath;
+}
+/**
+* Extract YAML frontmatter and body from markdown content.
+* Returns null frontmatter if content doesn't start with ---.
+*/
+function extractFrontmatterAndBody(content) {
+	if (!content.startsWith("---")) return {
+		frontmatter: null,
+		body: content
+	};
+	const endIndex = content.indexOf("---", 3);
+	if (endIndex === -1) return {
+		frontmatter: null,
+		body: content
+	};
+	return {
+		frontmatter: content.substring(3, endIndex).trim(),
+		body: content.substring(endIndex + 3)
+	};
+}
+/**
+* Process Co-Authored-By lines based on attribution setting.
+* @param content - File content to process
+* @param attribution - null=remove, undefined=keep default, string=replace
+*/
+function processAttribution(content, attribution) {
+	if (attribution === null) return content.replace(/(\r?\n){2}Co-Authored-By:.*$/gim, "");
+	if (attribution === void 0) return content;
+	const safeAttribution = attribution.replace(/\$/g, "$$$$");
+	return content.replace(/Co-Authored-By:.*$/gim, `Co-Authored-By: ${safeAttribution}`);
+}
+/**
+* Build a hook command path using forward slashes for cross-platform compatibility.
+*/
+function buildHookCommand(configDir, hookName) {
+	return `node "${configDir.replace(/\\/g, "/") + "/hooks/" + hookName}"`;
+}
+/**
+* Read and parse settings.json, returning empty object if it doesn't exist.
+*/
+function readSettings(settingsPath) {
+	if (node_fs.existsSync(settingsPath)) try {
+		return JSON.parse(node_fs.readFileSync(settingsPath, "utf8"));
+	} catch {
 		return {};
 	}
-	/**
-	* Write settings.json with proper formatting.
-	*/
-	function writeSettings(settingsPath, settings) {
-		fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + "\n");
-	}
-}));
+	return {};
+}
+/**
+* Write settings.json with proper formatting.
+*/
+function writeSettings(settingsPath, settings) {
+	node_fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + "\n");
+}
 
 //#endregion
-//#region ../adapters/dist/claude.js
-var require_claude = /* @__PURE__ */ __commonJSMin(((exports) => {
-	/**
-	* @maxsim/adapters — Claude Code adapter
-	*
-	* Ports the Claude-specific logic from bin/install.js:
-	*   - getGlobalDir('claude', ...)  (lines 135-142)
-	*   - getDirName('claude')         (line 49)
-	*   - getConfigDirFromHome('claude', isGlobal) (lines 58-72)
-	*   - copyWithPathReplacement for Claude (lines 839-892)
-	*/
-	var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
-		if (k2 === void 0) k2 = k;
-		var desc = Object.getOwnPropertyDescriptor(m, k);
-		if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) desc = {
-			enumerable: true,
-			get: function() {
-				return m[k];
-			}
-		};
-		Object.defineProperty(o, k2, desc);
-	}) : (function(o, m, k, k2) {
-		if (k2 === void 0) k2 = k;
-		o[k2] = m[k];
-	}));
-	var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
-		Object.defineProperty(o, "default", {
-			enumerable: true,
-			value: v
-		});
-	}) : function(o, v) {
-		o["default"] = v;
+//#region src/adapters/claude.ts
+/**
+* @maxsim/adapters — Claude Code adapter
+*
+* Ports the Claude-specific logic from bin/install.js:
+*   - getGlobalDir('claude', ...)  (lines 135-142)
+*   - getDirName('claude')         (line 49)
+*   - getConfigDirFromHome('claude', isGlobal) (lines 58-72)
+*   - copyWithPathReplacement for Claude (lines 839-892)
+*/
+/**
+* Get the global config directory for Claude Code.
+* Priority: explicitDir > CLAUDE_CONFIG_DIR env > ~/.claude
+*/
+function getGlobalDir$4(explicitDir) {
+	if (explicitDir) return expandTilde(explicitDir);
+	if (process.env.CLAUDE_CONFIG_DIR) return expandTilde(process.env.CLAUDE_CONFIG_DIR);
+	return node_path.join(node_os.homedir(), ".claude");
+}
+/**
+* Get the config directory path relative to home for hook templating.
+* Used for path.join(homeDir, '<configDir>', ...) replacement in hooks.
+*/
+function getConfigDirFromHome$4(isGlobal) {
+	return "'.claude'";
+}
+/**
+* Transform markdown content for Claude Code installation.
+* For Claude, this is path replacement only — no frontmatter conversion needed.
+* Replaces ~/.claude/ and ./.claude/ references with the actual install path prefix.
+*/
+function transformContent$3(content, pathPrefix) {
+	const globalClaudeRegex = /~\/\.claude\//g;
+	const localClaudeRegex = /\.\/\.claude\//g;
+	let result = content.replace(globalClaudeRegex, pathPrefix);
+	result = result.replace(localClaudeRegex, `./.claude/`);
+	return result;
+}
+/**
+* Claude Code adapter configuration.
+* Claude uses nested command structure (commands/maxsim/*.md).
+*/
+const claudeAdapter = {
+	runtime: "claude",
+	dirName: ".claude",
+	getGlobalDir: getGlobalDir$4,
+	getConfigDirFromHome: getConfigDirFromHome$4,
+	transformContent: transformContent$3,
+	commandStructure: "nested"
+};
+
+//#endregion
+//#region src/adapters/transforms/tool-maps.ts
+/**
+* @maxsim/adapters — Tool name mappings per runtime
+*
+* Ported from bin/install.js lines ~327-390
+*/
+/** Tool name mapping from Claude Code to OpenCode */
+const claudeToOpencodeTools = {
+	AskUserQuestion: "question",
+	SlashCommand: "skill",
+	TodoWrite: "todowrite",
+	WebFetch: "webfetch",
+	WebSearch: "websearch"
+};
+/** Tool name mapping from Claude Code to Gemini CLI */
+const claudeToGeminiTools = {
+	Read: "read_file",
+	Write: "write_file",
+	Edit: "replace",
+	Bash: "run_shell_command",
+	Glob: "glob",
+	Grep: "search_file_content",
+	WebSearch: "google_web_search",
+	WebFetch: "web_fetch",
+	TodoWrite: "write_todos",
+	AskUserQuestion: "ask_user"
+};
+/**
+* Convert a Claude Code tool name to OpenCode format.
+* - Applies special mappings (AskUserQuestion -> question, etc.)
+* - Converts to lowercase (except MCP tools which keep their format)
+*/
+function convertToolName(claudeTool) {
+	if (claudeToOpencodeTools[claudeTool]) return claudeToOpencodeTools[claudeTool];
+	if (claudeTool.startsWith("mcp__")) return claudeTool;
+	return claudeTool.toLowerCase();
+}
+/**
+* Convert a Claude Code tool name to Gemini CLI format.
+* - Applies Claude->Gemini mapping (Read->read_file, Bash->run_shell_command, etc.)
+* - Filters out MCP tools (mcp__*) -- auto-discovered at runtime in Gemini
+* - Filters out Task -- agents are auto-registered as tools in Gemini
+* @returns Gemini tool name, or null if tool should be excluded
+*/
+function convertGeminiToolName(claudeTool) {
+	if (claudeTool.startsWith("mcp__")) return null;
+	if (claudeTool === "Task") return null;
+	if (claudeToGeminiTools[claudeTool]) return claudeToGeminiTools[claudeTool];
+	return claudeTool.toLowerCase();
+}
+
+//#endregion
+//#region src/adapters/transforms/content.ts
+/**
+* @maxsim/adapters — Content transformation utilities
+*
+* Ported from bin/install.js lines ~423-564
+*/
+/**
+* Convert /maxsim:command-name to $maxsim-command-name for Codex skill mentions.
+* Ported from install.js line ~423
+*/
+function convertSlashCommandsToCodexSkillMentions(content) {
+	let converted = content.replace(/\/maxsim:([a-z0-9-]+)/gi, (_, commandName) => {
+		return `$maxsim-${String(commandName).toLowerCase()}`;
 	});
-	var __importStar = exports && exports.__importStar || (function() {
-		var ownKeys = function(o) {
-			ownKeys = Object.getOwnPropertyNames || function(o) {
-				var ar = [];
-				for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-				return ar;
-			};
-			return ownKeys(o);
-		};
-		return function(mod) {
-			if (mod && mod.__esModule) return mod;
-			var result = {};
-			if (mod != null) {
-				for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-			}
-			__setModuleDefault(result, mod);
-			return result;
-		};
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.claudeAdapter = void 0;
-	exports.installClaude = installClaude;
-	const path$3 = __importStar(require("node:path"));
-	const os$3 = __importStar(require("node:os"));
-	const base_js_1 = require_base();
-	/**
-	* Get the global config directory for Claude Code.
-	* Priority: explicitDir > CLAUDE_CONFIG_DIR env > ~/.claude
-	*/
-	function getGlobalDir(explicitDir) {
-		if (explicitDir) return (0, base_js_1.expandTilde)(explicitDir);
-		if (process.env.CLAUDE_CONFIG_DIR) return (0, base_js_1.expandTilde)(process.env.CLAUDE_CONFIG_DIR);
-		return path$3.join(os$3.homedir(), ".claude");
-	}
-	/**
-	* Get the config directory path relative to home for hook templating.
-	* Used for path.join(homeDir, '<configDir>', ...) replacement in hooks.
-	*/
-	function getConfigDirFromHome(isGlobal) {
-		return "'.claude'";
-	}
-	/**
-	* Transform markdown content for Claude Code installation.
-	* For Claude, this is path replacement only — no frontmatter conversion needed.
-	* Replaces ~/.claude/ and ./.claude/ references with the actual install path prefix.
-	*/
-	function transformContent(content, pathPrefix) {
-		const globalClaudeRegex = /~\/\.claude\//g;
-		const localClaudeRegex = /\.\/\.claude\//g;
-		let result = content.replace(globalClaudeRegex, pathPrefix);
-		result = result.replace(localClaudeRegex, `./.claude/`);
-		return result;
-	}
-	/**
-	* Claude Code adapter configuration.
-	* Claude uses nested command structure (commands/maxsim/*.md).
-	*/
-	exports.claudeAdapter = {
-		runtime: "claude",
-		dirName: ".claude",
-		getGlobalDir,
-		getConfigDirFromHome,
-		transformContent,
-		commandStructure: "nested"
-	};
-	/**
-	* Install Claude Code adapter files.
-	* Stub — actual install orchestration will be implemented in Phase 5.
-	*/
-	function installClaude() {
-		throw new Error("installClaude() not yet implemented — see Phase 5");
-	}
-}));
-
-//#endregion
-//#region ../adapters/dist/transforms/tool-maps.js
-var require_tool_maps = /* @__PURE__ */ __commonJSMin(((exports) => {
-	/**
-	* @maxsim/adapters — Tool name mappings per runtime
-	*
-	* Ported from bin/install.js lines ~327-390
-	*/
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.convertToolName = convertToolName;
-	exports.convertGeminiToolName = convertGeminiToolName;
-	/** Tool name mapping from Claude Code to OpenCode */
-	const claudeToOpencodeTools = {
-		AskUserQuestion: "question",
-		SlashCommand: "skill",
-		TodoWrite: "todowrite",
-		WebFetch: "webfetch",
-		WebSearch: "websearch"
-	};
-	/** Tool name mapping from Claude Code to Gemini CLI */
-	const claudeToGeminiTools = {
-		Read: "read_file",
-		Write: "write_file",
-		Edit: "replace",
-		Bash: "run_shell_command",
-		Glob: "glob",
-		Grep: "search_file_content",
-		WebSearch: "google_web_search",
-		WebFetch: "web_fetch",
-		TodoWrite: "write_todos",
-		AskUserQuestion: "ask_user"
-	};
-	/**
-	* Convert a Claude Code tool name to OpenCode format.
-	* - Applies special mappings (AskUserQuestion -> question, etc.)
-	* - Converts to lowercase (except MCP tools which keep their format)
-	*/
-	function convertToolName(claudeTool) {
-		if (claudeToOpencodeTools[claudeTool]) return claudeToOpencodeTools[claudeTool];
-		if (claudeTool.startsWith("mcp__")) return claudeTool;
-		return claudeTool.toLowerCase();
-	}
-	/**
-	* Convert a Claude Code tool name to Gemini CLI format.
-	* - Applies Claude->Gemini mapping (Read->read_file, Bash->run_shell_command, etc.)
-	* - Filters out MCP tools (mcp__*) -- auto-discovered at runtime in Gemini
-	* - Filters out Task -- agents are auto-registered as tools in Gemini
-	* @returns Gemini tool name, or null if tool should be excluded
-	*/
-	function convertGeminiToolName(claudeTool) {
-		if (claudeTool.startsWith("mcp__")) return null;
-		if (claudeTool === "Task") return null;
-		if (claudeToGeminiTools[claudeTool]) return claudeToGeminiTools[claudeTool];
-		return claudeTool.toLowerCase();
-	}
-}));
-
-//#endregion
-//#region ../adapters/dist/transforms/content.js
-var require_content = /* @__PURE__ */ __commonJSMin(((exports) => {
-	/**
-	* @maxsim/adapters — Content transformation utilities
-	*
-	* Ported from bin/install.js lines ~423-564
-	*/
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.convertSlashCommandsToCodexSkillMentions = convertSlashCommandsToCodexSkillMentions;
-	exports.convertClaudeToCodexMarkdown = convertClaudeToCodexMarkdown;
-	exports.stripSubTags = stripSubTags;
-	exports.convertClaudeToGeminiAgent = convertClaudeToGeminiAgent;
-	exports.replacePathReferences = replacePathReferences;
-	const tool_maps_js_1 = require_tool_maps();
-	/**
-	* Convert /maxsim:command-name to $maxsim-command-name for Codex skill mentions.
-	* Ported from install.js line ~423
-	*/
-	function convertSlashCommandsToCodexSkillMentions(content) {
-		let converted = content.replace(/\/maxsim:([a-z0-9-]+)/gi, (_, commandName) => {
-			return `$maxsim-${String(commandName).toLowerCase()}`;
-		});
-		converted = converted.replace(/\/maxsim-help\b/g, "$maxsim-help");
-		return converted;
-	}
-	/**
-	* Convert Claude markdown to Codex markdown format.
-	* Replaces slash commands and $ARGUMENTS placeholder.
-	* Ported from install.js line ~431
-	*/
-	function convertClaudeToCodexMarkdown(content) {
-		let converted = convertSlashCommandsToCodexSkillMentions(content);
-		converted = converted.replace(/\$ARGUMENTS\b/g, "{{MAXSIM_ARGS}}");
-		return converted;
-	}
-	/**
-	* Strip HTML <sub> tags for Gemini CLI output.
-	* Terminals don't support subscript -- converts <sub>text</sub> to italic *(text)*.
-	* Ported from install.js line ~474
-	*/
-	function stripSubTags(content) {
-		return content.replace(/<sub>(.*?)<\/sub>/g, "*($1)*");
-	}
-	/**
-	* Convert Claude Code agent frontmatter to Gemini CLI format.
-	* - tools: must be a YAML array (not comma-separated string)
-	* - tool names: must use Gemini built-in names (read_file, not Read)
-	* - color: must be removed (causes validation error)
-	* - mcp__* tools: must be excluded (auto-discovered at runtime)
-	* - ${VAR} patterns: escaped to $VAR for Gemini template compatibility
-	*
-	* Ported from install.js line ~487
-	*/
-	function convertClaudeToGeminiAgent(content) {
-		if (!content.startsWith("---")) return content;
-		const endIndex = content.indexOf("---", 3);
-		if (endIndex === -1) return content;
-		const frontmatter = content.substring(3, endIndex).trim();
-		const body = content.substring(endIndex + 3);
-		const lines = frontmatter.split("\n");
-		const newLines = [];
-		let inAllowedTools = false;
-		const tools = [];
-		for (const line of lines) {
-			const trimmed = line.trim();
-			if (trimmed.startsWith("allowed-tools:")) {
-				inAllowedTools = true;
-				continue;
-			}
-			if (trimmed.startsWith("tools:")) {
-				const toolsValue = trimmed.substring(6).trim();
-				if (toolsValue) {
-					const parsed = toolsValue.split(",").map((t) => t.trim()).filter((t) => t);
-					for (const t of parsed) {
-						const mapped = (0, tool_maps_js_1.convertGeminiToolName)(t);
-						if (mapped) tools.push(mapped);
-					}
-				} else inAllowedTools = true;
-				continue;
-			}
-			if (trimmed.startsWith("color:")) continue;
-			if (inAllowedTools) {
-				if (trimmed.startsWith("- ")) {
-					const mapped = (0, tool_maps_js_1.convertGeminiToolName)(trimmed.substring(2).trim());
+	converted = converted.replace(/\/maxsim-help\b/g, "$maxsim-help");
+	return converted;
+}
+/**
+* Convert Claude markdown to Codex markdown format.
+* Replaces slash commands and $ARGUMENTS placeholder.
+* Ported from install.js line ~431
+*/
+function convertClaudeToCodexMarkdown(content) {
+	let converted = convertSlashCommandsToCodexSkillMentions(content);
+	converted = converted.replace(/\$ARGUMENTS\b/g, "{{MAXSIM_ARGS}}");
+	return converted;
+}
+/**
+* Strip HTML <sub> tags for Gemini CLI output.
+* Terminals don't support subscript -- converts <sub>text</sub> to italic *(text)*.
+* Ported from install.js line ~474
+*/
+function stripSubTags(content) {
+	return content.replace(/<sub>(.*?)<\/sub>/g, "*($1)*");
+}
+/**
+* Convert Claude Code agent frontmatter to Gemini CLI format.
+* - tools: must be a YAML array (not comma-separated string)
+* - tool names: must use Gemini built-in names (read_file, not Read)
+* - color: must be removed (causes validation error)
+* - mcp__* tools: must be excluded (auto-discovered at runtime)
+* - ${VAR} patterns: escaped to $VAR for Gemini template compatibility
+*
+* Ported from install.js line ~487
+*/
+function convertClaudeToGeminiAgent(content) {
+	if (!content.startsWith("---")) return content;
+	const endIndex = content.indexOf("---", 3);
+	if (endIndex === -1) return content;
+	const frontmatter = content.substring(3, endIndex).trim();
+	const body = content.substring(endIndex + 3);
+	const lines = frontmatter.split("\n");
+	const newLines = [];
+	let inAllowedTools = false;
+	const tools = [];
+	for (const line of lines) {
+		const trimmed = line.trim();
+		if (trimmed.startsWith("allowed-tools:")) {
+			inAllowedTools = true;
+			continue;
+		}
+		if (trimmed.startsWith("tools:")) {
+			const toolsValue = trimmed.substring(6).trim();
+			if (toolsValue) {
+				const parsed = toolsValue.split(",").map((t) => t.trim()).filter((t) => t);
+				for (const t of parsed) {
+					const mapped = convertGeminiToolName(t);
 					if (mapped) tools.push(mapped);
-					continue;
-				} else if (trimmed && !trimmed.startsWith("-")) inAllowedTools = false;
-			}
-			if (!inAllowedTools) newLines.push(line);
+				}
+			} else inAllowedTools = true;
+			continue;
 		}
-		if (tools.length > 0) {
-			newLines.push("tools:");
-			for (const tool of tools) newLines.push(`  - ${tool}`);
+		if (trimmed.startsWith("color:")) continue;
+		if (inAllowedTools) {
+			if (trimmed.startsWith("- ")) {
+				const mapped = convertGeminiToolName(trimmed.substring(2).trim());
+				if (mapped) tools.push(mapped);
+				continue;
+			} else if (trimmed && !trimmed.startsWith("-")) inAllowedTools = false;
 		}
-		return `---\n${newLines.join("\n").trim()}\n---${stripSubTags(body.replace(/\$\{(\w+)\}/g, "$$$1"))}`;
+		if (!inAllowedTools) newLines.push(line);
 	}
-	/**
-	* Replace path references in markdown content for a target runtime.
-	* Replaces ~/.claude/ with pathPrefix and ./.claude/ with ./dirName/.
-	*/
-	function replacePathReferences(content, pathPrefix, dirName) {
-		const globalClaudeRegex = /~\/\.claude\//g;
-		const localClaudeRegex = /\.\/\.claude\//g;
-		let result = content.replace(globalClaudeRegex, pathPrefix);
-		result = result.replace(localClaudeRegex, `./${dirName}/`);
-		return result;
+	if (tools.length > 0) {
+		newLines.push("tools:");
+		for (const tool of tools) newLines.push(`  - ${tool}`);
 	}
-}));
+	return `---\n${newLines.join("\n").trim()}\n---${stripSubTags(body.replace(/\$\{(\w+)\}/g, "$$$1"))}`;
+}
+/**
+* Replace path references in markdown content for a target runtime.
+* Replaces ~/.claude/ with pathPrefix and ./.claude/ with ./dirName/.
+*/
+function replacePathReferences(content, pathPrefix, dirName) {
+	const globalClaudeRegex = /~\/\.claude\//g;
+	const localClaudeRegex = /\.\/\.claude\//g;
+	let result = content.replace(globalClaudeRegex, pathPrefix);
+	result = result.replace(localClaudeRegex, `./${dirName}/`);
+	return result;
+}
 
 //#endregion
-//#region ../adapters/dist/transforms/frontmatter.js
-var require_frontmatter = /* @__PURE__ */ __commonJSMin(((exports) => {
-	/**
-	* @maxsim/adapters — Frontmatter conversion functions for opencode, gemini, codex
-	*
-	* Ported from bin/install.js lines ~308-711
-	*/
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.colorNameToHex = void 0;
-	exports.toSingleLine = toSingleLine;
-	exports.yamlQuote = yamlQuote;
-	exports.extractFrontmatterField = extractFrontmatterField;
-	exports.convertClaudeToOpencodeFrontmatter = convertClaudeToOpencodeFrontmatter;
-	exports.convertClaudeToGeminiToml = convertClaudeToGeminiToml;
-	exports.convertClaudeCommandToCodexSkill = convertClaudeCommandToCodexSkill;
-	exports.getCodexSkillAdapterHeader = getCodexSkillAdapterHeader;
-	const base_js_1 = require_base();
-	const tool_maps_js_1 = require_tool_maps();
-	const content_js_1 = require_content();
-	/** Color name to hex mapping for opencode compatibility */
-	exports.colorNameToHex = {
-		cyan: "#00FFFF",
-		red: "#FF0000",
-		green: "#00FF00",
-		blue: "#0000FF",
-		yellow: "#FFFF00",
-		magenta: "#FF00FF",
-		orange: "#FFA500",
-		purple: "#800080",
-		pink: "#FFC0CB",
-		white: "#FFFFFF",
-		black: "#000000",
-		gray: "#808080",
-		grey: "#808080"
-	};
-	/** Collapse whitespace to single line */
-	function toSingleLine(value) {
-		return value.replace(/\s+/g, " ").trim();
-	}
-	/** Quote a value for YAML using JSON.stringify */
-	function yamlQuote(value) {
-		return JSON.stringify(value);
-	}
-	/** Extract a single-line field value from YAML frontmatter text */
-	function extractFrontmatterField(frontmatter, fieldName) {
-		const regex = new RegExp(`^${fieldName}:\\s*(.+)$`, "m");
-		const match = frontmatter.match(regex);
-		if (!match) return null;
-		return match[1].trim().replace(/^['"]|['"]$/g, "");
-	}
-	/**
-	* Convert Claude Code frontmatter to OpenCode format.
-	* - Converts 'allowed-tools:' array to 'tools:' object with tool: true entries
-	* - Converts color names to hex
-	* - Removes name: field (opencode uses filename)
-	* - Replaces tool name references in body content
-	* - Replaces /maxsim: with /maxsim- (flat command structure)
-	* - Replaces ~/.claude with ~/.config/opencode
-	* - Replaces subagent_type="general-purpose" with "general"
-	*
-	* Ported from install.js line ~566
-	*/
-	function convertClaudeToOpencodeFrontmatter(content) {
-		let convertedContent = content;
-		convertedContent = convertedContent.replace(/\bAskUserQuestion\b/g, "question");
-		convertedContent = convertedContent.replace(/\bSlashCommand\b/g, "skill");
-		convertedContent = convertedContent.replace(/\bTodoWrite\b/g, "todowrite");
-		convertedContent = convertedContent.replace(/\/maxsim:/g, "/maxsim-");
-		convertedContent = convertedContent.replace(/~\/\.claude\b/g, "~/.config/opencode");
-		convertedContent = convertedContent.replace(/subagent_type="general-purpose"/g, "subagent_type=\"general\"");
-		if (!convertedContent.startsWith("---")) return convertedContent;
-		const endIndex = convertedContent.indexOf("---", 3);
-		if (endIndex === -1) return convertedContent;
-		const frontmatter = convertedContent.substring(3, endIndex).trim();
-		const body = convertedContent.substring(endIndex + 3);
-		const lines = frontmatter.split("\n");
-		const newLines = [];
-		let inAllowedTools = false;
-		const allowedTools = [];
-		for (const line of lines) {
-			const trimmed = line.trim();
-			if (trimmed.startsWith("allowed-tools:")) {
-				inAllowedTools = true;
+//#region src/adapters/transforms/frontmatter.ts
+/**
+* @maxsim/adapters — Frontmatter conversion functions for opencode, gemini, codex
+*
+* Ported from bin/install.js lines ~308-711
+*/
+/** Color name to hex mapping for opencode compatibility */
+const colorNameToHex = {
+	cyan: "#00FFFF",
+	red: "#FF0000",
+	green: "#00FF00",
+	blue: "#0000FF",
+	yellow: "#FFFF00",
+	magenta: "#FF00FF",
+	orange: "#FFA500",
+	purple: "#800080",
+	pink: "#FFC0CB",
+	white: "#FFFFFF",
+	black: "#000000",
+	gray: "#808080",
+	grey: "#808080"
+};
+/** Collapse whitespace to single line */
+function toSingleLine(value) {
+	return value.replace(/\s+/g, " ").trim();
+}
+/** Quote a value for YAML using JSON.stringify */
+function yamlQuote(value) {
+	return JSON.stringify(value);
+}
+/** Extract a single-line field value from YAML frontmatter text */
+function extractFrontmatterField(frontmatter, fieldName) {
+	const regex = new RegExp(`^${fieldName}:\\s*(.+)$`, "m");
+	const match = frontmatter.match(regex);
+	if (!match) return null;
+	return match[1].trim().replace(/^['"]|['"]$/g, "");
+}
+/**
+* Convert Claude Code frontmatter to OpenCode format.
+* - Converts 'allowed-tools:' array to 'tools:' object with tool: true entries
+* - Converts color names to hex
+* - Removes name: field (opencode uses filename)
+* - Replaces tool name references in body content
+* - Replaces /maxsim: with /maxsim- (flat command structure)
+* - Replaces ~/.claude with ~/.config/opencode
+* - Replaces subagent_type="general-purpose" with "general"
+*
+* Ported from install.js line ~566
+*/
+function convertClaudeToOpencodeFrontmatter(content) {
+	let convertedContent = content;
+	convertedContent = convertedContent.replace(/\bAskUserQuestion\b/g, "question");
+	convertedContent = convertedContent.replace(/\bSlashCommand\b/g, "skill");
+	convertedContent = convertedContent.replace(/\bTodoWrite\b/g, "todowrite");
+	convertedContent = convertedContent.replace(/\/maxsim:/g, "/maxsim-");
+	convertedContent = convertedContent.replace(/~\/\.claude\b/g, "~/.config/opencode");
+	convertedContent = convertedContent.replace(/subagent_type="general-purpose"/g, "subagent_type=\"general\"");
+	if (!convertedContent.startsWith("---")) return convertedContent;
+	const endIndex = convertedContent.indexOf("---", 3);
+	if (endIndex === -1) return convertedContent;
+	const frontmatter = convertedContent.substring(3, endIndex).trim();
+	const body = convertedContent.substring(endIndex + 3);
+	const lines = frontmatter.split("\n");
+	const newLines = [];
+	let inAllowedTools = false;
+	const allowedTools = [];
+	for (const line of lines) {
+		const trimmed = line.trim();
+		if (trimmed.startsWith("allowed-tools:")) {
+			inAllowedTools = true;
+			continue;
+		}
+		if (trimmed.startsWith("tools:")) {
+			const toolsValue = trimmed.substring(6).trim();
+			if (toolsValue) {
+				const tools = toolsValue.split(",").map((t) => t.trim()).filter((t) => t);
+				allowedTools.push(...tools);
+			}
+			continue;
+		}
+		if (trimmed.startsWith("name:")) continue;
+		if (trimmed.startsWith("color:")) {
+			const colorValue = trimmed.substring(6).trim().toLowerCase();
+			const hexColor = colorNameToHex[colorValue];
+			if (hexColor) newLines.push(`color: "${hexColor}"`);
+			else if (colorValue.startsWith("#")) {
+				if (/^#[0-9a-f]{3}$|^#[0-9a-f]{6}$/i.test(colorValue)) newLines.push(line);
+			}
+			continue;
+		}
+		if (inAllowedTools) {
+			if (trimmed.startsWith("- ")) {
+				allowedTools.push(trimmed.substring(2).trim());
 				continue;
-			}
-			if (trimmed.startsWith("tools:")) {
-				const toolsValue = trimmed.substring(6).trim();
-				if (toolsValue) {
-					const tools = toolsValue.split(",").map((t) => t.trim()).filter((t) => t);
-					allowedTools.push(...tools);
-				}
-				continue;
-			}
-			if (trimmed.startsWith("name:")) continue;
-			if (trimmed.startsWith("color:")) {
-				const colorValue = trimmed.substring(6).trim().toLowerCase();
-				const hexColor = exports.colorNameToHex[colorValue];
-				if (hexColor) newLines.push(`color: "${hexColor}"`);
-				else if (colorValue.startsWith("#")) {
-					if (/^#[0-9a-f]{3}$|^#[0-9a-f]{6}$/i.test(colorValue)) newLines.push(line);
-				}
-				continue;
-			}
-			if (inAllowedTools) {
-				if (trimmed.startsWith("- ")) {
-					allowedTools.push(trimmed.substring(2).trim());
-					continue;
-				} else if (trimmed && !trimmed.startsWith("-")) inAllowedTools = false;
-			}
-			if (!inAllowedTools) newLines.push(line);
+			} else if (trimmed && !trimmed.startsWith("-")) inAllowedTools = false;
 		}
-		if (allowedTools.length > 0) {
-			newLines.push("tools:");
-			for (const tool of allowedTools) newLines.push(`  ${(0, tool_maps_js_1.convertToolName)(tool)}: true`);
-		}
-		return `---\n${newLines.join("\n").trim()}\n---${body}`;
+		if (!inAllowedTools) newLines.push(line);
 	}
-	/**
-	* Convert Claude Code markdown command to Gemini TOML format.
-	* Ported from install.js line ~677
-	*/
-	function convertClaudeToGeminiToml(content) {
-		if (!content.startsWith("---")) return `prompt = ${JSON.stringify(content)}\n`;
-		const endIndex = content.indexOf("---", 3);
-		if (endIndex === -1) return `prompt = ${JSON.stringify(content)}\n`;
-		const frontmatter = content.substring(3, endIndex).trim();
-		const body = content.substring(endIndex + 3).trim();
-		let description = "";
-		const lines = frontmatter.split("\n");
-		for (const line of lines) {
-			const trimmed = line.trim();
-			if (trimmed.startsWith("description:")) {
-				description = trimmed.substring(12).trim();
-				break;
-			}
-		}
-		let toml = "";
-		if (description) toml += `description = ${JSON.stringify(description)}\n`;
-		toml += `prompt = ${JSON.stringify(body)}\n`;
-		return toml;
+	if (allowedTools.length > 0) {
+		newLines.push("tools:");
+		for (const tool of allowedTools) newLines.push(`  ${convertToolName(tool)}: true`);
 	}
-	/**
-	* Convert Claude command to Codex skill format with adapter header.
-	* Ported from install.js line ~452
-	*/
-	function convertClaudeCommandToCodexSkill(content, skillName) {
-		const converted = (0, content_js_1.convertClaudeToCodexMarkdown)(content);
-		const { frontmatter, body } = (0, base_js_1.extractFrontmatterAndBody)(converted);
-		let description = `Run MAXSIM workflow ${skillName}.`;
-		if (frontmatter) {
-			const maybeDescription = extractFrontmatterField(frontmatter, "description");
-			if (maybeDescription) description = maybeDescription;
+	return `---\n${newLines.join("\n").trim()}\n---${body}`;
+}
+/**
+* Convert Claude Code markdown command to Gemini TOML format.
+* Ported from install.js line ~677
+*/
+function convertClaudeToGeminiToml(content) {
+	if (!content.startsWith("---")) return `prompt = ${JSON.stringify(content)}\n`;
+	const endIndex = content.indexOf("---", 3);
+	if (endIndex === -1) return `prompt = ${JSON.stringify(content)}\n`;
+	const frontmatter = content.substring(3, endIndex).trim();
+	const body = content.substring(endIndex + 3).trim();
+	let description = "";
+	const lines = frontmatter.split("\n");
+	for (const line of lines) {
+		const trimmed = line.trim();
+		if (trimmed.startsWith("description:")) {
+			description = trimmed.substring(12).trim();
+			break;
 		}
-		description = toSingleLine(description);
-		const shortDescription = description.length > 180 ? `${description.slice(0, 177)}...` : description;
-		const adapter = getCodexSkillAdapterHeader(skillName);
-		return `---\nname: ${yamlQuote(skillName)}\ndescription: ${yamlQuote(description)}\nmetadata:\n  short-description: ${yamlQuote(shortDescription)}\n---\n\n${adapter}\n\n${body.trimStart()}`;
 	}
-	/**
-	* Generate the Codex skill adapter header block.
-	* Ported from install.js line ~437
-	*/
-	function getCodexSkillAdapterHeader(skillName) {
-		const invocation = `$${skillName}`;
-		return `<codex_skill_adapter>
+	let toml = "";
+	if (description) toml += `description = ${JSON.stringify(description)}\n`;
+	toml += `prompt = ${JSON.stringify(body)}\n`;
+	return toml;
+}
+/**
+* Convert Claude command to Codex skill format with adapter header.
+* Ported from install.js line ~452
+*/
+function convertClaudeCommandToCodexSkill(content, skillName) {
+	const { frontmatter, body } = extractFrontmatterAndBody(convertClaudeToCodexMarkdown(content));
+	let description = `Run MAXSIM workflow ${skillName}.`;
+	if (frontmatter) {
+		const maybeDescription = extractFrontmatterField(frontmatter, "description");
+		if (maybeDescription) description = maybeDescription;
+	}
+	description = toSingleLine(description);
+	const shortDescription = description.length > 180 ? `${description.slice(0, 177)}...` : description;
+	const adapter = getCodexSkillAdapterHeader(skillName);
+	return `---\nname: ${yamlQuote(skillName)}\ndescription: ${yamlQuote(description)}\nmetadata:\n  short-description: ${yamlQuote(shortDescription)}\n---\n\n${adapter}\n\n${body.trimStart()}`;
+}
+/**
+* Generate the Codex skill adapter header block.
+* Ported from install.js line ~437
+*/
+function getCodexSkillAdapterHeader(skillName) {
+	const invocation = `$${skillName}`;
+	return `<codex_skill_adapter>
 Codex skills-first mode:
 - This skill is invoked by mentioning \`${invocation}\`.
 - Treat all user text after \`${invocation}\` as \`{{MAXSIM_ARGS}}\`.
@@ -5958,531 +6022,170 @@ Legacy orchestration compatibility:
 - Implement equivalent behavior with Codex collaboration tools: \`spawn_agent\`, \`wait\`, \`send_input\`, and \`close_agent\`.
 - Treat legacy \`subagent_type\` names as role hints in the spawned message.
 </codex_skill_adapter>`;
-	}
-}));
+}
 
 //#endregion
-//#region ../adapters/dist/opencode.js
-var require_opencode = /* @__PURE__ */ __commonJSMin(((exports) => {
-	/**
-	* @maxsim/adapters — OpenCode adapter
-	*
-	* Ports the OpenCode-specific logic from bin/install.js:
-	*   - getOpencodeGlobalDir()           (lines 79-97)
-	*   - getGlobalDir('opencode', ...)    (lines 104-111)
-	*   - getDirName('opencode')           (line 46)
-	*   - getConfigDirFromHome('opencode', isGlobal) (lines 58-68)
-	*   - convertClaudeToOpencodeFrontmatter + path replacement
-	*/
-	var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
-		if (k2 === void 0) k2 = k;
-		var desc = Object.getOwnPropertyDescriptor(m, k);
-		if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) desc = {
-			enumerable: true,
-			get: function() {
-				return m[k];
-			}
-		};
-		Object.defineProperty(o, k2, desc);
-	}) : (function(o, m, k, k2) {
-		if (k2 === void 0) k2 = k;
-		o[k2] = m[k];
-	}));
-	var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
-		Object.defineProperty(o, "default", {
-			enumerable: true,
-			value: v
-		});
-	}) : function(o, v) {
-		o["default"] = v;
-	});
-	var __importStar = exports && exports.__importStar || (function() {
-		var ownKeys = function(o) {
-			ownKeys = Object.getOwnPropertyNames || function(o) {
-				var ar = [];
-				for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-				return ar;
-			};
-			return ownKeys(o);
-		};
-		return function(mod) {
-			if (mod && mod.__esModule) return mod;
-			var result = {};
-			if (mod != null) {
-				for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-			}
-			__setModuleDefault(result, mod);
-			return result;
-		};
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.opencodeAdapter = void 0;
-	const path$2 = __importStar(require("node:path"));
-	const os$2 = __importStar(require("node:os"));
-	const base_js_1 = require_base();
-	const frontmatter_js_1 = require_frontmatter();
-	const content_js_1 = require_content();
-	/**
-	* Get the global config directory for OpenCode.
-	* OpenCode follows XDG Base Directory spec and uses ~/.config/opencode/.
-	* Priority: OPENCODE_CONFIG_DIR > dirname(OPENCODE_CONFIG) > XDG_CONFIG_HOME/opencode > ~/.config/opencode
-	*/
-	function getOpencodeGlobalDir() {
-		if (process.env.OPENCODE_CONFIG_DIR) return (0, base_js_1.expandTilde)(process.env.OPENCODE_CONFIG_DIR);
-		if (process.env.OPENCODE_CONFIG) return path$2.dirname((0, base_js_1.expandTilde)(process.env.OPENCODE_CONFIG));
-		if (process.env.XDG_CONFIG_HOME) return path$2.join((0, base_js_1.expandTilde)(process.env.XDG_CONFIG_HOME), "opencode");
-		return path$2.join(os$2.homedir(), ".config", "opencode");
-	}
-	/**
-	* Get the global config directory for OpenCode.
-	* Priority: explicitDir > env vars (via getOpencodeGlobalDir)
-	*/
-	function getGlobalDir(explicitDir) {
-		if (explicitDir) return (0, base_js_1.expandTilde)(explicitDir);
-		return getOpencodeGlobalDir();
-	}
-	/**
-	* Get the config directory path relative to home for hook templating.
-	*/
-	function getConfigDirFromHome(isGlobal) {
-		if (!isGlobal) return "'.opencode'";
-		return "'.config', 'opencode'";
-	}
-	/**
-	* Transform markdown content for OpenCode installation.
-	* Applies frontmatter conversion and path replacement.
-	*/
-	function transformContent(content, pathPrefix) {
-		let result = (0, content_js_1.replacePathReferences)(content, pathPrefix, ".opencode");
-		result = result.replace(/~\/\.opencode\//g, pathPrefix);
-		result = (0, frontmatter_js_1.convertClaudeToOpencodeFrontmatter)(result);
-		return result;
-	}
-	/**
-	* OpenCode adapter configuration.
-	* OpenCode uses flat command structure (command/maxsim-*.md).
-	*/
-	exports.opencodeAdapter = {
-		runtime: "opencode",
-		dirName: ".opencode",
-		getGlobalDir,
-		getConfigDirFromHome,
-		transformContent,
-		commandStructure: "flat"
-	};
-}));
+//#region src/adapters/opencode.ts
+/**
+* @maxsim/adapters — OpenCode adapter
+*
+* Ports the OpenCode-specific logic from bin/install.js:
+*   - getOpencodeGlobalDir()           (lines 79-97)
+*   - getGlobalDir('opencode', ...)    (lines 104-111)
+*   - getDirName('opencode')           (line 46)
+*   - getConfigDirFromHome('opencode', isGlobal) (lines 58-68)
+*   - convertClaudeToOpencodeFrontmatter + path replacement
+*/
+/**
+* Get the global config directory for OpenCode.
+* OpenCode follows XDG Base Directory spec and uses ~/.config/opencode/.
+* Priority: OPENCODE_CONFIG_DIR > dirname(OPENCODE_CONFIG) > XDG_CONFIG_HOME/opencode > ~/.config/opencode
+*/
+function getOpencodeGlobalDir$1() {
+	if (process.env.OPENCODE_CONFIG_DIR) return expandTilde(process.env.OPENCODE_CONFIG_DIR);
+	if (process.env.OPENCODE_CONFIG) return node_path.dirname(expandTilde(process.env.OPENCODE_CONFIG));
+	if (process.env.XDG_CONFIG_HOME) return node_path.join(expandTilde(process.env.XDG_CONFIG_HOME), "opencode");
+	return node_path.join(node_os.homedir(), ".config", "opencode");
+}
+/**
+* Get the global config directory for OpenCode.
+* Priority: explicitDir > env vars (via getOpencodeGlobalDir)
+*/
+function getGlobalDir$3(explicitDir) {
+	if (explicitDir) return expandTilde(explicitDir);
+	return getOpencodeGlobalDir$1();
+}
+/**
+* Get the config directory path relative to home for hook templating.
+*/
+function getConfigDirFromHome$3(isGlobal) {
+	if (!isGlobal) return "'.opencode'";
+	return "'.config', 'opencode'";
+}
+/**
+* Transform markdown content for OpenCode installation.
+* Applies frontmatter conversion and path replacement.
+*/
+function transformContent$2(content, pathPrefix) {
+	let result = replacePathReferences(content, pathPrefix, ".opencode");
+	result = result.replace(/~\/\.opencode\//g, pathPrefix);
+	result = convertClaudeToOpencodeFrontmatter(result);
+	return result;
+}
+/**
+* OpenCode adapter configuration.
+* OpenCode uses flat command structure (command/maxsim-*.md).
+*/
+const opencodeAdapter = {
+	runtime: "opencode",
+	dirName: ".opencode",
+	getGlobalDir: getGlobalDir$3,
+	getConfigDirFromHome: getConfigDirFromHome$3,
+	transformContent: transformContent$2,
+	commandStructure: "flat"
+};
 
 //#endregion
-//#region ../adapters/dist/gemini.js
-var require_gemini = /* @__PURE__ */ __commonJSMin(((exports) => {
-	/**
-	* @maxsim/adapters — Gemini adapter
-	*
-	* Ports the Gemini-specific logic from bin/install.js:
-	*   - getGlobalDir('gemini', ...)         (lines 113-122)
-	*   - getDirName('gemini')                (line 47)
-	*   - getConfigDirFromHome('gemini', isGlobal) (line 69)
-	*   - convertClaudeToGeminiToml + convertClaudeToGeminiAgent + stripSubTags
-	*/
-	var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
-		if (k2 === void 0) k2 = k;
-		var desc = Object.getOwnPropertyDescriptor(m, k);
-		if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) desc = {
-			enumerable: true,
-			get: function() {
-				return m[k];
-			}
-		};
-		Object.defineProperty(o, k2, desc);
-	}) : (function(o, m, k, k2) {
-		if (k2 === void 0) k2 = k;
-		o[k2] = m[k];
-	}));
-	var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
-		Object.defineProperty(o, "default", {
-			enumerable: true,
-			value: v
-		});
-	}) : function(o, v) {
-		o["default"] = v;
-	});
-	var __importStar = exports && exports.__importStar || (function() {
-		var ownKeys = function(o) {
-			ownKeys = Object.getOwnPropertyNames || function(o) {
-				var ar = [];
-				for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-				return ar;
-			};
-			return ownKeys(o);
-		};
-		return function(mod) {
-			if (mod && mod.__esModule) return mod;
-			var result = {};
-			if (mod != null) {
-				for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-			}
-			__setModuleDefault(result, mod);
-			return result;
-		};
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.stripSubTags = exports.convertClaudeToGeminiAgent = exports.convertClaudeToGeminiToml = exports.geminiAdapter = void 0;
-	const path$1 = __importStar(require("node:path"));
-	const os$1 = __importStar(require("node:os"));
-	const base_js_1 = require_base();
-	const frontmatter_js_1 = require_frontmatter();
-	Object.defineProperty(exports, "convertClaudeToGeminiToml", {
-		enumerable: true,
-		get: function() {
-			return frontmatter_js_1.convertClaudeToGeminiToml;
-		}
-	});
-	const content_js_1 = require_content();
-	Object.defineProperty(exports, "convertClaudeToGeminiAgent", {
-		enumerable: true,
-		get: function() {
-			return content_js_1.convertClaudeToGeminiAgent;
-		}
-	});
-	Object.defineProperty(exports, "stripSubTags", {
-		enumerable: true,
-		get: function() {
-			return content_js_1.stripSubTags;
-		}
-	});
-	/**
-	* Get the global config directory for Gemini.
-	* Priority: explicitDir > GEMINI_CONFIG_DIR env > ~/.gemini
-	*/
-	function getGlobalDir(explicitDir) {
-		if (explicitDir) return (0, base_js_1.expandTilde)(explicitDir);
-		if (process.env.GEMINI_CONFIG_DIR) return (0, base_js_1.expandTilde)(process.env.GEMINI_CONFIG_DIR);
-		return path$1.join(os$1.homedir(), ".gemini");
-	}
-	/**
-	* Get the config directory path relative to home for hook templating.
-	*/
-	function getConfigDirFromHome(_isGlobal) {
-		return "'.gemini'";
-	}
-	/**
-	* Transform markdown content for Gemini installation.
-	* Applies TOML conversion for commands, agent conversion for agents,
-	* stripSubTags, and path replacement.
-	*/
-	function transformContent(content, pathPrefix) {
-		let result = (0, content_js_1.replacePathReferences)(content, pathPrefix, ".gemini");
-		result = (0, content_js_1.stripSubTags)(result);
-		result = (0, frontmatter_js_1.convertClaudeToGeminiToml)(result);
-		return result;
-	}
-	/**
-	* Gemini adapter configuration.
-	* Gemini uses nested command structure (commands/maxsim/*.toml).
-	*/
-	exports.geminiAdapter = {
-		runtime: "gemini",
-		dirName: ".gemini",
-		getGlobalDir,
-		getConfigDirFromHome,
-		transformContent,
-		commandStructure: "nested"
-	};
-}));
+//#region src/adapters/gemini.ts
+/**
+* @maxsim/adapters — Gemini adapter
+*
+* Ports the Gemini-specific logic from bin/install.js:
+*   - getGlobalDir('gemini', ...)         (lines 113-122)
+*   - getDirName('gemini')                (line 47)
+*   - getConfigDirFromHome('gemini', isGlobal) (line 69)
+*   - convertClaudeToGeminiToml + convertClaudeToGeminiAgent + stripSubTags
+*/
+/**
+* Get the global config directory for Gemini.
+* Priority: explicitDir > GEMINI_CONFIG_DIR env > ~/.gemini
+*/
+function getGlobalDir$2(explicitDir) {
+	if (explicitDir) return expandTilde(explicitDir);
+	if (process.env.GEMINI_CONFIG_DIR) return expandTilde(process.env.GEMINI_CONFIG_DIR);
+	return node_path.join(node_os.homedir(), ".gemini");
+}
+/**
+* Get the config directory path relative to home for hook templating.
+*/
+function getConfigDirFromHome$2(_isGlobal) {
+	return "'.gemini'";
+}
+/**
+* Transform markdown content for Gemini installation.
+* Applies TOML conversion for commands, agent conversion for agents,
+* stripSubTags, and path replacement.
+*/
+function transformContent$1(content, pathPrefix) {
+	let result = replacePathReferences(content, pathPrefix, ".gemini");
+	result = stripSubTags(result);
+	result = convertClaudeToGeminiToml(result);
+	return result;
+}
+/**
+* Gemini adapter configuration.
+* Gemini uses nested command structure (commands/maxsim/*.toml).
+*/
+const geminiAdapter = {
+	runtime: "gemini",
+	dirName: ".gemini",
+	getGlobalDir: getGlobalDir$2,
+	getConfigDirFromHome: getConfigDirFromHome$2,
+	transformContent: transformContent$1,
+	commandStructure: "nested"
+};
 
 //#endregion
-//#region ../adapters/dist/codex.js
-var require_codex = /* @__PURE__ */ __commonJSMin(((exports) => {
-	/**
-	* @maxsim/adapters — Codex adapter
-	*
-	* Ports the Codex-specific logic from bin/install.js:
-	*   - getGlobalDir('codex', ...)         (lines 124-133)
-	*   - getDirName('codex')                (line 48)
-	*   - getConfigDirFromHome('codex', isGlobal) (line 70)
-	*   - convertClaudeCommandToCodexSkill + convertClaudeToCodexMarkdown
-	*/
-	var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
-		if (k2 === void 0) k2 = k;
-		var desc = Object.getOwnPropertyDescriptor(m, k);
-		if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) desc = {
-			enumerable: true,
-			get: function() {
-				return m[k];
-			}
-		};
-		Object.defineProperty(o, k2, desc);
-	}) : (function(o, m, k, k2) {
-		if (k2 === void 0) k2 = k;
-		o[k2] = m[k];
-	}));
-	var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
-		Object.defineProperty(o, "default", {
-			enumerable: true,
-			value: v
-		});
-	}) : function(o, v) {
-		o["default"] = v;
-	});
-	var __importStar = exports && exports.__importStar || (function() {
-		var ownKeys = function(o) {
-			ownKeys = Object.getOwnPropertyNames || function(o) {
-				var ar = [];
-				for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-				return ar;
-			};
-			return ownKeys(o);
-		};
-		return function(mod) {
-			if (mod && mod.__esModule) return mod;
-			var result = {};
-			if (mod != null) {
-				for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-			}
-			__setModuleDefault(result, mod);
-			return result;
-		};
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.convertClaudeToCodexMarkdown = exports.convertClaudeCommandToCodexSkill = exports.codexAdapter = void 0;
-	const path = __importStar(require("node:path"));
-	const os = __importStar(require("node:os"));
-	const base_js_1 = require_base();
-	const frontmatter_js_1 = require_frontmatter();
-	Object.defineProperty(exports, "convertClaudeCommandToCodexSkill", {
-		enumerable: true,
-		get: function() {
-			return frontmatter_js_1.convertClaudeCommandToCodexSkill;
-		}
-	});
-	const content_js_1 = require_content();
-	Object.defineProperty(exports, "convertClaudeToCodexMarkdown", {
-		enumerable: true,
-		get: function() {
-			return content_js_1.convertClaudeToCodexMarkdown;
-		}
-	});
-	/**
-	* Get the global config directory for Codex.
-	* Priority: explicitDir > CODEX_HOME env > ~/.codex
-	*/
-	function getGlobalDir(explicitDir) {
-		if (explicitDir) return (0, base_js_1.expandTilde)(explicitDir);
-		if (process.env.CODEX_HOME) return (0, base_js_1.expandTilde)(process.env.CODEX_HOME);
-		return path.join(os.homedir(), ".codex");
-	}
-	/**
-	* Get the config directory path relative to home for hook templating.
-	*/
-	function getConfigDirFromHome(_isGlobal) {
-		return "'.codex'";
-	}
-	/**
-	* Transform markdown content for Codex installation.
-	* Applies Codex markdown conversion and path replacement.
-	*/
-	function transformContent(content, pathPrefix) {
-		let result = (0, content_js_1.replacePathReferences)(content, pathPrefix, ".codex");
-		result = result.replace(/~\/\.codex\//g, pathPrefix);
-		result = (0, frontmatter_js_1.convertClaudeCommandToCodexSkill)(result);
-		return result;
-	}
-	/**
-	* Codex adapter configuration.
-	* Codex uses skill-based command structure (skills/maxsim-star/SKILL.md).
-	*/
-	exports.codexAdapter = {
-		runtime: "codex",
-		dirName: ".codex",
-		getGlobalDir,
-		getConfigDirFromHome,
-		transformContent,
-		commandStructure: "skills"
-	};
-}));
-
-//#endregion
-//#region ../adapters/dist/index.js
-var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
-	/**
-	* @maxsim/adapters — Runtime adapter registry
-	*/
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.replacePathReferences = exports.convertClaudeToGeminiAgent = exports.stripSubTags = exports.convertClaudeToCodexMarkdown = exports.convertSlashCommandsToCodexSkillMentions = exports.getCodexSkillAdapterHeader = exports.convertClaudeCommandToCodexSkill = exports.convertClaudeToGeminiToml = exports.convertClaudeToOpencodeFrontmatter = exports.extractFrontmatterField = exports.yamlQuote = exports.toSingleLine = exports.colorNameToHex = exports.convertGeminiToolName = exports.convertToolName = exports.writeSettings = exports.readSettings = exports.buildHookCommand = exports.processAttribution = exports.extractFrontmatterAndBody = exports.expandTilde = exports.codexAdapter = exports.geminiAdapter = exports.opencodeAdapter = exports.installClaude = exports.claudeAdapter = void 0;
-	const claude_js_1 = require_claude();
-	const opencode_js_1 = require_opencode();
-	const gemini_js_1 = require_gemini();
-	const codex_js_1 = require_codex();
-	var claude_js_2 = require_claude();
-	Object.defineProperty(exports, "claudeAdapter", {
-		enumerable: true,
-		get: function() {
-			return claude_js_2.claudeAdapter;
-		}
-	});
-	var claude_js_3 = require_claude();
-	Object.defineProperty(exports, "installClaude", {
-		enumerable: true,
-		get: function() {
-			return claude_js_3.installClaude;
-		}
-	});
-	var opencode_js_2 = require_opencode();
-	Object.defineProperty(exports, "opencodeAdapter", {
-		enumerable: true,
-		get: function() {
-			return opencode_js_2.opencodeAdapter;
-		}
-	});
-	var gemini_js_2 = require_gemini();
-	Object.defineProperty(exports, "geminiAdapter", {
-		enumerable: true,
-		get: function() {
-			return gemini_js_2.geminiAdapter;
-		}
-	});
-	var codex_js_2 = require_codex();
-	Object.defineProperty(exports, "codexAdapter", {
-		enumerable: true,
-		get: function() {
-			return codex_js_2.codexAdapter;
-		}
-	});
-	var base_js_1 = require_base();
-	Object.defineProperty(exports, "expandTilde", {
-		enumerable: true,
-		get: function() {
-			return base_js_1.expandTilde;
-		}
-	});
-	Object.defineProperty(exports, "extractFrontmatterAndBody", {
-		enumerable: true,
-		get: function() {
-			return base_js_1.extractFrontmatterAndBody;
-		}
-	});
-	Object.defineProperty(exports, "processAttribution", {
-		enumerable: true,
-		get: function() {
-			return base_js_1.processAttribution;
-		}
-	});
-	Object.defineProperty(exports, "buildHookCommand", {
-		enumerable: true,
-		get: function() {
-			return base_js_1.buildHookCommand;
-		}
-	});
-	Object.defineProperty(exports, "readSettings", {
-		enumerable: true,
-		get: function() {
-			return base_js_1.readSettings;
-		}
-	});
-	Object.defineProperty(exports, "writeSettings", {
-		enumerable: true,
-		get: function() {
-			return base_js_1.writeSettings;
-		}
-	});
-	var tool_maps_js_1 = require_tool_maps();
-	Object.defineProperty(exports, "convertToolName", {
-		enumerable: true,
-		get: function() {
-			return tool_maps_js_1.convertToolName;
-		}
-	});
-	Object.defineProperty(exports, "convertGeminiToolName", {
-		enumerable: true,
-		get: function() {
-			return tool_maps_js_1.convertGeminiToolName;
-		}
-	});
-	var frontmatter_js_1 = require_frontmatter();
-	Object.defineProperty(exports, "colorNameToHex", {
-		enumerable: true,
-		get: function() {
-			return frontmatter_js_1.colorNameToHex;
-		}
-	});
-	Object.defineProperty(exports, "toSingleLine", {
-		enumerable: true,
-		get: function() {
-			return frontmatter_js_1.toSingleLine;
-		}
-	});
-	Object.defineProperty(exports, "yamlQuote", {
-		enumerable: true,
-		get: function() {
-			return frontmatter_js_1.yamlQuote;
-		}
-	});
-	Object.defineProperty(exports, "extractFrontmatterField", {
-		enumerable: true,
-		get: function() {
-			return frontmatter_js_1.extractFrontmatterField;
-		}
-	});
-	Object.defineProperty(exports, "convertClaudeToOpencodeFrontmatter", {
-		enumerable: true,
-		get: function() {
-			return frontmatter_js_1.convertClaudeToOpencodeFrontmatter;
-		}
-	});
-	Object.defineProperty(exports, "convertClaudeToGeminiToml", {
-		enumerable: true,
-		get: function() {
-			return frontmatter_js_1.convertClaudeToGeminiToml;
-		}
-	});
-	Object.defineProperty(exports, "convertClaudeCommandToCodexSkill", {
-		enumerable: true,
-		get: function() {
-			return frontmatter_js_1.convertClaudeCommandToCodexSkill;
-		}
-	});
-	Object.defineProperty(exports, "getCodexSkillAdapterHeader", {
-		enumerable: true,
-		get: function() {
-			return frontmatter_js_1.getCodexSkillAdapterHeader;
-		}
-	});
-	var content_js_1 = require_content();
-	Object.defineProperty(exports, "convertSlashCommandsToCodexSkillMentions", {
-		enumerable: true,
-		get: function() {
-			return content_js_1.convertSlashCommandsToCodexSkillMentions;
-		}
-	});
-	Object.defineProperty(exports, "convertClaudeToCodexMarkdown", {
-		enumerable: true,
-		get: function() {
-			return content_js_1.convertClaudeToCodexMarkdown;
-		}
-	});
-	Object.defineProperty(exports, "stripSubTags", {
-		enumerable: true,
-		get: function() {
-			return content_js_1.stripSubTags;
-		}
-	});
-	Object.defineProperty(exports, "convertClaudeToGeminiAgent", {
-		enumerable: true,
-		get: function() {
-			return content_js_1.convertClaudeToGeminiAgent;
-		}
-	});
-	Object.defineProperty(exports, "replacePathReferences", {
-		enumerable: true,
-		get: function() {
-			return content_js_1.replacePathReferences;
-		}
-	});
-}));
+//#region src/adapters/codex.ts
+/**
+* @maxsim/adapters — Codex adapter
+*
+* Ports the Codex-specific logic from bin/install.js:
+*   - getGlobalDir('codex', ...)         (lines 124-133)
+*   - getDirName('codex')                (line 48)
+*   - getConfigDirFromHome('codex', isGlobal) (line 70)
+*   - convertClaudeCommandToCodexSkill + convertClaudeToCodexMarkdown
+*/
+/**
+* Get the global config directory for Codex.
+* Priority: explicitDir > CODEX_HOME env > ~/.codex
+*/
+function getGlobalDir$1(explicitDir) {
+	if (explicitDir) return expandTilde(explicitDir);
+	if (process.env.CODEX_HOME) return expandTilde(process.env.CODEX_HOME);
+	return node_path.join(node_os.homedir(), ".codex");
+}
+/**
+* Get the config directory path relative to home for hook templating.
+*/
+function getConfigDirFromHome$1(_isGlobal) {
+	return "'.codex'";
+}
+/**
+* Transform markdown content for Codex installation.
+* Applies Codex markdown conversion and path replacement.
+*/
+function transformContent(content, pathPrefix) {
+	let result = replacePathReferences(content, pathPrefix, ".codex");
+	result = result.replace(/~\/\.codex\//g, pathPrefix);
+	result = convertClaudeCommandToCodexSkill(result);
+	return result;
+}
+/**
+* Codex adapter configuration.
+* Codex uses skill-based command structure (skills/maxsim-star/SKILL.md).
+*/
+const codexAdapter = {
+	runtime: "codex",
+	dirName: ".codex",
+	getGlobalDir: getGlobalDir$1,
+	getConfigDirFromHome: getConfigDirFromHome$1,
+	transformContent,
+	commandStructure: "skills"
+};
 
 //#endregion
 //#region src/install.ts
-var import_dist = require_dist();
 const pkg = JSON.parse(node_fs.readFileSync(node_path.resolve(__dirname, "..", "package.json"), "utf-8"));
 const templatesRoot = node_path.resolve(__dirname, "assets", "templates");
 const args = process.argv.slice(2);
@@ -6513,10 +6216,10 @@ else {
 * Adapter registry keyed by runtime name
 */
 const adapterMap = {
-	claude: import_dist.claudeAdapter,
-	opencode: import_dist.opencodeAdapter,
-	gemini: import_dist.geminiAdapter,
-	codex: import_dist.codexAdapter
+	claude: claudeAdapter,
+	opencode: opencodeAdapter,
+	gemini: geminiAdapter,
+	codex: codexAdapter
 };
 /**
 * Get adapter for a runtime
@@ -6593,7 +6296,7 @@ function copyDirRecursive(src, dest) {
 * OpenCode follows XDG Base Directory spec
 */
 function getOpencodeGlobalDir() {
-	return import_dist.opencodeAdapter.getGlobalDir();
+	return opencodeAdapter.getGlobalDir();
 }
 const banner = "\n" + chalk.cyan(figlet.default.textSync("MAXSIM", { font: "ANSI Shadow" }).split("\n").map((line) => "  " + line).join("\n")) + "\n\n  MAXSIM " + chalk.dim("v" + pkg.version) + "\n  A meta-prompting, context engineering and spec-driven\n  development system for Claude Code, OpenCode, Gemini, and Codex.\n";
 function parseConfigDirArg() {
@@ -6638,14 +6341,14 @@ const attributionCache = /* @__PURE__ */ new Map();
 function getCommitAttribution(runtime) {
 	if (attributionCache.has(runtime)) return attributionCache.get(runtime);
 	let result;
-	if (runtime === "opencode") result = (0, import_dist.readSettings)(node_path.join(getGlobalDir("opencode", null), "opencode.json")).disable_ai_attribution === true ? null : void 0;
+	if (runtime === "opencode") result = readSettings(node_path.join(getGlobalDir("opencode", null), "opencode.json")).disable_ai_attribution === true ? null : void 0;
 	else if (runtime === "gemini") {
-		const attr = (0, import_dist.readSettings)(node_path.join(getGlobalDir("gemini", explicitConfigDir), "settings.json")).attribution;
+		const attr = readSettings(node_path.join(getGlobalDir("gemini", explicitConfigDir), "settings.json")).attribution;
 		if (!attr || attr.commit === void 0) result = void 0;
 		else if (attr.commit === "") result = null;
 		else result = attr.commit;
 	} else if (runtime === "claude") {
-		const attr = (0, import_dist.readSettings)(node_path.join(getGlobalDir("claude", explicitConfigDir), "settings.json")).attribution;
+		const attr = readSettings(node_path.join(getGlobalDir("claude", explicitConfigDir), "settings.json")).attribution;
 		if (!attr || attr.commit === void 0) result = void 0;
 		else if (attr.commit === "") result = null;
 		else result = attr.commit;
@@ -6677,8 +6380,8 @@ function copyFlattenedCommands(srcDir, destDir, prefix, pathPrefix, runtime) {
 			content = content.replace(globalClaudeRegex, pathPrefix);
 			content = content.replace(localClaudeRegex, `./${getDirName(runtime)}/`);
 			content = content.replace(opencodeDirRegex, pathPrefix);
-			content = (0, import_dist.processAttribution)(content, getCommitAttribution(runtime));
-			content = (0, import_dist.convertClaudeToOpencodeFrontmatter)(content);
+			content = processAttribution(content, getCommitAttribution(runtime));
+			content = convertClaudeToOpencodeFrontmatter(content);
 			node_fs.writeFileSync(destPath, content);
 		}
 	}
@@ -6711,8 +6414,8 @@ function copyCommandsAsCodexSkills(srcDir, skillsDir, prefix, pathPrefix, runtim
 			content = content.replace(globalClaudeRegex, pathPrefix);
 			content = content.replace(localClaudeRegex, `./${getDirName(runtime)}/`);
 			content = content.replace(codexDirRegex, pathPrefix);
-			content = (0, import_dist.processAttribution)(content, getCommitAttribution(runtime));
-			content = (0, import_dist.convertClaudeCommandToCodexSkill)(content, skillName);
+			content = processAttribution(content, getCommitAttribution(runtime));
+			content = convertClaudeCommandToCodexSkill(content, skillName);
 			node_fs.writeFileSync(node_path.join(skillDir, "SKILL.md"), content);
 		}
 	}
@@ -6739,18 +6442,18 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix, runtime, isCommand
 			const localClaudeRegex = /\.\/\.claude\//g;
 			content = content.replace(globalClaudeRegex, pathPrefix);
 			content = content.replace(localClaudeRegex, `./${dirName}/`);
-			content = (0, import_dist.processAttribution)(content, getCommitAttribution(runtime));
+			content = processAttribution(content, getCommitAttribution(runtime));
 			if (isOpencode) {
-				content = (0, import_dist.convertClaudeToOpencodeFrontmatter)(content);
+				content = convertClaudeToOpencodeFrontmatter(content);
 				node_fs.writeFileSync(destPath, content);
 			} else if (runtime === "gemini") if (isCommand) {
-				content = (0, import_dist.stripSubTags)(content);
-				const tomlContent = (0, import_dist.convertClaudeToGeminiToml)(content);
+				content = stripSubTags(content);
+				const tomlContent = convertClaudeToGeminiToml(content);
 				const tomlPath = destPath.replace(/\.md$/, ".toml");
 				node_fs.writeFileSync(tomlPath, tomlContent);
 			} else node_fs.writeFileSync(destPath, content);
 			else if (isCodex) {
-				content = (0, import_dist.convertClaudeToCodexMarkdown)(content);
+				content = convertClaudeToCodexMarkdown(content);
 				node_fs.writeFileSync(destPath, content);
 			} else node_fs.writeFileSync(destPath, content);
 		} else node_fs.copyFileSync(srcPath, destPath);
@@ -6903,7 +6606,7 @@ function uninstall(isGlobal, runtime = "claude") {
 	} catch {}
 	const settingsPath = node_path.join(targetDir, "settings.json");
 	if (node_fs.existsSync(settingsPath)) {
-		const settings = (0, import_dist.readSettings)(settingsPath);
+		const settings = readSettings(settingsPath);
 		let settingsModified = false;
 		const statusLine = settings.statusLine;
 		if (statusLine && statusLine.command && statusLine.command.includes("maxsim-statusline")) {
@@ -6938,7 +6641,7 @@ function uninstall(isGlobal, runtime = "claude") {
 		}
 		if (settingsHooks && Object.keys(settingsHooks).length === 0) delete settings.hooks;
 		if (settingsModified) {
-			(0, import_dist.writeSettings)(settingsPath, settings);
+			writeSettings(settingsPath, settings);
 			removedCount++;
 		}
 	}
@@ -7284,10 +6987,10 @@ function install(isGlobal, runtime = "claude") {
 		for (const entry of agentEntries) if (entry.isFile() && entry.name.endsWith(".md")) {
 			let content = node_fs.readFileSync(node_path.join(agentsSrc, entry.name), "utf8");
 			content = content.replace(/~\/\.claude\//g, pathPrefix);
-			content = (0, import_dist.processAttribution)(content, getCommitAttribution(runtime));
-			if (isOpencode) content = (0, import_dist.convertClaudeToOpencodeFrontmatter)(content);
-			else if (isGemini) content = (0, import_dist.convertClaudeToGeminiAgent)(content);
-			else if (isCodex) content = (0, import_dist.convertClaudeToCodexMarkdown)(content);
+			content = processAttribution(content, getCommitAttribution(runtime));
+			if (isOpencode) content = convertClaudeToOpencodeFrontmatter(content);
+			else if (isGemini) content = convertClaudeToGeminiAgent(content);
+			else if (isCodex) content = convertClaudeToCodexMarkdown(content);
 			node_fs.writeFileSync(node_path.join(agentsDest, entry.name), content);
 		}
 		if (verifyInstalled(agentsDest, "agents")) spinner.succeed(chalk.green("✓") + " Installed agents");
@@ -7402,10 +7105,10 @@ function install(isGlobal, runtime = "claude") {
 		runtime
 	};
 	const settingsPath = node_path.join(targetDir, "settings.json");
-	const settings = cleanupOrphanedHooks((0, import_dist.readSettings)(settingsPath));
-	const statuslineCommand = isGlobal ? (0, import_dist.buildHookCommand)(targetDir, "maxsim-statusline.js") : "node " + dirName + "/hooks/maxsim-statusline.js";
-	const updateCheckCommand = isGlobal ? (0, import_dist.buildHookCommand)(targetDir, "maxsim-check-update.js") : "node " + dirName + "/hooks/maxsim-check-update.js";
-	const contextMonitorCommand = isGlobal ? (0, import_dist.buildHookCommand)(targetDir, "maxsim-context-monitor.js") : "node " + dirName + "/hooks/maxsim-context-monitor.js";
+	const settings = cleanupOrphanedHooks(readSettings(settingsPath));
+	const statuslineCommand = isGlobal ? buildHookCommand(targetDir, "maxsim-statusline.js") : "node " + dirName + "/hooks/maxsim-statusline.js";
+	const updateCheckCommand = isGlobal ? buildHookCommand(targetDir, "maxsim-check-update.js") : "node " + dirName + "/hooks/maxsim-check-update.js";
+	const contextMonitorCommand = isGlobal ? buildHookCommand(targetDir, "maxsim-context-monitor.js") : "node " + dirName + "/hooks/maxsim-context-monitor.js";
 	if (isGemini) {
 		if (!settings.experimental) settings.experimental = {};
 		const experimental = settings.experimental;
@@ -7454,7 +7157,7 @@ function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallS
 		};
 		console.log(`  ${chalk.green("✓")} Configured statusline`);
 	}
-	if (!isCodex && settingsPath && settings) (0, import_dist.writeSettings)(settingsPath, settings);
+	if (!isCodex && settingsPath && settings) writeSettings(settingsPath, settings);
 	if (isOpencode) configureOpencodePermissions(isGlobal);
 	let program = "Claude Code";
 	if (runtime === "opencode") program = "OpenCode";

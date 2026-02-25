@@ -42,15 +42,14 @@
   },
   "devDependencies": {
     "@inquirer/prompts": "^8.3.0",
-    "@maxsim/adapters": "workspace:*",
-    "@maxsim/core": "workspace:*",
-    "@maxsim/dashboard": "workspace:*",
-    "@maxsim/hooks": "workspace:*",
-    "@maxsim/templates": "workspace:*",
     "@types/figlet": "^1.7.0",
     "@types/node": "^25.3.0",
     "chalk": "^5.6.2",
-    "ora": "^9.3.0"
+    "esbuild": "^0.24.0",
+    "ora": "^9.3.0",
+    "tsdown": "^0.20.3",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   },
   "dependencies": {
     "figlet": "^1.10.0"

@@ -35,12 +35,12 @@ let node_os = require("node:os");
 node_os = __toESM(node_os);
 let node_child_process = require("node:child_process");
 
-//#region src/shared.ts
+//#region src/hooks/shared.ts
 /** The '.claude' path segment -- template marker replaced during install. */
 const CLAUDE_DIR = ".claude";
 
 //#endregion
-//#region src/maxsim-check-update.ts
+//#region src/hooks/maxsim-check-update.ts
 /**
 * Check for MAXSIM updates in background, write result to cache.
 * Called by SessionStart hook - runs once per session.

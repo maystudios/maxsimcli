@@ -34,7 +34,7 @@ node_os = __toESM(node_os);
 let node_path = require("node:path");
 node_path = __toESM(node_path);
 
-//#region src/shared.ts
+//#region src/hooks/shared.ts
 /**
 * Shared utilities for MAXSIM hooks.
 */
@@ -56,7 +56,7 @@ function readStdinJson(callback) {
 }
 
 //#endregion
-//#region src/maxsim-context-monitor.ts
+//#region src/hooks/maxsim-context-monitor.ts
 /**
 * Context Monitor - PostToolUse hook
 * Reads context metrics from the statusline bridge file and injects

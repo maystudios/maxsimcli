@@ -9,8 +9,16 @@ const shared = {
   sourcemap: true,
   tsconfig: 'tsconfig.lib.json',
   external: [/^node:/],
-  noExternal: [/^@maxsim\//],
-  inlineOnly: false,
+};
+
+const hookShared = {
+  format: 'cjs' as const,
+  platform: 'node' as const,
+  target: 'es2022' as const,
+  sourcemap: true,
+  tsconfig: 'tsconfig.lib.json',
+  external: [/^node:/],
+  outDir: 'dist/assets/hooks',
 };
 
 export default defineConfig([
@@ -22,5 +30,21 @@ export default defineConfig([
   {
     ...shared,
     entry: { cli: 'src/cli.ts' },
+  },
+  // Hooks — compiled as standalone bundles into dist/assets/hooks/
+  {
+    ...hookShared,
+    entry: { 'maxsim-check-update': 'src/hooks/maxsim-check-update.ts' },
+    dts: { build: true },
+  },
+  {
+    ...hookShared,
+    entry: { 'maxsim-context-monitor': 'src/hooks/maxsim-context-monitor.ts' },
+    dts: { build: true },
+  },
+  {
+    ...hookShared,
+    entry: { 'maxsim-statusline': 'src/hooks/maxsim-statusline.ts' },
+    dts: { build: true },
   },
 ]);

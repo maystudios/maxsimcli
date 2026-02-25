@@ -8,6 +8,9 @@
     "outDir": "dist",
     "rootDir": "src",
     "resolveJsonModule": true,
+    "paths": {
+      "@maxsim/core": ["../cli/src/core/index.ts"]
+    },
     "lib": [
       "esnext"
     ]
