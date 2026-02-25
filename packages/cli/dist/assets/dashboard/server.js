@@ -41462,7 +41462,7 @@ var PtyManager = class PtyManager {
 			ptyLog("INFO", "Killing existing session before spawn");
 			this.kill();
 		}
-		const shell = process.platform === "win32" ? "claude.cmd" : "claude";
+		const shell = this.resolveClaudePath();
 		const args = [];
 		if (opts.skipPermissions) args.push("--dangerously-skip-permissions");
 		ptyLog("INFO", `Spawning: shell=${shell}, args=${JSON.stringify(args)}, cwd=${opts.cwd}, cols=${opts.cols ?? 120}, rows=${opts.rows ?? 30}`);
@@ -41567,6 +41567,26 @@ var PtyManager = class PtyManager {
 	}
 	isAvailable() {
 		return pty !== null;
+	}
+	resolveClaudePath() {
+		if (process.platform !== "win32") return "claude";
+		const { execSync } = require("child_process");
+		for (const name of [
+			"claude.exe",
+			"claude.cmd",
+			"claude"
+		]) try {
+			const first = execSync(`where ${name}`, {
+				encoding: "utf8",
+				timeout: 5e3
+			}).trim().split(/\r?\n/)[0];
+			if (first) {
+				ptyLog("INFO", `Resolved claude path: ${first}`);
+				return first;
+			}
+		} catch {}
+		ptyLog("WARN", "Could not resolve claude path, falling back to \"claude\"");
+		return "claude";
 	}
 	broadcastToClients(message) {
 		const data = JSON.stringify(message);
