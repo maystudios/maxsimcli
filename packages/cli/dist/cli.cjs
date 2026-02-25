@@ -3740,7 +3740,7 @@ var require_phase = /* @__PURE__ */ __commonJSMin(((exports) => {
 		if (!node_fs_1$2.default.existsSync(roadmapPath)) (0, core_js_1.error)("ROADMAP.md not found");
 		const content = node_fs_1$2.default.readFileSync(roadmapPath, "utf-8");
 		const slug = (0, core_js_1.generateSlugInternal)(description);
-		const afterPhaseEscaped = (0, core_js_1.normalizePhaseName)(afterPhase).replace(/^0+/, "").replace(/\./g, "\\.");
+		const afterPhaseEscaped = "0*" + (0, core_js_1.normalizePhaseName)(afterPhase).replace(/^0+/, "").replace(/\./g, "\\.");
 		if (!(0, core_js_1.getPhasePattern)(afterPhaseEscaped, "i").test(content)) (0, core_js_1.error)(`Phase ${afterPhase} not found in ROADMAP.md`);
 		const phasesDir = node_path_1$2.default.join(cwd, ".planning", "phases");
 		const normalizedBase = (0, core_js_1.normalizePhaseName)(afterPhase);

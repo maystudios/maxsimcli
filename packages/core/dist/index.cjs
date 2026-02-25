@@ -3066,7 +3066,7 @@ function cmdPhaseInsert(cwd, afterPhase, description, raw) {
 	if (!node_fs.default.existsSync(roadmapPath)) error("ROADMAP.md not found");
 	const content = node_fs.default.readFileSync(roadmapPath, "utf-8");
 	const slug = generateSlugInternal(description);
-	const afterPhaseEscaped = normalizePhaseName(afterPhase).replace(/^0+/, "").replace(/\./g, "\\.");
+	const afterPhaseEscaped = "0*" + normalizePhaseName(afterPhase).replace(/^0+/, "").replace(/\./g, "\\.");
 	if (!getPhasePattern(afterPhaseEscaped, "i").test(content)) error(`Phase ${afterPhase} not found in ROADMAP.md`);
 	const phasesDir = node_path.default.join(cwd, ".planning", "phases");
 	const normalizedBase = normalizePhaseName(afterPhase);

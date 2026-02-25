@@ -26,7 +26,7 @@
     },
     "test": {
       "cache": true,
-      "inputs": ["default", "^production"]
+      "inputs": ["default", "^default"]
     }
   }
 }

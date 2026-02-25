@@ -367,7 +367,7 @@ export function cmdPhaseInsert(cwd: string, afterPhase: string | undefined, desc
 
   const normalizedAfter = normalizePhaseName(afterPhase);
   const unpadded = normalizedAfter.replace(/^0+/, '');
-  const afterPhaseEscaped = unpadded.replace(/\./g, '\\.');
+  const afterPhaseEscaped = '0*' + unpadded.replace(/\./g, '\\.');
   const targetPattern = getPhasePattern(afterPhaseEscaped, 'i');
   if (!targetPattern.test(content)) {
     error(`Phase ${afterPhase} not found in ROADMAP.md`);
