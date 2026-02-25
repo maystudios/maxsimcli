@@ -1,3 +1,10 @@
+## [2.4.2](https://github.com/maystudios/maxsim/compare/v2.4.1...v2.4.2) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** auto-install node-pty before starting dashboard server ([6e576a5](https://github.com/maystudios/maxsim/commit/6e576a583795188749857b92253b78cdb05c3cb7))
+
 ## [2.4.1](https://github.com/maystudios/maxsim/compare/v2.4.0...v2.4.1) (2026-02-25)
 
 
