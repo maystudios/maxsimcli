@@ -3,7 +3,7 @@ import { useWebSocket } from "@/components/providers/websocket-provider";
 import { cn } from "@/lib/utils";
 import type { DashboardPhase } from "@/lib/types";
 
-type ActiveView = "overview" | "phase" | "todos" | "blockers";
+type ActiveView = "overview" | "phase" | "todos" | "blockers" | "terminal";
 
 interface SidebarProps {
   activeView: ActiveView;
@@ -152,6 +152,23 @@ export function Sidebar({ activeView, activePhaseId, onNavigate }: SidebarProps)
               {openBlockers}
             </span>
           )}
+        </button>
+      </div>
+
+      {/* Terminal nav */}
+      <div className="border-t border-border px-1 py-2">
+        <button
+          type="button"
+          onClick={() => onNavigate("terminal")}
+          className={cn(
+            "flex w-full items-center gap-2.5 rounded-sm px-3 py-2 text-left text-sm transition-colors",
+            activeView === "terminal"
+              ? "bg-card-hover text-foreground"
+              : "hover:bg-card-hover text-muted-foreground"
+          )}
+        >
+          <span className="font-mono text-xs font-bold">{">_"}</span>
+          <span className="font-mono text-xs uppercase tracking-wide">Terminal</span>
         </button>
       </div>
 

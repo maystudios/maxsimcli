@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { WebSocketProvider } from "@/components/providers/websocket-provider";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { StatsHeader } from "@/components/dashboard/stats-header";
@@ -8,9 +8,11 @@ import { TodosPanel } from "@/components/dashboard/todos-panel";
 import { BlockersPanel } from "@/components/dashboard/blockers-panel";
 import { AppShell } from "@/components/layout/app-shell";
 import { Sidebar } from "@/components/layout/sidebar";
+import { Terminal } from "@/components/terminal/Terminal";
+import { TerminalToggle, useTerminalLayout } from "@/components/terminal/TerminalTab";
 import type { DashboardPhase } from "@/lib/types";
 
-type ActiveView = "overview" | "phase" | "todos" | "blockers";
+export type ActiveView = "overview" | "phase" | "todos" | "blockers" | "terminal";
 
 /** Skeleton placeholder for loading state */
 function LoadingSkeleton() {
@@ -72,8 +74,14 @@ function DashboardApp() {
   const { roadmap, state, todos, loading, error } = useDashboardData();
   const [activeView, setActiveView] = useState<ActiveView>("overview");
   const [activePhaseId, setActivePhaseId] = useState<string | null>(null);
+  const { splitMode, toggleSplit } = useTerminalLayout();
+  /** Track the last non-terminal view for split mode dashboard content */
+  const lastDashboardViewRef = useRef<{ view: ActiveView; phaseId: string | null }>({ view: "overview", phaseId: null });
 
   const handleNavigate = useCallback((view: ActiveView, id?: string) => {
+    if (view !== "terminal") {
+      lastDashboardViewRef.current = { view, phaseId: view === "phase" && id ? id : null };
+    }
     setActiveView(view);
     if (view === "phase" && id) {
       setActivePhaseId(id);
@@ -155,10 +163,16 @@ function DashboardApp() {
           </div>
         );
 
+      case "terminal":
+        // Terminal content is rendered persistently below, not here
+        return null;
+
       default:
         return null;
     }
   }
+
+  const isTerminalView = activeView === "terminal";
 
   return (
     <AppShell
@@ -170,7 +184,26 @@ function DashboardApp() {
         />
       }
     >
-      {renderContent()}
+      {/* Dashboard content: hidden when terminal is full-height, visible in split top half */}
+      <div
+        style={{ display: isTerminalView && !splitMode ? "none" : "block" }}
+        className={
+          isTerminalView && splitMode
+            ? "h-1/2 overflow-auto border-b border-border p-6"
+            : "flex-1 overflow-y-auto p-6"
+        }
+      >
+        {renderContent()}
+      </div>
+
+      {/* Terminal: always mounted, visibility toggled via CSS */}
+      <div
+        style={{ display: isTerminalView ? "flex" : "none" }}
+        className={`relative flex-col ${isTerminalView && splitMode ? "h-1/2" : "flex-1"}`}
+      >
+        <TerminalToggle splitMode={splitMode} onToggle={toggleSplit} />
+        <Terminal />
+      </div>
     </AppShell>
   );
 }
