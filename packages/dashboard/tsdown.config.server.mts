@@ -21,6 +21,9 @@ export default defineConfig({
   outDir: 'dist',
   clean: false,
   tsconfig: 'tsconfig.server.json',
+  // We intentionally bundle all deps into a single self-contained server.js.
+  // inlineOnly: false suppresses tsdown's warning about detected dependencies.
+  inlineOnly: false,
   noExternal: [
     'express',
     'sirv',

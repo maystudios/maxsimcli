@@ -110,6 +110,19 @@ describe('feature', () => {
 });
 ```
 
+## Pre-Push Build Verification
+
+**MANDATORY: Always run `pnpm run build` locally and confirm it succeeds before pushing to `main`.**
+
+The CI pipeline runs `pnpm run build` before publishing. If the build fails in CI, the release is blocked and users get broken versions. Catching failures locally is always faster.
+
+```bash
+# Run before every push — must complete with "Successfully ran target build for N projects"
+pnpm run build
+```
+
+If the build fails: fix the issue, re-run the build to confirm it passes, then push.
+
 ## Git Workflow
 
 Always **commit and push** after completing every change — fixes, features, refactors. Never leave work only committed locally. Every push to `main` triggers the CI/CD pipeline which publishes to npm (if the commit prefix warrants a version bump). This is intentional: users install via `npx maxsimcli@latest` and need fixes delivered immediately.
