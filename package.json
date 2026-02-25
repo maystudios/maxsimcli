@@ -44,7 +44,8 @@
     "onlyBuiltDependencies": [
       "esbuild",
       "nx",
-      "@nx/nx-win32-x64-msvc"
+      "@nx/nx-win32-x64-msvc",
+      "node-pty"
     ]
   },
   "devDependencies": {

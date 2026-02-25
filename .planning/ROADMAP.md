@@ -14,9 +14,11 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 
 - [x] **Phase 15: E2E Package Scaffold** - Create `packages/e2e` NX package with correct wiring and clean ROADMAP docs
 - [x] **Phase 16: Pack + Install + Tool Tests** - Full globalSetup pipeline plus file validation, binary smoke tests, and tool behavioral tests against a mock project fixture (completed 2026-02-24)
-- [x] **Phase 17: Dashboard Read Tests** - Spawn dashboard server from installed path, validate all read API endpoints against mock fixture (completed 2026-02-24)
-- [ ] **Phase 18: Dashboard Write Tests** - Validate task checkbox toggle and STATE.md write APIs update files on disk
-- [ ] **Phase 19: CI Integration** - Wire E2E suite into GitHub Actions, gate publish on green E2E
+- [x] **Phase 17: Dashboard Read Tests** - Spawn dashboard server from installed path, validate all read API endpoints against mock fixture (completed 2026-02-24)
+- [x] **Phase 18: Dashboard Write Tests** - Validate task checkbox toggle and STATE.md write APIs update files on disk (completed 2026-02-25)
+- [x] **Phase 19: CI Integration** - Wire E2E suite into GitHub Actions, gate publish on green E2E (completed 2026-02-25)
+- [x] **Phase 20: Dashboard Migrate to Vite + Express** - Replace Next.js standalone with Vite (client build) + tsdown-bundled Express server for reliable npm packaging (completed 2026-02-25)
+- [ ] **Phase 21: Interactive Claude Code Terminal** - Browser-based terminal in the dashboard that spawns and controls Claude Code via PTY + WebSocket with xterm.js rendering and session persistence
 
 ---
 
@@ -66,7 +68,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 17-01-PLAN.md — Fix mock fixture for dashboard compatibility and write dashboard.test.ts read API tests
+- [x] 17-01-PLAN.md — Fix mock fixture for dashboard compatibility and write dashboard.test.ts read API tests
 
 ### Phase 18: Dashboard Write Tests
 **Goal**: The dashboard write APIs mutate files on disk correctly — task checkbox toggles persist as `[x]` in plan files, and STATE.md edits persist the full updated content
@@ -75,7 +77,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. A PATCH request to the task toggle endpoint updates the corresponding plan `.md` file on disk — re-reading the file shows `[x]` marking on the targeted task
   2. A PUT request to `/api/state` writes the updated content to the mock `STATE.md` file — re-reading the file returns the new content
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [x] 18-01-PLAN.md — Add DASH-06 task toggle and DASH-07 STATE.md write API tests
 
 ### Phase 19: CI Integration
 **Goal**: GitHub Actions runs `nx run e2e:e2e` on every push to main, after `cli:build` with `STANDALONE_BUILD=true`, and a failing E2E suite blocks the publish job
@@ -86,7 +91,43 @@ Plans:
   2. The E2E job runs after `cli:build` completes (correct `needs:` dependency)
   3. A deliberate test failure in the E2E suite causes the publish job to be skipped — the gating is verified
   4. The E2E NX target has `"cache": false` so CI never serves stale results from a previous run
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [x] 19-01-PLAN.md — Split publish.yml into e2e + release jobs with E2E gating
+
+### Phase 20: Dashboard Migrate to Vite + Express
+**Goal**: The dashboard ships as a Vite-built static `client/` folder served by a single tsdown-bundled `server.js` that includes Express, sirv, ws, chokidar and all API route logic — no `node_modules/` at the install destination, no pnpm symlinks, no path-resolution fragility
+**Depends on**: Phase 19
+**Success Criteria** (what must be TRUE):
+  1. `vite build` produces `packages/dashboard/dist/client/` with `index.html` and hashed asset files
+  2. `tsdown` bundles `packages/dashboard/src/server.ts` + all its dependencies into a single `packages/dashboard/dist/server.js`
+  3. `node dist/server.js` starts the dashboard and serves the React app from `dist/client/` with WebSocket and all API routes functional
+  4. The built `dist/` output (client + server.js only, no `node_modules/`) is copied into `packages/cli/dist/assets/dashboard/` by `copy-assets.cjs`
+  5. `npx maxsimcli` installs and `npx maxsimcli dashboard` starts successfully on Linux (CI), Windows, and macOS — no EPERM, no missing module errors
+**Plans**: 2 plans
+
+Plans:
+- [x] 20-01-PLAN.md — Build infrastructure: Vite config, tsdown config, package.json, copy-assets, install.ts cleanup
+- [x] 20-02-PLAN.md — React + Express code migration: src/server.ts, src/main.tsx, App.tsx, move components/hooks, delete app/
+
+### Phase 21: Interactive Claude Code Terminal
+**Goal**: The MAXSIM Dashboard includes a browser-based terminal view that spawns Claude Code as a server-side background process (optionally in skip-permissions mode), streams its full ANSI output in real-time via WebSocket to an xterm.js terminal emulator in the frontend, accepts keyboard input forwarded back to the process, provides quick-action buttons for common MAXSIM commands (/maxsim:progress, /maxsim:execute-phase, /maxsim:roadmap), and preserves the session across brief browser disconnects so a running process is never interrupted
+**Depends on**: Phase 20
+**Requirements**: DASH-TERM-01, DASH-TERM-02, DASH-TERM-03, DASH-TERM-04, DASH-TERM-05
+**Success Criteria** (what must be TRUE):
+  1. A "Terminal" tab in the dashboard spawns `claude` (Claude Code CLI) as a PTY child process on the server with configurable `--dangerously-skip-permissions` flag
+  2. All stdout/stderr output including ANSI escape codes is streamed via WebSocket to the browser and rendered correctly in an xterm.js terminal (colors, cursor positioning, line wrapping)
+  3. Keyboard input typed in the browser terminal is forwarded to the server process stdin in real-time — interactive Claude Code sessions work end-to-end
+  4. Quick-action buttons send predefined MAXSIM slash commands to the running Claude Code process
+  5. The WebSocket connection supports automatic reconnection — if the browser tab is closed and reopened within 60 seconds, the terminal reattaches to the still-running process with scrollback history preserved
+**Plans**: 4 plans
+
+Plans:
+- [ ] 21-01-PLAN.md — Server-side PTY manager, session store, and terminal WebSocket endpoint
+- [ ] 21-02-PLAN.md — xterm.js Terminal React component, WebSocket hook, and status bar
+- [ ] 21-03-PLAN.md — Terminal tab integration into sidebar and App.tsx with split-panel mode
+- [ ] 21-04-PLAN.md — Quick-action button bar with confirmation, settings, and reconnection polish
 
 ---
 
@@ -99,5 +140,7 @@ Plans:
 | 15. E2E Package Scaffold | 1/1 | Complete | 2026-02-24 |
 | 16. Pack + Install + Tool Tests | 3/3 | Complete | 2026-02-25 |
 | 17. Dashboard Read Tests | 1/1 | Complete    | 2026-02-24 |
-| 18. Dashboard Write Tests | 0/TBD | Not started | - |
-| 19. CI Integration | 0/TBD | Not started | - |
+| 18. Dashboard Write Tests | 1/1 | Complete | 2026-02-25 |
+| 19. CI Integration | 0/1 | Not started | - |
+| 20. Dashboard Migrate to Vite + Express | 0/2 | Not started | - |
+| 21. Interactive Claude Code Terminal | 0/4 | Not started | - |

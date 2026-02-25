@@ -24,6 +24,7 @@ export default defineConfig({
   // We intentionally bundle all deps into a single self-contained server.js.
   // inlineOnly: false suppresses tsdown's warning about detected dependencies.
   inlineOnly: false,
+  external: ['node-pty'],
   noExternal: [
     'express',
     'sirv',

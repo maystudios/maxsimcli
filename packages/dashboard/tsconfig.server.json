@@ -13,7 +13,8 @@
     ]
   },
   "include": [
-    "src/server.ts"
+    "src/server.ts",
+    "src/terminal/**/*.ts"
   ],
   "exclude": [
     "node_modules",
