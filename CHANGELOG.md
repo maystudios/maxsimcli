@@ -1,3 +1,18 @@
+# [2.2.0](https://github.com/maystudios/maxsim/compare/v2.1.1...v2.2.0) (2026-02-25)
+
+
+### Bug Fixes
+
+* **website:** replace outdated /gsd: command prefix with /maxsim: and update command count to 31 ([4bda14d](https://github.com/maystudios/maxsim/commit/4bda14dee198a5039d3053c3cfa4e3a7e03a59e4))
+
+
+### Features
+
+* **21-01:** add PTY manager, session store, and terminal WebSocket endpoint ([a5d9903](https://github.com/maystudios/maxsim/commit/a5d9903b449bd96e8bc95dc693ab45f3a4d35e7e))
+* **21-02:** add TerminalStatusBar with process info and controls ([f824f34](https://github.com/maystudios/maxsim/commit/f824f34aa52e5cab04b619ca6571441314b8f705))
+* **21-02:** add useTerminal hook and Terminal xterm.js component ([c9c0642](https://github.com/maystudios/maxsim/commit/c9c06428449927f9a41761c5e5dc243a4a7ae723))
+* **install:** prompt to enable Agent Teams for Claude during interactive install ([69b25d3](https://github.com/maystudios/maxsim/commit/69b25d3448146a06b17ee4fe2f655962ab4c87fd))
+
 ## [2.1.1](https://github.com/maystudios/maxsim/compare/v2.1.0...v2.1.1) (2026-02-25)
 
 
