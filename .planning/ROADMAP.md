@@ -18,7 +18,7 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 - [x] **Phase 18: Dashboard Write Tests** - Validate task checkbox toggle and STATE.md write APIs update files on disk (completed 2026-02-25)
 - [x] **Phase 19: CI Integration** - Wire E2E suite into GitHub Actions, gate publish on green E2E (completed 2026-02-25)
 - [x] **Phase 20: Dashboard Migrate to Vite + Express** - Replace Next.js standalone with Vite (client build) + tsdown-bundled Express server for reliable npm packaging (completed 2026-02-25)
-- [ ] **Phase 21: Interactive Claude Code Terminal** - Browser-based terminal in the dashboard that spawns and controls Claude Code via PTY + WebSocket with xterm.js rendering and session persistence
+- [x] **Phase 21: Interactive Claude Code Terminal** - Browser-based terminal in the dashboard that spawns and controls Claude Code via PTY + WebSocket with xterm.js rendering and session persistence (completed 2026-02-25)
 
 ---
 
@@ -143,4 +143,4 @@ Plans:
 | 18. Dashboard Write Tests | 1/1 | Complete | 2026-02-25 |
 | 19. CI Integration | 0/1 | Not started | - |
 | 20. Dashboard Migrate to Vite + Express | 0/2 | Not started | - |
-| 21. Interactive Claude Code Terminal | 3/4 | In Progress|  |
+| 21. Interactive Claude Code Terminal | 4/4 | Complete   | 2026-02-25 |

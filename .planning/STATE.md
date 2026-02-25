@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** `npx maxsimcli@latest` installs a complete AI dev workflow system that works immediately — validated end-to-end from the npm consumer perspective, not the monorepo perspective
-**Current focus:** Phase 18 — Dashboard Write Tests
+**Current focus:** Phase 21 — Interactive Claude Code Terminal
 
 ## Current Position
 
-Phase: 18 — Dashboard Write Tests
-Plan: 18-01 (complete)
-Status: Phase 18 complete — DASH-06 and DASH-07 write API tests added; mock STATE.md bold-format fix; server lifecycle refactored to file-level
-Last activity: 2026-02-25 — Phase 18 complete (Dashboard Write Tests)
+Phase: 21 — Interactive Claude Code Terminal
+Plan: 21-03 (complete)
+Status: Plan 03 complete — Terminal integrated into dashboard layout with sidebar nav, split/full-height toggle, persistent mount
+Last activity: 2026-02-25 — Plan 21-03 complete (Terminal Dashboard Layout Integration)
 
 Progress: [████░░░░░░] 40% (3/5 phases complete)
 
@@ -82,6 +82,7 @@ Progress: [████░░░░░░] 40% (3/5 phases complete)
 | Phase 14 P03 | 3min | 3 tasks | 2 files |
 | Phase 21 P01 | 4min | 2 tasks | 7 files |
 | Phase 21 P04 | 2min | 2 tasks | 2 files |
+| Phase 21 P03 | 2min | 1 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -187,6 +188,8 @@ Recent decisions affecting current work:
 - [v2.0.0 Roadmap]: pollUntilReady helper (inline, no wait-on dep) for dashboard health check — never fixed-delay setTimeout
 - [Phase 21]: node-pty marked as external in tsdown (native addon cannot be bundled)
 - [Phase 21]: Terminal WebSocket at /ws/terminal separate from dashboard /api/ws
+- [Phase 21-03]: CSS display:none/block for terminal persistence across view switches (not conditional render)
+- [Phase 21-03]: AppShell main refactored to flex-col overflow-hidden; padding moved to content wrapper in App.tsx
 - [Phase 21]: Confirmation popup always shown before sending quick-action commands
 
 ### Roadmap Evolution
@@ -212,5 +215,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 21-01-PLAN.md (Server-Side PTY Terminal Infrastructure)
-Resume file: N/A — Phase 21 plan 01 complete. Next: 21-02 frontend terminal components.
+Stopped at: Completed 21-03-PLAN.md (Terminal Dashboard Layout Integration)
+Resume file: N/A — Phase 21 plan 03 complete. Next: 21-04 or remaining terminal plans.

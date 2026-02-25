@@ -118,7 +118,15 @@ export function useTerminal(opts: UseTerminalOptions = {}): UseTerminalReturn {
               onScrollback.current?.(msg.data);
               break;
             case "status":
-              setStatus(msg.status);
+              setStatus({
+                pid: msg.pid,
+                uptime: msg.uptime,
+                cwd: msg.cwd,
+                memoryMB: msg.memoryMB,
+                isActive: msg.isActive,
+                skipPermissions: msg.skipPermissions,
+                alive: msg.alive,
+              });
               break;
             case "exit":
               setExitCode(msg.code ?? 1);

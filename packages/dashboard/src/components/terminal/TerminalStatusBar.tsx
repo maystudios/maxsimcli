@@ -11,10 +11,9 @@ interface TerminalStatusBarProps {
   onRestart: () => void;
 }
 
-function formatUptime(ms: number): string {
-  const totalSeconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
+function formatUptime(secs: number): string {
+  const minutes = Math.floor(secs / 60);
+  const seconds = secs % 60;
   return `${minutes}m ${seconds}s`;
 }
 
