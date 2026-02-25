@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && npm run build:server",
-    "build:server": "tsdown --config tsdown.config.server.ts",
+    "build:server": "tsdown --config tsdown.config.server.mts",
     "start": "node dist/server.js"
   },
   "dependencies": {
