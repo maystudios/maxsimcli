@@ -1,7 +1,16 @@
-import * as pty from 'node-pty';
-import type { IPty } from 'node-pty';
 import { WebSocket } from 'ws';
 import { SessionStore } from './session-store';
+
+// node-pty is a native C++ addon that may not be available at the install destination.
+// Lazy-load it so the server starts without it — terminal features degrade gracefully.
+let pty: typeof import('node-pty') | null = null;
+try {
+  pty = require('node-pty');
+} catch {
+  // node-pty not available — terminal features will be disabled
+}
+
+type IPty = import('node-pty').IPty;
 
 interface PtySession {
   process: IPty;
@@ -47,6 +56,14 @@ export class PtyManager {
     cols?: number;
     rows?: number;
   }): void {
+    if (!pty) {
+      this.broadcastToClients({
+        type: 'output',
+        data: '\r\n\x1b[31mTerminal unavailable: node-pty is not installed.\r\nRun: npm install node-pty\x1b[0m\r\n',
+      });
+      return;
+    }
+
     if (this.session) {
       this.kill();
     }
@@ -173,6 +190,10 @@ export class PtyManager {
 
   isAlive(): boolean {
     return this.session !== null;
+  }
+
+  isAvailable(): boolean {
+    return pty !== null;
   }
 
   private broadcastToClients(message: Record<string, unknown>): void {
