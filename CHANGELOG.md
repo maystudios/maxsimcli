@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/maystudios/maxsim/compare/v2.1.0...v2.1.1) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** prevent server shutdown from broken stderr pipe on Windows ([7cbb9f6](https://github.com/maystudios/maxsim/commit/7cbb9f601cd006f72f99d9fba75daf39818e4ec8))
+
 # [2.1.0](https://github.com/maystudios/maxsim/compare/v2.0.5...v2.1.0) (2026-02-25)
 
 
