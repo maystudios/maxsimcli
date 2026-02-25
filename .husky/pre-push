@@ -1,4 +1,4 @@
-pnpm run build
-pnpm run lint
+npm run build
+npm run lint
 node scripts/pre-push-docs-check.cjs
-pnpm test
+npm test
