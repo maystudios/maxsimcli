@@ -175,6 +175,10 @@ Plans:
   2. QuickActionBar buttons are enabled when the terminal process is active and alive
   3. TerminalStatusBar displays correct connection status, PID, uptime, and memory usage
   4. `TerminalStatusBar.formatUptime` receives milliseconds (or server sends milliseconds) — uptime displays correctly, not "0m 0s"
+**Plans**: 1 plan
+
+Plans:
+- [ ] 24-01-PLAN.md — Fix QuickActionBar disabled logic and verify status parsing alignment
 
 ### Phase 25: Planning Doc Hygiene
 **Goal**: Fix all stale traceability entries, backfill empty SUMMARY.md frontmatter, add missing VERIFICATION.md files for phases 15/18/19/20, and make pre-push hook portable via husky

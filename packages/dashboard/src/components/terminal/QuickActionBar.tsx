@@ -79,7 +79,7 @@ export function QuickActionBar({
     return cmd;
   }, []);
 
-  const disabled = unavailable || isActive || !isAlive;
+  const disabled = unavailable || !isAlive;
 
   const handleClick = useCallback(
     async (cmd: QuickCommand) => {
