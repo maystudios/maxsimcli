@@ -1,13 +1,16 @@
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { WebSocket } from 'ws';
 import { SessionStore } from './session-store';
 
 // node-pty is a native C++ addon that may not be available at the install destination.
 // Lazy-load it so the server starts without it — terminal features degrade gracefully.
 let pty: typeof import('node-pty') | null = null;
+let ptyLoadError: string | null = null;
 try {
   pty = require('node-pty');
-} catch {
-  // node-pty not available — terminal features will be disabled
+} catch (err) {
+  ptyLoadError = err instanceof Error ? err.message : String(err);
 }
 
 type IPty = import('node-pty').IPty;
@@ -36,6 +39,17 @@ const DISCONNECT_TIMEOUT_MS = 60_000;
 const STATUS_INTERVAL_MS = 1_000;
 const ACTIVE_THRESHOLD_MS = 2_000;
 
+// Logging helper — writes to dashboard logs dir
+const logDir = path.join(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/i, '$1')), '..', 'logs');
+function ptyLog(level: string, ...args: unknown[]): void {
+  try {
+    fs.mkdirSync(logDir, { recursive: true });
+    const ts = new Date().toISOString();
+    const msg = args.map(a => typeof a === 'string' ? a : JSON.stringify(a)).join(' ');
+    fs.appendFileSync(path.join(logDir, `dashboard-${ts.slice(0, 10)}.log`), `[${ts}] [${level}] [pty-manager] ${msg}\n`);
+  } catch { /* best effort */ }
+}
+
 export class PtyManager {
   private static instance: PtyManager | null = null;
   private session: PtySession | null = null;
@@ -57,14 +71,16 @@ export class PtyManager {
     rows?: number;
   }): void {
     if (!pty) {
+      ptyLog('ERROR', `node-pty not available: ${ptyLoadError}`);
       this.broadcastToClients({
         type: 'output',
-        data: '\r\n\x1b[31mTerminal unavailable: node-pty is not installed.\r\nRun: npm install node-pty\x1b[0m\r\n',
+        data: `\r\n\x1b[31mTerminal unavailable: node-pty is not installed.\r\nError: ${ptyLoadError}\r\nRun: npm install node-pty\x1b[0m\r\n`,
       });
       return;
     }
 
     if (this.session) {
+      ptyLog('INFO', 'Killing existing session before spawn');
       this.kill();
     }
 
@@ -75,6 +91,8 @@ export class PtyManager {
       args.push('--dangerously-skip-permissions');
     }
 
+    ptyLog('INFO', `Spawning: shell=${shell}, args=${JSON.stringify(args)}, cwd=${opts.cwd}, cols=${opts.cols ?? 120}, rows=${opts.rows ?? 30}`);
+
     const proc = pty.spawn(shell, args, {
       name: 'xterm-256color',
       cols: opts.cols ?? 120,
@@ -82,6 +100,8 @@ export class PtyManager {
       cwd: opts.cwd,
       env: process.env as Record<string, string>,
     });
+
+    ptyLog('INFO', `Process spawned with pid=${proc.pid}`);
 
     const store = new SessionStore();
 
@@ -104,6 +124,7 @@ export class PtyManager {
     });
 
     proc.onExit(({ exitCode }: { exitCode: number }) => {
+      ptyLog('INFO', `Process exited with code=${exitCode}`);
       this.broadcastToClients({ type: 'exit', code: exitCode });
       this.stopStatusBroadcast();
       this.session = null;

@@ -29,9 +29,29 @@ import type {
 import { watch, type FSWatcher } from 'chokidar';
 import { PtyManager } from './terminal/pty-manager';
 
+// ─── Logging ──────────────────────────────────────────────────────────────
+
+const dashboardDir = path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/i, '$1'));
+const logDir = path.join(dashboardDir, 'logs');
+fs.mkdirSync(logDir, { recursive: true });
+
+const logFile = path.join(logDir, `dashboard-${new Date().toISOString().slice(0, 10)}.log`);
+const logStream = fs.createWriteStream(logFile, { flags: 'a' });
+
+function log(level: 'INFO' | 'WARN' | 'ERROR', tag: string, ...args: unknown[]): void {
+  const ts = new Date().toISOString();
+  const msg = args.map(a => typeof a === 'string' ? a : JSON.stringify(a)).join(' ');
+  const line = `[${ts}] [${level}] [${tag}] ${msg}\n`;
+  logStream.write(line);
+  if (level === 'ERROR') {
+    console.error(`[${tag}]`, ...args);
+  }
+}
+
 // ─── Config ────────────────────────────────────────────────────────────────
 
 const projectCwd = process.env.MAXSIM_PROJECT_CWD || process.cwd();
+log('INFO', 'server', `Starting dashboard server, projectCwd=${projectCwd}`);
 
 // client/ folder is co-located with server.js in dist/
 const clientDir = path.join(__dirname, 'client');
@@ -617,18 +637,24 @@ function appendToStateSection(
   statePath: string,
   sectionPattern: RegExp,
   entry: string,
+  fallbackSection: string,
 ): { success: boolean; reason?: string } {
-  let content = fs.readFileSync(statePath, 'utf-8');
+  // Normalize line endings to LF for consistent regex matching
+  let content = fs.readFileSync(statePath, 'utf-8').replace(/\r\n/g, '\n');
   const match = content.match(sectionPattern);
-  if (!match) return { success: false, reason: 'Section not found in STATE.md' };
 
-  let sectionBody = match[2];
-  sectionBody = sectionBody
-    .replace(/None yet\.?\s*\n?/gi, '')
-    .replace(/No decisions yet\.?\s*\n?/gi, '')
-    .replace(/None\.?\s*\n?/gi, '');
-  sectionBody = sectionBody.trimEnd() + '\n' + entry + '\n';
-  content = content.replace(sectionPattern, (_m, header: string) => `${header}${sectionBody}`);
+  if (match) {
+    let sectionBody = match[2];
+    sectionBody = sectionBody
+      .replace(/None yet\.?\s*\n?/gi, '')
+      .replace(/No decisions yet\.?\s*\n?/gi, '')
+      .replace(/None\.?\s*\n?/gi, '');
+    sectionBody = sectionBody.trimEnd() + '\n' + entry + '\n';
+    content = content.replace(sectionPattern, (_m, header: string) => `${header}${sectionBody}`);
+  } else {
+    // Section not found — append it to the end of the file
+    content = content.trimEnd() + '\n\n' + fallbackSection + '\n' + entry + '\n';
+  }
 
   suppressPath(statePath);
   fs.writeFileSync(statePath, content, 'utf-8');
@@ -647,8 +673,7 @@ app.post('/api/state/decision', (req: Request, res: Response) => {
   const entry = `- [Phase ${phaseLabel}]: ${text.trim()}`;
   const sectionPattern = /(###?\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
 
-  const result = appendToStateSection(statePath, sectionPattern, entry);
-  if (!result.success) return res.status(404).json({ error: result.reason });
+  const result = appendToStateSection(statePath, sectionPattern, entry, '### Decisions');
   return res.json({ added: true, decision: entry });
 });
 
@@ -663,8 +688,7 @@ app.post('/api/state/blocker', (req: Request, res: Response) => {
   const entry = `- ${text.trim()}`;
   const sectionPattern = /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
 
-  const result = appendToStateSection(statePath, sectionPattern, entry);
-  if (!result.success) return res.status(404).json({ error: result.reason });
+  const result = appendToStateSection(statePath, sectionPattern, entry, '### Blockers/Concerns');
   return res.json({ added: true, blocker: text.trim() });
 });
 
@@ -822,15 +846,19 @@ async function main(): Promise<void> {
   const ptyManager = PtyManager.getInstance();
 
   if (!ptyManager.isAvailable()) {
-    console.error('[server] node-pty not available — terminal features disabled');
+    log('WARN', 'server', 'node-pty not available — terminal features disabled');
+  } else {
+    log('INFO', 'server', 'node-pty available — terminal features enabled');
   }
 
   // Terminal WebSocket connections
   terminalWss.on('connection', (ws: WebSocket) => {
+    log('INFO', 'terminal-ws', 'Client connected');
     ptyManager.addClient(ws);
 
     if (!ptyManager.isAvailable()) {
       ws.send(JSON.stringify({ type: 'unavailable', reason: 'node-pty is not installed — terminal features disabled' }));
+      log('WARN', 'terminal-ws', 'Sent unavailable to client — node-pty missing');
     }
 
     ws.on('message', (raw: Buffer | string) => {
@@ -841,31 +869,45 @@ async function main(): Promise<void> {
             ptyManager.write(msg.data);
             break;
           case 'resize':
+            log('INFO', 'terminal-ws', `Resize: ${msg.cols}x${msg.rows}`);
             ptyManager.resize(msg.cols, msg.rows);
             break;
           case 'spawn':
-            ptyManager.spawn({
-              skipPermissions: !!msg.skipPermissions,
-              cwd: projectCwd,
-              cols: msg.cols,
-              rows: msg.rows,
-            });
+            log('INFO', 'terminal-ws', `Spawn requested: skipPermissions=${!!msg.skipPermissions}, cwd=${projectCwd}`);
+            try {
+              ptyManager.spawn({
+                skipPermissions: !!msg.skipPermissions,
+                cwd: projectCwd,
+                cols: msg.cols,
+                rows: msg.rows,
+              });
+              log('INFO', 'terminal-ws', `Spawn succeeded, pid=${ptyManager.getStatus()?.pid}`);
+            } catch (err) {
+              const errMsg = err instanceof Error ? err.message : String(err);
+              log('ERROR', 'terminal-ws', `Spawn failed: ${errMsg}`);
+              ws.send(JSON.stringify({ type: 'output', data: `\r\n\x1b[31mFailed to start terminal: ${errMsg}\x1b[0m\r\n` }));
+            }
             break;
           case 'kill':
+            log('INFO', 'terminal-ws', 'Kill requested');
             ptyManager.kill();
             break;
+          default:
+            log('WARN', 'terminal-ws', `Unknown message type: ${msg.type}`);
         }
-      } catch {
-        // ignore malformed messages
+      } catch (err) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        log('ERROR', 'terminal-ws', `Message handling error: ${errMsg}`);
       }
     });
 
     ws.on('close', () => {
+      log('INFO', 'terminal-ws', 'Client disconnected');
       ptyManager.removeClient(ws);
     });
 
     ws.on('error', (err) => {
-      console.error('[terminal-ws] Client error:', err.message);
+      log('ERROR', 'terminal-ws', `Client error: ${err.message}`);
     });
   });
 
@@ -899,7 +941,9 @@ async function main(): Promise<void> {
   const url = `http://localhost:${port}`;
 
   server.listen(port, () => {
+    log('INFO', 'server', `Dashboard ready at ${url}, log file: ${logFile}`);
     console.error(`Dashboard ready at ${url}`);
+    console.error(`Logs: ${logFile}`);
     open(url).catch(() => {});
   });
 

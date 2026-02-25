@@ -32444,7 +32444,7 @@ var require_websocket = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const tls = require("tls");
 	const { randomBytes, createHash: createHash$1 } = require("crypto");
 	const { Duplex: Duplex$2, Readable: Readable$1 } = require("stream");
-	const { URL } = require("url");
+	const { URL: URL$1 } = require("url");
 	const PerMessageDeflate = require_permessage_deflate();
 	const Receiver = require_receiver();
 	const Sender = require_sender();
@@ -32973,9 +32973,9 @@ var require_websocket = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		websocket._closeTimeout = opts.closeTimeout;
 		if (!protocolVersions.includes(opts.protocolVersion)) throw new RangeError(`Unsupported protocol version: ${opts.protocolVersion} (supported versions: ${protocolVersions.join(", ")})`);
 		let parsedUrl;
-		if (address instanceof URL) parsedUrl = address;
+		if (address instanceof URL$1) parsedUrl = address;
 		else try {
-			parsedUrl = new URL(address);
+			parsedUrl = new URL$1(address);
 		} catch (e) {
 			throw new SyntaxError(`Invalid URL: ${address}`);
 		}
@@ -33077,7 +33077,7 @@ var require_websocket = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				req.abort();
 				let addr;
 				try {
-					addr = new URL(location, address);
+					addr = new URL$1(location, address);
 				} catch (e) {
 					emitErrorAndClose(websocket, /* @__PURE__ */ new SyntaxError(`Invalid URL: ${location}`));
 					return;
@@ -41425,12 +41425,24 @@ var SessionStore = class {
 //#endregion
 //#region src/terminal/pty-manager.ts
 let pty = null;
+let ptyLoadError = null;
 try {
 	pty = require("node-pty");
-} catch {}
+} catch (err) {
+	ptyLoadError = err instanceof Error ? err.message : String(err);
+}
 const DISCONNECT_TIMEOUT_MS = 6e4;
 const STATUS_INTERVAL_MS = 1e3;
 const ACTIVE_THRESHOLD_MS = 2e3;
+const logDir$1 = node_path.join(node_path.dirname(new URL(require("url").pathToFileURL(__filename).href).pathname.replace(/^\/([A-Z]:)/i, "$1")), "..", "logs");
+function ptyLog(level, ...args) {
+	try {
+		node_fs.mkdirSync(logDir$1, { recursive: true });
+		const ts = (/* @__PURE__ */ new Date()).toISOString();
+		const msg = args.map((a) => typeof a === "string" ? a : JSON.stringify(a)).join(" ");
+		node_fs.appendFileSync(node_path.join(logDir$1, `dashboard-${ts.slice(0, 10)}.log`), `[${ts}] [${level}] [pty-manager] ${msg}\n`);
+	} catch {}
+}
 var PtyManager = class PtyManager {
 	static instance = null;
 	session = null;
@@ -41443,16 +41455,21 @@ var PtyManager = class PtyManager {
 	}
 	spawn(opts) {
 		if (!pty) {
+			ptyLog("ERROR", `node-pty not available: ${ptyLoadError}`);
 			this.broadcastToClients({
 				type: "output",
-				data: "\r\n\x1B[31mTerminal unavailable: node-pty is not installed.\r\nRun: npm install node-pty\x1B[0m\r\n"
+				data: `\r\n\x1b[31mTerminal unavailable: node-pty is not installed.\r\nError: ${ptyLoadError}\r\nRun: npm install node-pty\x1b[0m\r\n`
 			});
 			return;
 		}
-		if (this.session) this.kill();
+		if (this.session) {
+			ptyLog("INFO", "Killing existing session before spawn");
+			this.kill();
+		}
 		const shell = process.platform === "win32" ? "claude.cmd" : "claude";
 		const args = [];
 		if (opts.skipPermissions) args.push("--dangerously-skip-permissions");
+		ptyLog("INFO", `Spawning: shell=${shell}, args=${JSON.stringify(args)}, cwd=${opts.cwd}, cols=${opts.cols ?? 120}, rows=${opts.rows ?? 30}`);
 		const proc = pty.spawn(shell, args, {
 			name: "xterm-256color",
 			cols: opts.cols ?? 120,
@@ -41460,6 +41477,7 @@ var PtyManager = class PtyManager {
 			cwd: opts.cwd,
 			env: process.env
 		});
+		ptyLog("INFO", `Process spawned with pid=${proc.pid}`);
 		const store = new SessionStore();
 		this.session = {
 			process: proc,
@@ -41480,6 +41498,7 @@ var PtyManager = class PtyManager {
 			});
 		});
 		proc.onExit(({ exitCode }) => {
+			ptyLog("INFO", `Process exited with code=${exitCode}`);
 			this.broadcastToClients({
 				type: "exit",
 				code: exitCode
@@ -41577,7 +41596,18 @@ var PtyManager = class PtyManager {
 
 //#endregion
 //#region src/server.ts
+const dashboardDir = node_path.dirname(new URL(require("url").pathToFileURL(__filename).href).pathname.replace(/^\/([A-Z]:)/i, "$1"));
+const logDir = node_path.join(dashboardDir, "logs");
+node_fs.mkdirSync(logDir, { recursive: true });
+const logFile = node_path.join(logDir, `dashboard-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 10)}.log`);
+const logStream = node_fs.createWriteStream(logFile, { flags: "a" });
+function log(level, tag, ...args) {
+	const line = `[${(/* @__PURE__ */ new Date()).toISOString()}] [${level}] [${tag}] ${args.map((a) => typeof a === "string" ? a : JSON.stringify(a)).join(" ")}\n`;
+	logStream.write(line);
+	if (level === "ERROR") console.error(`[${tag}]`, ...args);
+}
 const projectCwd = process.env.MAXSIM_PROJECT_CWD || process.cwd();
+log("INFO", "server", `Starting dashboard server, projectCwd=${projectCwd}`);
 const clientDir = node_path.join(__dirname, "client");
 function isWithinPlanning(cwd, targetPath) {
 	const planningDir = node_path.resolve(cwd, ".planning");
@@ -42003,17 +42033,15 @@ None yet.
 `;
 	node_fs.writeFileSync(statePath, template, "utf-8");
 }
-function appendToStateSection(statePath, sectionPattern, entry) {
-	let content = node_fs.readFileSync(statePath, "utf-8");
+function appendToStateSection(statePath, sectionPattern, entry, fallbackSection) {
+	let content = node_fs.readFileSync(statePath, "utf-8").replace(/\r\n/g, "\n");
 	const match = content.match(sectionPattern);
-	if (!match) return {
-		success: false,
-		reason: "Section not found in STATE.md"
-	};
-	let sectionBody = match[2];
-	sectionBody = sectionBody.replace(/None yet\.?\s*\n?/gi, "").replace(/No decisions yet\.?\s*\n?/gi, "").replace(/None\.?\s*\n?/gi, "");
-	sectionBody = sectionBody.trimEnd() + "\n" + entry + "\n";
-	content = content.replace(sectionPattern, (_m, header) => `${header}${sectionBody}`);
+	if (match) {
+		let sectionBody = match[2];
+		sectionBody = sectionBody.replace(/None yet\.?\s*\n?/gi, "").replace(/No decisions yet\.?\s*\n?/gi, "").replace(/None\.?\s*\n?/gi, "");
+		sectionBody = sectionBody.trimEnd() + "\n" + entry + "\n";
+		content = content.replace(sectionPattern, (_m, header) => `${header}${sectionBody}`);
+	} else content = content.trimEnd() + "\n\n" + fallbackSection + "\n" + entry + "\n";
 	suppressPath(statePath);
 	node_fs.writeFileSync(statePath, content, "utf-8");
 	return { success: true };
@@ -42024,8 +42052,7 @@ app.post("/api/state/decision", (req, res) => {
 	const { phase, text } = req.body;
 	if (!text?.trim()) return res.status(400).json({ error: "text is required" });
 	const entry = `- [Phase ${phase?.trim() || "?"}]: ${text.trim()}`;
-	const result = appendToStateSection(statePath, /(###?\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i, entry);
-	if (!result.success) return res.status(404).json({ error: result.reason });
+	appendToStateSection(statePath, /(###?\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i, entry, "### Decisions");
 	return res.json({
 		added: true,
 		decision: entry
@@ -42036,8 +42063,7 @@ app.post("/api/state/blocker", (req, res) => {
 	ensureStateMd(statePath);
 	const { text } = req.body;
 	if (!text?.trim()) return res.status(400).json({ error: "text is required" });
-	const result = appendToStateSection(statePath, /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i, `- ${text.trim()}`);
-	if (!result.success) return res.status(404).json({ error: result.reason });
+	appendToStateSection(statePath, /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i, `- ${text.trim()}`, "### Blockers/Concerns");
 	return res.json({
 		added: true,
 		blocker: text.trim()
@@ -42160,13 +42186,18 @@ async function main() {
 	const wss = createWSS();
 	const terminalWss = new import_websocket_server.default({ noServer: true });
 	const ptyManager = PtyManager.getInstance();
-	if (!ptyManager.isAvailable()) console.error("[server] node-pty not available — terminal features disabled");
+	if (!ptyManager.isAvailable()) log("WARN", "server", "node-pty not available — terminal features disabled");
+	else log("INFO", "server", "node-pty available — terminal features enabled");
 	terminalWss.on("connection", (ws) => {
+		log("INFO", "terminal-ws", "Client connected");
 		ptyManager.addClient(ws);
-		if (!ptyManager.isAvailable()) ws.send(JSON.stringify({
-			type: "unavailable",
-			reason: "node-pty is not installed — terminal features disabled"
-		}));
+		if (!ptyManager.isAvailable()) {
+			ws.send(JSON.stringify({
+				type: "unavailable",
+				reason: "node-pty is not installed — terminal features disabled"
+			}));
+			log("WARN", "terminal-ws", "Sent unavailable to client — node-pty missing");
+		}
 		ws.on("message", (raw) => {
 			try {
 				const msg = JSON.parse(typeof raw === "string" ? raw : raw.toString());
@@ -42175,27 +42206,44 @@ async function main() {
 						ptyManager.write(msg.data);
 						break;
 					case "resize":
+						log("INFO", "terminal-ws", `Resize: ${msg.cols}x${msg.rows}`);
 						ptyManager.resize(msg.cols, msg.rows);
 						break;
 					case "spawn":
-						ptyManager.spawn({
-							skipPermissions: !!msg.skipPermissions,
-							cwd: projectCwd,
-							cols: msg.cols,
-							rows: msg.rows
-						});
+						log("INFO", "terminal-ws", `Spawn requested: skipPermissions=${!!msg.skipPermissions}, cwd=${projectCwd}`);
+						try {
+							ptyManager.spawn({
+								skipPermissions: !!msg.skipPermissions,
+								cwd: projectCwd,
+								cols: msg.cols,
+								rows: msg.rows
+							});
+							log("INFO", "terminal-ws", `Spawn succeeded, pid=${ptyManager.getStatus()?.pid}`);
+						} catch (err) {
+							const errMsg = err instanceof Error ? err.message : String(err);
+							log("ERROR", "terminal-ws", `Spawn failed: ${errMsg}`);
+							ws.send(JSON.stringify({
+								type: "output",
+								data: `\r\n\x1b[31mFailed to start terminal: ${errMsg}\x1b[0m\r\n`
+							}));
+						}
 						break;
 					case "kill":
+						log("INFO", "terminal-ws", "Kill requested");
 						ptyManager.kill();
 						break;
+					default: log("WARN", "terminal-ws", `Unknown message type: ${msg.type}`);
 				}
-			} catch {}
+			} catch (err) {
+				log("ERROR", "terminal-ws", `Message handling error: ${err instanceof Error ? err.message : String(err)}`);
+			}
 		});
 		ws.on("close", () => {
+			log("INFO", "terminal-ws", "Client disconnected");
 			ptyManager.removeClient(ws);
 		});
 		ws.on("error", (err) => {
-			console.error("[terminal-ws] Client error:", err.message);
+			log("ERROR", "terminal-ws", `Client error: ${err.message}`);
 		});
 	});
 	const server = (0, node_http.createServer)(app);
@@ -42218,7 +42266,9 @@ async function main() {
 	const port = await esm_default(3333);
 	const url = `http://localhost:${port}`;
 	server.listen(port, () => {
+		log("INFO", "server", `Dashboard ready at ${url}, log file: ${logFile}`);
 		console.error(`Dashboard ready at ${url}`);
+		console.error(`Logs: ${logFile}`);
 		open$1(url).catch(() => {});
 	});
 	function shutdown() {
