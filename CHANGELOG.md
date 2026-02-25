@@ -1,3 +1,33 @@
+# [2.0.0](https://github.com/maystudios/maxsim/compare/v1.3.0...v2.0.0) (2026-02-25)
+
+
+* feat!: release v2.0.0 — E2E-validated npm delivery with live dashboard ([13fa7a4](https://github.com/maystudios/maxsim/commit/13fa7a479e3e75d20e30b46406d42684f0bee7eb))
+
+
+### Bug Fixes
+
+* **ci:** call semantic-release binary directly to avoid pnpm recursive exec ([bdf4108](https://github.com/maystudios/maxsim/commit/bdf41089d16b41cfe8ed591fa092916437391052))
+* **ci:** set NODE_AUTH_TOKEN so setup-node npmrc auth works with semantic-release ([bc30224](https://github.com/maystudios/maxsim/commit/bc302246bf31f295bb457ba39664c9b0b2ed10e1))
+* **ci:** use pnpm exec semantic-release to resolve local plugins ([bd62749](https://github.com/maystudios/maxsim/commit/bd6274991b35e156ca4b4551732b813f0f2f979b))
+* **e2e:** add title frontmatter and 02-integration dir to mock fixture ([2563892](https://github.com/maystudios/maxsim/commit/2563892b3a9931bd1c98c5f7c4491a0182e9c822))
+
+
+### Features
+
+* **ci:** add E2E gate to publish workflow — failing tests block release ([c2dd048](https://github.com/maystudios/maxsim/commit/c2dd048dc6d737fb23e0ba652537a2d3196bae8b))
+* **e2e:** add dashboard.test.ts with 5 read API endpoint assertions ([f3df880](https://github.com/maystudios/maxsim/commit/f3df8803e2c2e123b781a25ecde7b9fbba57ae80))
+
+
+### BREAKING CHANGES
+
+* Minimum Node.js version raised to >=22.0.0. Complete
+rewrite from CJS monolith to pnpm workspace with TypeScript packages.
+Dashboard now ships inside the npm tarball as a Next.js standalone build.
+E2E test suite validates the full install lifecycle from npm consumer
+perspective. CI gate blocks publish when E2E fails.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
 ## 1.3.0 (2026-02-24)
 
 ### 🚀 Features
