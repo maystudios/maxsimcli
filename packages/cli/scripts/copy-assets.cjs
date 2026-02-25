@@ -152,4 +152,13 @@ if (fs.existsSync(dashboardStandalone)) {
   console.warn('  [warn] Dashboard standalone build not found, skipping. Run STANDALONE_BUILD=true nx build dashboard first.');
 }
 
+// 5. Copy root README.md into packages/cli/ so it's included in the npm tarball
+// (npm "files" includes "README.md" which must be present at publish time)
+const readmeSrc = path.join(monorepoRoot, 'README.md');
+const readmeDest = path.join(pkgCliRoot, 'README.md');
+if (fs.existsSync(readmeSrc)) {
+  fs.copyFileSync(readmeSrc, readmeDest);
+  console.log(`  [assets] Copied README.md -> packages/cli/README.md`);
+}
+
 console.log('  [assets] Done.');

@@ -1515,7 +1515,9 @@ const subcommand = args.find(a => !a.startsWith('-'));
         console.log(chalk_1.default.blue('Starting dashboard...'));
         console.log(chalk_1.default.gray(`  Project: ${projectCwd}`));
         console.log(chalk_1.default.gray(`  Server:  ${serverPath}\n`));
-        const child = spawnDash('node', [serverPath], {
+        // Use process.execPath (absolute path to the current node binary) to avoid
+        // shell: true which does not quote args and breaks paths with spaces (DEP0190).
+        const child = spawnDash(process.execPath, [serverPath], {
             cwd: dashboardDir,
             detached: true,
             stdio: ['ignore', 'ignore', 'pipe'],
@@ -1524,49 +1526,48 @@ const subcommand = args.find(a => !a.startsWith('-'));
                 MAXSIM_PROJECT_CWD: projectCwd,
                 NODE_ENV: 'production',
             },
-            ...(process.platform === 'win32' ? { shell: true } : {}),
         });
-        // Collect stderr briefly to detect startup failures
-        let stderrData = '';
-        if (child.stderr) {
-            child.stderr.setEncoding('utf8');
-            child.stderr.on('data', (chunk) => { stderrData += chunk; });
-        }
-        // Wait for server to start or fail
-        const started = await new Promise((resolve) => {
-            child.on('error', () => resolve(false));
-            child.on('exit', (code) => {
-                if (code !== null && code !== 0)
-                    resolve(false);
-            });
-            setTimeout(async () => {
-                // Check health
-                try {
-                    const controller = new AbortController();
-                    const timer = setTimeout(() => controller.abort(), 2000);
-                    const res = await fetch('http://localhost:3333/api/health', { signal: controller.signal });
-                    clearTimeout(timer);
-                    resolve(res.ok);
-                }
-                catch {
-                    resolve(false);
-                }
-            }, 3000);
+        // Wait for server to announce its URL via stderr ("Dashboard ready at <url>")
+        // or fail (process exit / error). Timeout after 20s for slow Windows cold-starts.
+        const result = await new Promise((resolve) => {
+            let stderrData = '';
+            let resolved = false;
+            function done(url) {
+                if (resolved)
+                    return;
+                resolved = true;
+                resolve({ url, stderr: stderrData });
+            }
+            child.on('error', () => done(null));
+            child.on('exit', (code) => { if (code !== null && code !== 0)
+                done(null); });
+            if (child.stderr) {
+                child.stderr.setEncoding('utf8');
+                child.stderr.on('data', (chunk) => {
+                    stderrData += chunk;
+                    // Server writes: "Dashboard ready at http://localhost:<port>"
+                    const match = stderrData.match(/Dashboard ready at (https?:\/\/[^\s]+)/);
+                    if (match)
+                        done(match[1]);
+                });
+            }
+            // Hard timeout — Next.js standalone can be slow on Windows first cold-start
+            setTimeout(() => done(null), 20000);
         });
-        if (started) {
+        if (result.url) {
             child.unref();
             if (child.stderr)
                 child.stderr.destroy();
-            console.log(chalk_1.default.green('  Dashboard ready at http://localhost:3333'));
+            console.log(chalk_1.default.green(`  Dashboard ready at ${result.url}`));
         }
         else {
             // Show error info if server failed
-            if (stderrData.trim()) {
+            if (result.stderr.trim()) {
                 console.log(chalk_1.default.red('\n  Dashboard failed to start:\n'));
-                console.log(chalk_1.default.gray('  ' + stderrData.trim().split('\n').join('\n  ')));
+                console.log(chalk_1.default.gray('  ' + result.stderr.trim().split('\n').join('\n  ')));
             }
             else {
-                console.log(chalk_1.default.yellow('\n  Dashboard did not respond. Check if port 3333 is available.'));
+                console.log(chalk_1.default.yellow('\n  Dashboard did not respond after 20s. Run with DEBUG=1 for details.'));
             }
             child.unref();
             if (child.stderr)

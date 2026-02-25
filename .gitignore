@@ -28,6 +28,9 @@ tmp/
 # Build artifacts (committed to npm, not git)
 hooks/dist/
 
+# Generated during build — copied from root README.md
+packages/cli/README.md
+
 # Animation assets
 animation/
 *.gif

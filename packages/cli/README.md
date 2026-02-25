@@ -134,6 +134,37 @@ Loop **discuss → plan → execute → verify** until done. Archive the milesto
 | `/maxsim:pause-work` | Create handoff when stopping mid-phase |
 | `/maxsim:resume-work` | Restore from last session |
 
+### Live Dashboard
+
+| Command | Description |
+|---------|-------------|
+| `npx maxsimcli dashboard` | Launch the live project dashboard |
+
+MAXSIM includes a real-time web dashboard that shows phase progress, open tasks, blockers,
+and allows inline plan editing.
+
+```bash
+npx maxsimcli dashboard
+```
+
+The dashboard auto-detects a free port starting from 3333 and opens your browser.
+It watches `.planning/` for changes and updates in real-time via WebSocket.
+
+- **Auto-installed** during `npx maxsimcli@latest` -- no separate setup needed
+- **Works with both global and local installs**
+- **Auto-opens browser** on launch
+- **Detects running instances** -- won't start a duplicate server
+- **Auto-launches** during `/maxsim:execute-phase`
+
+**Features:**
+- Real-time updates via WebSocket -- edit a `.planning/` file and the dashboard refreshes instantly
+- Phase overview with animated progress bars and milestone stats
+- Phase drill-down with plan tasks and toggleable checkboxes
+- Inline CodeMirror Markdown editor for plan files (Ctrl+S to save)
+- Todos panel -- create, complete, and manage todos
+- Blockers panel -- view and resolve blockers from STATE.md
+- Swiss Style Design dark theme
+
 ### Phase Management
 
 | Command | Description |

@@ -6485,13 +6485,14 @@ var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 var require_package = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"name": "maxsimcli",
-		"version": "1.2.3",
+		"version": "2.0.0",
 		"private": false,
 		"description": "A meta-prompting, context engineering and spec-driven development system for Claude Code, OpenCode, Gemini and Codex by MayStudios.",
 		"bin": { "maxsimcli": "dist/install.cjs" },
 		"main": "./dist/cli.cjs",
 		"types": "./dist/cli.d.cts",
-		"files": ["dist"],
+		"files": ["dist", "README.md"],
+		"scripts": { "prepublishOnly": "node -e \"require('fs').copyFileSync('../../README.md', './README.md')\"" },
 		"engines": { "node": ">=22.0.0" },
 		"keywords": [
 			"claude",
@@ -7612,7 +7613,7 @@ const subcommand = args.find((a) => !a.startsWith("-"));
 		console.log(chalk.blue("Starting dashboard..."));
 		console.log(chalk.gray(`  Project: ${projectCwd}`));
 		console.log(chalk.gray(`  Server:  ${serverPath}\n`));
-		const child = spawnDash("node", [serverPath], {
+		const child = spawnDash(process.execPath, [serverPath], {
 			cwd: dashboardDir,
 			detached: true,
 			stdio: [
@@ -7624,41 +7625,42 @@ const subcommand = args.find((a) => !a.startsWith("-"));
 				...process.env,
 				MAXSIM_PROJECT_CWD: projectCwd,
 				NODE_ENV: "production"
-			},
-			...process.platform === "win32" ? { shell: true } : {}
+			}
 		});
-		let stderrData = "";
-		if (child.stderr) {
-			child.stderr.setEncoding("utf8");
-			child.stderr.on("data", (chunk) => {
-				stderrData += chunk;
-			});
-		}
-		if (await new Promise((resolve) => {
-			child.on("error", () => resolve(false));
+		const result = await new Promise((resolve) => {
+			let stderrData = "";
+			let resolved = false;
+			function done(url) {
+				if (resolved) return;
+				resolved = true;
+				resolve({
+					url,
+					stderr: stderrData
+				});
+			}
+			child.on("error", () => done(null));
 			child.on("exit", (code) => {
-				if (code !== null && code !== 0) resolve(false);
+				if (code !== null && code !== 0) done(null);
 			});
-			setTimeout(async () => {
-				try {
-					const controller = new AbortController();
-					const timer = setTimeout(() => controller.abort(), 2e3);
-					const res = await fetch("http://localhost:3333/api/health", { signal: controller.signal });
-					clearTimeout(timer);
-					resolve(res.ok);
-				} catch {
-					resolve(false);
-				}
-			}, 3e3);
-		})) {
+			if (child.stderr) {
+				child.stderr.setEncoding("utf8");
+				child.stderr.on("data", (chunk) => {
+					stderrData += chunk;
+					const match = stderrData.match(/Dashboard ready at (https?:\/\/[^\s]+)/);
+					if (match) done(match[1]);
+				});
+			}
+			setTimeout(() => done(null), 2e4);
+		});
+		if (result.url) {
 			child.unref();
 			if (child.stderr) child.stderr.destroy();
-			console.log(chalk.green("  Dashboard ready at http://localhost:3333"));
+			console.log(chalk.green(`  Dashboard ready at ${result.url}`));
 		} else {
-			if (stderrData.trim()) {
+			if (result.stderr.trim()) {
 				console.log(chalk.red("\n  Dashboard failed to start:\n"));
-				console.log(chalk.gray("  " + stderrData.trim().split("\n").join("\n  ")));
-			} else console.log(chalk.yellow("\n  Dashboard did not respond. Check if port 3333 is available."));
+				console.log(chalk.gray("  " + result.stderr.trim().split("\n").join("\n  ")));
+			} else console.log(chalk.yellow("\n  Dashboard did not respond after 20s. Run with DEBUG=1 for details."));
 			child.unref();
 			if (child.stderr) child.stderr.destroy();
 		}
