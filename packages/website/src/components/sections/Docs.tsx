@@ -109,7 +109,8 @@ function GettingStarted() {
           code={`~/.claude/
 ├── commands/maxsim/   # 31 user-facing commands (/maxsim:*)
 ├── agents/            # 11 specialized agent prompts
-└── hooks/             # Pre/post hooks for automation`}
+├── hooks/             # Pre/post hooks for automation
+└── dashboard/         # Pre-built web dashboard (Vite + Express)`}
         />
       </div>
 
@@ -175,6 +176,12 @@ const commands: CommandDef[] = [
     signature: "/maxsim:verify-work",
     description: "Validate built features through conversational user acceptance testing.",
     example: `/maxsim:verify-work`,
+  },
+  {
+    name: "dashboard",
+    signature: "npx maxsimcli dashboard",
+    description: "Launch the real-time web dashboard. View phase progress, todos, blockers, and an interactive terminal in your browser.",
+    example: `npx maxsimcli dashboard`,
   },
 ];
 

@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { Brain, Layers, Globe, FileText, Users, Gauge } from "lucide-react";
+import { Brain, Layers, Globe, FileText, Users, Gauge, LayoutDashboard } from "lucide-react";
 
 const features = [
   {
@@ -37,6 +37,12 @@ const features = [
     title: "Model Profiles",
     description:
       "Quality, balanced, and budget tiers for optimal cost. Orchestrators use lean models; planners and executors use heavy ones.",
+  },
+  {
+    icon: LayoutDashboard,
+    title: "Live Dashboard",
+    description:
+      "Real-time web UI bundled inside the CLI. View phase progress, todos, blockers, and an interactive terminal — all in one browser tab.",
   },
 ];
 
