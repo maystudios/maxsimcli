@@ -9,6 +9,7 @@ const shared = {
   sourcemap: true,
   tsconfig: 'tsconfig.json',
   external: [/^node:/],
+  inlineOnly: false,
 };
 
 const hookShared = {
@@ -19,6 +20,7 @@ const hookShared = {
   tsconfig: 'tsconfig.json',
   external: [/^node:/],
   outDir: 'dist/assets/hooks',
+  inlineOnly: false,
 };
 
 export default defineConfig([
