@@ -52,13 +52,14 @@ export function err<T = never>(error: string): Result<T> {
 // ─── Core interfaces ─────────────────────────────────────────────────────────
 
 export type ModelTier = 'opus' | 'sonnet' | 'haiku';
-export type ModelProfileName = 'quality' | 'balanced' | 'budget';
+export type ModelProfileName = 'quality' | 'balanced' | 'budget' | 'tokenburner';
 export type ModelResolution = 'inherit' | ModelTier;
 
 export interface ModelProfileEntry {
   quality: ModelTier;
   balanced: ModelTier;
   budget: ModelTier;
+  tokenburner: ModelTier;
 }
 
 export type AgentType =

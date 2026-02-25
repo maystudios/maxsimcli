@@ -25,17 +25,17 @@ import type {
 // ─── Model Profile Table ─────────────────────────────────────────────────────
 
 export const MODEL_PROFILES: ModelProfiles = {
-  'maxsim-planner':              { quality: 'opus', balanced: 'opus',   budget: 'sonnet' },
-  'maxsim-roadmapper':           { quality: 'opus', balanced: 'sonnet', budget: 'sonnet' },
-  'maxsim-executor':             { quality: 'opus', balanced: 'sonnet', budget: 'sonnet' },
-  'maxsim-phase-researcher':     { quality: 'opus', balanced: 'sonnet', budget: 'haiku' },
-  'maxsim-project-researcher':   { quality: 'opus', balanced: 'sonnet', budget: 'haiku' },
-  'maxsim-research-synthesizer': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
-  'maxsim-debugger':             { quality: 'opus', balanced: 'sonnet', budget: 'sonnet' },
-  'maxsim-codebase-mapper':      { quality: 'sonnet', balanced: 'haiku', budget: 'haiku' },
-  'maxsim-verifier':             { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
-  'maxsim-plan-checker':         { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
-  'maxsim-integration-checker':  { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
+  'maxsim-planner':              { quality: 'opus', balanced: 'opus',   budget: 'sonnet', tokenburner: 'opus' },
+  'maxsim-roadmapper':           { quality: 'opus', balanced: 'sonnet', budget: 'sonnet', tokenburner: 'opus' },
+  'maxsim-executor':             { quality: 'opus', balanced: 'sonnet', budget: 'sonnet', tokenburner: 'opus' },
+  'maxsim-phase-researcher':     { quality: 'opus', balanced: 'sonnet', budget: 'haiku',  tokenburner: 'opus' },
+  'maxsim-project-researcher':   { quality: 'opus', balanced: 'sonnet', budget: 'haiku',  tokenburner: 'opus' },
+  'maxsim-research-synthesizer': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', tokenburner: 'opus' },
+  'maxsim-debugger':             { quality: 'opus', balanced: 'sonnet', budget: 'sonnet', tokenburner: 'opus' },
+  'maxsim-codebase-mapper':      { quality: 'sonnet', balanced: 'haiku', budget: 'haiku', tokenburner: 'opus' },
+  'maxsim-verifier':             { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', tokenburner: 'opus' },
+  'maxsim-plan-checker':         { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', tokenburner: 'opus' },
+  'maxsim-integration-checker':  { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', tokenburner: 'opus' },
 };
 
 // ─── Output helpers ──────────────────────────────────────────────────────────

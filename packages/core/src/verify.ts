@@ -816,7 +816,7 @@ export function cmdValidateHealth(cwd: string, options: HealthOptions, raw: bool
     try {
       const rawContent = fs.readFileSync(configPath, 'utf-8');
       const parsed: Record<string, unknown> = JSON.parse(rawContent) as Record<string, unknown>;
-      const validProfiles = ['quality', 'balanced', 'budget'];
+      const validProfiles = ['quality', 'balanced', 'budget', 'tokenburner'];
       if (parsed.model_profile && !validProfiles.includes(parsed.model_profile as string)) {
         addIssue('warning', 'W004', `config.json: invalid model_profile "${parsed.model_profile}"`, `Valid values: ${validProfiles.join(', ')}`);
       }
