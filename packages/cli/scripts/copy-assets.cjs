@@ -135,11 +135,15 @@ if (fs.existsSync(dashboardStandalone)) {
   // Without hoisting, require("next") fails with MODULE_NOT_FOUND.
   hoistPnpmPackages(path.join(dashboardDest, 'node_modules'));
 
-  // Copy static assets into the standalone .next/static (required by Next.js)
+  // Copy static assets where the custom server expects them.
+  // server.ts uses `dir: path.join(__dirname, "packages", "dashboard")`, so Next.js
+  // serves /_next/static/ from packages/dashboard/.next/static/ — NOT the root .next/static/.
+  // The build:standalone script already placed them at the root .next/static/ (for the
+  // default Next.js standalone server.js), so we additionally copy them to the correct path.
   if (fs.existsSync(dashboardStatic)) {
-    const staticDest = path.join(dashboardDest, '.next', 'static');
+    const staticDest = path.join(dashboardDest, 'packages', 'dashboard', '.next', 'static');
     fs.cpSync(dashboardStatic, staticDest, { recursive: true });
-    console.log(`  [assets] Copied static files -> dist/assets/dashboard/.next/static/`);
+    console.log(`  [assets] Copied static files -> dist/assets/dashboard/packages/dashboard/.next/static/`);
   }
 
   // Next.js standalone in monorepo mode does not copy all manifest files into the
