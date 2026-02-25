@@ -716,9 +716,17 @@ async function main(): Promise<void> {
   const terminalWss = new WebSocketServer({ noServer: true });
   const ptyManager = PtyManager.getInstance();
 
+  if (!ptyManager.isAvailable()) {
+    console.error('[server] node-pty not available — terminal features disabled');
+  }
+
   // Terminal WebSocket connections
   terminalWss.on('connection', (ws: WebSocket) => {
     ptyManager.addClient(ws);
+
+    if (!ptyManager.isAvailable()) {
+      ws.send(JSON.stringify({ type: 'unavailable', reason: 'node-pty is not installed — terminal features disabled' }));
+    }
 
     ws.on('message', (raw: Buffer | string) => {
       try {
