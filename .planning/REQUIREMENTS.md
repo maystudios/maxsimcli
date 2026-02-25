@@ -56,7 +56,7 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 
 ### Planning Cleanup
 
-- [ ] **DOCS-01**: ROADMAP.md phase statuses match actual codebase state — all completed phases marked `[x]`, no stale "In Progress" entries that have shipped
+- [x] **DOCS-01**: ROADMAP.md phase statuses match actual codebase state — all completed phases marked `[x]`, no stale "In Progress" entries that have shipped
 
 ### CI Integration
 
