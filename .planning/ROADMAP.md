@@ -178,7 +178,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 24-01-PLAN.md — Fix QuickActionBar disabled logic and verify status parsing alignment
+- [x] 24-01-PLAN.md — Fix QuickActionBar disabled logic and verify status parsing alignment
 
 ### Phase 25: Planning Doc Hygiene
 **Goal**: Fix all stale traceability entries, backfill empty SUMMARY.md frontmatter, add missing VERIFICATION.md files for phases 15/18/19/20, and make pre-push hook portable via husky
@@ -193,9 +193,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 25-01-PLAN.md — Fix traceability table and backfill SUMMARY.md requirements_completed
-- [ ] 25-02-PLAN.md — Install Husky and create portable pre-push hook
-- [ ] 25-03-PLAN.md — Create retroactive VERIFICATION.md for phases 15, 18, 19, 20
+- [x] 25-01-PLAN.md — Fix traceability table and backfill SUMMARY.md requirements_completed
+- [x] 25-02-PLAN.md — Install Husky and create portable pre-push hook
+- [x] 25-03-PLAN.md — Create retroactive VERIFICATION.md for phases 15, 18, 19, 20
 
 ---
 
