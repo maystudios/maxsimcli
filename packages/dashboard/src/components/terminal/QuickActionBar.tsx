@@ -9,6 +9,7 @@ interface QuickActionBarProps {
   onSendCommand: (cmd: string) => void;
   isActive: boolean;
   isAlive: boolean;
+  unavailable?: boolean;
 }
 
 const DEFAULT_COMMANDS: QuickCommand[] = [
@@ -43,6 +44,7 @@ export function QuickActionBar({
   onSendCommand,
   isActive,
   isAlive,
+  unavailable = false,
 }: QuickActionBarProps) {
   const [minimized, setMinimized] = useState(false);
   const [commands, setCommands] = useState<QuickCommand[]>(loadCommands);
@@ -77,7 +79,7 @@ export function QuickActionBar({
     return cmd;
   }, []);
 
-  const disabled = isActive || !isAlive;
+  const disabled = unavailable || isActive || !isAlive;
 
   const handleClick = useCallback(
     async (cmd: QuickCommand) => {
@@ -252,7 +254,7 @@ export function QuickActionBar({
             onClick={() => handleClick(cmd)}
             disabled={disabled}
             className="rounded-md px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
-            title={cmd.command}
+            title={unavailable ? "Terminal unavailable — node-pty not installed" : cmd.command}
           >
             {cmd.label}
           </button>

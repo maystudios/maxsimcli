@@ -17,6 +17,7 @@ interface UseTerminalOptions {
 
 interface UseTerminalReturn {
   connected: boolean;
+  unavailable: boolean;
   status: TerminalStatus | null;
   exitCode: number | null;
   send: (msg: object) => void;
@@ -35,6 +36,7 @@ export function useTerminal(opts: UseTerminalOptions = {}): UseTerminalReturn {
   const { autoSpawn = false, skipPermissions = false } = opts;
 
   const [connected, setConnected] = useState(false);
+  const [unavailable, setUnavailable] = useState(false);
   const [status, setStatus] = useState<TerminalStatus | null>(null);
   const [exitCode, setExitCode] = useState<number | null>(null);
 
@@ -134,6 +136,9 @@ export function useTerminal(opts: UseTerminalOptions = {}): UseTerminalReturn {
             case "started":
               setExitCode(null);
               break;
+            case "unavailable":
+              setUnavailable(true);
+              break;
           }
         } catch {
           // Ignore unparseable messages
@@ -163,6 +168,7 @@ export function useTerminal(opts: UseTerminalOptions = {}): UseTerminalReturn {
 
   return {
     connected,
+    unavailable,
     status,
     exitCode,
     send,

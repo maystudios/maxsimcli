@@ -22,6 +22,7 @@ export function Terminal({ onReady }: TerminalProps) {
 
   const {
     connected,
+    unavailable,
     status,
     exitCode,
     writeInput,
@@ -137,7 +138,20 @@ export function Terminal({ onReady }: TerminalProps) {
           onSendCommand={writeInput}
           isActive={status?.isActive ?? false}
           isAlive={status?.alive ?? false}
+          unavailable={unavailable}
         />
+
+        {/* Unavailable overlay */}
+        {unavailable && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-card">
+            <div className="max-w-sm text-center">
+              <h2 className="text-lg font-semibold text-foreground mb-2">Terminal unavailable</h2>
+              <p className="text-sm text-muted-foreground">
+                node-pty is not installed. Run <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">npm install node-pty</code> in the dashboard directory.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Reconnection overlay (only when disconnected, not clean exit) */}
         {!connected && exitCode === null && (
