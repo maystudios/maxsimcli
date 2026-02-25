@@ -51,7 +51,7 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 - [x] **DASH-TERM-01**: Terminal tab spawns Claude Code as PTY child process on the server with configurable `--dangerously-skip-permissions` flag
 - [x] **DASH-TERM-02**: All stdout/stderr including ANSI escape codes streamed via WebSocket and rendered in xterm.js
 - [x] **DASH-TERM-03**: Keyboard input forwarded from browser to server process stdin in real-time
-- [x] **DASH-TERM-04**: Quick-action buttons send predefined MAXSIM slash commands to the running process
+- [ ] **DASH-TERM-04**: Quick-action buttons send predefined MAXSIM slash commands to the running process
 - [x] **DASH-TERM-05**: WebSocket reconnection within 60 seconds reattaches to still-running process with scrollback preserved
 
 ### Planning Cleanup
@@ -77,8 +77,8 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| E2E-01 | Phase 15 → Phase 23 | In Progress |
-| DOCS-01 | Phase 15 → Phase 23 | In Progress |
+| E2E-01 | Phase 15 → Phase 23 | Satisfied |
+| DOCS-01 | Phase 15 → Phase 23 | Satisfied |
 | E2E-02 | Phase 16 | Satisfied |
 | E2E-03 | Phase 16 | Satisfied |
 | E2E-04 | Phase 16 | Satisfied |
@@ -99,5 +99,5 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 | DASH-TERM-01 | Phase 21 → Phase 22 | Complete |
 | DASH-TERM-02 | Phase 21 | Satisfied |
 | DASH-TERM-03 | Phase 21 | Satisfied |
-| DASH-TERM-04 | Phase 21 | Satisfied |
+| DASH-TERM-04 | Phase 21 → Phase 24 | Pending |
 | DASH-TERM-05 | Phase 21 | Satisfied |

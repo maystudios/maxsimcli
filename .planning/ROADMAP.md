@@ -21,6 +21,8 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 - [x] **Phase 21: Interactive Claude Code Terminal** - Browser-based terminal in the dashboard that spawns and controls Claude Code via PTY + WebSocket with xterm.js rendering and session persistence (completed 2026-02-25)
 - [x] **Phase 22: Fix node-pty Delivery (Lazy-Load)** - Lazy-load node-pty so dashboard server starts without native addon; terminal degrades gracefully (completed 2026-02-25)
 - [x] **Phase 23: E2E Wiring & Next.js Cleanup** - Add dashboard:build to e2e dependsOn, remove orphaned Next.js files, fix ROADMAP/REQUIREMENTS staleness (completed 2026-02-25)
+- [ ] **Phase 24: Fix Terminal Status Parsing & Quick Actions** - Fix status parse bug in use-terminal.ts that disables quick-action buttons and breaks status bar
+- [ ] **Phase 25: Planning Doc Hygiene** - Fix stale traceability, backfill SUMMARY.md frontmatter, add missing VERIFICATIONs, portable pre-push hook
 
 ---
 
@@ -161,13 +163,35 @@ Plans:
 
 Plans:
 - [x] 23-01-PLAN.md — E2E wiring fix and Next.js orphaned file cleanup
-- [ ] 23-02-PLAN.md — Planning doc audit and pre-push consistency hook
+- [x] 23-02-PLAN.md — Planning doc audit and pre-push consistency hook
+
+### Phase 24: Fix Terminal Status Parsing & Quick Actions
+**Goal**: Fix the status message parsing bug in `use-terminal.ts` that cascades into permanently disabled quick-action buttons and broken status bar, plus fix the uptime unit mismatch
+**Depends on**: Phase 23
+**Requirements**: DASH-TERM-04
+**Gap Closure**: Closes unsatisfied requirement, integration gap (Terminal → E2E), and broken flow from v2.0 audit
+**Success Criteria** (what must be TRUE):
+  1. `use-terminal.ts` correctly destructures spread fields (`pid`, `uptime`, `cwd`, `memoryMB`, `isActive`, `skipPermissions`, `alive`) from WebSocket status messages instead of reading `msg.status`
+  2. QuickActionBar buttons are enabled when the terminal process is active and alive
+  3. TerminalStatusBar displays correct connection status, PID, uptime, and memory usage
+  4. `TerminalStatusBar.formatUptime` receives milliseconds (or server sends milliseconds) — uptime displays correctly, not "0m 0s"
+
+### Phase 25: Planning Doc Hygiene
+**Goal**: Fix all stale traceability entries, backfill empty SUMMARY.md frontmatter, add missing VERIFICATION.md files for phases 15/18/19/20, and make pre-push hook portable via husky
+**Depends on**: Phase 24
+**Gap Closure**: Closes all remaining tech debt items from v2.0 audit
+**Success Criteria** (what must be TRUE):
+  1. REQUIREMENTS.md traceability table shows "Satisfied" for E2E-01 and DOCS-01 (not "In Progress")
+  2. DASH-TERM-04 checkbox reset to `[ ]` until Phase 24 satisfies it, then re-checked
+  3. All 9 phase SUMMARY.md files have populated `requirements_completed` arrays
+  4. VERIFICATION.md exists for phases 15, 18, 19, and 20
+  5. Pre-push hook is auto-installed on fresh clones (husky prepare script or equivalent)
 
 ---
 
 ## Progress
 
-**Execution Order:** 15 → 16 → 17 → 18 → 19 → 20 → 21 → 22 → 23 (strict sequential — each phase depends on the previous)
+**Execution Order:** 15 → 16 → 17 → 18 → 19 → 20 → 21 → 22 → 23 → 24 → 25 (strict sequential — each phase depends on the previous)
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -179,4 +203,6 @@ Plans:
 | 20. Dashboard Migrate to Vite + Express | 2/2 | Complete | 2026-02-25 |
 | 21. Interactive Claude Code Terminal | 4/4 | Complete | 2026-02-25 |
 | 22. Fix node-pty Delivery (Lazy-Load) | 2/2 | Complete    | 2026-02-25 |
-| 23. E2E Wiring & Next.js Cleanup | 2/2 | Complete   | 2026-02-25 |
+| 23. E2E Wiring & Next.js Cleanup | 2/2 | Complete    | 2026-02-25 |
+| 24. Fix Terminal Status Parsing & Quick Actions | 0/0 | Pending | — |
+| 25. Planning Doc Hygiene | 0/0 | Pending | — |
