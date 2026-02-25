@@ -1,3 +1,10 @@
+## [2.0.3](https://github.com/maystudios/maxsim/compare/v2.0.2...v2.0.3) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** copy required-server-files.json into standalone bundle and clean stale installs ([2f1e938](https://github.com/maystudios/maxsim/commit/2f1e9389d933083b35719e2f8af343971a059346))
+
 ## [2.0.2](https://github.com/maystudios/maxsim/compare/v2.0.1...v2.0.2) (2026-02-25)
 
 
