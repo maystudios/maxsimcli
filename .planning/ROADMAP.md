@@ -19,7 +19,7 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 - [x] **Phase 19: CI Integration** - Wire E2E suite into GitHub Actions, gate publish on green E2E (completed 2026-02-25)
 - [x] **Phase 20: Dashboard Migrate to Vite + Express** - Replace Next.js standalone with Vite (client build) + tsdown-bundled Express server for reliable npm packaging (completed 2026-02-25)
 - [x] **Phase 21: Interactive Claude Code Terminal** - Browser-based terminal in the dashboard that spawns and controls Claude Code via PTY + WebSocket with xterm.js rendering and session persistence (completed 2026-02-25)
-- [ ] **Phase 22: Fix node-pty Delivery (Lazy-Load)** - Lazy-load node-pty so dashboard server starts without native addon; terminal degrades gracefully
+- [x] **Phase 22: Fix node-pty Delivery (Lazy-Load)** - Lazy-load node-pty so dashboard server starts without native addon; terminal degrades gracefully (completed 2026-02-25)
 - [ ] **Phase 23: E2E Wiring & Next.js Cleanup** - Add dashboard:build to e2e dependsOn, remove orphaned Next.js files, fix ROADMAP/REQUIREMENTS staleness
 
 ---
@@ -177,5 +177,5 @@ Plans:
 | 19. CI Integration | 1/1 | Complete | 2026-02-25 |
 | 20. Dashboard Migrate to Vite + Express | 2/2 | Complete | 2026-02-25 |
 | 21. Interactive Claude Code Terminal | 4/4 | Complete | 2026-02-25 |
-| 22. Fix node-pty Delivery (Lazy-Load) | 1/2 | In Progress|  |
+| 22. Fix node-pty Delivery (Lazy-Load) | 2/2 | Complete   | 2026-02-25 |
 | 23. E2E Wiring & Next.js Cleanup | 0/0 | Not started | - |

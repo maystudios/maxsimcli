@@ -60,7 +60,7 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 
 ### CI Integration
 
-- [ ] **CI-01**: GitHub Actions E2E job runs `nx run e2e:e2e` on push to main, after `cli:build` with `STANDALONE_BUILD=true`, and gates on green E2E before publish
+- [x] **CI-01**: GitHub Actions E2E job runs `nx run e2e:e2e` on push to main, after `cli:build` with `STANDALONE_BUILD=true`, and gates on green E2E before publish
 
 ---
 
@@ -95,7 +95,7 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 | DASH-05 | Phase 17 → Phase 22 | Complete |
 | DASH-06 | Phase 18 → Phase 22 | Complete |
 | DASH-07 | Phase 18 → Phase 22 | Complete |
-| CI-01 | Phase 19 → Phase 22 | Pending |
+| CI-01 | Phase 19 → Phase 22 | Complete |
 | DASH-TERM-01 | Phase 21 → Phase 22 | Complete |
 | DASH-TERM-02 | Phase 21 | Satisfied |
 | DASH-TERM-03 | Phase 21 | Satisfied |

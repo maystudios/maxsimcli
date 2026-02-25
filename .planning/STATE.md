@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 22 — Fix node-pty Lazy Load
-Plan: 22-01 (complete)
-Status: Plan 01 complete — Server graceful degradation + frontend error card when node-pty absent
-Last activity: 2026-02-25 — Plan 22-01 complete (Server Graceful Degradation + Frontend Error Card)
+Plan: 22-02 (complete)
+Status: Plan 02 complete — E2E test for absent node-pty
+Last activity: 2026-02-25 — Plan 22-02 complete (E2E Test for Absent node-pty)
 
 Progress: [████░░░░░░] 40% (3/5 phases complete)
 
@@ -84,6 +84,7 @@ Progress: [████░░░░░░] 40% (3/5 phases complete)
 | Phase 21 P04 | 2min | 2 tasks | 2 files |
 | Phase 21 P03 | 2min | 1 tasks | 4 files |
 | Phase 22 P01 | 2min | 2 tasks | 4 files |
+| Phase 22 P02 | 19min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -192,6 +193,8 @@ Recent decisions affecting current work:
 - [Phase 21-03]: CSS display:none/block for terminal persistence across view switches (not conditional render)
 - [Phase 21-03]: AppShell main refactored to flex-col overflow-hidden; padding moved to content wrapper in App.tsx
 - [Phase 21]: Confirmation popup always shown before sending quick-action commands
+- [Phase 22]: curl for WebSocket upgrade verification in vitest fork workers (ws/native WebSocket hang)
+- [Phase 22]: fileParallelism: false in e2e vitest config to prevent dashboard port conflicts
 
 ### Roadmap Evolution
 
@@ -216,5 +219,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 22-01-PLAN.md (Server Graceful Degradation + Frontend Error Card)
-Resume file: N/A — Phase 22 plan 01 complete.
+Stopped at: Completed 22-02-PLAN.md (E2E Test for Absent node-pty)
+Resume file: N/A — Phase 22 plan 02 complete.
