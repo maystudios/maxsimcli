@@ -604,6 +604,22 @@ async function handleDashboard(args) {
             // Use default cwd
         }
     }
+    // node-pty is a native addon that must be installed in the dashboard directory.
+    // Auto-install it if missing so the terminal works out of the box.
+    const ptyModulePath = path.join(serverDir, 'node_modules', 'node-pty');
+    if (!fs.existsSync(ptyModulePath)) {
+        console.log('Installing node-pty for terminal support...');
+        try {
+            (0, node_child_process_1.execSync)('npm install node-pty --save-optional --no-audit --no-fund --loglevel=error', {
+                cwd: serverDir,
+                stdio: 'inherit',
+                timeout: 120_000,
+            });
+        }
+        catch {
+            console.warn('node-pty installation failed — terminal will be unavailable.');
+        }
+    }
     console.log('Dashboard starting...');
     const child = (0, node_child_process_1.spawn)(runner, runnerArgs, {
         cwd: serverDir,

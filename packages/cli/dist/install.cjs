@@ -7548,6 +7548,20 @@ async function promptLocation(runtimes) {
 	}) === "global";
 }
 /**
+* Prompt whether to enable Agent Teams (Claude only, experimental feature)
+*/
+async function promptAgentTeams() {
+	console.log();
+	console.log(chalk.cyan("  Agent Teams") + chalk.dim(" (experimental)"));
+	console.log(chalk.dim("  Coordinate multiple Claude Code instances working in parallel."));
+	console.log(chalk.dim("  Enables CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS in settings.json."));
+	console.log();
+	return dist_default$1({
+		message: "Enable Agent Teams?",
+		default: false
+	});
+}
+/**
 * Install MAXSIM for all selected runtimes
 */
 async function installAllRuntimes(runtimes, isGlobal, isInteractive) {
@@ -7560,8 +7574,15 @@ async function installAllRuntimes(runtimes, isGlobal, isInteractive) {
 	const primaryStatuslineResult = results.find((r) => statuslineRuntimes.includes(r.runtime));
 	let shouldInstallStatusline = false;
 	if (primaryStatuslineResult && primaryStatuslineResult.settings) shouldInstallStatusline = await handleStatusline(primaryStatuslineResult.settings, isInteractive);
+	let enableAgentTeams = false;
+	if (isInteractive && runtimes.includes("claude")) enableAgentTeams = await promptAgentTeams();
 	for (const result of results) {
 		const useStatusline = statuslineRuntimes.includes(result.runtime) && shouldInstallStatusline;
+		if (result.runtime === "claude" && enableAgentTeams && result.settings) {
+			const env = result.settings.env ?? {};
+			env["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"] = "1";
+			result.settings.env = env;
+		}
 		finishInstall(result.settingsPath, result.settings, result.statuslineCommand, useStatusline, result.runtime, isGlobal);
 	}
 }
