@@ -49,6 +49,7 @@
     ]
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.4",
     "@inquirer/prompts": "^8.3.0",
     "@nx/js": "22.5.1",
     "@nx/vitest": "22.5.1",
@@ -62,6 +63,7 @@
     "@vitest/coverage-v8": "^4.0.18",
     "chalk": "^5.6.2",
     "esbuild": "^0.24.0",
+    "husky": "^9.1.7",
     "nx": "22.5.1",
     "ora": "^9.3.0",
     "semantic-release": "^24.2.5",
@@ -76,6 +78,8 @@
     "test": "nx run-many --target=test",
     "e2e": "node scripts/e2e-test.cjs",
     "e2e:publish": "node scripts/e2e-test.cjs --bump-and-publish",
-    "release": "semantic-release"
+    "lint": "biome check .",
+    "release": "semantic-release",
+    "prepare": "husky"
   }
 }
