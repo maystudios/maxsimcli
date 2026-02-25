@@ -123,8 +123,66 @@ function copyDirRecursive(src: string, dest: string): void {
     const destPath = path.join(dest, entry.name);
     if (entry.isDirectory()) {
       copyDirRecursive(srcPath, destPath);
+    } else if (entry.isSymbolicLink()) {
+      // Dereference symlinks so pnpm virtual-store links become real files/dirs.
+      // This matters for dashboard node_modules which may use pnpm's .pnpm/ store.
+      const target = fs.realpathSync(srcPath);
+      const stat = fs.statSync(target);
+      if (stat.isDirectory()) {
+        copyDirRecursive(target, destPath);
+      } else {
+        fs.copyFileSync(target, destPath);
+      }
     } else {
       fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
+/**
+ * After copying a dashboard directory, hoist packages from the pnpm virtual
+ * store (.pnpm/) to the top-level node_modules/ so that require() can find
+ * them. Next.js standalone builds on pnpm omit the top-level hoisted symlinks
+ * (e.g. node_modules/styled-jsx) so we recreate them as real directories.
+ */
+function hoistPnpmPackages(nodeModulesDir: string): void {
+  const pnpmDir = path.join(nodeModulesDir, '.pnpm');
+  if (!fs.existsSync(pnpmDir)) return;
+
+  for (const storeEntry of fs.readdirSync(pnpmDir)) {
+    const innerNM = path.join(pnpmDir, storeEntry, 'node_modules');
+    if (!fs.existsSync(innerNM)) continue;
+
+    for (const pkg of fs.readdirSync(innerNM)) {
+      if (pkg === '.pnpm') continue;
+
+      const pkgSrc = path.join(innerNM, pkg);
+      const pkgDest = path.join(nodeModulesDir, pkg);
+
+      // Skip if already present at top level (first match wins)
+      if (fs.existsSync(pkgDest)) continue;
+
+      try {
+        // Resolve symlinks before checking / copying
+        const realSrc = fs.existsSync(pkgSrc) ? fs.realpathSync(pkgSrc) : pkgSrc;
+        if (!fs.existsSync(realSrc)) continue;
+        const stat = fs.statSync(realSrc);
+
+        if (pkg.startsWith('@') && stat.isDirectory()) {
+          // Scoped package: one level deeper
+          for (const scopedPkg of fs.readdirSync(realSrc)) {
+            const scopedSrc = path.join(realSrc, scopedPkg);
+            const scopedDest = path.join(pkgDest, scopedPkg);
+            if (!fs.existsSync(scopedDest) && fs.statSync(scopedSrc).isDirectory()) {
+              fs.cpSync(scopedSrc, scopedDest, { recursive: true, dereference: true });
+            }
+          }
+        } else if (stat.isDirectory()) {
+          fs.cpSync(realSrc, pkgDest, { recursive: true, dereference: true });
+        }
+      } catch {
+        // Non-fatal: skip packages that can't be hoisted
+      }
     }
   }
 }
@@ -1495,6 +1553,9 @@ function install(
       fs.rmSync(dashboardDest, { recursive: true, force: true });
     }
     copyDirRecursive(dashboardSrc, dashboardDest);
+    // Hoist any pnpm virtual-store packages that were not at the top level in the
+    // bundle (e.g. styled-jsx in v2.0.2 was only in .pnpm/, not node_modules/).
+    hoistPnpmPackages(path.join(dashboardDest, 'node_modules'));
 
     // Write dashboard.json NEXT TO dashboard/ dir (survives overwrites on upgrade)
     const dashboardConfigDest = path.join(targetDir, 'dashboard.json');
@@ -1833,6 +1894,9 @@ const subcommand = args.find(a => !a.startsWith('-'));
       }
       fs.mkdirSync(installDashDir, { recursive: true });
       copyDirRecursive(dashboardAssetSrc, installDashDir);
+      // Hoist pnpm virtual-store packages (e.g. styled-jsx) that may be missing
+      // from the top-level node_modules/ in older npm bundle versions.
+      hoistPnpmPackages(path.join(installDashDir, 'node_modules'));
       // Write/update dashboard.json
       const dashConfigPath = path.join(installDir, 'dashboard.json');
       if (!fs.existsSync(dashConfigPath)) {

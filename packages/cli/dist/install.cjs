@@ -6485,7 +6485,7 @@ var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 var require_package = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"name": "maxsimcli",
-		"version": "2.0.0",
+		"version": "2.0.2",
 		"private": false,
 		"description": "A meta-prompting, context engineering and spec-driven development system for Claude Code, OpenCode, Gemini and Codex by MayStudios.",
 		"bin": { "maxsimcli": "dist/install.cjs" },
@@ -6601,7 +6601,48 @@ function copyDirRecursive(src, dest) {
 		const srcPath = node_path.join(src, entry.name);
 		const destPath = node_path.join(dest, entry.name);
 		if (entry.isDirectory()) copyDirRecursive(srcPath, destPath);
-		else node_fs.copyFileSync(srcPath, destPath);
+		else if (entry.isSymbolicLink()) {
+			const target = node_fs.realpathSync(srcPath);
+			if (node_fs.statSync(target).isDirectory()) copyDirRecursive(target, destPath);
+			else node_fs.copyFileSync(target, destPath);
+		} else node_fs.copyFileSync(srcPath, destPath);
+	}
+}
+/**
+* After copying a dashboard directory, hoist packages from the pnpm virtual
+* store (.pnpm/) to the top-level node_modules/ so that require() can find
+* them. Next.js standalone builds on pnpm omit the top-level hoisted symlinks
+* (e.g. node_modules/styled-jsx) so we recreate them as real directories.
+*/
+function hoistPnpmPackages(nodeModulesDir) {
+	const pnpmDir = node_path.join(nodeModulesDir, ".pnpm");
+	if (!node_fs.existsSync(pnpmDir)) return;
+	for (const storeEntry of node_fs.readdirSync(pnpmDir)) {
+		const innerNM = node_path.join(pnpmDir, storeEntry, "node_modules");
+		if (!node_fs.existsSync(innerNM)) continue;
+		for (const pkg of node_fs.readdirSync(innerNM)) {
+			if (pkg === ".pnpm") continue;
+			const pkgSrc = node_path.join(innerNM, pkg);
+			const pkgDest = node_path.join(nodeModulesDir, pkg);
+			if (node_fs.existsSync(pkgDest)) continue;
+			try {
+				const realSrc = node_fs.existsSync(pkgSrc) ? node_fs.realpathSync(pkgSrc) : pkgSrc;
+				if (!node_fs.existsSync(realSrc)) continue;
+				const stat = node_fs.statSync(realSrc);
+				if (pkg.startsWith("@") && stat.isDirectory()) for (const scopedPkg of node_fs.readdirSync(realSrc)) {
+					const scopedSrc = node_path.join(realSrc, scopedPkg);
+					const scopedDest = node_path.join(pkgDest, scopedPkg);
+					if (!node_fs.existsSync(scopedDest) && node_fs.statSync(scopedSrc).isDirectory()) node_fs.cpSync(scopedSrc, scopedDest, {
+						recursive: true,
+						dereference: true
+					});
+				}
+				else if (stat.isDirectory()) node_fs.cpSync(realSrc, pkgDest, {
+					recursive: true,
+					dereference: true
+				});
+			} catch {}
+		}
 	}
 }
 /**
@@ -7396,7 +7437,12 @@ function install(isGlobal, runtime = "claude") {
 			color: "cyan"
 		}).start();
 		const dashboardDest = node_path.join(targetDir, "dashboard");
+		if (node_fs.existsSync(dashboardDest)) node_fs.rmSync(dashboardDest, {
+			recursive: true,
+			force: true
+		});
 		copyDirRecursive(dashboardSrc, dashboardDest);
+		hoistPnpmPackages(node_path.join(dashboardDest, "node_modules"));
 		const dashboardConfigDest = node_path.join(targetDir, "dashboard.json");
 		const projectCwd = isGlobal ? targetDir : process.cwd();
 		node_fs.writeFileSync(dashboardConfigDest, JSON.stringify({ projectCwd }, null, 2) + "\n");
@@ -7588,8 +7634,13 @@ const subcommand = args.find((a) => !a.startsWith("-"));
 		const installDir = node_path.join(process.cwd(), ".claude");
 		const installDashDir = node_path.join(installDir, "dashboard");
 		if (node_fs.existsSync(dashboardAssetSrc)) {
+			if (node_fs.existsSync(installDashDir)) node_fs.rmSync(installDashDir, {
+				recursive: true,
+				force: true
+			});
 			node_fs.mkdirSync(installDashDir, { recursive: true });
 			copyDirRecursive(dashboardAssetSrc, installDashDir);
+			hoistPnpmPackages(node_path.join(installDashDir, "node_modules"));
 			const dashConfigPath = node_path.join(installDir, "dashboard.json");
 			if (!node_fs.existsSync(dashConfigPath)) node_fs.writeFileSync(dashConfigPath, JSON.stringify({ projectCwd: process.cwd() }, null, 2) + "\n");
 		}
