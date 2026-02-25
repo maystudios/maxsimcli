@@ -54,7 +54,7 @@ export function createMockProject(): MockProject {
     '## Current Position',
     '',
     'Phase: 01',
-    'Status: In progress',
+    '**Status:** In progress',
     '',
     '## Accumulated Context',
     '',
