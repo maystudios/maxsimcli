@@ -1,3 +1,10 @@
+## [2.0.4](https://github.com/maystudios/maxsim/compare/v2.0.3...v2.0.4) (2026-02-25)
+
+
+### Bug Fixes
+
+* **dashboard:** hoist styled-jsx from pnpm store at install time ([fd6654d](https://github.com/maystudios/maxsim/commit/fd6654d9fa111055cb18fec6482c2d4b4205c187))
+
 ## [2.0.3](https://github.com/maystudios/maxsim/compare/v2.0.2...v2.0.3) (2026-02-25)
 
 
