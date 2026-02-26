@@ -1,3 +1,10 @@
+## [3.3.1](https://github.com/maystudios/maxsim/compare/v3.3.0...v3.3.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** add shutdown button, auto-shutdown after 60s with no clients ([92a545a](https://github.com/maystudios/maxsim/commit/92a545a23576954fe485198e53fd756f6b88a7d2))
+
 # [3.3.0](https://github.com/maystudios/maxsim/compare/v3.2.2...v3.3.0) (2026-02-26)
 
 
