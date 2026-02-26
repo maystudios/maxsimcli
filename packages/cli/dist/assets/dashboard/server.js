@@ -57663,11 +57663,6 @@ function log(level, tag, ...args) {
 const projectCwd = process.env.MAXSIM_PROJECT_CWD || process.cwd();
 const networkMode = process.env.MAXSIM_NETWORK_MODE === "1";
 let resolvedPort = 3333;
-function getLocalNetworkIp() {
-	const ifaces = node_os.networkInterfaces();
-	for (const iface of Object.values(ifaces)) for (const info of iface ?? []) if (info.family === "IPv4" && !info.internal) return info.address;
-	return null;
-}
 function getTailscaleIp() {
 	const ifaces = node_os.networkInterfaces();
 	for (const [name, iface] of Object.entries(ifaces)) {
@@ -57681,8 +57676,20 @@ function getTailscaleIp() {
 	}
 	return null;
 }
-const localNetworkIp = networkMode ? getLocalNetworkIp() : null;
 const tailscaleIp = getTailscaleIp();
+function getLanIp() {
+	const ifaces = node_os.networkInterfaces();
+	for (const [name, iface] of Object.entries(ifaces)) {
+		const isTailscaleIface = name === "Tailscale" || name === "tailscale0" || name.toLowerCase().includes("tailscale");
+		for (const info of iface ?? []) {
+			if (info.family !== "IPv4" || info.internal || isTailscaleIface) continue;
+			const parts = info.address.split(".").map(Number);
+			if (!(parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127)) return info.address;
+		}
+	}
+	return null;
+}
+const localNetworkIp = networkMode || tailscaleIp !== null ? getLanIp() : null;
 log("INFO", "server", `Starting dashboard server, projectCwd=${projectCwd}, networkMode=${networkMode}`);
 const clientDir = node_path.join(__dirname, "client");
 function isWithinPlanning(cwd, targetPath) {
@@ -58356,10 +58363,16 @@ async function main() {
 	server.listen(port, bindHost, () => {
 		log("INFO", "server", `Dashboard ready at ${localUrl}, log file: ${logFile}`);
 		console.error(`Dashboard ready at ${localUrl}`);
-		if (networkMode && localNetworkIp) console.error(`Network URL:      http://${localNetworkIp}:${port}`);
+		if (localNetworkIp) console.error(`LAN URL:          http://${localNetworkIp}:${port}`);
 		if (tailscaleIp) {
 			console.error(`Tailscale URL:    http://${tailscaleIp}:${port}`);
 			console.error(`                  → open on any Tailscale device`);
+		}
+		if (bindHost === "0.0.0.0" && localNetworkIp && process.platform === "win32") {
+			console.error("");
+			console.error(`[firewall] Windows may block LAN connections on port ${port}.`);
+			console.error(`[firewall] Run once as Administrator to allow it:`);
+			console.error(`[firewall]   netsh advfirewall firewall add rule name="MAXSIM Dashboard" dir=in action=allow protocol=TCP localport=${port}`);
 		}
 		console.error(`Logs: ${logFile}`);
 		open$1(localUrl).catch(() => {});

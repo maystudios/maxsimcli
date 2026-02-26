@@ -188,16 +188,18 @@ function normalizeFsPath(p: string): string {
 
 let clientCount = 0;
 
-function createWSS(): WebSocketServer {
+function createWSS(onClientCountChange?: (count: number) => void): WebSocketServer {
   const wss = new WebSocketServer({ noServer: true });
 
   wss.on('connection', (ws) => {
     clientCount++;
     console.error(`[ws] Client connected (${clientCount} total)`);
+    onClientCountChange?.(clientCount);
 
     ws.on('close', () => {
       clientCount--;
       console.error(`[ws] Client disconnected (${clientCount} total)`);
+      onClientCountChange?.(clientCount);
     });
 
     ws.on('error', (err) => {
@@ -897,6 +899,15 @@ app.get('/api/server-info', (_req: Request, res: Response) => {
   });
 });
 
+// ── Shutdown ──
+// Resolved in main() and exposed here so the endpoint can call it
+let shutdownFn: (() => void) | null = null;
+
+app.post('/api/shutdown', (_req: Request, res: Response) => {
+  res.json({ shutdown: true });
+  setTimeout(() => shutdownFn?.(), 100);
+});
+
 // ── Static client (Vite build) ──
 if (fs.existsSync(clientDir)) {
   app.use(sirv(clientDir, { single: true }));
@@ -908,8 +919,28 @@ if (fs.existsSync(clientDir)) {
 
 // ─── Main ──────────────────────────────────────────────────────────────────
 
+const AUTO_SHUTDOWN_DELAY_MS = 60_000; // 60 seconds
+
 async function main(): Promise<void> {
-  const wss = createWSS();
+  let autoShutdownTimer: NodeJS.Timeout | null = null;
+
+  const wss = createWSS((count) => {
+    if (count > 0) {
+      if (autoShutdownTimer) {
+        clearTimeout(autoShutdownTimer);
+        autoShutdownTimer = null;
+        log('INFO', 'server', 'Auto-shutdown cancelled — client connected');
+      }
+    } else {
+      autoShutdownTimer = setTimeout(() => {
+        if (wss.clients.size === 0) {
+          log('INFO', 'server', 'Auto-shutdown: no clients for 60s — shutting down');
+          shutdown();
+        }
+      }, AUTO_SHUTDOWN_DELAY_MS);
+      log('INFO', 'server', `Auto-shutdown scheduled in ${AUTO_SHUTDOWN_DELAY_MS / 1000}s (no clients)`);
+    }
+  });
   const terminalWss = new WebSocketServer({ noServer: true });
   const ptyManager = PtyManager.getInstance();
 
@@ -1048,6 +1079,8 @@ async function main(): Promise<void> {
       process.exit(1);
     }, 5000);
   }
+
+  shutdownFn = shutdown;
 
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);

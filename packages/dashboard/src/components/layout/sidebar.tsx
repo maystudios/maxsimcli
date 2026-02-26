@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { useWebSocket } from "@/components/providers/websocket-provider";
 import { NetworkQRButton } from "@/components/network/NetworkQRButton";
@@ -30,6 +31,25 @@ function statusDotClass(status: DashboardPhase["diskStatus"]): string {
 export function Sidebar({ activeView, activePhaseId, onNavigate }: SidebarProps) {
   const { roadmap, state, todos } = useDashboardData();
   const { connected } = useWebSocket();
+  const [confirmShutdown, setConfirmShutdown] = useState(false);
+
+  useEffect(() => {
+    if (!confirmShutdown) return;
+    const t = setTimeout(() => setConfirmShutdown(false), 3000);
+    return () => clearTimeout(t);
+  }, [confirmShutdown]);
+
+  async function handleShutdown() {
+    if (!confirmShutdown) {
+      setConfirmShutdown(true);
+      return;
+    }
+    try {
+      await fetch('/api/shutdown', { method: 'POST' });
+    } catch {
+      // server is shutting down — connection error is expected
+    }
+  }
 
   const phases: DashboardPhase[] = (roadmap?.phases ?? []).map((p) => ({
     number: p.number,
@@ -159,11 +179,37 @@ export function Sidebar({ activeView, activePhaseId, onNavigate }: SidebarProps)
 
       {/* Footer */}
       <div className="border-t border-border px-5 py-3">
-        <div className="flex items-center gap-2">
-          <span className={cn("inline-block h-1.5 w-1.5", connected ? "bg-success" : "bg-danger")} />
-          <span className="text-xs text-muted-foreground">
-            {connected ? "Connected" : "Disconnected"}
-          </span>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className={cn("inline-block h-1.5 w-1.5", connected ? "bg-success" : "bg-danger")} />
+            <span className="text-xs text-muted-foreground">
+              {connected ? "Connected" : "Disconnected"}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={handleShutdown}
+            title={confirmShutdown ? "Click again to confirm shutdown" : "Shut down dashboard server"}
+            className={cn(
+              "flex items-center gap-1 rounded px-1.5 py-0.5 text-xs transition-colors duration-150",
+              confirmShutdown
+                ? "bg-danger/15 text-danger hover:bg-danger/25"
+                : "text-muted-foreground hover:text-foreground hover:bg-card-hover"
+            )}
+          >
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              className="h-3 w-3 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M6 2.5A5.5 5.5 0 1 0 10 3" strokeLinecap="round" />
+              <path d="M8 1v5" strokeLinecap="round" />
+            </svg>
+            {confirmShutdown && <span>Confirm</span>}
+          </button>
         </div>
       </div>
     </aside>

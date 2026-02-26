@@ -1435,7 +1435,11 @@ function Sidebar({
                 >
                   <span className="flex items-center gap-2">
                     {active && (
-                      <span className="block w-1 h-1 rounded-full bg-accent flex-shrink-0" />
+                      <motion.span
+                        layoutId="sidebar-active-dot"
+                        className="block w-1 h-1 rounded-full bg-accent flex-shrink-0"
+                        transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                      />
                     )}
                     {item.label}
                   </span>
@@ -1531,41 +1535,25 @@ export default function DocsPage() {
 
   const allSectionIds = SIDEBAR.flatMap((g) => g.items.map((i) => i.id));
 
-  // Scrollspy via IntersectionObserver
+  // Scrollspy via scroll event — deterministic, no flicker
   useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-    const visibleMap = new Map<string, number>();
-
-    const flush = () => {
+    const onScroll = () => {
       if (isScrollingRef.current) return;
-      let best = "";
-      let bestRatio = -1;
-      for (const [id, ratio] of visibleMap) {
-        if (ratio > bestRatio) {
-          bestRatio = ratio;
-          best = id;
+      const threshold = 140; // px from top of viewport
+      for (let i = allSectionIds.length - 1; i >= 0; i--) {
+        const el = document.getElementById(allSectionIds[i]);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= threshold) {
+          setActiveId(allSectionIds[i]);
+          return;
         }
       }
-      if (best) setActiveId(best);
+      setActiveId(allSectionIds[0]);
     };
 
-    for (const id of allSectionIds) {
-      const el = document.getElementById(id);
-      if (!el) continue;
-      const obs = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            visibleMap.set(id, entry.intersectionRatio);
-          }
-          flush();
-        },
-        { threshold: [0, 0.1, 0.3, 0.5], rootMargin: "-80px 0px -40% 0px" }
-      );
-      obs.observe(el);
-      observers.push(obs);
-    }
-
-    return () => observers.forEach((o) => o.disconnect());
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const navigateTo = useCallback((id: string) => {
