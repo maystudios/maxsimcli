@@ -65,25 +65,46 @@ if (hasAll) {
  * Add a firewall rule to allow inbound traffic on the given port.
  * Handles Windows (netsh), Linux (ufw / iptables), and macOS (no rule needed).
  */
+/** Check whether the current process is running with admin/root privileges. */
+function isElevated(): boolean {
+  if (process.platform === 'win32') {
+    try {
+      execSyncBase('net session', { stdio: 'pipe' });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  // Linux / macOS: check if uid is 0
+  return process.getuid?.() === 0;
+}
+
 function applyFirewallRule(port: number): void {
   const platform = process.platform;
   try {
     if (platform === 'win32') {
-      execSyncBase(
-        `netsh advfirewall firewall add rule name="MAXSIM Dashboard" dir=in action=allow protocol=TCP localport=${port}`,
-        { stdio: 'pipe' },
-      );
-      console.log(chalk.green('  ✓ Windows Firewall rule added for port ' + port));
+      const cmd = `netsh advfirewall firewall add rule name="MAXSIM Dashboard" dir=in action=allow protocol=TCP localport=${port}`;
+      if (isElevated()) {
+        execSyncBase(cmd, { stdio: 'pipe' });
+        console.log(chalk.green('  ✓ Windows Firewall rule added for port ' + port));
+      } else {
+        // Trigger UAC elevation via PowerShell — this opens the Windows UAC dialog
+        console.log(chalk.gray('  Requesting administrator privileges for firewall rule...'));
+        const psCmd = `Start-Process cmd -ArgumentList '/c ${cmd}' -Verb RunAs -Wait`;
+        execSyncBase(`powershell -NoProfile -Command "${psCmd}"`, { stdio: 'pipe' });
+        console.log(chalk.green('  ✓ Windows Firewall rule added for port ' + port));
+      }
     } else if (platform === 'linux') {
+      const sudoPrefix = isElevated() ? '' : 'sudo ';
       try {
-        execSyncBase(`ufw allow ${port}/tcp`, { stdio: 'pipe' });
+        execSyncBase(`${sudoPrefix}ufw allow ${port}/tcp`, { stdio: 'pipe' });
         console.log(chalk.green('  ✓ UFW rule added for port ' + port));
       } catch {
         try {
-          execSyncBase(`iptables -A INPUT -p tcp --dport ${port} -j ACCEPT`, { stdio: 'pipe' });
+          execSyncBase(`${sudoPrefix}iptables -A INPUT -p tcp --dport ${port} -j ACCEPT`, { stdio: 'pipe' });
           console.log(chalk.green('  ✓ iptables rule added for port ' + port));
         } catch {
-          console.log(chalk.yellow(`  ⚠ Could not add firewall rule automatically. Allow port ${port} manually if needed.`));
+          console.log(chalk.yellow(`  ⚠ Could not add firewall rule automatically. Run: sudo ufw allow ${port}/tcp`));
         }
       }
     } else if (platform === 'darwin') {
@@ -1951,18 +1972,23 @@ const subcommand = args.find(a => !a.startsWith('-'));
       process.exit(0);
     }
 
+    // --network flag overrides stored config (lets users enable network mode ad-hoc)
+    const forceNetwork = args.includes('--network');
+
     // Read projectCwd from dashboard.json (one level up from dashboard/ dir)
     const dashboardDir = path.dirname(serverPath);
     const dashboardConfigPath = path.join(path.dirname(dashboardDir), 'dashboard.json');
     let projectCwd = process.cwd();
-    let networkMode = false;
+    let networkMode = forceNetwork;
     if (fs.existsSync(dashboardConfigPath)) {
       try {
         const config = JSON.parse(fs.readFileSync(dashboardConfigPath, 'utf8')) as { projectCwd?: string; networkMode?: boolean };
         if (config.projectCwd) {
           projectCwd = config.projectCwd;
         }
-        networkMode = config.networkMode ?? false;
+        if (!forceNetwork) {
+          networkMode = config.networkMode ?? false;
+        }
       } catch {
         // Use default cwd
       }

@@ -21,7 +21,7 @@ export function NetworkQRButton() {
 
   useEffect(() => {
     if (serverInfo?.networkUrl) {
-      QRCode.toDataURL(serverInfo.networkUrl, { width: 200, margin: 2 })
+      QRCode.toDataURL(serverInfo.networkUrl, { width: 192, margin: 2 })
         .then(setQrDataUrl)
         .catch(() => {});
     }
@@ -30,30 +30,42 @@ export function NetworkQRButton() {
   if (!serverInfo?.networkEnabled || !serverInfo.networkUrl) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className="relative border-t border-border px-1 py-2">
+      {/* QR popup — appears above the button */}
       {open && (
-        <div className="mb-2 rounded-lg border border-border bg-background p-4 shadow-xl">
-          <p className="mb-1 font-mono text-[10px] text-muted-foreground">Local Network</p>
-          <p className="mb-3 font-mono text-xs text-foreground">{serverInfo.networkUrl}</p>
+        <div className="absolute bottom-full left-2 right-2 mb-2 rounded-lg border border-border bg-card p-3 shadow-xl">
+          <p className="mb-0.5 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+            Local Network
+          </p>
+          <p className="mb-3 font-mono text-[11px] break-all text-foreground">
+            {serverInfo.networkUrl}
+          </p>
           {qrDataUrl && (
             <img
               src={qrDataUrl}
               alt="QR code for local network access"
-              width={200}
-              height={200}
-              className="rounded-sm"
+              width={192}
+              height={192}
+              className="w-full rounded-sm"
             />
           )}
+          <p className="mt-2 font-mono text-[9px] text-muted-foreground">
+            Scan to open on another device
+          </p>
         </div>
       )}
+
+      {/* Sidebar-style button */}
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        title={open ? "Close QR code" : "Open on another device"}
-        className="flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-foreground shadow-md transition-colors hover:bg-muted"
+        title={open ? "Close QR code" : "Open dashboard on another device"}
+        className="flex w-full items-center gap-2.5 rounded-sm px-3 py-2 text-left text-sm transition-colors hover:bg-card-hover text-muted-foreground"
       >
         <QRIcon />
-        Share
+        <span className="font-mono text-xs uppercase tracking-wide">
+          Share
+        </span>
       </button>
     </div>
   );

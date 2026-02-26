@@ -1,5 +1,6 @@
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { useWebSocket } from "@/components/providers/websocket-provider";
+import { NetworkQRButton } from "@/components/network/NetworkQRButton";
 import { cn } from "@/lib/utils";
 import type { DashboardPhase } from "@/lib/types";
 
@@ -171,6 +172,9 @@ export function Sidebar({ activeView, activePhaseId, onNavigate }: SidebarProps)
           <span className="font-mono text-xs uppercase tracking-wide">Terminal</span>
         </button>
       </div>
+
+      {/* Local network share button (only visible when network mode is active) */}
+      <NetworkQRButton />
 
       {/* Footer: Connection status */}
       <div className="border-t border-border px-4 py-3">
