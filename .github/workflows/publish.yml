@@ -49,7 +49,13 @@ jobs:
           node-version: 22
           registry-url: https://registry.npmjs.org
 
+      # Run npm ci without auth token — the token is only needed for publish.
+      # setup-node writes an .npmrc that injects NODE_AUTH_TOKEN for every request,
+      # which causes 403 when npm tries to download the "npm" package itself
+      # (@semantic-release/npm bundles npm as a dependency).
       - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ""
 
       - name: Build
         run: npm run build
