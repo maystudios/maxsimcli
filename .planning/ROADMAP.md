@@ -23,6 +23,7 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 - [x] **Phase 23: E2E Wiring & Next.js Cleanup** - Add dashboard:build to e2e dependsOn, remove orphaned Next.js files, fix ROADMAP/REQUIREMENTS staleness (completed 2026-02-25)
 - [x] **Phase 24: Fix Terminal Status Parsing & Quick Actions** - Fix status parse bug in use-terminal.ts that disables quick-action buttons and breaks status bar (completed 2026-02-25)
 - [x] **Phase 25: Planning Doc Hygiene** - Fix stale traceability, backfill SUMMARY.md frontmatter, add missing VERIFICATIONs, portable pre-push hook (completed 2026-02-25)
+- [ ] **Phase 26: Superpowers-Inspired Workflow Enhancements** - Integrate anti-rationalization prompting, evidence-based verification gates, two-stage code review, and on-demand skills into agent prompts and workflows
 
 ---
 
@@ -197,11 +198,31 @@ Plans:
 - [x] 25-02-PLAN.md — Install Husky and create portable pre-push hook
 - [x] 25-03-PLAN.md — Create retroactive VERIFICATION.md for phases 15, 18, 19, 20
 
+### Phase 26: Superpowers-Inspired Workflow Enhancements
+
+**Goal:** Integrate proven techniques from the [Superpowers](https://github.com/obra/superpowers) plugin into MAXSIM's agent prompts and workflows — specifically anti-rationalization prompting (Iron Laws, Hard Gates, Red Flags), evidence-based verification gates, two-stage code review (spec compliance + code quality), and on-demand skill loading for subagents. This is a prompt engineering and workflow enhancement phase — no new CLI features or tools, purely improving agent behavior quality through better instructions.
+**Depends on:** Phase 25
+**Reference:** Research analysis at `docs/superpowers-research.md`, reference repo at `docs/superpowers-reference/`
+**Success Criteria** (what must be TRUE):
+  1. Executor, Verifier, and Debugger agent prompts include explicit anti-rationalization sections (Common Rationalizations table + Red Flags - STOP checklist) that close known loopholes
+  2. Verifier agent enforces evidence-based verification gate: every success claim requires running a command, reading full output, and citing evidence BEFORE stating the claim
+  3. Executor workflow supports an optional two-stage review mode where after each task batch, a spec-compliance review runs followed by a code-quality review (configurable via .planning/config.json)
+  4. A `templates/skills/` directory exists with at least 3 foundational skills (TDD enforcement, systematic debugging, verification-before-completion) that subagents can load on-demand via the Skill tool during execution
+  5. All existing tests continue to pass — no regressions from prompt changes
+**Plans:** 5 plans
+
+Plans:
+- [ ] 26-01-PLAN.md — Create 3 foundational skill files (tdd, systematic-debugging, verification-before-completion)
+- [ ] 26-02-PLAN.md — Create spec-reviewer and code-reviewer agent prompts for two-stage review
+- [ ] 26-03-PLAN.md — Enhance executor, verifier, debugger with anti-rationalization, evidence gates, two-stage review, skills
+- [ ] 26-04-PLAN.md — Enhance planner, researcher, plan-checker with anti-rationalization and skills
+- [ ] 26-05-PLAN.md — Install delivery: extend install.ts and copy-assets for skills directory
+
 ---
 
 ## Progress
 
-**Execution Order:** 15 → 16 → 17 → 18 → 19 → 20 → 21 → 22 → 23 → 24 → 25 (strict sequential — each phase depends on the previous)
+**Execution Order:** 15 → 16 → 17 → 18 → 19 → 20 → 21 → 22 → 23 → 24 → 25 → 26 (strict sequential — each phase depends on the previous)
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -216,3 +237,4 @@ Plans:
 | 23. E2E Wiring & Next.js Cleanup | 2/2 | Complete    | 2026-02-25 |
 | 24. Fix Terminal Status Parsing & Quick Actions | 1/1 | Complete    | 2026-02-25 |
 | 25. Planning Doc Hygiene | 3/3 | Complete    | 2026-02-25 |
+| 26. Superpowers-Inspired Workflow Enhancements | 0/5 | Planned | — |
