@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 26 — Superpowers-Inspired Workflow Enhancements
-Plan: 26-02 (complete)
-Status: Plan 02 complete — Created spec-reviewer and code-reviewer agent prompts
-Last activity: 2026-02-26 — Created two-stage reviewer agents
+Plan: 26-04 (complete)
+Status: Plan 04 complete — Added anti-rationalization and skills to thinking agents
+Last activity: 2026-02-26 — Enhanced planner, researcher, plan-checker agents
 
-Progress: [████------] 40% (2/5 plans complete)
+Progress: [██████----] 60% (3/5 plans complete)
 
 ## Performance Metrics
 
@@ -92,6 +92,7 @@ Progress: [████------] 40% (2/5 plans complete)
 | Phase 25 P03 | 2min | 2 tasks | 4 files |
 | Phase 26 P01 | 2min | 1 tasks | 3 files |
 | Phase 26 P02 | 2min | 2 tasks | 2 files |
+| Phase 26 P04 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -212,6 +213,8 @@ Recent decisions affecting current work:
 - [Phase 26-02]: Code reviewer uses 5 dimensions (correctness, conventions, error handling, security, maintainability) with CRITICAL/WARNING/NOTE severity
 - [Phase 26-02]: Both reviewer agents receive context inline from executor — neither reads PLAN.md directly
 - [Phase 26-02]: HARD-GATE anti-rationalization pattern: XML tag with explicit rule preventing verdict without full check
+- [Phase 26]: Anti-rationalization sections placed before <success_criteria> with role-specific Iron Laws, rationalizations, and red flags
+- [Phase 26]: Planner gets TDD + Verification skills; researcher and checker get Verification only
 
 ### Roadmap Evolution
 
@@ -237,5 +240,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 26-02-PLAN.md (Reviewer agent prompts for two-stage review)
+Stopped at: Completed 26-04-PLAN.md (Anti-rationalization and skills for thinking agents)
 Resume file: N/A
