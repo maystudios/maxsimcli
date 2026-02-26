@@ -24,6 +24,7 @@ metrics:
   completed: "2026-02-24"
   tasks_completed: 3
   files_changed: 3
+requirements-completed: []
 ---
 
 # Phase 10 Plan 01: Chalk Migration Summary

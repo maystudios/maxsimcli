@@ -28,6 +28,7 @@ metrics:
 requirements:
   - CMD-REMOVE-01
   - CMD-REMOVE-02
+requirements-completed: []
 ---
 
 # Phase 11 Plan 01: Remove join-discord Command and Update Counts Summary
