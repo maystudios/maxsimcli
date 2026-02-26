@@ -87,8 +87,27 @@ function getTailscaleIp(): string | null {
   return null;
 }
 
-const localNetworkIp = networkMode ? getLocalNetworkIp() : null;
+// Always detect both IPs — binding decision and server-info depend on them
 const tailscaleIp = getTailscaleIp();
+// Exclude Tailscale range from LAN IP so both show independently
+function getLanIp(): string | null {
+  const ifaces = os.networkInterfaces();
+  for (const [name, iface] of Object.entries(ifaces)) {
+    const isTailscaleIface =
+      name === 'Tailscale' ||
+      name === 'tailscale0' ||
+      name.toLowerCase().includes('tailscale');
+    for (const info of iface ?? []) {
+      if (info.family !== 'IPv4' || info.internal || isTailscaleIface) continue;
+      const parts = info.address.split('.').map(Number);
+      const isTailscaleRange = parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127;
+      if (!isTailscaleRange) return info.address;
+    }
+  }
+  return null;
+}
+// LAN IP is shown whenever the server is network-accessible (networkMode OR tailscale active)
+const localNetworkIp = (networkMode || tailscaleIp !== null) ? getLanIp() : null;
 
 log('INFO', 'server', `Starting dashboard server, projectCwd=${projectCwd}, networkMode=${networkMode}`);
 
@@ -995,12 +1014,20 @@ async function main(): Promise<void> {
   server.listen(port, bindHost, () => {
     log('INFO', 'server', `Dashboard ready at ${localUrl}, log file: ${logFile}`);
     console.error(`Dashboard ready at ${localUrl}`);
-    if (networkMode && localNetworkIp) {
-      console.error(`Network URL:      http://${localNetworkIp}:${port}`);
+    if (localNetworkIp) {
+      console.error(`LAN URL:          http://${localNetworkIp}:${port}`);
     }
     if (tailscaleIp) {
       console.error(`Tailscale URL:    http://${tailscaleIp}:${port}`);
       console.error(`                  → open on any Tailscale device`);
+    }
+    // On Windows, the firewall blocks incoming LAN connections by default.
+    // Tailscale bypasses this via its own virtual adapter — plain LAN does not.
+    if (bindHost === '0.0.0.0' && localNetworkIp && process.platform === 'win32') {
+      console.error('');
+      console.error(`[firewall] Windows may block LAN connections on port ${port}.`);
+      console.error(`[firewall] Run once as Administrator to allow it:`);
+      console.error(`[firewall]   netsh advfirewall firewall add rule name="MAXSIM Dashboard" dir=in action=allow protocol=TCP localport=${port}`);
     }
     console.error(`Logs: ${logFile}`);
     open(localUrl).catch(() => {});

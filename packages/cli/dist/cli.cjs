@@ -15816,6 +15816,7 @@ async function handleDashboard(args) {
 	const DEFAULT_PORT = 3333;
 	const PORT_RANGE_END = 3343;
 	const HEALTH_TIMEOUT_MS = 1500;
+	const networkMode = args.includes("--network");
 	if (args.includes("--stop")) {
 		for (let port = DEFAULT_PORT; port <= PORT_RANGE_END; port++) if (await checkHealth(port, HEALTH_TIMEOUT_MS)) {
 			console.log(`Dashboard found on port ${port} — sending shutdown...`);
@@ -15889,7 +15890,8 @@ async function handleDashboard(args) {
 		env: {
 			...process.env,
 			MAXSIM_PROJECT_CWD: projectCwd,
-			NODE_ENV: isTsFile ? "development" : "production"
+			NODE_ENV: isTsFile ? "development" : "production",
+			...networkMode ? { MAXSIM_NETWORK_MODE: "1" } : {}
 		},
 		...process.platform === "win32" ? { shell: true } : {}
 	});

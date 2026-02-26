@@ -417,6 +417,7 @@ async function handleDashboard(args: string[]): Promise<void> {
   const DEFAULT_PORT = 3333;
   const PORT_RANGE_END = 3343;
   const HEALTH_TIMEOUT_MS = 1500;
+  const networkMode = args.includes('--network');
 
   // Handle --stop flag
   if (args.includes('--stop')) {
@@ -523,6 +524,7 @@ async function handleDashboard(args: string[]): Promise<void> {
       ...process.env,
       MAXSIM_PROJECT_CWD: projectCwd,
       NODE_ENV: isTsFile ? 'development' : 'production',
+      ...(networkMode ? { MAXSIM_NETWORK_MODE: '1' } : {}),
     },
     // On Windows, use shell to ensure detached works correctly
     ...(process.platform === 'win32' ? { shell: true } : {}),
