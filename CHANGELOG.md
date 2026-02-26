@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/maystudios/maxsim/compare/v3.0.0...v3.0.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** fix 4 terminal bugs — input after restart, scroll in split mode, mouse wheel, command execution ([382d69c](https://github.com/maystudios/maxsim/commit/382d69c721e8de4fd5c1b48de6af3e7e80a67752))
+
 # [3.0.0](https://github.com/maystudios/maxsim/compare/v2.5.6...v3.0.0) (2026-02-25)
 
 
