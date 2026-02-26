@@ -1,3 +1,10 @@
+## [3.1.2](https://github.com/maystudios/maxsim/compare/v3.1.1...v3.1.2) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** detect task completion from [x] marker in <done> tags ([80a1803](https://github.com/maystudios/maxsim/commit/80a1803e75efb4825f6f1b17e631358572016eb9))
+
 ## [3.1.1](https://github.com/maystudios/maxsim/compare/v3.1.0...v3.1.1) (2026-02-26)
 
 
