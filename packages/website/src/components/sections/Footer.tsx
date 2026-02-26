@@ -70,17 +70,28 @@ function FooterLink({
   href,
   children,
   external,
+  pushState,
 }: {
   href: string;
   children: React.ReactNode;
   external?: boolean;
+  pushState?: boolean;
 }) {
+  const handleClick = pushState
+    ? (e: React.MouseEvent) => {
+        e.preventDefault();
+        window.history.pushState({}, "", href);
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      }
+    : undefined;
+
   return (
     <a
       href={href}
+      onClick={handleClick}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
-      className="group relative inline-flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors duration-200 w-fit"
+      className="group relative inline-flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors duration-200 w-fit cursor-pointer"
     >
       {children}
       <span className="absolute -bottom-px left-0 h-px w-0 bg-accent group-hover:w-full transition-all duration-300 ease-out" />
@@ -92,6 +103,7 @@ const NAV_LINKS = [
   { label: "Features", href: "#features" },
   { label: "How It Works", href: "#how-it-works" },
   { label: "Docs", href: "#docs" },
+  { label: "Documentation", href: "/docs", pushState: true },
 ];
 
 const EXTERNAL_LINKS = [
@@ -139,7 +151,7 @@ export function Footer() {
             </span>
             <nav className="flex flex-col gap-3.5">
               {NAV_LINKS.map((link) => (
-                <FooterLink key={link.href} href={link.href}>
+                <FooterLink key={link.href} href={link.href} pushState={"pushState" in link ? link.pushState : false}>
                   {link.label}
                 </FooterLink>
               ))}

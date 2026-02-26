@@ -662,6 +662,35 @@ export function Docs() {
           </AnimatePresence>
         </div>
 
+        <motion.div
+          className="mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-border rounded bg-surface/40 px-6 py-5"
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          <div>
+            <p className="text-sm font-medium text-foreground mb-0.5">
+              Looking for the complete reference?
+            </p>
+            <p className="text-xs text-muted">
+              The full documentation covers every command, agent, config option, and advanced workflow.
+            </p>
+          </div>
+          <a
+            href="/docs"
+            onClick={(e) => {
+              e.preventDefault();
+              window.history.pushState({}, "", "/docs");
+              window.dispatchEvent(new PopStateEvent("popstate"));
+            }}
+            className="flex-shrink-0 inline-flex items-center gap-2 text-sm font-medium text-accent hover:text-accent-light border border-accent/30 hover:border-accent/60 px-4 py-2 rounded transition-colors duration-200 cursor-pointer"
+          >
+            Full Documentation
+            <span className="text-xs">→</span>
+          </a>
+        </motion.div>
+
       </div>
     </section>
   );

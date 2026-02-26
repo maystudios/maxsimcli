@@ -9,6 +9,12 @@ const navLinks = [
   { label: "Docs", href: "#docs", section: "docs" },
 ];
 
+function navigateToDocsPage(e: React.MouseEvent) {
+  e.preventDefault();
+  window.history.pushState({}, "", "/docs");
+  window.dispatchEvent(new PopStateEvent("popstate"));
+}
+
 const easeInOutCubic = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
@@ -137,6 +143,24 @@ export default function Navbar() {
             );
           })}
           <a
+            href="/docs"
+            onClick={navigateToDocsPage}
+            className={`relative text-sm pb-1 transition-colors duration-200 cursor-pointer ${
+              window.location.pathname.startsWith("/docs")
+                ? "text-foreground"
+                : "text-muted hover:text-foreground"
+            }`}
+          >
+            Full Docs
+            {window.location.pathname.startsWith("/docs") && (
+              <motion.span
+                layoutId="nav-active-dot"
+                className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 block w-1 h-1 rounded-full bg-accent"
+                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              />
+            )}
+          </a>
+          <a
             href="https://github.com/maystudios/maxsim"
             target="_blank"
             rel="noopener noreferrer"
@@ -180,6 +204,13 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
+              <a
+                href="/docs"
+                onClick={(e) => { navigateToDocsPage(e); setMobileOpen(false); }}
+                className="text-sm text-muted hover:text-foreground transition-colors cursor-pointer"
+              >
+                Full Docs
+              </a>
               <a
                 href="https://github.com/maystudios/maxsim"
                 target="_blank"
