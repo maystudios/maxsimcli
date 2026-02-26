@@ -209,15 +209,15 @@ export function comparePhaseNum(a: string | number, b: string | number): number 
  * @param escapedPhaseNum - regex-escaped phase number string to match a specific phase
  * @param flags - regex flags (default: 'gi')
  */
-export function getPhasePattern(escapedPhaseNum?: string, flags = 'gi'): RegExp {
+export function getPhasePattern(escapedPhaseNum?: string, flags = 'gim'): RegExp {
   if (escapedPhaseNum) {
     return new RegExp(
-      `#{2,4}\\s*Phase\\s+${escapedPhaseNum}:\\s*([^\\n]+)`,
+      `^#{2,4}\\s*Phase\\s+${escapedPhaseNum}:\\s*([^\\n]+)`,
       flags,
     );
   }
   return new RegExp(
-    `#{2,4}\\s*Phase\\s+(\\d+[A-Z]?(?:\\.\\d+)?)\\s*:\\s*([^\\n]+)`,
+    `^#{2,4}\\s*Phase\\s+(\\d+[A-Z]?(?:\\.\\d+)?)\\s*:\\s*([^\\n]+)`,
     flags,
   );
 }

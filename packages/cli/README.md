@@ -165,6 +165,10 @@ Real-time web dashboard — bundled inside the CLI, no separate setup needed.
 npx maxsimcli dashboard --network  # LAN sharing + QR code
 ```
 
+![MAXSIM Dashboard — Phase Overview](https://raw.githubusercontent.com/maystudios/maxsimcli/main/assets/dashboard-phases.png)
+
+![MAXSIM Dashboard — Integrated Terminal](https://raw.githubusercontent.com/maystudios/maxsimcli/main/assets/dashboard-terminal.png)
+
 ---
 
 ## Commands
