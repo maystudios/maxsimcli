@@ -12,7 +12,7 @@ interface SidebarProps {
   onNavigate: (view: ActiveView, id?: string) => void;
 }
 
-function statusBarClass(status: DashboardPhase["diskStatus"]): string {
+function statusDotClass(status: DashboardPhase["diskStatus"]): string {
   switch (status) {
     case "complete":
       return "bg-success";
@@ -21,7 +21,7 @@ function statusBarClass(status: DashboardPhase["diskStatus"]): string {
     case "planned":
     case "researched":
     case "discussed":
-      return "bg-muted-foreground";
+      return "bg-muted-foreground/50";
     default:
       return "bg-muted";
   }
@@ -50,29 +50,32 @@ export function Sidebar({ activeView, activePhaseId, onNavigate }: SidebarProps)
 
   return (
     <aside className="flex h-full w-56 shrink-0 flex-col border-r border-border bg-card">
-      {/* Logo */}
+      {/* Logo — matches website navbar style */}
       <div className="border-b border-border px-5 py-4">
         <button
           type="button"
           onClick={() => onNavigate("overview")}
           className="flex flex-col gap-0.5 text-left"
         >
-          <span className="font-mono text-sm font-bold tracking-widest uppercase text-foreground">
+          <span className="text-sm font-bold tracking-tight text-foreground">
             MAXSIM
           </span>
-          <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+          <span className="text-xs text-muted-foreground">
             Dashboard
           </span>
         </button>
       </div>
 
-      {/* Phases */}
+      {/* Phase section */}
       <div className="flex-1 overflow-y-auto">
-        <div className="px-5 py-3">
-          <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+        {/* Section label with accent line — website style */}
+        <div className="flex items-center gap-2 px-5 py-3">
+          <span className="block w-4 h-px bg-border" />
+          <span className="text-xs uppercase tracking-widest text-muted-foreground">
             Phases
           </span>
         </div>
+
         <nav className="flex flex-col">
           {phases.map((phase) => {
             const isActive = activeView === "phase" && activePhaseId === phase.number;
@@ -84,31 +87,17 @@ export function Sidebar({ activeView, activePhaseId, onNavigate }: SidebarProps)
                 type="button"
                 onClick={() => onNavigate("phase", phase.number)}
                 className={cn(
-                  "flex w-full items-center gap-2.5 px-5 py-2 text-left transition-colors",
+                  "flex w-full items-center gap-2.5 px-5 py-2 text-left transition-colors duration-200",
                   isActive
-                    ? "bg-card-hover border-l-2 border-l-accent"
-                    : "border-l-2 border-l-transparent hover:bg-card-hover",
-                  isCurrent && !isActive && "border-l-accent/40"
+                    ? "bg-card-hover border-l-2 border-l-accent text-foreground"
+                    : "border-l-2 border-l-transparent text-muted-foreground hover:text-foreground hover:bg-card-hover"
                 )}
               >
-                {/* Status indicator */}
-                <span
-                  className={cn(
-                    "inline-block h-1.5 w-1.5 shrink-0",
-                    statusBarClass(phase.diskStatus)
-                  )}
-                />
-                <span
-                  className={cn(
-                    "font-mono text-[10px] font-bold tabular-nums",
-                    isCurrent || isActive ? "text-accent" : "text-muted-foreground"
-                  )}
-                >
+                <span className={cn("inline-block h-1.5 w-1.5 shrink-0", statusDotClass(phase.diskStatus))} />
+                <span className={cn("font-mono text-xs tabular-nums shrink-0", isCurrent || isActive ? "text-accent" : "")}>
                   {phase.number}
                 </span>
-                <span className="truncate text-xs text-foreground/80">
-                  {phase.name}
-                </span>
+                <span className="truncate text-xs">{phase.name}</span>
               </button>
             );
           })}
@@ -121,34 +110,30 @@ export function Sidebar({ activeView, activePhaseId, onNavigate }: SidebarProps)
           type="button"
           onClick={() => onNavigate("todos")}
           className={cn(
-            "flex w-full items-center justify-between px-5 py-2.5 text-left transition-colors",
+            "flex w-full items-center justify-between px-5 py-2.5 text-left transition-colors duration-200",
             activeView === "todos"
-              ? "bg-card-hover text-foreground"
-              : "hover:bg-card-hover text-muted-foreground"
+              ? "text-foreground bg-card-hover"
+              : "text-muted-foreground hover:text-foreground hover:bg-card-hover"
           )}
         >
-          <span className="font-mono text-[10px] uppercase tracking-widest">Todos</span>
+          <span className="text-sm">Todos</span>
           {openTodos > 0 && (
-            <span className="font-mono text-[9px] font-bold text-warning tabular-nums">
-              {openTodos}
-            </span>
+            <span className="font-mono text-xs text-warning tabular-nums">{openTodos}</span>
           )}
         </button>
         <button
           type="button"
           onClick={() => onNavigate("blockers")}
           className={cn(
-            "flex w-full items-center justify-between px-5 py-2.5 text-left transition-colors border-t border-border",
+            "flex w-full items-center justify-between border-t border-border px-5 py-2.5 text-left transition-colors duration-200",
             activeView === "blockers"
-              ? "bg-card-hover text-foreground"
-              : "hover:bg-card-hover text-muted-foreground"
+              ? "text-foreground bg-card-hover"
+              : "text-muted-foreground hover:text-foreground hover:bg-card-hover"
           )}
         >
-          <span className="font-mono text-[10px] uppercase tracking-widest">Blockers</span>
+          <span className="text-sm">Blockers</span>
           {openBlockers > 0 && (
-            <span className="font-mono text-[9px] font-bold text-danger tabular-nums">
-              {openBlockers}
-            </span>
+            <span className="font-mono text-xs text-danger tabular-nums">{openBlockers}</span>
           )}
         </button>
       </div>
@@ -159,30 +144,25 @@ export function Sidebar({ activeView, activePhaseId, onNavigate }: SidebarProps)
           type="button"
           onClick={() => onNavigate("terminal")}
           className={cn(
-            "flex w-full items-center gap-2.5 px-5 py-2.5 text-left transition-colors",
+            "flex w-full items-center gap-2 px-5 py-2.5 text-left transition-colors duration-200",
             activeView === "terminal"
-              ? "bg-card-hover text-foreground"
-              : "hover:bg-card-hover text-muted-foreground"
+              ? "text-foreground bg-card-hover"
+              : "text-muted-foreground hover:text-foreground hover:bg-card-hover"
           )}
         >
-          <span className="font-mono text-[10px] font-bold">{">_"}</span>
-          <span className="font-mono text-[10px] uppercase tracking-widest">Terminal</span>
+          <span className="font-mono text-xs">{">"}_</span>
+          <span className="text-sm">Terminal</span>
         </button>
       </div>
 
       <NetworkQRButton />
 
-      {/* Footer: connection */}
+      {/* Footer */}
       <div className="border-t border-border px-5 py-3">
         <div className="flex items-center gap-2">
-          <span
-            className={cn(
-              "inline-block h-1.5 w-1.5",
-              connected ? "bg-success" : "bg-danger"
-            )}
-          />
-          <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-            {connected ? "Live" : "Offline"}
+          <span className={cn("inline-block h-1.5 w-1.5", connected ? "bg-success" : "bg-danger")} />
+          <span className="text-xs text-muted-foreground">
+            {connected ? "Connected" : "Disconnected"}
           </span>
         </div>
       </div>

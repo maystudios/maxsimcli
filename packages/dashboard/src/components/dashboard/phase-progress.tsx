@@ -20,7 +20,18 @@ function barColor(status: DashboardPhase["diskStatus"]): string {
     case "partial":
       return "bg-accent";
     default:
-      return "bg-muted-foreground";
+      return "bg-muted-foreground/40";
+  }
+}
+
+function dotColor(status: DashboardPhase["diskStatus"]): string {
+  switch (status) {
+    case "complete":
+      return "bg-success";
+    case "partial":
+      return "bg-accent";
+    default:
+      return "bg-muted-foreground/40";
   }
 }
 
@@ -41,12 +52,16 @@ export function PhaseProgress({
     <button
       type="button"
       onClick={() => onClick(phaseNumber)}
-      className={`group w-full text-left transition-colors border-b border-border ${
-        isCurrent ? "bg-card-hover border-l-2 border-l-accent" : "hover:bg-card-hover border-l-2 border-l-transparent"
+      className={`group relative w-full text-left transition-colors duration-200 bg-background ${
+        isCurrent
+          ? "border-l-2 border-l-accent"
+          : "border-l-2 border-l-transparent hover:border-l-accent/40"
       }`}
     >
-      <div className="flex items-center gap-3 px-4 py-3">
-        {/* Checkbox / status marker */}
+      {/* Hover overlay — matches website feature card hover */}
+      <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-card-hover" />
+
+      <div className="relative flex items-center gap-3 px-4 py-3">
         {onToggleComplete ? (
           <input
             type="checkbox"
@@ -60,28 +75,26 @@ export function PhaseProgress({
             title={roadmapComplete ? "Mark incomplete" : "Mark complete"}
           />
         ) : (
-          <span
-            className={`inline-block h-1.5 w-1.5 shrink-0 ${barColor(status)}`}
-          />
+          <span className={`inline-block h-1.5 w-1.5 shrink-0 ${dotColor(status)}`} />
         )}
 
         <span
-          className={`font-mono text-xs font-bold tabular-nums ${
+          className={`font-mono text-xs font-bold tabular-nums shrink-0 ${
             isCurrent ? "text-accent" : "text-muted-foreground"
           }`}
         >
           {phaseNumber}
         </span>
 
-        <span className="truncate text-xs text-foreground/90">{phaseName}</span>
+        <span className="truncate text-sm text-foreground/90">{phaseName}</span>
 
-        <span className="ml-auto shrink-0 font-mono text-[10px] text-muted-foreground tabular-nums">
+        <span className="ml-auto shrink-0 font-mono text-xs text-muted-foreground tabular-nums">
           {completedPlans}/{totalPlans}
         </span>
       </div>
 
-      {/* Progress bar — 1px height, flat */}
-      <div className="h-px w-full bg-muted">
+      {/* Progress bar */}
+      <div className="h-px w-full bg-muted/50">
         <motion.div
           className={`h-full ${barColor(status)}`}
           initial={{ width: 0 }}

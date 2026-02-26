@@ -26,20 +26,21 @@ export function StatsHeader({ roadmap, state, todos }: StatsHeaderProps) {
 
   return (
     <div className="border-b border-border pb-6">
-      {/* Top row */}
-      <div className="flex items-center justify-between mb-4">
-        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+      {/* Section label — website accent line pattern */}
+      <div className="flex items-center gap-3 mb-4">
+        <span className="block w-6 h-px bg-accent" />
+        <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
           Milestone Progress
         </span>
-        <div className="flex items-center gap-4">
-          <span className="font-mono text-[10px] text-muted-foreground tabular-nums">
+        <span className="ml-auto flex items-center gap-3">
+          <span className="text-xs text-muted-foreground tabular-nums">
             {completedPhases}/{totalPhases} phases
           </span>
           <span
             className={`inline-block h-1.5 w-1.5 ${connected ? "bg-success" : "bg-danger"}`}
             title={connected ? "Connected" : "Disconnected"}
           />
-        </div>
+        </span>
       </div>
 
       {/* Progress bar */}
@@ -58,11 +59,11 @@ export function StatsHeader({ roadmap, state, todos }: StatsHeaderProps) {
           <span className="font-mono text-3xl font-bold tabular-nums text-foreground leading-none">
             {progressPercent}
           </span>
-          <span className="font-mono text-sm text-muted-foreground ml-1">%</span>
+          <span className="text-sm text-muted-foreground ml-1">%</span>
         </div>
 
         <div className="border-l border-border pl-10">
-          <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground block mb-1">
+          <span className="text-xs uppercase tracking-widest text-muted-foreground block mb-1">
             Current
           </span>
           <div className="flex items-baseline gap-2">
@@ -75,7 +76,7 @@ export function StatsHeader({ roadmap, state, todos }: StatsHeaderProps) {
 
         <div className="ml-auto flex items-end gap-8">
           <div className="text-right">
-            <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground block mb-1">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground block mb-1">
               Blockers
             </span>
             <span
@@ -88,7 +89,7 @@ export function StatsHeader({ roadmap, state, todos }: StatsHeaderProps) {
           </div>
 
           <div className="text-right">
-            <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground block mb-1">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground block mb-1">
               Todos
             </span>
             <span
