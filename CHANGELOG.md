@@ -1,3 +1,10 @@
+## [3.5.3](https://github.com/maystudios/maxsimcli/compare/v3.5.2...v3.5.3) (2026-02-26)
+
+
+### Bug Fixes
+
+* **readme:** add dashboard screenshots and publish to npm with updated README ([ba3c7d8](https://github.com/maystudios/maxsimcli/commit/ba3c7d881d3647dac332360b882111ddf03a80f2))
+
 ## [3.5.2](https://github.com/maystudios/maxsimcli/compare/v3.5.1...v3.5.2) (2026-02-26)
 
 
