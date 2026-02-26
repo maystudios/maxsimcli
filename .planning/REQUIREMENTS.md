@@ -15,9 +15,9 @@ All 42 v1.0 requirements (NX-01 through PUB-04) are satisfied. See `.planning/v1
 
 ### E2E Infrastructure
 
-- [x] **E2E-01**: `packages/e2e` NX package exists with `private: true`, `implicitDependencies: ["cli", "dashboard"]`, `dependsOn: cli:build`, `cache: false`, and an `e2e` NX target that runs Vitest with the E2E config
+- [ ] **E2E-01**: E2E test package exists with correct wiring — tests run via `npx vitest run --config vitest.e2e.config.ts` from `packages/cli/`, with build dependencies satisfied before execution
 - [x] **E2E-02**: globalSetup runs `npm pack` from `packages/cli/dist/` and installs via local tarball to a `mkdtempSync` temp directory — never hits the npm registry
-- [x] **E2E-03**: install.test.ts validates exact file counts post-install: exactly 31 command `.md` files, exactly 11 agent `.md` files, known workflow directory structure
+- [ ] **E2E-03**: install.test.ts validates exact file counts post-install: exactly 31 command `.md` files, exactly 13 agent `.md` files, known workflow directory structure
 - [x] **E2E-04**: Binary smoke test: `maxsimcli --version` exits 0 from the installed temp path
 
 ### Tool Behavioral Tests
@@ -60,7 +60,7 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 
 ### CI Integration
 
-- [x] **CI-01**: GitHub Actions E2E job runs `nx run e2e:e2e` on push to main, after `cli:build` with `STANDALONE_BUILD=true`, and gates on green E2E before publish
+- [ ] **CI-01**: GitHub Actions E2E job runs E2E tests on push to main, after build with `STANDALONE_BUILD=true`, and gates on green E2E before publish
 
 ---
 
@@ -77,10 +77,10 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| E2E-01 | Phase 15 → Phase 23 | Satisfied |
-| DOCS-01 | Phase 15 → Phase 23 | Satisfied |
+| E2E-01 | Phase 15 → Phase 23 → Phase 28 | Pending |
+| DOCS-01 | Phase 15 → Phase 23 → Phase 28 | Pending |
 | E2E-02 | Phase 16 | Satisfied |
-| E2E-03 | Phase 16 | Satisfied |
+| E2E-03 | Phase 16 → Phase 27 | Pending |
 | E2E-04 | Phase 16 | Satisfied |
 | TOOL-01 | Phase 16 | Satisfied |
 | TOOL-02 | Phase 16 | Satisfied |
@@ -95,7 +95,7 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 | DASH-05 | Phase 17 → Phase 22 | Satisfied |
 | DASH-06 | Phase 18 → Phase 22 | Satisfied |
 | DASH-07 | Phase 18 → Phase 22 | Satisfied |
-| CI-01 | Phase 19 → Phase 22 | Satisfied |
+| CI-01 | Phase 19 → Phase 22 → Phase 27 | Pending |
 | DASH-TERM-01 | Phase 21 → Phase 22 | Satisfied |
 | DASH-TERM-02 | Phase 21 | Satisfied |
 | DASH-TERM-03 | Phase 21 | Satisfied |

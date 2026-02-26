@@ -24,6 +24,8 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 - [x] **Phase 24: Fix Terminal Status Parsing & Quick Actions** - Fix status parse bug in use-terminal.ts that disables quick-action buttons and breaks status bar (completed 2026-02-25)
 - [x] **Phase 25: Planning Doc Hygiene** - Fix stale traceability, backfill SUMMARY.md frontmatter, add missing VERIFICATIONs, portable pre-push hook (completed 2026-02-25)
 - [x] **Phase 26: Superpowers-Inspired Workflow Enhancements** - Integrate anti-rationalization prompting, evidence-based verification gates, two-stage code review, and on-demand skills into agent prompts and workflows (completed 2026-02-26)
+- [ ] **Phase 27: Fix CI E2E Pipeline & Test Assertions** - Add e2e job to publish.yml, gate release on green E2E, fix agent count assertion (11→13)
+- [ ] **Phase 28: Requirement Reconciliation & Doc Cleanup** - Update outdated E2E-01 requirement wording, fix stale VERIFICATION.md files, remove orphan dirs, backfill SUMMARY.md arrays
 
 ---
 
@@ -218,6 +220,39 @@ Plans:
 - [x] 26-04-PLAN.md — Enhance planner, researcher, plan-checker with anti-rationalization and skills
 - [x] 26-05-PLAN.md — Install delivery: extend install.ts and copy-assets for skills directory
 
+### Phase 27: Fix CI E2E Pipeline & Test Assertions
+
+**Goal:** publish.yml runs E2E tests before release and the E2E test suite passes — fix the missing e2e job in CI and the stale agent count assertion that will fail on run
+**Depends on:** Phase 26
+**Requirements:** CI-01, E2E-03
+**Gap Closure:** Closes CI-01 (unsatisfied), E2E-03 (partial), 2 integration gaps, 2 broken flows from v2.0 audit
+**Success Criteria** (what must be TRUE):
+  1. publish.yml has a dedicated `e2e` job that runs `npx vitest run --config vitest.e2e.config.ts` after build
+  2. The `release` job has `needs: [build-and-test, e2e]` — a failing E2E suite blocks publish
+  3. install.test.ts asserts `toHaveLength(13)` matching the actual 13 agent files in `templates/agents/`
+  4. E2E tests pass locally: `cd packages/cli && npx vitest run --config vitest.e2e.config.ts` exits 0
+**Plans**: 0 plans
+
+Plans:
+_(none yet)_
+
+### Phase 28: Requirement Reconciliation & Doc Cleanup
+
+**Goal:** Reconcile outdated requirement wording (E2E-01 NX package → npm scripts), fix stale VERIFICATION.md files, remove orphan phase directories, and backfill empty SUMMARY.md requirements_completed arrays
+**Depends on:** Phase 27
+**Requirements:** E2E-01, DOCS-01
+**Gap Closure:** Closes E2E-01 (partial — requirement wording outdated), 1 integration gap, 4 tech debt items from v2.0 audit
+**Success Criteria** (what must be TRUE):
+  1. E2E-01 requirement text updated to reflect npm scripts migration (no NX reference)
+  2. Phase 21 VERIFICATION.md body/frontmatter consistency fixed (both say passed)
+  3. Phase 23 VERIFICATION.md updated to reflect resolution by Phase 25
+  4. Orphan directories `20-dashboard-migrate-vite-express` and `20-new-phase` removed
+  5. All phase SUMMARY.md `requirements_completed` arrays populated
+**Plans**: 0 plans
+
+Plans:
+_(none yet)_
+
 ---
 
 ## Progress
@@ -237,4 +272,6 @@ Plans:
 | 23. E2E Wiring & Next.js Cleanup | 2/2 | Complete    | 2026-02-25 |
 | 24. Fix Terminal Status Parsing & Quick Actions | 1/1 | Complete    | 2026-02-25 |
 | 25. Planning Doc Hygiene | 3/3 | Complete    | 2026-02-25 |
-| 26. Superpowers-Inspired Workflow Enhancements | 5/5 | Complete   | 2026-02-26 |
+| 26. Superpowers-Inspired Workflow Enhancements | 5/5 | Complete    | 2026-02-26 |
+| 27. Fix CI E2E Pipeline & Test Assertions | 0/0 | Not Started | — |
+| 28. Requirement Reconciliation & Doc Cleanup | 0/0 | Not Started | — |
