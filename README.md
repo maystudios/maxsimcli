@@ -2,6 +2,8 @@
 
 # MAXSIM
 
+> ⚠️ **Early Alpha** — MAXSIM is in active early development. APIs, commands, and workflows may change between releases. Use with that in mind and expect rough edges.
+
 **A meta-prompting, context engineering, and spec-driven development system for Claude Code, OpenCode, Gemini CLI, and Codex.**
 
 **Solves context rot — the quality degradation that happens as Claude fills its context window.**
