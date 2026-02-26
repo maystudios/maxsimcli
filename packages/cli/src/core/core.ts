@@ -367,7 +367,7 @@ export function getRoadmapPhaseInternal(cwd: string, phaseNum: string | number):
     const sectionEnd = nextHeaderMatch ? headerIndex + nextHeaderMatch.index! : content.length;
     const section = content.slice(headerIndex, sectionEnd).trim();
 
-    const goalMatch = section.match(/\*\*Goal:\*\*\s*([^\n]+)/i);
+    const goalMatch = section.match(/\*\*Goal(?::\*\*|\*\*:)\s*([^\n]+)/i);
     const goal = goalMatch ? goalMatch[1].trim() : null;
 
     return {

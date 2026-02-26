@@ -72,7 +72,7 @@ export function parseRoadmap(cwd: string): RoadmapAnalysis | null {
     const sectionEnd = nextHeader ? sectionStart + nextHeader.index! : content.length;
     const section = content.slice(sectionStart, sectionEnd);
 
-    const goalMatch = section.match(/\*\*Goal:\*\*\s*([^\n]+)/i);
+    const goalMatch = section.match(/\*\*Goal(?::\*\*|\*\*:)\s*([^\n]+)/i);
     const goal = goalMatch ? goalMatch[1].trim() : null;
 
     const dependsMatch = section.match(/\*\*Depends on:\*\*\s*([^\n]+)/i);

@@ -13,7 +13,7 @@ describe('install file structure (E2E-03)', () => {
     expect(files).toHaveLength(31);
   });
 
-  it('installs exactly 11 agent .md files', () => {
+  it('installs exactly 13 agent .md files', () => {
     const installDir = inject('installDir');
     const agentsDir = join(installDir, '.claude', 'agents');
     expect(existsSync(agentsDir)).toBe(true);

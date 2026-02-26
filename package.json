@@ -23,7 +23,7 @@
     "semantic-release": "^24.2.5"
   },
   "scripts": {
-    "build": "npm run build:cli && npm run build:dashboard",
+    "build": "npm run build:dashboard && npm run build:cli",
     "build:cli": "cd packages/cli && npx tsdown && node scripts/copy-assets.cjs",
     "build:dashboard": "cd packages/dashboard && npm run build",
     "test": "cd packages/cli && npx vitest run --passWithNoTests",
