@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** `npx maxsimcli@latest` installs a complete AI dev workflow system that works immediately — validated end-to-end from the npm consumer perspective, not the monorepo perspective
-**Current focus:** Phase 23 — E2E Wiring & Next.js Cleanup
+**Current focus:** Phase 26 — Superpowers-Inspired Workflow Enhancements
 
 ## Current Position
 
-Phase: 25 — Planning Doc Hygiene
-Plan: 25-03 (complete)
-Status: Plan 03 complete — Retroactive VERIFICATION.md for phases 15, 18, 19, 20
-Last activity: 2026-02-25 — Created retroactive verification files
+Phase: 26 — Superpowers-Inspired Workflow Enhancements
+Plan: 26-02 (complete)
+Status: Plan 02 complete — Created spec-reviewer and code-reviewer agent prompts
+Last activity: 2026-02-26 — Created two-stage reviewer agents
 
-Progress: [██████████] 100% (5/5 phases complete)
+Progress: [████------] 40% (2/5 plans complete)
 
 ## Performance Metrics
 
@@ -90,6 +90,8 @@ Progress: [██████████] 100% (5/5 phases complete)
 | Phase 24 P01 | 1min | 2 tasks | 1 files |
 | Phase 25 P02 | 2min | 2 tasks | 4 files |
 | Phase 25 P03 | 2min | 2 tasks | 4 files |
+| Phase 26 P01 | 2min | 1 tasks | 3 files |
+| Phase 26 P02 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -203,6 +205,13 @@ Recent decisions affecting current work:
 - [Phase 23]: Removed stale .next and app entries from tsconfig.json exclude during cleanup
 - [Phase 24]: isActive removed from QuickActionBar disabled condition - means activity not running state
 - [Phase 25]: Biome linter enabled with recommended:false; formatter disabled initially for existing codebase compatibility
+- [Phase 26-01]: Skills follow Superpowers SKILL.md pattern (frontmatter + Iron Law + Gate Function + Rationalizations + Red Flags + Verification Checklist) fully adapted to MAXSIM context
+- [Phase 26-01]: Each skill file kept under 130 lines for lightweight on-demand loading by agents
+- [Phase 26-01]: Skills include MAXSIM integration sections referencing plan execution, task commits, and deviation rules
+- [Phase 26-02]: Spec reviewer uses REQUIREMENT/STATUS/EVIDENCE format for structured evidence-based findings
+- [Phase 26-02]: Code reviewer uses 5 dimensions (correctness, conventions, error handling, security, maintainability) with CRITICAL/WARNING/NOTE severity
+- [Phase 26-02]: Both reviewer agents receive context inline from executor — neither reads PLAN.md directly
+- [Phase 26-02]: HARD-GATE anti-rationalization pattern: XML tag with explicit rule preventing verdict without full check
 
 ### Roadmap Evolution
 
@@ -213,6 +222,7 @@ Recent decisions affecting current work:
 - Phase 13 added: Live Project Dashboard — real-time web dashboard (Swiss Style Design + Aceternity UI)
 - Phase 14 added: Dashboard npm Delivery — ship dashboard inside maxsimcli npm package via Next.js standalone build
 - v2.0.0 Milestone: Phases 15-19 defined for E2E stabilization (E2E package scaffold, pack/install/tool tests, dashboard read tests, dashboard write tests, CI integration)
+- Phase 26 added: Superpowers-Inspired Workflow Enhancements — anti-rationalization prompting, evidence-based verification, two-stage review, on-demand skills (ref: docs/superpowers-research.md)
 
 ### Pending Todos
 
@@ -226,6 +236,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-25
-Stopped at: Completed 25-03-PLAN.md (Retroactive verification for phases 15, 18, 19, 20)
+Last session: 2026-02-26
+Stopped at: Completed 26-02-PLAN.md (Reviewer agent prompts for two-stage review)
 Resume file: N/A
