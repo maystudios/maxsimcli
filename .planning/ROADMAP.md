@@ -23,7 +23,7 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 - [x] **Phase 23: E2E Wiring & Next.js Cleanup** - Add dashboard:build to e2e dependsOn, remove orphaned Next.js files, fix ROADMAP/REQUIREMENTS staleness (completed 2026-02-25)
 - [x] **Phase 24: Fix Terminal Status Parsing & Quick Actions** - Fix status parse bug in use-terminal.ts that disables quick-action buttons and breaks status bar (completed 2026-02-25)
 - [x] **Phase 25: Planning Doc Hygiene** - Fix stale traceability, backfill SUMMARY.md frontmatter, add missing VERIFICATIONs, portable pre-push hook (completed 2026-02-25)
-- [ ] **Phase 26: Superpowers-Inspired Workflow Enhancements** - Integrate anti-rationalization prompting, evidence-based verification gates, two-stage code review, and on-demand skills into agent prompts and workflows
+- [x] **Phase 26: Superpowers-Inspired Workflow Enhancements** - Integrate anti-rationalization prompting, evidence-based verification gates, two-stage code review, and on-demand skills into agent prompts and workflows (completed 2026-02-26)
 
 ---
 
@@ -209,7 +209,7 @@ Plans:
   3. Executor workflow supports an optional two-stage review mode where after each task batch, a spec-compliance review runs followed by a code-quality review (configurable via .planning/config.json)
   4. A `templates/skills/` directory exists with at least 3 foundational skills (TDD enforcement, systematic debugging, verification-before-completion) that subagents can load on-demand via the Skill tool during execution
   5. All existing tests continue to pass — no regressions from prompt changes
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans complete
 
 Plans:
 - [ ] 26-01-PLAN.md — Create 3 foundational skill files (tdd, systematic-debugging, verification-before-completion)
@@ -237,4 +237,4 @@ Plans:
 | 23. E2E Wiring & Next.js Cleanup | 2/2 | Complete    | 2026-02-25 |
 | 24. Fix Terminal Status Parsing & Quick Actions | 1/1 | Complete    | 2026-02-25 |
 | 25. Planning Doc Hygiene | 3/3 | Complete    | 2026-02-25 |
-| 26. Superpowers-Inspired Workflow Enhancements | 4/5 | In Progress|  |
+| 26. Superpowers-Inspired Workflow Enhancements | 5/5 | Complete   | 2026-02-26 |
