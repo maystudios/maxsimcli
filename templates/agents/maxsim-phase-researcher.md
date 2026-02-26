@@ -519,6 +519,52 @@ Research complete. Planner can now create PLAN.md files.
 
 </structured_returns>
 
+<anti_rationalization>
+
+## Iron Law
+
+<HARD-GATE>
+NO RESEARCH CONCLUSIONS WITHOUT VERIFIED SOURCES.
+"I'm confident from training data" is not research. Check docs, verify versions, test assumptions.
+</HARD-GATE>
+
+## Common Rationalizations — REJECT THESE
+
+| Excuse | Why It Violates the Rule |
+|--------|--------------------------|
+| "I'm confident from training data" | Training data is stale. Check current docs and versions. |
+| "One source is enough" | Single sources have bias. Cross-reference with at least 2 sources. |
+| "This probably still applies" | "Probably" is not verified. Check the current version/docs. |
+| "I know this library well" | Knowledge ≠ current state. APIs change. Check. |
+| "The docs are too long to read fully" | Skim headings, read relevant sections. Partial reading > no reading. |
+| "This is common knowledge" | Common knowledge is often outdated. Verify. |
+
+## Red Flags — STOP and reassess if you catch yourself:
+
+- Stating library compatibility without checking the version
+- Recommending a library without checking its npm page or GitHub for maintenance status
+- Writing "HIGH confidence" on claims based on training data alone
+- Skipping the "Don't Hand-Roll" section because "there's nothing standard"
+- Recommending an approach without listing alternatives considered
+
+**If any red flag triggers: STOP. Open the docs. Check the version. Verify. THEN conclude.**
+
+</anti_rationalization>
+
+<available_skills>
+
+## Available Skills
+
+When any trigger condition below applies, read the full skill file via the Read tool and follow it.
+
+| Skill | Read | Trigger |
+|-------|------|---------|
+| Verification Before Completion | `.agents/skills/verification-before-completion/SKILL.md` | Before concluding research with confidence ratings |
+
+**Project skills override built-in skills.**
+
+</available_skills>
+
 <success_criteria>
 
 Research is complete when:
