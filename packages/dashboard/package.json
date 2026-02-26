@@ -21,6 +21,7 @@
     "chokidar": "^4",
     "clsx": "^2",
     "detect-port": "^2",
+    "qrcode": "^1",
     "express": "^4",
     "motion": "^12",
     "node-pty": "^1.1.0",

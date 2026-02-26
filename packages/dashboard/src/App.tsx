@@ -10,6 +10,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Terminal } from "@/components/terminal/Terminal";
 import { TerminalToggle, useTerminalLayout } from "@/components/terminal/TerminalTab";
+import { NetworkQRButton } from "@/components/network/NetworkQRButton";
 import type { DashboardPhase } from "@/lib/types";
 
 export type ActiveView = "overview" | "phase" | "todos" | "blockers" | "terminal";
@@ -220,6 +221,9 @@ function DashboardApp() {
         <TerminalToggle splitMode={splitMode} onToggle={toggleSplit} />
         <Terminal />
       </div>
+
+      {/* Local network QR code button — only visible when network mode is enabled */}
+      <NetworkQRButton />
     </AppShell>
   );
 }

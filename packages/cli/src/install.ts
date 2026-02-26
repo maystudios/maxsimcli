@@ -2,6 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
 import * as crypto from 'node:crypto';
+import { execSync as execSyncBase } from 'node:child_process';
 import fsExtra from 'fs-extra';
 
 import chalk from 'chalk';
@@ -58,6 +59,41 @@ if (hasAll) {
   if (hasClaude) selectedRuntimes.push('claude');
   if (hasGemini) selectedRuntimes.push('gemini');
   if (hasCodex) selectedRuntimes.push('codex');
+}
+
+/**
+ * Add a firewall rule to allow inbound traffic on the given port.
+ * Handles Windows (netsh), Linux (ufw / iptables), and macOS (no rule needed).
+ */
+function applyFirewallRule(port: number): void {
+  const platform = process.platform;
+  try {
+    if (platform === 'win32') {
+      execSyncBase(
+        `netsh advfirewall firewall add rule name="MAXSIM Dashboard" dir=in action=allow protocol=TCP localport=${port}`,
+        { stdio: 'pipe' },
+      );
+      console.log(chalk.green('  ✓ Windows Firewall rule added for port ' + port));
+    } else if (platform === 'linux') {
+      try {
+        execSyncBase(`ufw allow ${port}/tcp`, { stdio: 'pipe' });
+        console.log(chalk.green('  ✓ UFW rule added for port ' + port));
+      } catch {
+        try {
+          execSyncBase(`iptables -A INPUT -p tcp --dport ${port} -j ACCEPT`, { stdio: 'pipe' });
+          console.log(chalk.green('  ✓ iptables rule added for port ' + port));
+        } catch {
+          console.log(chalk.yellow(`  ⚠ Could not add firewall rule automatically. Allow port ${port} manually if needed.`));
+        }
+      }
+    } else if (platform === 'darwin') {
+      // macOS does not block inbound connections by default — no rule needed
+      console.log(chalk.gray('  macOS: No firewall rule needed (inbound connections are allowed by default)'));
+    }
+  } catch (err) {
+    console.warn(chalk.yellow(`  ⚠ Firewall rule failed: ${(err as Error).message}`));
+    console.warn(chalk.gray(`  You may need to manually allow port ${port} through your firewall.`));
+  }
 }
 
 /**
@@ -1241,10 +1277,10 @@ interface InstallResult {
   runtime: RuntimeName;
 }
 
-function install(
+async function install(
   isGlobal: boolean,
   runtime: RuntimeName = 'claude',
-): InstallResult {
+): Promise<InstallResult> {
   const isOpencode = runtime === 'opencode';
   const isGemini = runtime === 'gemini';
   const isCodex = runtime === 'codex';
@@ -1490,6 +1526,17 @@ function install(
   // No node_modules/ needed at destination — all server deps are bundled inline.
   const dashboardSrc = path.resolve(__dirname, 'assets', 'dashboard');
   if (fs.existsSync(dashboardSrc)) {
+    // Ask whether to expose the dashboard on the local network (before spinner)
+    let networkMode = false;
+    try {
+      networkMode = await confirm({
+        message: 'Allow dashboard to be accessible on your local network? (adds firewall rule, enables QR code)',
+        default: false,
+      });
+    } catch {
+      // Non-interactive terminal — default to false
+    }
+
     spinner = ora({ text: 'Installing dashboard...', color: 'cyan' }).start();
     const dashboardDest = path.join(targetDir, 'dashboard');
     // Clean existing dashboard to prevent stale files from old installs
@@ -1499,12 +1546,16 @@ function install(
     // Write dashboard.json NEXT TO dashboard/ dir (survives overwrites on upgrade)
     const dashboardConfigDest = path.join(targetDir, 'dashboard.json');
     const projectCwd = isGlobal ? targetDir : process.cwd();
-    fs.writeFileSync(dashboardConfigDest, JSON.stringify({ projectCwd }, null, 2) + '\n');
+    fs.writeFileSync(dashboardConfigDest, JSON.stringify({ projectCwd, networkMode }, null, 2) + '\n');
 
     if (fs.existsSync(path.join(dashboardDest, 'server.js'))) {
       spinner.succeed(chalk.green('✓') + ' Installed dashboard');
     } else {
       spinner.succeed(chalk.green('✓') + ' Installed dashboard (server.js not found in bundle)');
+    }
+
+    if (networkMode) {
+      applyFirewallRule(3333);
     }
   }
 
@@ -1795,7 +1846,7 @@ async function installAllRuntimes(
   const results: InstallResult[] = [];
 
   for (const runtime of runtimes) {
-    const result = install(isGlobal, runtime);
+    const result = await install(isGlobal, runtime);
     results.push(result);
   }
 
@@ -1904,12 +1955,14 @@ const subcommand = args.find(a => !a.startsWith('-'));
     const dashboardDir = path.dirname(serverPath);
     const dashboardConfigPath = path.join(path.dirname(dashboardDir), 'dashboard.json');
     let projectCwd = process.cwd();
+    let networkMode = false;
     if (fs.existsSync(dashboardConfigPath)) {
       try {
-        const config = JSON.parse(fs.readFileSync(dashboardConfigPath, 'utf8')) as { projectCwd?: string };
+        const config = JSON.parse(fs.readFileSync(dashboardConfigPath, 'utf8')) as { projectCwd?: string; networkMode?: boolean };
         if (config.projectCwd) {
           projectCwd = config.projectCwd;
         }
+        networkMode = config.networkMode ?? false;
       } catch {
         // Use default cwd
       }
@@ -1938,7 +1991,11 @@ const subcommand = args.find(a => !a.startsWith('-'));
 
     console.log(chalk.blue('Starting dashboard...'));
     console.log(chalk.gray(`  Project: ${projectCwd}`));
-    console.log(chalk.gray(`  Server:  ${serverPath}\n`));
+    console.log(chalk.gray(`  Server:  ${serverPath}`));
+    if (networkMode) {
+      console.log(chalk.gray('  Network: enabled (local network access + QR code)'));
+    }
+    console.log('');
 
     // Use stdio: 'ignore' (fully detached) — a piped stderr causes the server to crash on
     // Windows when the read-end is closed after the parent reads the ready message (EPIPE).
@@ -1949,6 +2006,7 @@ const subcommand = args.find(a => !a.startsWith('-'));
       env: {
         ...process.env,
         MAXSIM_PROJECT_CWD: projectCwd,
+        MAXSIM_NETWORK_MODE: networkMode ? '1' : '0',
         NODE_ENV: 'production',
       },
     });

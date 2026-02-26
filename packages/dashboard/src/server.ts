@@ -1,5 +1,6 @@
 import * as path from 'node:path';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
 import { createServer } from 'node:http';
 import type { IncomingMessage } from 'node:http';
 import type { Duplex } from 'node:stream';
@@ -50,7 +51,25 @@ function log(level: 'INFO' | 'WARN' | 'ERROR', tag: string, ...args: unknown[]):
 // ─── Config ────────────────────────────────────────────────────────────────
 
 const projectCwd = process.env.MAXSIM_PROJECT_CWD || process.cwd();
-log('INFO', 'server', `Starting dashboard server, projectCwd=${projectCwd}`);
+const networkMode = process.env.MAXSIM_NETWORK_MODE === '1';
+// Port is resolved in main() and set here so /api/server-info can read it before listen completes
+let resolvedPort = 3333;
+
+function getLocalNetworkIp(): string | null {
+  const ifaces = os.networkInterfaces();
+  for (const iface of Object.values(ifaces)) {
+    for (const info of iface ?? []) {
+      if (info.family === 'IPv4' && !info.internal) {
+        return info.address;
+      }
+    }
+  }
+  return null;
+}
+
+const localNetworkIp = networkMode ? getLocalNetworkIp() : null;
+
+log('INFO', 'server', `Starting dashboard server, projectCwd=${projectCwd}, networkMode=${networkMode}`);
 
 // client/ folder is co-located with server.js in dist/
 const clientDir = path.join(__dirname, 'client');
@@ -828,6 +847,15 @@ app.put('/api/plan/*', (req: Request, res: Response) => {
   return res.json({ written: true, path: relativePath });
 });
 
+// ── Server info (network mode / QR code) ──
+app.get('/api/server-info', (_req: Request, res: Response) => {
+  return res.json({
+    networkEnabled: networkMode,
+    localUrl: `http://localhost:${resolvedPort}`,
+    networkUrl: localNetworkIp ? `http://${localNetworkIp}:${resolvedPort}` : null,
+  });
+});
+
 // ── Static client (Vite build) ──
 if (fs.existsSync(clientDir)) {
   app.use(sirv(clientDir, { single: true }));
@@ -937,13 +965,18 @@ async function main(): Promise<void> {
   }
 
   const port = await detectPort(3333);
-  const url = `http://localhost:${port}`;
+  resolvedPort = port;
+  const localUrl = `http://localhost:${port}`;
+  const bindHost = networkMode ? '0.0.0.0' : '127.0.0.1';
 
-  server.listen(port, () => {
-    log('INFO', 'server', `Dashboard ready at ${url}, log file: ${logFile}`);
-    console.error(`Dashboard ready at ${url}`);
+  server.listen(port, bindHost, () => {
+    log('INFO', 'server', `Dashboard ready at ${localUrl}, log file: ${logFile}`);
+    console.error(`Dashboard ready at ${localUrl}`);
+    if (networkMode && localNetworkIp) {
+      console.error(`Network URL:      http://${localNetworkIp}:${port}`);
+    }
     console.error(`Logs: ${logFile}`);
-    open(url).catch(() => {});
+    open(localUrl).catch(() => {});
   });
 
   function shutdown(): void {
