@@ -87,6 +87,10 @@ None - no external service configuration required.
 - DASH-08 pre-existing failure should be investigated in a future phase (logged in deferred-items.md)
 - Phase 28 can proceed with confidence that E2E regressions will block npm publish
 
+## Self-Check: PASSED
+
+All files exist, all commits verified (4afbb97, 48394a4, 82cc70c).
+
 ---
 *Phase: 27-fix-ci-e2e-pipeline*
 *Completed: 2026-02-26*

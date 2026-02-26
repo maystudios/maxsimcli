@@ -273,5 +273,5 @@ _(none yet)_
 | 24. Fix Terminal Status Parsing & Quick Actions | 1/1 | Complete    | 2026-02-25 |
 | 25. Planning Doc Hygiene | 3/3 | Complete    | 2026-02-25 |
 | 26. Superpowers-Inspired Workflow Enhancements | 5/5 | Complete    | 2026-02-26 |
-| 27. Fix CI E2E Pipeline & Test Assertions | 1/1 | Complete   | 2026-02-26 |
+| 27. Fix CI E2E Pipeline & Test Assertions | 1/1 | Complete    | 2026-02-26 |
 | 28. Requirement Reconciliation & Doc Cleanup | 0/0 | Not Started | — |
