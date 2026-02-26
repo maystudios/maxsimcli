@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/maystudios/maxsim/compare/v3.1.0...v3.1.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** move QR button to sidebar, add --network flag, admin elevation for firewall ([dcf6830](https://github.com/maystudios/maxsim/commit/dcf683014e17ee00a960ade1f8633a9fcd8d45ae))
+
 # [3.1.0](https://github.com/maystudios/maxsim/compare/v3.0.3...v3.1.0) (2026-02-26)
 
 
