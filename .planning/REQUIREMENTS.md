@@ -15,7 +15,7 @@ All 42 v1.0 requirements (NX-01 through PUB-04) are satisfied. See `.planning/v1
 
 ### E2E Infrastructure
 
-- [ ] **E2E-01**: E2E test package exists with correct wiring — tests run via `npx vitest run --config vitest.e2e.config.ts` from `packages/cli/`, with build dependencies satisfied before execution
+- [x] **E2E-01**: E2E test package exists with correct wiring — tests run via `npx vitest run --config vitest.e2e.config.ts` from `packages/cli/`, with build dependencies satisfied before execution
 - [x] **E2E-02**: globalSetup runs `npm pack` from `packages/cli/dist/` and installs via local tarball to a `mkdtempSync` temp directory — never hits the npm registry
 - [x] **E2E-03**: install.test.ts validates exact file counts post-install: exactly 31 command `.md` files, exactly 13 agent `.md` files, known workflow directory structure
 - [x] **E2E-04**: Binary smoke test: `maxsimcli --version` exits 0 from the installed temp path
@@ -77,8 +77,8 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| E2E-01 | Phase 15 → Phase 23 → Phase 28 | Pending |
-| DOCS-01 | Phase 15 → Phase 23 → Phase 28 | Pending |
+| E2E-01 | Phase 15 → Phase 23 → Phase 28 | Satisfied |
+| DOCS-01 | Phase 15 → Phase 23 → Phase 28 | Satisfied |
 | E2E-02 | Phase 16 | Satisfied |
 | E2E-03 | Phase 16 → Phase 27 | Complete |
 | E2E-04 | Phase 16 | Satisfied |

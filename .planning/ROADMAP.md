@@ -248,10 +248,10 @@ Plans:
   3. Phase 23 VERIFICATION.md updated to reflect resolution by Phase 25
   4. Orphan directories `20-dashboard-migrate-vite-express` and `20-new-phase` removed
   5. All phase SUMMARY.md `requirements_completed` arrays populated
-**Plans**: 0 plans
+**Plans**: 1 plan
 
 Plans:
-_(none yet)_
+- [ ] 28-01-PLAN.md — Close E2E-01/DOCS-01 requirements, fix VERIFICATION.md files, remove orphan dirs, backfill SUMMARY.md arrays
 
 ---
 
