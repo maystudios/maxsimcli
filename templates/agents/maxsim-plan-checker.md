@@ -31,6 +31,8 @@ Before verifying, discover project context:
 
 **Project instructions:** Read `./CLAUDE.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
 
+**Self-improvement lessons:** Read `.planning/LESSONS.md` if it exists — accumulated lessons from past executions. Use planning insights as an additional verification dimension: flag plans that repeat known gap patterns or ignore documented codebase conventions.
+
 **Project skills:** Check `.agents/skills/` directory if it exists:
 1. List available skills (subdirectories)
 2. Read `SKILL.md` for each skill (lightweight index ~130 lines)

@@ -57715,14 +57715,16 @@ function normalizeFsPath(p) {
 	return p.replace(/\\/g, "/");
 }
 let clientCount = 0;
-function createWSS() {
+function createWSS(onClientCountChange) {
 	const wss = new import_websocket_server.default({ noServer: true });
 	wss.on("connection", (ws) => {
 		clientCount++;
 		console.error(`[ws] Client connected (${clientCount} total)`);
+		onClientCountChange?.(clientCount);
 		ws.on("close", () => {
 			clientCount--;
 			console.error(`[ws] Client disconnected (${clientCount} total)`);
+			onClientCountChange?.(clientCount);
 		});
 		ws.on("error", (err) => {
 			console.error("[ws] Client error:", err.message);
@@ -58271,12 +58273,35 @@ app.get("/api/server-info", (_req, res) => {
 		tailscaleUrl: tailscaleIp ? `http://${tailscaleIp}:${resolvedPort}` : null
 	});
 });
+let shutdownFn = null;
+app.post("/api/shutdown", (_req, res) => {
+	res.json({ shutdown: true });
+	setTimeout(() => shutdownFn?.(), 100);
+});
 if (node_fs.existsSync(clientDir)) app.use(build_default(clientDir, { single: true }));
 else app.get("/", (_req, res) => {
 	res.send("<html><body><p>Dashboard client not found. Run <code>pnpm run build</code> first.</p></body></html>");
 });
+const AUTO_SHUTDOWN_DELAY_MS = 6e4;
 async function main() {
-	const wss = createWSS();
+	let autoShutdownTimer = null;
+	const wss = createWSS((count) => {
+		if (count > 0) {
+			if (autoShutdownTimer) {
+				clearTimeout(autoShutdownTimer);
+				autoShutdownTimer = null;
+				log("INFO", "server", "Auto-shutdown cancelled — client connected");
+			}
+		} else {
+			autoShutdownTimer = setTimeout(() => {
+				if (wss.clients.size === 0) {
+					log("INFO", "server", "Auto-shutdown: no clients for 60s — shutting down");
+					shutdown();
+				}
+			}, AUTO_SHUTDOWN_DELAY_MS);
+			log("INFO", "server", `Auto-shutdown scheduled in ${AUTO_SHUTDOWN_DELAY_MS / 1e3}s (no clients)`);
+		}
+	});
 	const terminalWss = new import_websocket_server.default({ noServer: true });
 	const ptyManager = PtyManager.getInstance();
 	if (!ptyManager.isAvailable()) log("WARN", "server", "node-pty not available — terminal features disabled");
@@ -58392,6 +58417,7 @@ async function main() {
 			process.exit(1);
 		}, 5e3);
 	}
+	shutdownFn = shutdown;
 	process.on("SIGINT", shutdown);
 	process.on("SIGTERM", shutdown);
 	process.on("exit", () => {

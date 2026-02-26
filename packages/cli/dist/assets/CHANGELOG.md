@@ -1,3 +1,31 @@
+## [3.3.1](https://github.com/maystudios/maxsim/compare/v3.3.0...v3.3.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** add shutdown button, auto-shutdown after 60s with no clients ([92a545a](https://github.com/maystudios/maxsim/commit/92a545a23576954fe485198e53fd756f6b88a7d2))
+
+# [3.3.0](https://github.com/maystudios/maxsim/compare/v3.2.2...v3.3.0) (2026-02-26)
+
+
+### Features
+
+* **website:** add full /docs documentation page with sidebar navigation ([ca2ed67](https://github.com/maystudios/maxsim/commit/ca2ed674218ed080b40930528c48f3403b4c93bf))
+
+## [3.2.2](https://github.com/maystudios/maxsim/compare/v3.2.1...v3.2.2) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** LAN sharing — always detect local IP, add --network flag, Windows firewall hint ([3cd26a6](https://github.com/maystudios/maxsim/commit/3cd26a6073e11df23c80d9997a08017a24200547))
+
+## [3.2.1](https://github.com/maystudios/maxsim/compare/v3.2.0...v3.2.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** mobile-responsive layout with hamburger drawer and adaptive stats ([89d37e6](https://github.com/maystudios/maxsim/commit/89d37e608067ad05fd1022487fbe17b7b2154ccf))
+
 # [3.2.0](https://github.com/maystudios/maxsim/compare/v3.1.6...v3.2.0) (2026-02-26)
 
 

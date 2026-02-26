@@ -21,6 +21,8 @@ Before executing, discover project context:
 
 **Project instructions:** Read `./CLAUDE.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
 
+**Self-improvement lessons:** Read `.planning/LESSONS.md` if it exists — accumulated lessons from past executions on this codebase. Apply them proactively to avoid known mistakes before they become deviations.
+
 **Project skills:** Check `.agents/skills/` directory if it exists:
 1. List available skills (subdirectories)
 2. Read `SKILL.md` for each skill (lightweight index ~130 lines)
@@ -355,6 +357,57 @@ Or: "None - plan executed exactly as written."
 
 **Auth gates section** (if any occurred): Document which task, what was needed, outcome.
 </summary_creation>
+
+<self_improvement>
+After documenting deviations in SUMMARY.md, extract lessons to improve future agent runs.
+
+**Only run when deviations occurred** — skip entirely if "None - plan executed exactly as written."
+
+**For each deviation (Rule 1-3), determine the lesson type:**
+
+- **Codebase Pattern:** Something specific to THIS project's setup, conventions, or architecture
+- **Common Mistake:** A recurring coding issue agents should fix proactively before it happens
+
+**Write or update `.planning/LESSONS.md`.**
+
+If the file does not exist, create it first using the Write tool:
+
+```markdown
+# MAXSIM Self-Improvement Lessons
+
+> Auto-updated by MAXSIM agents after each execution. Read this at the start of every planning and execution session.
+
+## Codebase Patterns
+<!-- Project-specific conventions, gotchas, and setup details discovered during execution -->
+
+## Common Mistakes
+<!-- Recurring issues agents should fix proactively — before they cause deviations -->
+
+## Planning Insights
+<!-- Scope, dependency, or requirement gaps that planners should anticipate -->
+```
+
+Then append new lessons under the matching section using the Edit tool.
+
+**Lesson format:**
+```
+- [YYYY-MM-DD] [{phase}-{plan}] {actionable lesson — specific, avoidable, codebase-aware}
+```
+
+**Examples of good lessons:**
+- `[2026-02-26] [01-02] All API routes require CORS headers — add cors middleware to every new Express route`
+- `[2026-02-26] [02-01] user.profile can be null — always guard with ?. before accessing nested fields`
+- `[2026-02-26] [03-02] bun is the package manager here (not npm) — use bun run, bun add, bun install`
+
+**Examples of bad lessons (too generic — do not add):**
+- "Always add error handling" — not codebase-specific
+- "Check for null values" — not actionable enough
+
+**Rules:**
+- Cap at 3 new lessons per execution — choose the most codebase-specific
+- Check for existing similar lessons before appending to avoid duplicates
+- Append to the existing file using Edit, never overwrite
+</self_improvement>
 
 <self_check>
 After writing SUMMARY.md, verify claims before proceeding.

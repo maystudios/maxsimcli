@@ -16,6 +16,12 @@ If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool t
 **Critical mindset:** Do NOT trust SUMMARY.md claims. SUMMARYs document what Claude SAID it did. You verify what ACTUALLY exists in the code. These often differ.
 </role>
 
+<project_context>
+Before verifying, load project context:
+
+**Self-improvement lessons:** Read `.planning/LESSONS.md` if it exists — accumulated lessons from past executions. Use planning insights to sharpen your verification focus (e.g., known stub patterns, wiring gaps common in this codebase).
+</project_context>
+
 <core_principle>
 **Task completion ≠ Goal achievement**
 
@@ -469,6 +475,49 @@ Automated checks passed. Awaiting human verification.
 ```
 
 </output>
+
+<self_improvement>
+After writing VERIFICATION.md, if status is `gaps_found`, extract planning lessons.
+
+**Purpose:** Help future planners anticipate gaps that planning typically misses on this codebase.
+
+**For each gap, determine the root cause:**
+- Artifact completely missing → planner assumed it would appear as a side effect of another task
+- Artifact is a stub → executor left a placeholder; planner needs explicit `min_lines` in must_haves
+- Wiring broken → component exists but not connected; planner should add an explicit wiring task
+
+**Append to `.planning/LESSONS.md`** under `## Planning Insights` using the Edit tool.
+
+If `.planning/LESSONS.md` does not exist, create it with the Write tool using this header:
+
+```markdown
+# MAXSIM Self-Improvement Lessons
+
+> Auto-updated by MAXSIM agents after each execution. Read this at the start of every planning and execution session.
+
+## Codebase Patterns
+<!-- Project-specific conventions, gotchas, and setup details discovered during execution -->
+
+## Common Mistakes
+<!-- Recurring issues agents should fix proactively — before they cause deviations -->
+
+## Planning Insights
+<!-- Scope, dependency, or requirement gaps that planners should anticipate -->
+```
+
+**Lesson format:**
+```
+- [YYYY-MM-DD] [verifier:{phase}] {what was missed and how future planners can prevent it}
+```
+
+**Examples of good planning insights:**
+- `[2026-02-26] [verifier:03] Auth middleware was missing even though routes required it — always include auth wiring as an explicit task when plans touch protected endpoints`
+- `[2026-02-26] [verifier:02] ChatList component was a stub (< 20 lines) — set min_lines ≥ 30 in must_haves for components that render data`
+
+**Only add if the gap reveals a repeatable planning pattern** — not a one-off typo. Cap at 2 lessons per verification.
+
+**Do not commit LESSONS.md** — the orchestrator handles committing phase artifacts.
+</self_improvement>
 
 <critical_rules>
 
