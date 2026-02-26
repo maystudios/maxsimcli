@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { Brain, Layers, Globe, FileText, Users, Gauge, LayoutDashboard } from "lucide-react";
+import { Brain, Layers, Globe, FileText, Users, Gauge, LayoutDashboard, Wifi, GitBranch, Zap } from "lucide-react";
 
 const features = [
   {
@@ -15,6 +15,12 @@ const features = [
       "Solves context rot by offloading work to fresh-context subagents. Never lose track of your project state again.",
   },
   {
+    icon: LayoutDashboard,
+    title: "Live Dashboard",
+    description:
+      "Real-time web UI with phase progress, inline Markdown editor, todos, blockers, STATE.md editor, and LAN/QR sharing. Bundled inside the CLI — launch with one command.",
+  },
+  {
     icon: Globe,
     title: "Multi-Runtime Support",
     description:
@@ -24,25 +30,37 @@ const features = [
     icon: FileText,
     title: "Spec-Driven Development",
     description:
-      "Structured planning with phases, research, verification, and UAT. Every step is documented in markdown.",
+      "Structured planning with phases, research, verification, and UAT. Every step is documented in markdown and persists across sessions.",
   },
   {
     icon: Users,
     title: "11 Specialized Agents",
     description:
-      "Researcher, planner, executor, verifier, debugger, and more — each agent is an expert at its specific task.",
+      "Researcher, planner, executor, verifier, debugger, codebase mapper, and more — each agent is an expert at its single task.",
   },
   {
     icon: Gauge,
-    title: "Model Profiles",
+    title: "4 Model Profiles",
     description:
-      "Quality, balanced, and budget tiers for optimal cost. Orchestrators use lean models; planners and executors use heavy ones.",
+      "Quality, balanced, budget, and tokenburner tiers. Orchestrators use lean models; planners and executors use heavy ones. Override individual agents per project.",
   },
   {
-    icon: LayoutDashboard,
-    title: "Live Dashboard",
+    icon: Zap,
+    title: "Wave-Based Parallelization",
     description:
-      "Real-time web UI with phase tracking, quick command shortcuts, split-view terminal, and network QR access. Bundled inside the CLI — launch with one command.",
+      "Execution plans are grouped into dependency waves and run in parallel with isolated fresh-context subagents, then committed atomically.",
+  },
+  {
+    icon: GitBranch,
+    title: "Branching Strategies",
+    description:
+      "Auto-create git branches per phase or milestone. Configurable templates like maxsim/phase-{N}-{slug} keep your repo organized.",
+  },
+  {
+    icon: Wifi,
+    title: "LAN & Tailscale Sharing",
+    description:
+      "Share the dashboard over your local network or Tailscale VPN. Auto-configures firewall rules and generates a QR code for instant mobile access.",
   },
 ];
 
