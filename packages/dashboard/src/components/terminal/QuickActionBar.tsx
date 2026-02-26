@@ -102,6 +102,21 @@ export function QuickActionBar({
     setConfirmCommand(null);
   }, []);
 
+  // Allow Enter to confirm when the confirmation popup is open
+  useEffect(() => {
+    if (!confirmCommand) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleConfirm();
+      } else if (e.key === "Escape") {
+        handleCancel();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [confirmCommand, handleConfirm, handleCancel]);
+
   // Settings handlers
   const [editCommands, setEditCommands] = useState<QuickCommand[]>([]);
 

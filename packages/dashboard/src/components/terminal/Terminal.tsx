@@ -18,7 +18,7 @@ export function Terminal({ onReady }: TerminalProps) {
   const fitAddonRef = useRef<FitAddon | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [skipPermissions, setSkipPermissions] = useState(false);
+  const [skipPermissions, setSkipPermissions] = useState(true);
 
   const {
     connected,

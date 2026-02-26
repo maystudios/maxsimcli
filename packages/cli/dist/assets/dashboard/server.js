@@ -57204,13 +57204,17 @@ var PtyManager = class PtyManager {
 		proc.onData((data) => {
 			this.lastOutputTime = Date.now();
 			store.append(data);
-			this.broadcastToClients({
+			if (this.session?.pid === proc.pid) this.broadcastToClients({
 				type: "output",
 				data
 			});
 		});
 		proc.onExit(({ exitCode }) => {
 			ptyLog("INFO", `Process exited with code=${exitCode}`);
+			if (this.session?.pid !== proc.pid) {
+				ptyLog("INFO", `Ignoring stale exit for old pid=${proc.pid} (current pid=${this.session?.pid ?? "none"})`);
+				return;
+			}
 			this.broadcastToClients({
 				type: "exit",
 				code: exitCode
