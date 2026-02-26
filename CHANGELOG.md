@@ -1,3 +1,10 @@
+# [3.2.0](https://github.com/maystudios/maxsim/compare/v3.1.6...v3.2.0) (2026-02-26)
+
+
+### Features
+
+* **dashboard:** Tailscale auto-detection for secure remote access ([f3bb602](https://github.com/maystudios/maxsim/commit/f3bb60259afdec1f4c7ed6df3a18b8ec0131b48b))
+
 ## [3.1.6](https://github.com/maystudios/maxsim/compare/v3.1.5...v3.1.6) (2026-02-26)
 
 
