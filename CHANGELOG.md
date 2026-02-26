@@ -1,3 +1,10 @@
+## [3.5.2](https://github.com/maystudios/maxsimcli/compare/v3.5.1...v3.5.2) (2026-02-26)
+
+
+### Bug Fixes
+
+* **repo:** update all GitHub URLs to new repo name maystudios/maxsimcli ([b260b32](https://github.com/maystudios/maxsimcli/commit/b260b32a1dada6bf85ea0b11588997f45007c8f6))
+
 ## [3.5.1](https://github.com/maystudios/maxsim/compare/v3.5.0...v3.5.1) (2026-02-26)
 
 
