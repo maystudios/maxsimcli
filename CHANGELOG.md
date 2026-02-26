@@ -1,3 +1,10 @@
+# [3.5.0](https://github.com/maystudios/maxsim/compare/v3.4.0...v3.5.0) (2026-02-26)
+
+
+### Features
+
+* **website:** comprehensive SEO overhaul with meta tags, sitemap, and structured data ([33db639](https://github.com/maystudios/maxsim/commit/33db6392345312f84a2d89a355a64d7d00335612))
+
 # [3.4.0](https://github.com/maystudios/maxsim/compare/v3.3.1...v3.4.0) (2026-02-26)
 
 
