@@ -1,3 +1,10 @@
+## [3.0.3](https://github.com/maystudios/maxsim/compare/v3.0.2...v3.0.3) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** skip permissions on by default, enter key confirms quick command ([5a59fbf](https://github.com/maystudios/maxsim/commit/5a59fbfd02231f018e30813d28c7444122c3968b))
+
 ## [3.0.2](https://github.com/maystudios/maxsim/compare/v3.0.1...v3.0.2) (2026-02-26)
 
 
