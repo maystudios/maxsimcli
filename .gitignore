@@ -9,6 +9,8 @@ commands.html
 
 # Local test installs
 .claude/
+.agent/
+.agents/
 
 # NX cache and workspace data
 .nx/
