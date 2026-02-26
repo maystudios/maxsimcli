@@ -1,3 +1,10 @@
+## [3.1.6](https://github.com/maystudios/maxsim/compare/v3.1.5...v3.1.6) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** align design language to website — Geist font, accent lines, feature grid ([181888c](https://github.com/maystudios/maxsim/commit/181888c9bc8a32aa60225dcab28feec68915fa43))
+
 ## [3.1.5](https://github.com/maystudios/maxsim/compare/v3.1.4...v3.1.5) (2026-02-26)
 
 
