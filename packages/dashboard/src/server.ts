@@ -473,14 +473,15 @@ function parsePhaseDetail(
           ? filesMatch[1].trim().split('\n').map(f => f.trim()).filter(Boolean)
           : [];
 
+        const doneText = doneMatch ? doneMatch[1].trim() : '';
         tasks.push({
           name: taskName,
           type: taskType,
           files,
           action: actionMatch ? actionMatch[1].trim() : '',
           verify: verifyMatch ? verifyMatch[1].trim() : '',
-          done: doneMatch ? doneMatch[1].trim() : '',
-          completed: false,
+          done: doneText,
+          completed: /^\[x\]/i.test(doneText),
         });
       }
 

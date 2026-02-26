@@ -30,6 +30,8 @@ let node_path = require("node:path");
 node_path = __toESM(node_path);
 let node_fs = require("node:fs");
 node_fs = __toESM(node_fs);
+let node_os = require("node:os");
+node_os = __toESM(node_os);
 let node_http = require("node:http");
 let path = require("path");
 path = __toESM(path);
@@ -39,8 +41,6 @@ let node_querystring = require("node:querystring");
 node_querystring = __toESM(node_querystring);
 let node_net = require("node:net");
 let node_util = require("node:util");
-let node_os = require("node:os");
-node_os = __toESM(node_os);
 let node_fs_promises = require("node:fs/promises");
 node_fs_promises = __toESM(node_fs_promises);
 let node_child_process = require("node:child_process");
@@ -57322,7 +57322,15 @@ function log(level, tag, ...args) {
 	if (level === "ERROR") console.error(`[${tag}]`, ...args);
 }
 const projectCwd = process.env.MAXSIM_PROJECT_CWD || process.cwd();
-log("INFO", "server", `Starting dashboard server, projectCwd=${projectCwd}`);
+const networkMode = process.env.MAXSIM_NETWORK_MODE === "1";
+let resolvedPort = 3333;
+function getLocalNetworkIp() {
+	const ifaces = node_os.networkInterfaces();
+	for (const iface of Object.values(ifaces)) for (const info of iface ?? []) if (info.family === "IPv4" && !info.internal) return info.address;
+	return null;
+}
+const localNetworkIp = networkMode ? getLocalNetworkIp() : null;
+log("INFO", "server", `Starting dashboard server, projectCwd=${projectCwd}, networkMode=${networkMode}`);
 const clientDir = node_path.join(__dirname, "client");
 function isWithinPlanning(cwd, targetPath) {
 	const planningDir = node_path.resolve(cwd, ".planning");
@@ -57599,14 +57607,15 @@ function parsePhaseDetail(cwd, phaseId) {
 				const verifyMatch = taskBody.match(/<verify>([\s\S]*?)<\/verify>/);
 				const doneMatch = taskBody.match(/<done>([\s\S]*?)<\/done>/);
 				const files = filesMatch ? filesMatch[1].trim().split("\n").map((f) => f.trim()).filter(Boolean) : [];
+				const doneText = doneMatch ? doneMatch[1].trim() : "";
 				tasks.push({
 					name: taskName,
 					type: taskType,
 					files,
 					action: actionMatch ? actionMatch[1].trim() : "",
 					verify: verifyMatch ? verifyMatch[1].trim() : "",
-					done: doneMatch ? doneMatch[1].trim() : "",
-					completed: false
+					done: doneText,
+					completed: /^\[x\]/i.test(doneText)
 				});
 			}
 			plans.push({
@@ -57893,6 +57902,13 @@ app.put("/api/plan/*", (req, res) => {
 		path: relativePath
 	});
 });
+app.get("/api/server-info", (_req, res) => {
+	return res.json({
+		networkEnabled: networkMode,
+		localUrl: `http://localhost:${resolvedPort}`,
+		networkUrl: localNetworkIp ? `http://${localNetworkIp}:${resolvedPort}` : null
+	});
+});
 if (node_fs.existsSync(clientDir)) app.use(build_default(clientDir, { single: true }));
 else app.get("/", (_req, res) => {
 	res.send("<html><body><p>Dashboard client not found. Run <code>pnpm run build</code> first.</p></body></html>");
@@ -57979,12 +57995,15 @@ async function main() {
 		console.error("[server] Failed to start file watcher:", err.message);
 	}
 	const port = await esm_default(3333);
-	const url = `http://localhost:${port}`;
-	server.listen(port, () => {
-		log("INFO", "server", `Dashboard ready at ${url}, log file: ${logFile}`);
-		console.error(`Dashboard ready at ${url}`);
+	resolvedPort = port;
+	const localUrl = `http://localhost:${port}`;
+	const bindHost = networkMode ? "0.0.0.0" : "127.0.0.1";
+	server.listen(port, bindHost, () => {
+		log("INFO", "server", `Dashboard ready at ${localUrl}, log file: ${logFile}`);
+		console.error(`Dashboard ready at ${localUrl}`);
+		if (networkMode && localNetworkIp) console.error(`Network URL:      http://${localNetworkIp}:${port}`);
 		console.error(`Logs: ${logFile}`);
-		open$1(url).catch(() => {});
+		open$1(localUrl).catch(() => {});
 	});
 	function shutdown() {
 		console.error("\n[server] Shutting down...");

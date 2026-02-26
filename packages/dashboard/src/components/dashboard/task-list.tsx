@@ -52,10 +52,12 @@ export function TaskList({
 
           // Toggle: if done text exists but task not completed, mark as completed
           // We add a [x] prefix or remove it
+          // Determine current state from file content, not stale task.completed
+          const isCurrentlyChecked = /^\s*\[x\]/i.test(doneContent);
           let newDoneContent: string;
-          if (task.completed) {
+          if (isCurrentlyChecked) {
             // Uncheck: remove leading [x] marker
-            newDoneContent = doneContent.replace(/^\s*\[x\]\s*/, "");
+            newDoneContent = doneContent.replace(/^\s*\[x\]\s*/i, "");
           } else {
             // Check: add [x] marker at start
             newDoneContent = `[x] ${doneContent.trim()}`;
