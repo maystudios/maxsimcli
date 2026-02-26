@@ -1,3 +1,10 @@
+## [3.1.5](https://github.com/maystudios/maxsim/compare/v3.1.4...v3.1.5) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** align color scheme to website — blue accent, [#09090](https://github.com/maystudios/maxsim/issues/09090)b bg ([0c2803f](https://github.com/maystudios/maxsim/commit/0c2803fc0de2171171db71c91939e89e9fc11ac5)), closes [#09090b](https://github.com/maystudios/maxsim/issues/09090b) [#09090b](https://github.com/maystudios/maxsim/issues/09090b) [#111111](https://github.com/maystudios/maxsim/issues/111111) [#3b82f6](https://github.com/maystudios/maxsim/issues/3b82f6) [#e63946](https://github.com/maystudios/maxsim/issues/e63946) [#a1a1aa](https://github.com/maystudios/maxsim/issues/a1a1aa) [#777777](https://github.com/maystudios/maxsim/issues/777777) [#27272a](https://github.com/maystudios/maxsim/issues/27272a) [#2a2a2a](https://github.com/maystudios/maxsim/issues/2a2a2a) [#18181b](https://github.com/maystudios/maxsim/issues/18181b) [#161616](https://github.com/maystudios/maxsim/issues/161616)
+
 ## [3.1.4](https://github.com/maystudios/maxsim/compare/v3.1.3...v3.1.4) (2026-02-26)
 
 
