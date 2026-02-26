@@ -1,3 +1,10 @@
+## [3.0.2](https://github.com/maystudios/maxsim/compare/v3.0.1...v3.0.2) (2026-02-26)
+
+
+### Bug Fixes
+
+* **ci:** clear NODE_AUTH_TOKEN for npm ci to fix 403 on npm package download ([37fdec7](https://github.com/maystudios/maxsim/commit/37fdec7a161e093224164eee54671d01f5e3ebef))
+
 ## [3.0.1](https://github.com/maystudios/maxsim/compare/v3.0.0...v3.0.1) (2026-02-26)
 
 
