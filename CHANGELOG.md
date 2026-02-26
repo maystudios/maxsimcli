@@ -1,3 +1,10 @@
+## [3.5.1](https://github.com/maystudios/maxsim/compare/v3.5.0...v3.5.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **readme:** add early alpha notice at top of README ([06a03e2](https://github.com/maystudios/maxsim/commit/06a03e235a73d70896b1c599a970566ff0aa1a97))
+
 # [3.5.0](https://github.com/maystudios/maxsim/compare/v3.4.0...v3.5.0) (2026-02-26)
 
 
