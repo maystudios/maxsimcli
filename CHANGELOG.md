@@ -1,3 +1,10 @@
+## [3.1.3](https://github.com/maystudios/maxsim/compare/v3.1.2...v3.1.3) (2026-02-26)
+
+
+### Bug Fixes
+
+* **deps:** replace custom utility code with established npm libraries ([3f3c00a](https://github.com/maystudios/maxsim/commit/3f3c00a041e93a0c092b46f1788ac51233974b3d))
+
 ## [3.1.2](https://github.com/maystudios/maxsim/compare/v3.1.1...v3.1.2) (2026-02-26)
 
 
