@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#09090b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f0f14;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#6366f1;stop-opacity:0.1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="20" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softglow">
+      <feGaussianBlur stdDeviation="40" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)" />
+
+  <!-- Grid lines -->
+  <g stroke="#ffffff" stroke-opacity="0.03" stroke-width="1">
+    <line x1="0" y1="105" x2="1200" y2="105" />
+    <line x1="0" y1="210" x2="1200" y2="210" />
+    <line x1="0" y1="315" x2="1200" y2="315" />
+    <line x1="0" y1="420" x2="1200" y2="420" />
+    <line x1="0" y1="525" x2="1200" y2="525" />
+    <line x1="150" y1="0" x2="150" y2="630" />
+    <line x1="300" y1="0" x2="300" y2="630" />
+    <line x1="450" y1="0" x2="450" y2="630" />
+    <line x1="600" y1="0" x2="600" y2="630" />
+    <line x1="750" y1="0" x2="750" y2="630" />
+    <line x1="900" y1="0" x2="900" y2="630" />
+    <line x1="1050" y1="0" x2="1050" y2="630" />
+  </g>
+
+  <!-- Blue glow orb -->
+  <ellipse cx="600" cy="280" rx="320" ry="180" fill="url(#glowGrad)" filter="url(#softglow)" />
+
+  <!-- Border -->
+  <rect x="40" y="40" width="1120" height="550" rx="16" fill="none" stroke="#3b82f6" stroke-opacity="0.15" stroke-width="1" />
+
+  <!-- Top left badge -->
+  <rect x="80" y="80" width="140" height="28" rx="14" fill="#1e40af" fill-opacity="0.4" stroke="#3b82f6" stroke-opacity="0.4" stroke-width="1" />
+  <text x="150" y="99" font-family="monospace" font-size="12" fill="#93c5fd" text-anchor="middle" font-weight="500">npx maxsimcli</text>
+
+  <!-- Main title -->
+  <text x="600" y="270" font-family="system-ui, -apple-system, sans-serif" font-size="120" fill="#ffffff" text-anchor="middle" font-weight="800" filter="url(#glow)" letter-spacing="-4">MAXSIM</text>
+
+  <!-- Blue underline accent -->
+  <rect x="440" y="290" width="320" height="3" rx="2" fill="#3b82f6" fill-opacity="0.8" />
+
+  <!-- Subtitle -->
+  <text x="600" y="355" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#94a3b8" text-anchor="middle" font-weight="400" letter-spacing="0.5">Meta-Prompting &amp; Context Engineering</text>
+  <text x="600" y="390" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#64748b" text-anchor="middle" font-weight="400">for AI Coding Agents</text>
+
+  <!-- Feature pills -->
+  <g transform="translate(600, 460)">
+    <!-- Claude Code pill -->
+    <rect x="-340" y="-18" width="148" height="36" rx="18" fill="#1e293b" stroke="#334155" stroke-width="1" />
+    <text x="-266" y="5" font-family="monospace" font-size="13" fill="#94a3b8" text-anchor="middle">Claude Code</text>
+
+    <!-- OpenCode pill -->
+    <rect x="-176" y="-18" width="120" height="36" rx="18" fill="#1e293b" stroke="#334155" stroke-width="1" />
+    <text x="-116" y="5" font-family="monospace" font-size="13" fill="#94a3b8" text-anchor="middle">OpenCode</text>
+
+    <!-- Gemini pill -->
+    <rect x="-40" y="-18" width="116" height="36" rx="18" fill="#1e293b" stroke="#334155" stroke-width="1" />
+    <text x="18" y="5" font-family="monospace" font-size="13" fill="#94a3b8" text-anchor="middle">Gemini CLI</text>
+
+    <!-- Codex pill -->
+    <rect x="92" y="-18" width="90" height="36" rx="18" fill="#1e293b" stroke="#334155" stroke-width="1" />
+    <text x="137" y="5" font-family="monospace" font-size="13" fill="#94a3b8" text-anchor="middle">Codex</text>
+
+    <!-- Free pill -->
+    <rect x="198" y="-18" width="116" height="36" rx="18" fill="#172554" stroke="#1d4ed8" stroke-width="1" />
+    <text x="256" y="5" font-family="monospace" font-size="13" fill="#60a5fa" text-anchor="middle">Free &amp; Open</text>
+  </g>
+
+  <!-- Bottom domain -->
+  <text x="600" y="560" font-family="monospace" font-size="16" fill="#475569" text-anchor="middle">maxsimcli.dev</text>
+</svg>

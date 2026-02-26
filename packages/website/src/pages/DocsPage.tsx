@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, Copy, Check, ChevronRight, Github } from "lucide-react";
 import { Footer } from "../components/sections/Footer";
@@ -1571,6 +1572,18 @@ export default function DocsPage() {
   }, []);
 
   return (
+    <>
+      <Helmet>
+        <title>Documentation — MAXSIM</title>
+        <meta name="description" content="Complete documentation for MAXSIM: installation, commands, workflows, phases, milestones, and the planning directory structure. Get started with AI-powered spec-driven development." />
+        <link rel="canonical" href="https://maxsimcli.dev/docs" />
+        <meta property="og:url" content="https://maxsimcli.dev/docs" />
+        <meta property="og:title" content="Documentation — MAXSIM" />
+        <meta property="og:description" content="Complete documentation for MAXSIM: installation, commands, workflows, phases, milestones, and the planning directory structure." />
+        <meta name="twitter:url" content="https://maxsimcli.dev/docs" />
+        <meta name="twitter:title" content="Documentation — MAXSIM" />
+        <meta name="twitter:description" content="Complete documentation for MAXSIM: installation, commands, workflows, phases, milestones, and the planning directory structure." />
+      </Helmet>
     <div className="min-h-screen bg-background text-foreground font-sans antialiased">
       <DocsNavbar
         onMobileMenuToggle={() => setMobileOpen((v) => !v)}
@@ -1640,5 +1653,6 @@ export default function DocsPage() {
 
       <Footer />
     </div>
+    </>
   );
 }

@@ -14,6 +14,7 @@
     "motion": "^12.34.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-helmet-async": "^2.0.5",
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
@@ -24,6 +25,7 @@
     "@vitejs/plugin-react": "^5.1.1",
     "tailwindcss": "^4.2.1",
     "typescript": "~5.9.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vite-plugin-sitemap": "^0.8.2"
   }
 }
