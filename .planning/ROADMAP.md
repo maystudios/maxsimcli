@@ -234,7 +234,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 27-01-PLAN.md — Add e2e job to publish.yml, gate release, fix agent count assertion
+- [x] 27-01-PLAN.md — Add e2e job to publish.yml, gate release, fix agent count assertion
 
 ### Phase 28: Requirement Reconciliation & Doc Cleanup
 
