@@ -1,3 +1,10 @@
+# [3.4.0](https://github.com/maystudios/maxsim/compare/v3.3.1...v3.4.0) (2026-02-26)
+
+
+### Features
+
+* **agents:** add self-improvement loop to MAXSIM agents ([48e12c3](https://github.com/maystudios/maxsim/commit/48e12c36a56013a880ca31524f47250aedcbb4bc))
+
 ## [3.3.1](https://github.com/maystudios/maxsim/compare/v3.3.0...v3.3.1) (2026-02-26)
 
 
