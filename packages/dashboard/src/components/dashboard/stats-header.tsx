@@ -54,28 +54,32 @@ export function StatsHeader({ roadmap, state, todos }: StatsHeaderProps) {
       </div>
 
       {/* Stats */}
-      <div className="flex items-end gap-10">
-        <div>
-          <span className="font-mono text-3xl font-bold tabular-nums text-foreground leading-none">
-            {progressPercent}
-          </span>
-          <span className="text-sm text-muted-foreground ml-1">%</span>
-        </div>
-
-        <div className="border-l border-border pl-10">
-          <span className="text-xs uppercase tracking-widest text-muted-foreground block mb-1">
-            Current
-          </span>
-          <div className="flex items-baseline gap-2">
-            <span className="font-mono text-sm font-bold text-accent">
-              {currentPhaseNum}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-10">
+        {/* Left group: progress % + current phase */}
+        <div className="flex items-end gap-4 sm:gap-10">
+          <div>
+            <span className="font-mono text-3xl font-bold tabular-nums text-foreground leading-none">
+              {progressPercent}
             </span>
-            <span className="text-sm text-foreground/80">{currentPhaseName}</span>
+            <span className="text-sm text-muted-foreground ml-1">%</span>
+          </div>
+
+          <div className="border-l border-border pl-4 sm:pl-10">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground block mb-1">
+              Current
+            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="font-mono text-sm font-bold text-accent">
+                {currentPhaseNum}
+              </span>
+              <span className="truncate text-sm text-foreground/80 max-w-[140px] sm:max-w-none">{currentPhaseName}</span>
+            </div>
           </div>
         </div>
 
-        <div className="ml-auto flex items-end gap-8">
-          <div className="text-right">
+        {/* Right group: blockers + todos */}
+        <div className="flex items-end gap-6 sm:ml-auto sm:gap-8">
+          <div>
             <span className="text-xs uppercase tracking-widest text-muted-foreground block mb-1">
               Blockers
             </span>
@@ -88,7 +92,7 @@ export function StatsHeader({ roadmap, state, todos }: StatsHeaderProps) {
             </span>
           </div>
 
-          <div className="text-right">
+          <div>
             <span className="text-xs uppercase tracking-widest text-muted-foreground block mb-1">
               Todos
             </span>

@@ -74,6 +74,7 @@ function DashboardApp() {
   const { roadmap, state, todos, loading, error } = useDashboardData();
   const [activeView, setActiveView] = useState<ActiveView>("overview");
   const [activePhaseId, setActivePhaseId] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { splitMode, toggleSplit } = useTerminalLayout();
   /** Track the last non-terminal view for split mode dashboard content */
   const lastDashboardViewRef = useRef<{ view: ActiveView; phaseId: string | null }>({ view: "overview", phaseId: null });
@@ -86,6 +87,7 @@ function DashboardApp() {
     if (view === "phase" && id) {
       setActivePhaseId(id);
     }
+    setMobileMenuOpen(false);
   }, []);
 
   const handlePhaseClick = useCallback((phaseNumber: string) => {
@@ -192,6 +194,9 @@ function DashboardApp() {
 
   return (
     <AppShell
+      mobileMenuOpen={mobileMenuOpen}
+      onMobileMenuToggle={() => setMobileMenuOpen((v) => !v)}
+      onMobileMenuClose={() => setMobileMenuOpen(false)}
       sidebar={
         <Sidebar
           activeView={activeView}
@@ -205,8 +210,8 @@ function DashboardApp() {
         style={{ display: isTerminalView && !splitMode ? "none" : "block" }}
         className={
           isTerminalView && splitMode
-            ? "h-1/2 min-h-0 overflow-auto border-b border-border p-6"
-            : "flex-1 overflow-y-auto p-6"
+            ? "h-1/2 min-h-0 overflow-auto border-b border-border p-4 sm:p-6"
+            : "flex-1 overflow-y-auto p-4 sm:p-6"
         }
       >
         {renderContent()}
