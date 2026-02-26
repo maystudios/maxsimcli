@@ -178,9 +178,27 @@ const commands: CommandDef[] = [
     example: `/maxsim:verify-work`,
   },
   {
+    name: "discuss-phase",
+    signature: "/maxsim:discuss-phase",
+    description: "Gather phase context through adaptive questioning before planning. Helps clarify requirements and assumptions.",
+    example: `/maxsim:discuss-phase`,
+  },
+  {
+    name: "resume-work",
+    signature: "/maxsim:resume-work",
+    description: "Resume work from the previous session with full context restoration from STATE.md and phase files.",
+    example: `/maxsim:resume-work`,
+  },
+  {
+    name: "roadmap",
+    signature: "/maxsim:roadmap",
+    description: "Display the project roadmap with phase status icons, plan counts, and milestone summary.",
+    example: `/maxsim:roadmap`,
+  },
+  {
     name: "dashboard",
     signature: "npx maxsimcli dashboard",
-    description: "Launch the real-time web dashboard. View phase progress, todos, blockers, and an interactive terminal in your browser.",
+    description: "Launch the real-time web dashboard. View phase progress, todos, blockers, quick commands, and an interactive terminal in your browser.",
     example: `npx maxsimcli dashboard`,
   },
 ];
@@ -265,8 +283,9 @@ agents/*.md                # Specialized subagent prompts (11 agents)`}
       <div>
         <DocSubheading>Tools Layer</DocSubheading>
         <DocText>
-          maxsim-tools.cjs is the main CLI router — it dispatches to 11 lib modules for state management,
-          phase lifecycle, roadmap parsing, verification, and more.
+          cli.cjs is the main tools router — it dispatches to core modules for state management,
+          phase lifecycle, roadmap parsing, verification, and more. Large outputs are written to
+          a tmpfile and returned as @file:/path to prevent buffer overflow.
         </DocText>
       </div>
     </div>
@@ -304,9 +323,10 @@ function Configuration() {
         </DocText>
         <CodeBlock
           language="text"
-          code={`quality    → Opus for planners/executors, Sonnet for orchestrators
-balanced   → Sonnet for planners/executors, Haiku for orchestrators
-budget     → Haiku for everything`}
+          code={`quality       → Opus for planners/executors, Sonnet for orchestrators
+balanced      → Sonnet for planners/executors, Haiku for orchestrators
+budget        → Haiku for everything
+tokenburner   → Opus for everything (maximum quality, maximum cost)`}
         />
       </div>
 

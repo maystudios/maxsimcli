@@ -42,7 +42,7 @@ const features = [
     icon: LayoutDashboard,
     title: "Live Dashboard",
     description:
-      "Real-time web UI bundled inside the CLI. View phase progress, todos, blockers, and an interactive terminal — all in one browser tab.",
+      "Real-time web UI with phase tracking, quick command shortcuts, split-view terminal, and network QR access. Bundled inside the CLI — launch with one command.",
   },
 ];
 

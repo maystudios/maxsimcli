@@ -162,10 +162,22 @@ export function Footer() {
         </div>
 
         <div className="border-t border-border/40 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <p className="text-xs font-mono text-muted/40">
-            &copy; {new Date().getFullYear()} MayStudios — Built with care for the
-            AI development community
-          </p>
+          <div className="flex flex-col gap-1.5">
+            <p className="text-xs font-mono text-muted/40">
+              &copy; {new Date().getFullYear()} May Studios — Build with MAXSIM.
+            </p>
+            <p className="text-xs font-mono text-muted/30">
+              by{" "}
+              <a
+                href="https://sven-maibaum.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted/50 hover:text-muted transition-colors underline underline-offset-2"
+              >
+                Sven Maibaum
+              </a>
+            </p>
+          </div>
           <MovingBorderButton onClick={scrollToTop}>
             <ArrowUp size={13} strokeWidth={2} />
             Back to top

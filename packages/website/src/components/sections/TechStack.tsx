@@ -11,8 +11,8 @@ const toolchainStack = [
   { name: "TypeScript" },
   { name: "esbuild" },
   { name: "CJS Modules" },
-  { name: "pnpm" },
-  { name: "Nx" },
+  { name: "npm workspaces" },
+  { name: "tsdown" },
 ];
 
 const allItems = [...commandLayer, ...toolchainStack];
