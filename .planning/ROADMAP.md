@@ -212,11 +212,11 @@ Plans:
 **Plans:** 5/5 plans complete
 
 Plans:
-- [ ] 26-01-PLAN.md — Create 3 foundational skill files (tdd, systematic-debugging, verification-before-completion)
-- [ ] 26-02-PLAN.md — Create spec-reviewer and code-reviewer agent prompts for two-stage review
-- [ ] 26-03-PLAN.md — Enhance executor, verifier, debugger with anti-rationalization, evidence gates, two-stage review, skills
-- [ ] 26-04-PLAN.md — Enhance planner, researcher, plan-checker with anti-rationalization and skills
-- [ ] 26-05-PLAN.md — Install delivery: extend install.ts and copy-assets for skills directory
+- [x] 26-01-PLAN.md — Create 3 foundational skill files (tdd, systematic-debugging, verification-before-completion)
+- [x] 26-02-PLAN.md — Create spec-reviewer and code-reviewer agent prompts for two-stage review
+- [x] 26-03-PLAN.md — Enhance executor, verifier, debugger with anti-rationalization, evidence gates, two-stage review, skills
+- [x] 26-04-PLAN.md — Enhance planner, researcher, plan-checker with anti-rationalization and skills
+- [x] 26-05-PLAN.md — Install delivery: extend install.ts and copy-assets for skills directory
 
 ---
 
