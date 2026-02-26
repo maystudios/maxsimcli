@@ -9,10 +9,6 @@ interface PhaseDetailProps {
   onBack: () => void;
 }
 
-/**
- * Phase drill-down view with plan cards, context summary, and research status.
- * Supports inline editing via CodeMirror editor overlay.
- */
 export function PhaseDetail({ phaseId, onBack }: PhaseDetailProps) {
   const { plans, context, research, loading, error, refetch } =
     usePhaseDetail(phaseId);
@@ -20,51 +16,36 @@ export function PhaseDetail({ phaseId, onBack }: PhaseDetailProps) {
   const [editingPath, setEditingPath] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
 
-  // Extract phase name from first plan's frontmatter or phaseId
   const phaseName =
     plans.length > 0
       ? ((plans[0].frontmatter.phase as string) ?? phaseId)
       : phaseId;
 
-  const handleEdit = useCallback(
-    async (planPath: string) => {
-      // Fetch full plan content from API
-      try {
-        const pathAfterPlanning = planPath.replace(/^\.planning[\\/]/, "");
-        const segments = pathAfterPlanning.split(/[\\/]/);
-        const response = await fetch(`/api/plan/${segments.join("/")}`);
-
-        if (!response.ok) {
-          console.error("[phase-detail] Failed to fetch plan for editing");
-          return;
-        }
-
-        const data = (await response.json()) as { content: string };
-        setEditingContent(data.content);
-        setEditingPath(planPath);
-      } catch (err) {
-        console.error("[phase-detail] Error fetching plan:", err);
-      }
-    },
-    []
-  );
+  const handleEdit = useCallback(async (planPath: string) => {
+    try {
+      const pathAfterPlanning = planPath.replace(/^\.planning[\\/]/, "");
+      const segments = pathAfterPlanning.split(/[\\/]/);
+      const response = await fetch(`/api/plan/${segments.join("/")}`);
+      if (!response.ok) return;
+      const data = (await response.json()) as { content: string };
+      setEditingContent(data.content);
+      setEditingPath(planPath);
+    } catch (err) {
+      console.error("[phase-detail]", err);
+    }
+  }, []);
 
   const handleSave = useCallback(
     async (content: string) => {
       if (!editingPath) return;
-
       const pathAfterPlanning = editingPath.replace(/^\.planning[\\/]/, "");
       const segments = pathAfterPlanning.split(/[\\/]/);
-
       const response = await fetch(`/api/plan/${segments.join("/")}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content }),
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to save plan");
-      }
+      if (!response.ok) throw new Error("Failed to save plan");
     },
     [editingPath]
   );
@@ -77,18 +58,17 @@ export function PhaseDetail({ phaseId, onBack }: PhaseDetailProps) {
 
   return (
     <div className="space-y-6">
-      {/* Back button */}
+      {/* Back */}
       <button
         type="button"
         onClick={onBack}
         className={cn(
-          "flex items-center gap-2 text-sm text-muted-foreground",
-          "hover:text-foreground transition-colors",
-          "focus:outline-none focus:ring-2 focus:ring-accent/50 rounded-md px-2 py-1"
+          "flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground",
+          "hover:text-foreground transition-colors"
         )}
       >
         <svg
-          className="w-4 h-4"
+          className="w-3 h-3"
           viewBox="0 0 16 16"
           fill="none"
           stroke="currentColor"
@@ -96,85 +76,78 @@ export function PhaseDetail({ phaseId, onBack }: PhaseDetailProps) {
         >
           <path d="M10 3L5 8l5 5" />
         </svg>
-        Back to overview
+        Overview
       </button>
 
       {/* Phase header */}
-      <div>
-        <h2 className="text-2xl font-semibold tracking-tight">
-          <span className="text-accent font-mono">Phase {phaseId}</span>
-          <span className="mx-2 text-muted-foreground">-</span>
-          <span>{phaseName}</span>
-        </h2>
+      <div className="border-b border-border pb-4">
+        <div className="flex items-baseline gap-3 mb-2">
+          <span className="font-mono text-xs font-bold text-accent uppercase tracking-widest">
+            Phase {phaseId}
+          </span>
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">
+            {phaseName}
+          </h2>
+        </div>
 
-        {/* Context / Research indicators */}
-        <div className="flex gap-2 mt-2">
+        <div className="flex gap-2">
           {context && (
-            <span className="text-xs px-2 py-0.5 rounded-sm bg-success/20 text-success font-mono">
-              context available
+            <span className="font-mono text-[9px] uppercase tracking-widest px-2 py-0.5 border border-success/30 text-success">
+              Context
             </span>
           )}
           {research && (
-            <span className="text-xs px-2 py-0.5 rounded-sm bg-success/20 text-success font-mono">
-              research available
+            <span className="font-mono text-[9px] uppercase tracking-widest px-2 py-0.5 border border-success/30 text-success">
+              Research
             </span>
           )}
           {!context && !research && !loading && (
-            <span className="text-xs px-2 py-0.5 rounded-sm bg-muted text-muted-foreground font-mono">
-              no context or research
+            <span className="font-mono text-[9px] uppercase tracking-widest px-2 py-0.5 border border-border text-muted-foreground">
+              No context
             </span>
           )}
         </div>
       </div>
 
-      {/* Error state */}
+      {/* Error */}
       {error && (
-        <div className="p-4 rounded-lg border border-danger/50 bg-danger/10 text-danger text-sm">
+        <div className="border border-danger/30 p-4 text-danger text-sm font-mono text-xs">
           {error}
         </div>
       )}
 
-      {/* Loading state - skeleton cards */}
+      {/* Loading skeleton */}
       {loading && plans.length === 0 && (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="bg-card border border-border rounded-lg p-4 animate-pulse"
-            >
-              <div className="h-6 w-32 bg-muted rounded mb-3" />
-              <div className="h-4 w-3/4 bg-muted rounded mb-2" />
-              <div className="h-4 w-1/2 bg-muted rounded mb-3" />
-              <div className="space-y-2">
-                <div className="h-3 w-full bg-muted rounded" />
-                <div className="h-3 w-5/6 bg-muted rounded" />
-              </div>
+            <div key={i} className="border border-border p-4 animate-pulse">
+              <div className="h-4 w-24 bg-muted mb-3" />
+              <div className="h-3 w-3/4 bg-muted mb-2" />
+              <div className="h-3 w-1/2 bg-muted" />
             </div>
           ))}
         </div>
       )}
 
-      {/* Empty state */}
+      {/* Empty */}
       {!loading && !error && plans.length === 0 && (
-        <div className="p-8 text-center text-muted-foreground border border-border rounded-lg bg-card">
-          <p className="text-sm">
-            No plans yet -- run{" "}
-            <code className="font-mono text-accent">/maxsim:plan-phase</code> to
-            create plans
+        <div className="border border-border p-8 text-center">
+          <p className="font-mono text-xs text-muted-foreground">
+            No plans yet — run{" "}
+            <code className="text-accent">/maxsim:plan-phase</code>
           </p>
         </div>
       )}
 
-      {/* Plan cards */}
+      {/* Plans */}
       {plans.length > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {plans.map((plan) => (
             <PlanCard key={plan.path} plan={plan} onEdit={handleEdit} />
           ))}
         </div>
       )}
 
-      {/* Editor overlay */}
       {editingPath && (
         <PlanEditor
           initialContent={editingContent}

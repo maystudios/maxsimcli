@@ -13,39 +13,6 @@ interface PhaseProgressProps {
   onToggleComplete?: (phaseNumber: string, checked: boolean) => void;
 }
 
-/** Status icon for phase completion state */
-function StatusIcon({ status }: { status: DashboardPhase["diskStatus"] }) {
-  switch (status) {
-    case "complete":
-      return (
-        <svg
-          className="h-4 w-4 text-success"
-          viewBox="0 0 16 16"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M3 8.5l3.5 3.5L13 4" />
-        </svg>
-      );
-    case "partial":
-      return (
-        <span className="inline-block h-2.5 w-2.5 rounded-full border-2 border-accent bg-transparent" />
-      );
-    case "planned":
-    case "researched":
-    case "discussed":
-      return (
-        <span className="inline-block h-2.5 w-2.5 rounded-full border-2 border-muted-foreground bg-transparent" />
-      );
-    default:
-      return (
-        <span className="inline-block h-2.5 w-2.5 rounded-full bg-muted" />
-      );
-  }
-}
-
-/** Color class for the progress bar fill based on status */
 function barColor(status: DashboardPhase["diskStatus"]): string {
   switch (status) {
     case "complete":
@@ -57,9 +24,6 @@ function barColor(status: DashboardPhase["diskStatus"]): string {
   }
 }
 
-/**
- * Individual phase card with animated progress bar, plan count, and status.
- */
 export function PhaseProgress({
   phaseName,
   phaseNumber,
@@ -77,13 +41,12 @@ export function PhaseProgress({
     <button
       type="button"
       onClick={() => onClick(phaseNumber)}
-      className={`group flex w-full flex-col gap-2 rounded-sm px-4 py-3 text-left transition-colors ${
-        isCurrent
-          ? "border-l-4 border-l-accent bg-card-hover"
-          : "border-l-4 border-l-transparent hover:bg-card-hover"
+      className={`group w-full text-left transition-colors border-b border-border ${
+        isCurrent ? "bg-card-hover border-l-2 border-l-accent" : "hover:bg-card-hover border-l-2 border-l-transparent"
       }`}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 px-4 py-3">
+        {/* Checkbox / status marker */}
         {onToggleComplete ? (
           <input
             type="checkbox"
@@ -93,28 +56,34 @@ export function PhaseProgress({
               onToggleComplete(phaseNumber, e.target.checked);
             }}
             onClick={(e) => e.stopPropagation()}
-            className="h-3.5 w-3.5 shrink-0 cursor-pointer accent-accent"
+            className="h-3 w-3 shrink-0 cursor-pointer accent-accent"
             title={roadmapComplete ? "Mark incomplete" : "Mark complete"}
           />
         ) : (
-          <StatusIcon status={status} />
+          <span
+            className={`inline-block h-1.5 w-1.5 shrink-0 ${barColor(status)}`}
+          />
         )}
+
         <span
-          className={`font-mono text-sm font-semibold ${
+          className={`font-mono text-xs font-bold tabular-nums ${
             isCurrent ? "text-accent" : "text-muted-foreground"
           }`}
         >
           {phaseNumber}
         </span>
-        <span className="truncate text-sm text-foreground">{phaseName}</span>
-        <span className="ml-auto shrink-0 font-mono text-xs text-muted-foreground">
+
+        <span className="truncate text-xs text-foreground/90">{phaseName}</span>
+
+        <span className="ml-auto shrink-0 font-mono text-[10px] text-muted-foreground tabular-nums">
           {completedPlans}/{totalPlans}
         </span>
       </div>
 
-      <div className="h-1.5 w-full overflow-hidden rounded-sm bg-muted">
+      {/* Progress bar — 1px height, flat */}
+      <div className="h-px w-full bg-muted">
         <motion.div
-          className={`h-full rounded-sm ${barColor(status)}`}
+          className={`h-full ${barColor(status)}`}
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
           transition={{ duration: 0.5, ease: "easeOut" }}

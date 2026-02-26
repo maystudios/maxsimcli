@@ -19,33 +19,33 @@ function LoadingSkeleton() {
   return (
     <div className="flex flex-col gap-6">
       {/* Stats header skeleton */}
-      <div className="flex flex-col gap-4 border-b border-border pb-5">
-        <div className="h-3 w-40 animate-pulse rounded-sm bg-muted" />
-        <div className="h-2 w-full animate-pulse rounded-sm bg-muted" />
-        <div className="flex gap-8">
-          <div className="h-8 w-20 animate-pulse rounded-sm bg-muted" />
-          <div className="h-8 w-32 animate-pulse rounded-sm bg-muted" />
-          <div className="ml-auto flex gap-6">
-            <div className="h-6 w-24 animate-pulse rounded-sm bg-muted" />
-            <div className="h-6 w-20 animate-pulse rounded-sm bg-muted" />
+      <div className="flex flex-col gap-4 border-b border-border pb-6">
+        <div className="h-2 w-32 animate-pulse bg-muted" />
+        <div className="h-px w-full animate-pulse bg-muted" />
+        <div className="flex gap-10">
+          <div className="h-8 w-16 animate-pulse bg-muted" />
+          <div className="h-8 w-40 animate-pulse bg-muted" />
+          <div className="ml-auto flex gap-8">
+            <div className="h-6 w-12 animate-pulse bg-muted" />
+            <div className="h-6 w-12 animate-pulse bg-muted" />
           </div>
         </div>
       </div>
 
       {/* Phase list skeleton */}
-      <div className="flex flex-col gap-3">
-        <div className="flex justify-between px-4">
-          <div className="h-3 w-16 animate-pulse rounded-sm bg-muted" />
-          <div className="h-3 w-6 animate-pulse rounded-sm bg-muted" />
+      <div className="flex flex-col">
+        <div className="flex justify-between px-4 pb-3">
+          <div className="h-2 w-12 animate-pulse bg-muted" />
+          <div className="h-2 w-4 animate-pulse bg-muted" />
         </div>
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="flex flex-col gap-2 px-4 py-3">
-            <div className="flex gap-3">
-              <div className="h-4 w-4 animate-pulse rounded-full bg-muted" />
-              <div className="h-4 w-8 animate-pulse rounded-sm bg-muted" />
-              <div className="h-4 w-40 animate-pulse rounded-sm bg-muted" />
+          <div key={i} className="border-b border-border">
+            <div className="flex items-center gap-3 px-4 py-3">
+              <div className="h-1.5 w-1.5 animate-pulse bg-muted" />
+              <div className="h-3 w-6 animate-pulse bg-muted" />
+              <div className="h-3 w-36 animate-pulse bg-muted" />
             </div>
-            <div className="h-1.5 w-full animate-pulse rounded-sm bg-muted" />
+            <div className="h-px w-full animate-pulse bg-muted" />
           </div>
         ))}
       </div>
@@ -61,7 +61,7 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
       <button
         type="button"
         onClick={onRetry}
-        className="rounded-sm bg-accent px-4 py-2 font-mono text-xs text-foreground transition-colors hover:bg-accent-glow"
+        className="border border-accent bg-accent/10 px-4 py-2 font-mono text-xs uppercase tracking-widest text-accent transition-colors hover:bg-accent hover:text-foreground"
       >
         Retry
       </button>

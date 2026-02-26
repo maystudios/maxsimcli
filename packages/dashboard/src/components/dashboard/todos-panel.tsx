@@ -89,7 +89,7 @@ export function TodosPanel() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="font-mono text-lg font-semibold tracking-tight text-foreground">
+        <h2 className="font-mono text-xs uppercase tracking-widest text-foreground">
           Todos
         </h2>
         <span className="font-mono text-xs text-muted-foreground">
@@ -107,15 +107,15 @@ export function TodosPanel() {
             if (e.key === "Enter" && !submitting) handleAddTodo();
           }}
           placeholder="Add a new todo..."
-          className="flex-1 rounded-sm border border-border bg-card px-3 py-2 font-mono text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none"
+          className="flex-1 border border-border bg-card px-3 py-2 font-mono text-xs text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none"
         />
         <button
           type="button"
           onClick={handleAddTodo}
           disabled={submitting || !newTodoText.trim()}
           className={cn(
-            "rounded-sm bg-accent px-4 py-2 font-mono text-xs font-semibold text-foreground transition-colors",
-            "hover:bg-accent-glow disabled:opacity-40 disabled:cursor-not-allowed"
+            "bg-accent px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-foreground transition-colors",
+            "hover:opacity-80 disabled:opacity-30 disabled:cursor-not-allowed"
           )}
         >
           Add
@@ -124,18 +124,18 @@ export function TodosPanel() {
 
       {/* Error */}
       {error && (
-        <div className="rounded-sm border border-danger/50 bg-danger/10 px-3 py-2 text-sm text-danger">
+        <div className="border border-danger/30 px-3 py-2 font-mono text-xs text-danger">
           {error}
         </div>
       )}
 
       {/* Loading skeleton */}
       {loading && (
-        <div className="space-y-2">
+        <div className="space-y-px">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center gap-3 rounded-sm bg-card px-4 py-3">
-              <div className="h-4 w-4 animate-pulse rounded-sm bg-muted" />
-              <div className="h-4 w-48 animate-pulse rounded-sm bg-muted" />
+            <div key={i} className="flex items-center gap-3 bg-card px-4 py-3">
+              <div className="h-3 w-3 animate-pulse bg-muted" />
+              <div className="h-3 w-48 animate-pulse bg-muted" />
             </div>
           ))}
         </div>
@@ -154,9 +154,9 @@ export function TodosPanel() {
                 key={todo.file}
                 type="button"
                 onClick={() => handleToggle(todo.file, true)}
-                className="group flex w-full items-center gap-3 rounded-sm px-4 py-2.5 text-left transition-colors hover:bg-card-hover"
+                className="group flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-card-hover border-b border-border"
               >
-                <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border border-muted-foreground transition-colors group-hover:border-accent">
+                <span className="inline-flex h-3 w-3 shrink-0 items-center justify-center border border-muted-foreground transition-colors group-hover:border-accent">
                   {/* empty checkbox */}
                 </span>
                 <span className="text-sm text-foreground">{todo.text}</span>

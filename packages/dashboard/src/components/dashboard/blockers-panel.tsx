@@ -69,7 +69,7 @@ export function BlockersPanel() {
     <div className="space-y-6" key={refreshKey}>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="font-mono text-lg font-semibold tracking-tight text-foreground">
+        <h2 className="font-mono text-xs uppercase tracking-widest text-foreground">
           Blockers
         </h2>
         <span
@@ -86,24 +86,24 @@ export function BlockersPanel() {
 
       {/* Error */}
       {error && (
-        <div className="rounded-sm border border-danger/50 bg-danger/10 px-3 py-2 text-sm text-danger">
+        <div className="border border-danger/30 px-3 py-2 font-mono text-xs text-danger">
           {error}
         </div>
       )}
 
       {/* Active blockers */}
       {active.length === 0 ? (
-        <div className="rounded-sm border border-success/30 bg-success/5 px-4 py-6 text-center">
-          <p className="text-sm text-success">No active blockers</p>
+        <div className="border border-success/20 px-4 py-6 text-center">
+          <p className="font-mono text-xs text-success">No active blockers</p>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="border border-border divide-y divide-border">
           {active.map((blocker) => (
             <div
               key={blocker.text}
-              className="flex items-start gap-3 rounded-sm border border-border bg-card px-4 py-3"
+              className="flex items-start gap-3 bg-card px-4 py-3"
             >
-              <span className="mt-1 inline-block h-2 w-2 shrink-0 rounded-full bg-danger" />
+              <span className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 bg-danger" />
               <div className="flex-1">
                 <p className="text-sm text-foreground">{blocker.text}</p>
               </div>
@@ -112,9 +112,9 @@ export function BlockersPanel() {
                 onClick={() => handleResolve(blocker.text)}
                 disabled={resolving === blocker.text}
                 className={cn(
-                  "shrink-0 rounded-sm px-3 py-1 font-mono text-xs transition-colors",
-                  "bg-success/20 text-success hover:bg-success/30",
-                  "disabled:opacity-40 disabled:cursor-not-allowed"
+                  "shrink-0 border border-success/30 px-3 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors",
+                  "text-success hover:bg-success/10",
+                  "disabled:opacity-30 disabled:cursor-not-allowed"
                 )}
               >
                 {resolving === blocker.text ? "..." : "Resolve"}
@@ -154,7 +154,7 @@ export function BlockersPanel() {
                   key={blocker.text}
                   className="flex items-center gap-3 rounded-sm px-4 py-2"
                 >
-                  <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-muted" />
+                  <span className="inline-block h-1.5 w-1.5 shrink-0 bg-muted" />
                   <p className="text-sm text-muted-foreground line-through">
                     {blocker.text}
                   </p>

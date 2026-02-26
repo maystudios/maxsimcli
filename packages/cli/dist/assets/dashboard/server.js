@@ -48766,12 +48766,51 @@ var Git = require_git();
 init_git_response_error();
 
 //#endregion
+//#region ../../node_modules/slugify/slugify.js
+var require_slugify = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function(name, root, factory) {
+		if (typeof exports === "object") {
+			module.exports = factory();
+			module.exports["default"] = factory();
+		} else if (typeof define === "function" && define.amd) define(factory);
+		else root[name] = factory();
+	})("slugify", exports, function() {
+		var charMap = JSON.parse("{\"$\":\"dollar\",\"%\":\"percent\",\"&\":\"and\",\"<\":\"less\",\">\":\"greater\",\"|\":\"or\",\"¢\":\"cent\",\"£\":\"pound\",\"¤\":\"currency\",\"¥\":\"yen\",\"©\":\"(c)\",\"ª\":\"a\",\"®\":\"(r)\",\"º\":\"o\",\"À\":\"A\",\"Á\":\"A\",\"Â\":\"A\",\"Ã\":\"A\",\"Ä\":\"A\",\"Å\":\"A\",\"Æ\":\"AE\",\"Ç\":\"C\",\"È\":\"E\",\"É\":\"E\",\"Ê\":\"E\",\"Ë\":\"E\",\"Ì\":\"I\",\"Í\":\"I\",\"Î\":\"I\",\"Ï\":\"I\",\"Ð\":\"D\",\"Ñ\":\"N\",\"Ò\":\"O\",\"Ó\":\"O\",\"Ô\":\"O\",\"Õ\":\"O\",\"Ö\":\"O\",\"Ø\":\"O\",\"Ù\":\"U\",\"Ú\":\"U\",\"Û\":\"U\",\"Ü\":\"U\",\"Ý\":\"Y\",\"Þ\":\"TH\",\"ß\":\"ss\",\"à\":\"a\",\"á\":\"a\",\"â\":\"a\",\"ã\":\"a\",\"ä\":\"a\",\"å\":\"a\",\"æ\":\"ae\",\"ç\":\"c\",\"è\":\"e\",\"é\":\"e\",\"ê\":\"e\",\"ë\":\"e\",\"ì\":\"i\",\"í\":\"i\",\"î\":\"i\",\"ï\":\"i\",\"ð\":\"d\",\"ñ\":\"n\",\"ò\":\"o\",\"ó\":\"o\",\"ô\":\"o\",\"õ\":\"o\",\"ö\":\"o\",\"ø\":\"o\",\"ù\":\"u\",\"ú\":\"u\",\"û\":\"u\",\"ü\":\"u\",\"ý\":\"y\",\"þ\":\"th\",\"ÿ\":\"y\",\"Ā\":\"A\",\"ā\":\"a\",\"Ă\":\"A\",\"ă\":\"a\",\"Ą\":\"A\",\"ą\":\"a\",\"Ć\":\"C\",\"ć\":\"c\",\"Č\":\"C\",\"č\":\"c\",\"Ď\":\"D\",\"ď\":\"d\",\"Đ\":\"DJ\",\"đ\":\"dj\",\"Ē\":\"E\",\"ē\":\"e\",\"Ė\":\"E\",\"ė\":\"e\",\"Ę\":\"e\",\"ę\":\"e\",\"Ě\":\"E\",\"ě\":\"e\",\"Ğ\":\"G\",\"ğ\":\"g\",\"Ģ\":\"G\",\"ģ\":\"g\",\"Ĩ\":\"I\",\"ĩ\":\"i\",\"Ī\":\"i\",\"ī\":\"i\",\"Į\":\"I\",\"į\":\"i\",\"İ\":\"I\",\"ı\":\"i\",\"Ķ\":\"k\",\"ķ\":\"k\",\"Ļ\":\"L\",\"ļ\":\"l\",\"Ľ\":\"L\",\"ľ\":\"l\",\"Ł\":\"L\",\"ł\":\"l\",\"Ń\":\"N\",\"ń\":\"n\",\"Ņ\":\"N\",\"ņ\":\"n\",\"Ň\":\"N\",\"ň\":\"n\",\"Ō\":\"O\",\"ō\":\"o\",\"Ő\":\"O\",\"ő\":\"o\",\"Œ\":\"OE\",\"œ\":\"oe\",\"Ŕ\":\"R\",\"ŕ\":\"r\",\"Ř\":\"R\",\"ř\":\"r\",\"Ś\":\"S\",\"ś\":\"s\",\"Ş\":\"S\",\"ş\":\"s\",\"Š\":\"S\",\"š\":\"s\",\"Ţ\":\"T\",\"ţ\":\"t\",\"Ť\":\"T\",\"ť\":\"t\",\"Ũ\":\"U\",\"ũ\":\"u\",\"Ū\":\"u\",\"ū\":\"u\",\"Ů\":\"U\",\"ů\":\"u\",\"Ű\":\"U\",\"ű\":\"u\",\"Ų\":\"U\",\"ų\":\"u\",\"Ŵ\":\"W\",\"ŵ\":\"w\",\"Ŷ\":\"Y\",\"ŷ\":\"y\",\"Ÿ\":\"Y\",\"Ź\":\"Z\",\"ź\":\"z\",\"Ż\":\"Z\",\"ż\":\"z\",\"Ž\":\"Z\",\"ž\":\"z\",\"Ə\":\"E\",\"ƒ\":\"f\",\"Ơ\":\"O\",\"ơ\":\"o\",\"Ư\":\"U\",\"ư\":\"u\",\"ǈ\":\"LJ\",\"ǉ\":\"lj\",\"ǋ\":\"NJ\",\"ǌ\":\"nj\",\"Ș\":\"S\",\"ș\":\"s\",\"Ț\":\"T\",\"ț\":\"t\",\"ə\":\"e\",\"˚\":\"o\",\"Ά\":\"A\",\"Έ\":\"E\",\"Ή\":\"H\",\"Ί\":\"I\",\"Ό\":\"O\",\"Ύ\":\"Y\",\"Ώ\":\"W\",\"ΐ\":\"i\",\"Α\":\"A\",\"Β\":\"B\",\"Γ\":\"G\",\"Δ\":\"D\",\"Ε\":\"E\",\"Ζ\":\"Z\",\"Η\":\"H\",\"Θ\":\"8\",\"Ι\":\"I\",\"Κ\":\"K\",\"Λ\":\"L\",\"Μ\":\"M\",\"Ν\":\"N\",\"Ξ\":\"3\",\"Ο\":\"O\",\"Π\":\"P\",\"Ρ\":\"R\",\"Σ\":\"S\",\"Τ\":\"T\",\"Υ\":\"Y\",\"Φ\":\"F\",\"Χ\":\"X\",\"Ψ\":\"PS\",\"Ω\":\"W\",\"Ϊ\":\"I\",\"Ϋ\":\"Y\",\"ά\":\"a\",\"έ\":\"e\",\"ή\":\"h\",\"ί\":\"i\",\"ΰ\":\"y\",\"α\":\"a\",\"β\":\"b\",\"γ\":\"g\",\"δ\":\"d\",\"ε\":\"e\",\"ζ\":\"z\",\"η\":\"h\",\"θ\":\"8\",\"ι\":\"i\",\"κ\":\"k\",\"λ\":\"l\",\"μ\":\"m\",\"ν\":\"n\",\"ξ\":\"3\",\"ο\":\"o\",\"π\":\"p\",\"ρ\":\"r\",\"ς\":\"s\",\"σ\":\"s\",\"τ\":\"t\",\"υ\":\"y\",\"φ\":\"f\",\"χ\":\"x\",\"ψ\":\"ps\",\"ω\":\"w\",\"ϊ\":\"i\",\"ϋ\":\"y\",\"ό\":\"o\",\"ύ\":\"y\",\"ώ\":\"w\",\"Ё\":\"Yo\",\"Ђ\":\"DJ\",\"Є\":\"Ye\",\"І\":\"I\",\"Ї\":\"Yi\",\"Ј\":\"J\",\"Љ\":\"LJ\",\"Њ\":\"NJ\",\"Ћ\":\"C\",\"Џ\":\"DZ\",\"А\":\"A\",\"Б\":\"B\",\"В\":\"V\",\"Г\":\"G\",\"Д\":\"D\",\"Е\":\"E\",\"Ж\":\"Zh\",\"З\":\"Z\",\"И\":\"I\",\"Й\":\"J\",\"К\":\"K\",\"Л\":\"L\",\"М\":\"M\",\"Н\":\"N\",\"О\":\"O\",\"П\":\"P\",\"Р\":\"R\",\"С\":\"S\",\"Т\":\"T\",\"У\":\"U\",\"Ф\":\"F\",\"Х\":\"H\",\"Ц\":\"C\",\"Ч\":\"Ch\",\"Ш\":\"Sh\",\"Щ\":\"Sh\",\"Ъ\":\"U\",\"Ы\":\"Y\",\"Ь\":\"\",\"Э\":\"E\",\"Ю\":\"Yu\",\"Я\":\"Ya\",\"а\":\"a\",\"б\":\"b\",\"в\":\"v\",\"г\":\"g\",\"д\":\"d\",\"е\":\"e\",\"ж\":\"zh\",\"з\":\"z\",\"и\":\"i\",\"й\":\"j\",\"к\":\"k\",\"л\":\"l\",\"м\":\"m\",\"н\":\"n\",\"о\":\"o\",\"п\":\"p\",\"р\":\"r\",\"с\":\"s\",\"т\":\"t\",\"у\":\"u\",\"ф\":\"f\",\"х\":\"h\",\"ц\":\"c\",\"ч\":\"ch\",\"ш\":\"sh\",\"щ\":\"sh\",\"ъ\":\"u\",\"ы\":\"y\",\"ь\":\"\",\"э\":\"e\",\"ю\":\"yu\",\"я\":\"ya\",\"ё\":\"yo\",\"ђ\":\"dj\",\"є\":\"ye\",\"і\":\"i\",\"ї\":\"yi\",\"ј\":\"j\",\"љ\":\"lj\",\"њ\":\"nj\",\"ћ\":\"c\",\"ѝ\":\"u\",\"џ\":\"dz\",\"Ґ\":\"G\",\"ґ\":\"g\",\"Ғ\":\"GH\",\"ғ\":\"gh\",\"Қ\":\"KH\",\"қ\":\"kh\",\"Ң\":\"NG\",\"ң\":\"ng\",\"Ү\":\"UE\",\"ү\":\"ue\",\"Ұ\":\"U\",\"ұ\":\"u\",\"Һ\":\"H\",\"һ\":\"h\",\"Ә\":\"AE\",\"ә\":\"ae\",\"Ө\":\"OE\",\"ө\":\"oe\",\"Ա\":\"A\",\"Բ\":\"B\",\"Գ\":\"G\",\"Դ\":\"D\",\"Ե\":\"E\",\"Զ\":\"Z\",\"Է\":\"E'\",\"Ը\":\"Y'\",\"Թ\":\"T'\",\"Ժ\":\"JH\",\"Ի\":\"I\",\"Լ\":\"L\",\"Խ\":\"X\",\"Ծ\":\"C'\",\"Կ\":\"K\",\"Հ\":\"H\",\"Ձ\":\"D'\",\"Ղ\":\"GH\",\"Ճ\":\"TW\",\"Մ\":\"M\",\"Յ\":\"Y\",\"Ն\":\"N\",\"Շ\":\"SH\",\"Չ\":\"CH\",\"Պ\":\"P\",\"Ջ\":\"J\",\"Ռ\":\"R'\",\"Ս\":\"S\",\"Վ\":\"V\",\"Տ\":\"T\",\"Ր\":\"R\",\"Ց\":\"C\",\"Փ\":\"P'\",\"Ք\":\"Q'\",\"Օ\":\"O''\",\"Ֆ\":\"F\",\"և\":\"EV\",\"ء\":\"a\",\"آ\":\"aa\",\"أ\":\"a\",\"ؤ\":\"u\",\"إ\":\"i\",\"ئ\":\"e\",\"ا\":\"a\",\"ب\":\"b\",\"ة\":\"h\",\"ت\":\"t\",\"ث\":\"th\",\"ج\":\"j\",\"ح\":\"h\",\"خ\":\"kh\",\"د\":\"d\",\"ذ\":\"th\",\"ر\":\"r\",\"ز\":\"z\",\"س\":\"s\",\"ش\":\"sh\",\"ص\":\"s\",\"ض\":\"dh\",\"ط\":\"t\",\"ظ\":\"z\",\"ع\":\"a\",\"غ\":\"gh\",\"ف\":\"f\",\"ق\":\"q\",\"ك\":\"k\",\"ل\":\"l\",\"م\":\"m\",\"ن\":\"n\",\"ه\":\"h\",\"و\":\"w\",\"ى\":\"a\",\"ي\":\"y\",\"ً\":\"an\",\"ٌ\":\"on\",\"ٍ\":\"en\",\"َ\":\"a\",\"ُ\":\"u\",\"ِ\":\"e\",\"ْ\":\"\",\"٠\":\"0\",\"١\":\"1\",\"٢\":\"2\",\"٣\":\"3\",\"٤\":\"4\",\"٥\":\"5\",\"٦\":\"6\",\"٧\":\"7\",\"٨\":\"8\",\"٩\":\"9\",\"پ\":\"p\",\"چ\":\"ch\",\"ژ\":\"zh\",\"ک\":\"k\",\"گ\":\"g\",\"ی\":\"y\",\"۰\":\"0\",\"۱\":\"1\",\"۲\":\"2\",\"۳\":\"3\",\"۴\":\"4\",\"۵\":\"5\",\"۶\":\"6\",\"۷\":\"7\",\"۸\":\"8\",\"۹\":\"9\",\"฿\":\"baht\",\"ა\":\"a\",\"ბ\":\"b\",\"გ\":\"g\",\"დ\":\"d\",\"ე\":\"e\",\"ვ\":\"v\",\"ზ\":\"z\",\"თ\":\"t\",\"ი\":\"i\",\"კ\":\"k\",\"ლ\":\"l\",\"მ\":\"m\",\"ნ\":\"n\",\"ო\":\"o\",\"პ\":\"p\",\"ჟ\":\"zh\",\"რ\":\"r\",\"ს\":\"s\",\"ტ\":\"t\",\"უ\":\"u\",\"ფ\":\"f\",\"ქ\":\"k\",\"ღ\":\"gh\",\"ყ\":\"q\",\"შ\":\"sh\",\"ჩ\":\"ch\",\"ც\":\"ts\",\"ძ\":\"dz\",\"წ\":\"ts\",\"ჭ\":\"ch\",\"ხ\":\"kh\",\"ჯ\":\"j\",\"ჰ\":\"h\",\"Ṣ\":\"S\",\"ṣ\":\"s\",\"Ẁ\":\"W\",\"ẁ\":\"w\",\"Ẃ\":\"W\",\"ẃ\":\"w\",\"Ẅ\":\"W\",\"ẅ\":\"w\",\"ẞ\":\"SS\",\"Ạ\":\"A\",\"ạ\":\"a\",\"Ả\":\"A\",\"ả\":\"a\",\"Ấ\":\"A\",\"ấ\":\"a\",\"Ầ\":\"A\",\"ầ\":\"a\",\"Ẩ\":\"A\",\"ẩ\":\"a\",\"Ẫ\":\"A\",\"ẫ\":\"a\",\"Ậ\":\"A\",\"ậ\":\"a\",\"Ắ\":\"A\",\"ắ\":\"a\",\"Ằ\":\"A\",\"ằ\":\"a\",\"Ẳ\":\"A\",\"ẳ\":\"a\",\"Ẵ\":\"A\",\"ẵ\":\"a\",\"Ặ\":\"A\",\"ặ\":\"a\",\"Ẹ\":\"E\",\"ẹ\":\"e\",\"Ẻ\":\"E\",\"ẻ\":\"e\",\"Ẽ\":\"E\",\"ẽ\":\"e\",\"Ế\":\"E\",\"ế\":\"e\",\"Ề\":\"E\",\"ề\":\"e\",\"Ể\":\"E\",\"ể\":\"e\",\"Ễ\":\"E\",\"ễ\":\"e\",\"Ệ\":\"E\",\"ệ\":\"e\",\"Ỉ\":\"I\",\"ỉ\":\"i\",\"Ị\":\"I\",\"ị\":\"i\",\"Ọ\":\"O\",\"ọ\":\"o\",\"Ỏ\":\"O\",\"ỏ\":\"o\",\"Ố\":\"O\",\"ố\":\"o\",\"Ồ\":\"O\",\"ồ\":\"o\",\"Ổ\":\"O\",\"ổ\":\"o\",\"Ỗ\":\"O\",\"ỗ\":\"o\",\"Ộ\":\"O\",\"ộ\":\"o\",\"Ớ\":\"O\",\"ớ\":\"o\",\"Ờ\":\"O\",\"ờ\":\"o\",\"Ở\":\"O\",\"ở\":\"o\",\"Ỡ\":\"O\",\"ỡ\":\"o\",\"Ợ\":\"O\",\"ợ\":\"o\",\"Ụ\":\"U\",\"ụ\":\"u\",\"Ủ\":\"U\",\"ủ\":\"u\",\"Ứ\":\"U\",\"ứ\":\"u\",\"Ừ\":\"U\",\"ừ\":\"u\",\"Ử\":\"U\",\"ử\":\"u\",\"Ữ\":\"U\",\"ữ\":\"u\",\"Ự\":\"U\",\"ự\":\"u\",\"Ỳ\":\"Y\",\"ỳ\":\"y\",\"Ỵ\":\"Y\",\"ỵ\":\"y\",\"Ỷ\":\"Y\",\"ỷ\":\"y\",\"Ỹ\":\"Y\",\"ỹ\":\"y\",\"–\":\"-\",\"‘\":\"'\",\"’\":\"'\",\"“\":\"\\\"\",\"”\":\"\\\"\",\"„\":\"\\\"\",\"†\":\"+\",\"•\":\"*\",\"…\":\"...\",\"₠\":\"ecu\",\"₢\":\"cruzeiro\",\"₣\":\"french franc\",\"₤\":\"lira\",\"₥\":\"mill\",\"₦\":\"naira\",\"₧\":\"peseta\",\"₨\":\"rupee\",\"₩\":\"won\",\"₪\":\"new shequel\",\"₫\":\"dong\",\"€\":\"euro\",\"₭\":\"kip\",\"₮\":\"tugrik\",\"₯\":\"drachma\",\"₰\":\"penny\",\"₱\":\"peso\",\"₲\":\"guarani\",\"₳\":\"austral\",\"₴\":\"hryvnia\",\"₵\":\"cedi\",\"₸\":\"kazakhstani tenge\",\"₹\":\"indian rupee\",\"₺\":\"turkish lira\",\"₽\":\"russian ruble\",\"₿\":\"bitcoin\",\"℠\":\"sm\",\"™\":\"tm\",\"∂\":\"d\",\"∆\":\"delta\",\"∑\":\"sum\",\"∞\":\"infinity\",\"♥\":\"love\",\"元\":\"yuan\",\"円\":\"yen\",\"﷼\":\"rial\",\"ﻵ\":\"laa\",\"ﻷ\":\"laa\",\"ﻹ\":\"lai\",\"ﻻ\":\"la\"}");
+		var locales = JSON.parse("{\"bg\":{\"Й\":\"Y\",\"Ц\":\"Ts\",\"Щ\":\"Sht\",\"Ъ\":\"A\",\"Ь\":\"Y\",\"й\":\"y\",\"ц\":\"ts\",\"щ\":\"sht\",\"ъ\":\"a\",\"ь\":\"y\"},\"de\":{\"Ä\":\"AE\",\"ä\":\"ae\",\"Ö\":\"OE\",\"ö\":\"oe\",\"Ü\":\"UE\",\"ü\":\"ue\",\"ß\":\"ss\",\"%\":\"prozent\",\"&\":\"und\",\"|\":\"oder\",\"∑\":\"summe\",\"∞\":\"unendlich\",\"♥\":\"liebe\"},\"es\":{\"%\":\"por ciento\",\"&\":\"y\",\"<\":\"menor que\",\">\":\"mayor que\",\"|\":\"o\",\"¢\":\"centavos\",\"£\":\"libras\",\"¤\":\"moneda\",\"₣\":\"francos\",\"∑\":\"suma\",\"∞\":\"infinito\",\"♥\":\"amor\"},\"fr\":{\"%\":\"pourcent\",\"&\":\"et\",\"<\":\"plus petit\",\">\":\"plus grand\",\"|\":\"ou\",\"¢\":\"centime\",\"£\":\"livre\",\"¤\":\"devise\",\"₣\":\"franc\",\"∑\":\"somme\",\"∞\":\"infini\",\"♥\":\"amour\"},\"pt\":{\"%\":\"porcento\",\"&\":\"e\",\"<\":\"menor\",\">\":\"maior\",\"|\":\"ou\",\"¢\":\"centavo\",\"∑\":\"soma\",\"£\":\"libra\",\"∞\":\"infinito\",\"♥\":\"amor\"},\"uk\":{\"И\":\"Y\",\"и\":\"y\",\"Й\":\"Y\",\"й\":\"y\",\"Ц\":\"Ts\",\"ц\":\"ts\",\"Х\":\"Kh\",\"х\":\"kh\",\"Щ\":\"Shch\",\"щ\":\"shch\",\"Г\":\"H\",\"г\":\"h\"},\"vi\":{\"Đ\":\"D\",\"đ\":\"d\"},\"da\":{\"Ø\":\"OE\",\"ø\":\"oe\",\"Å\":\"AA\",\"å\":\"aa\",\"%\":\"procent\",\"&\":\"og\",\"|\":\"eller\",\"$\":\"dollar\",\"<\":\"mindre end\",\">\":\"større end\"},\"nb\":{\"&\":\"og\",\"Å\":\"AA\",\"Æ\":\"AE\",\"Ø\":\"OE\",\"å\":\"aa\",\"æ\":\"ae\",\"ø\":\"oe\"},\"it\":{\"&\":\"e\"},\"nl\":{\"&\":\"en\"},\"sv\":{\"&\":\"och\",\"Å\":\"AA\",\"Ä\":\"AE\",\"Ö\":\"OE\",\"å\":\"aa\",\"ä\":\"ae\",\"ö\":\"oe\"}}");
+		function replace(string, options) {
+			if (typeof string !== "string") throw new Error("slugify: string argument expected");
+			options = typeof options === "string" ? { replacement: options } : options || {};
+			var locale = locales[options.locale] || {};
+			var replacement = options.replacement === void 0 ? "-" : options.replacement;
+			var trim = options.trim === void 0 ? true : options.trim;
+			var slug = string.normalize().split("").reduce(function(result, ch) {
+				var appendChar = locale[ch];
+				if (appendChar === void 0) appendChar = charMap[ch];
+				if (appendChar === void 0) appendChar = ch;
+				if (appendChar === replacement) appendChar = " ";
+				return result + appendChar.replace(options.remove || /[^\w\s$*_+~.()'"!\-:@]+/g, "");
+			}, "");
+			if (options.strict) slug = slug.replace(/[^A-Za-z0-9\s]/g, "");
+			if (trim) slug = slug.trim();
+			slug = slug.replace(/\s+/g, replacement);
+			if (options.lower) slug = slug.toLowerCase();
+			return slug;
+		}
+		replace.extend = function(customMap) {
+			Object.assign(charMap, customMap);
+		};
+		return replace;
+	});
+}));
+
+//#endregion
 //#region ../cli/src/core/core.ts
 /**
 * Core — Shared utilities, constants, and internal helpers
 *
 * Ported from maxsim/bin/lib/core.cjs
 */
+var import_slugify = /* @__PURE__ */ __toESM(require_slugify());
 function normalizePhaseName(phase) {
 	const match = phase.match(/^(\d+)([A-Z])?(\.\d+)?/i);
 	if (!match) return phase;
@@ -55496,22 +55535,26 @@ function extractFrontmatter(content) {
 */
 
 //#endregion
+//#region ../../node_modules/escape-string-regexp/index.js
+function escapeStringRegexp(string) {
+	if (typeof string !== "string") throw new TypeError("Expected a string");
+	return string.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
+}
+
+//#endregion
 //#region ../cli/src/core/state.ts
 /**
 * State — STATE.md operations and progression engine
 *
 * Ported from maxsim/bin/lib/state.cjs
 */
-function escapeRegex(str) {
-	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
 function stateExtractField(content, fieldName) {
 	const pattern = new RegExp(`\\*\\*${fieldName}:\\*\\*\\s*(.+)`, "i");
 	const match = content.match(pattern);
 	return match ? match[1].trim() : null;
 }
 function stateReplaceField(content, fieldName, newValue) {
-	const escaped = escapeRegex(fieldName);
+	const escaped = escapeStringRegexp(fieldName);
 	const pattern = new RegExp(`(\\*\\*${escaped}:\\*\\*\\s*)(.*)`, "i");
 	if (pattern.test(content)) return content.replace(pattern, (_match, prefix) => `${prefix}${newValue}`);
 	return null;
@@ -57121,7 +57164,303 @@ function watch(paths, options = {}) {
 }
 
 //#endregion
+//#region ../../node_modules/lodash.debounce/index.js
+var require_lodash_debounce = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	/**
+	* lodash (Custom Build) <https://lodash.com/>
+	* Build: `lodash modularize exports="npm" -o ./`
+	* Copyright jQuery Foundation and other contributors <https://jquery.org/>
+	* Released under MIT license <https://lodash.com/license>
+	* Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+	* Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	*/
+	/** Used as the `TypeError` message for "Functions" methods. */
+	var FUNC_ERROR_TEXT = "Expected a function";
+	/** Used as references for various `Number` constants. */
+	var NAN = NaN;
+	/** `Object#toString` result references. */
+	var symbolTag = "[object Symbol]";
+	/** Used to match leading and trailing whitespace. */
+	var reTrim = /^\s+|\s+$/g;
+	/** Used to detect bad signed hexadecimal string values. */
+	var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+	/** Used to detect binary string values. */
+	var reIsBinary = /^0b[01]+$/i;
+	/** Used to detect octal string values. */
+	var reIsOctal = /^0o[0-7]+$/i;
+	/** Built-in method references without a dependency on `root`. */
+	var freeParseInt = parseInt;
+	/** Detect free variable `global` from Node.js. */
+	var freeGlobal = typeof global == "object" && global && global.Object === Object && global;
+	/** Detect free variable `self`. */
+	var freeSelf = typeof self == "object" && self && self.Object === Object && self;
+	/** Used as a reference to the global object. */
+	var root = freeGlobal || freeSelf || Function("return this")();
+	/**
+	* Used to resolve the
+	* [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+	* of values.
+	*/
+	var objectToString = Object.prototype.toString;
+	var nativeMax = Math.max, nativeMin = Math.min;
+	/**
+	* Gets the timestamp of the number of milliseconds that have elapsed since
+	* the Unix epoch (1 January 1970 00:00:00 UTC).
+	*
+	* @static
+	* @memberOf _
+	* @since 2.4.0
+	* @category Date
+	* @returns {number} Returns the timestamp.
+	* @example
+	*
+	* _.defer(function(stamp) {
+	*   console.log(_.now() - stamp);
+	* }, _.now());
+	* // => Logs the number of milliseconds it took for the deferred invocation.
+	*/
+	var now = function() {
+		return root.Date.now();
+	};
+	/**
+	* Creates a debounced function that delays invoking `func` until after `wait`
+	* milliseconds have elapsed since the last time the debounced function was
+	* invoked. The debounced function comes with a `cancel` method to cancel
+	* delayed `func` invocations and a `flush` method to immediately invoke them.
+	* Provide `options` to indicate whether `func` should be invoked on the
+	* leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+	* with the last arguments provided to the debounced function. Subsequent
+	* calls to the debounced function return the result of the last `func`
+	* invocation.
+	*
+	* **Note:** If `leading` and `trailing` options are `true`, `func` is
+	* invoked on the trailing edge of the timeout only if the debounced function
+	* is invoked more than once during the `wait` timeout.
+	*
+	* If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+	* until to the next tick, similar to `setTimeout` with a timeout of `0`.
+	*
+	* See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+	* for details over the differences between `_.debounce` and `_.throttle`.
+	*
+	* @static
+	* @memberOf _
+	* @since 0.1.0
+	* @category Function
+	* @param {Function} func The function to debounce.
+	* @param {number} [wait=0] The number of milliseconds to delay.
+	* @param {Object} [options={}] The options object.
+	* @param {boolean} [options.leading=false]
+	*  Specify invoking on the leading edge of the timeout.
+	* @param {number} [options.maxWait]
+	*  The maximum time `func` is allowed to be delayed before it's invoked.
+	* @param {boolean} [options.trailing=true]
+	*  Specify invoking on the trailing edge of the timeout.
+	* @returns {Function} Returns the new debounced function.
+	* @example
+	*
+	* // Avoid costly calculations while the window size is in flux.
+	* jQuery(window).on('resize', _.debounce(calculateLayout, 150));
+	*
+	* // Invoke `sendMail` when clicked, debouncing subsequent calls.
+	* jQuery(element).on('click', _.debounce(sendMail, 300, {
+	*   'leading': true,
+	*   'trailing': false
+	* }));
+	*
+	* // Ensure `batchLog` is invoked once after 1 second of debounced calls.
+	* var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
+	* var source = new EventSource('/stream');
+	* jQuery(source).on('message', debounced);
+	*
+	* // Cancel the trailing debounced invocation.
+	* jQuery(window).on('popstate', debounced.cancel);
+	*/
+	function debounce(func, wait, options) {
+		var lastArgs, lastThis, maxWait, result, timerId, lastCallTime, lastInvokeTime = 0, leading = false, maxing = false, trailing = true;
+		if (typeof func != "function") throw new TypeError(FUNC_ERROR_TEXT);
+		wait = toNumber(wait) || 0;
+		if (isObject(options)) {
+			leading = !!options.leading;
+			maxing = "maxWait" in options;
+			maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
+			trailing = "trailing" in options ? !!options.trailing : trailing;
+		}
+		function invokeFunc(time) {
+			var args = lastArgs, thisArg = lastThis;
+			lastArgs = lastThis = void 0;
+			lastInvokeTime = time;
+			result = func.apply(thisArg, args);
+			return result;
+		}
+		function leadingEdge(time) {
+			lastInvokeTime = time;
+			timerId = setTimeout(timerExpired, wait);
+			return leading ? invokeFunc(time) : result;
+		}
+		function remainingWait(time) {
+			var timeSinceLastCall = time - lastCallTime, timeSinceLastInvoke = time - lastInvokeTime, result = wait - timeSinceLastCall;
+			return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
+		}
+		function shouldInvoke(time) {
+			var timeSinceLastCall = time - lastCallTime, timeSinceLastInvoke = time - lastInvokeTime;
+			return lastCallTime === void 0 || timeSinceLastCall >= wait || timeSinceLastCall < 0 || maxing && timeSinceLastInvoke >= maxWait;
+		}
+		function timerExpired() {
+			var time = now();
+			if (shouldInvoke(time)) return trailingEdge(time);
+			timerId = setTimeout(timerExpired, remainingWait(time));
+		}
+		function trailingEdge(time) {
+			timerId = void 0;
+			if (trailing && lastArgs) return invokeFunc(time);
+			lastArgs = lastThis = void 0;
+			return result;
+		}
+		function cancel() {
+			if (timerId !== void 0) clearTimeout(timerId);
+			lastInvokeTime = 0;
+			lastArgs = lastCallTime = lastThis = timerId = void 0;
+		}
+		function flush() {
+			return timerId === void 0 ? result : trailingEdge(now());
+		}
+		function debounced() {
+			var time = now(), isInvoking = shouldInvoke(time);
+			lastArgs = arguments;
+			lastThis = this;
+			lastCallTime = time;
+			if (isInvoking) {
+				if (timerId === void 0) return leadingEdge(lastCallTime);
+				if (maxing) {
+					timerId = setTimeout(timerExpired, wait);
+					return invokeFunc(lastCallTime);
+				}
+			}
+			if (timerId === void 0) timerId = setTimeout(timerExpired, wait);
+			return result;
+		}
+		debounced.cancel = cancel;
+		debounced.flush = flush;
+		return debounced;
+	}
+	/**
+	* Checks if `value` is the
+	* [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+	* of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	*
+	* @static
+	* @memberOf _
+	* @since 0.1.0
+	* @category Lang
+	* @param {*} value The value to check.
+	* @returns {boolean} Returns `true` if `value` is an object, else `false`.
+	* @example
+	*
+	* _.isObject({});
+	* // => true
+	*
+	* _.isObject([1, 2, 3]);
+	* // => true
+	*
+	* _.isObject(_.noop);
+	* // => true
+	*
+	* _.isObject(null);
+	* // => false
+	*/
+	function isObject(value) {
+		var type = typeof value;
+		return !!value && (type == "object" || type == "function");
+	}
+	/**
+	* Checks if `value` is object-like. A value is object-like if it's not `null`
+	* and has a `typeof` result of "object".
+	*
+	* @static
+	* @memberOf _
+	* @since 4.0.0
+	* @category Lang
+	* @param {*} value The value to check.
+	* @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+	* @example
+	*
+	* _.isObjectLike({});
+	* // => true
+	*
+	* _.isObjectLike([1, 2, 3]);
+	* // => true
+	*
+	* _.isObjectLike(_.noop);
+	* // => false
+	*
+	* _.isObjectLike(null);
+	* // => false
+	*/
+	function isObjectLike(value) {
+		return !!value && typeof value == "object";
+	}
+	/**
+	* Checks if `value` is classified as a `Symbol` primitive or object.
+	*
+	* @static
+	* @memberOf _
+	* @since 4.0.0
+	* @category Lang
+	* @param {*} value The value to check.
+	* @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+	* @example
+	*
+	* _.isSymbol(Symbol.iterator);
+	* // => true
+	*
+	* _.isSymbol('abc');
+	* // => false
+	*/
+	function isSymbol(value) {
+		return typeof value == "symbol" || isObjectLike(value) && objectToString.call(value) == symbolTag;
+	}
+	/**
+	* Converts `value` to a number.
+	*
+	* @static
+	* @memberOf _
+	* @since 4.0.0
+	* @category Lang
+	* @param {*} value The value to process.
+	* @returns {number} Returns the number.
+	* @example
+	*
+	* _.toNumber(3.2);
+	* // => 3.2
+	*
+	* _.toNumber(Number.MIN_VALUE);
+	* // => 5e-324
+	*
+	* _.toNumber(Infinity);
+	* // => Infinity
+	*
+	* _.toNumber('3.2');
+	* // => 3.2
+	*/
+	function toNumber(value) {
+		if (typeof value == "number") return value;
+		if (isSymbol(value)) return NAN;
+		if (isObject(value)) {
+			var other = typeof value.valueOf == "function" ? value.valueOf() : value;
+			value = isObject(other) ? other + "" : other;
+		}
+		if (typeof value != "string") return value === 0 ? value : +value;
+		value = value.replace(reTrim, "");
+		var isBinary = reIsBinary.test(value);
+		return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
+	}
+	module.exports = debounce;
+}));
+
+//#endregion
 //#region src/terminal/session-store.ts
+var import_lodash_debounce = /* @__PURE__ */ __toESM(require_lodash_debounce());
 const MAX_SCROLLBACK = 5e4;
 var SessionStore = class {
 	scrollback = [];
@@ -57395,8 +57734,19 @@ function setupWatcher(cwd, wss) {
 		},
 		depth: 5
 	});
-	let changedPaths = /* @__PURE__ */ new Set();
-	let debounceTimer = null;
+	const changedPaths = /* @__PURE__ */ new Set();
+	const flushChanges = (0, import_lodash_debounce.default)(() => {
+		if (changedPaths.size > 0) {
+			const changes = Array.from(changedPaths);
+			changedPaths.clear();
+			console.error(`[watcher] Broadcasting ${changes.length} change(s)`);
+			broadcast(wss, {
+				type: "file-changes",
+				changes,
+				timestamp: Date.now()
+			});
+		}
+	}, 200);
 	function onFileChange(filePath) {
 		const normalized = normalizeFsPath(filePath);
 		if (isSuppressed(normalized)) {
@@ -57404,20 +57754,7 @@ function setupWatcher(cwd, wss) {
 			return;
 		}
 		changedPaths.add(normalized);
-		if (debounceTimer !== null) clearTimeout(debounceTimer);
-		debounceTimer = setTimeout(() => {
-			if (changedPaths.size > 0) {
-				const changes = Array.from(changedPaths);
-				changedPaths = /* @__PURE__ */ new Set();
-				console.error(`[watcher] Broadcasting ${changes.length} change(s)`);
-				broadcast(wss, {
-					type: "file-changes",
-					changes,
-					timestamp: Date.now()
-				});
-			}
-			debounceTimer = null;
-		}, 200);
+		flushChanges();
 	}
 	watcher.on("add", onFileChange);
 	watcher.on("change", onFileChange);
@@ -57813,7 +58150,10 @@ app.post("/api/todos", (req, res) => {
 	if (!text) return res.status(400).json({ error: "text is required" });
 	node_fs.mkdirSync(pendingDir, { recursive: true });
 	const timestamp = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
-	const filename = `${timestamp}-${text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40)}.md`;
+	const filename = `${timestamp}-${(0, import_slugify.default)(text, {
+		lower: true,
+		strict: true
+	}).slice(0, 40)}.md`;
 	const filePath = node_path.join(pendingDir, filename);
 	const content = `title: ${text}\ncreated: ${timestamp}\narea: general\n\n${text}\n`;
 	suppressPath(filePath);
