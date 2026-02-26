@@ -1,3 +1,10 @@
+## [3.2.2](https://github.com/maystudios/maxsim/compare/v3.2.1...v3.2.2) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** LAN sharing — always detect local IP, add --network flag, Windows firewall hint ([3cd26a6](https://github.com/maystudios/maxsim/commit/3cd26a6073e11df23c80d9997a08017a24200547))
+
 ## [3.2.1](https://github.com/maystudios/maxsim/compare/v3.2.0...v3.2.1) (2026-02-26)
 
 
