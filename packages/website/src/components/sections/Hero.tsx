@@ -174,7 +174,7 @@ export default function Hero() {
                 Get Started
               </a>
               <a
-                href="https://github.com/maystudios/maxsim"
+                href="https://github.com/maystudios/maxsimcli"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-md border border-border text-foreground font-semibold text-sm tracking-wide hover:border-accent/60 hover:text-accent transition-colors duration-200"

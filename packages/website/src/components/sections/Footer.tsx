@@ -109,7 +109,7 @@ const NAV_LINKS = [
 const EXTERNAL_LINKS = [
   {
     label: "GitHub",
-    href: "https://github.com/maystudios/maxsim",
+    href: "https://github.com/maystudios/maxsimcli",
     icon: <Github size={13} strokeWidth={1.5} />,
   },
   {

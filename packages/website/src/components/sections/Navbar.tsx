@@ -161,7 +161,7 @@ export default function Navbar() {
             )}
           </a>
           <a
-            href="https://github.com/maystudios/maxsim"
+            href="https://github.com/maystudios/maxsimcli"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm px-4 py-2 rounded-md border border-border text-foreground hover:bg-surface transition-colors"
@@ -212,7 +212,7 @@ export default function Navbar() {
                 Full Docs
               </a>
               <a
-                href="https://github.com/maystudios/maxsim"
+                href="https://github.com/maystudios/maxsimcli"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted hover:text-foreground transition-colors"

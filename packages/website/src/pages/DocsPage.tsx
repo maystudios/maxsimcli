@@ -1504,7 +1504,7 @@ function DocsNavbar({ onMobileMenuToggle, mobileOpen }: { onMobileMenuToggle: ()
             Back to Home
           </a>
           <a
-            href="https://github.com/maystudios/maxsim"
+            href="https://github.com/maystudios/maxsimcli"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-sm px-3 py-1.5 rounded border border-border text-muted hover:text-foreground hover:bg-surface transition-colors"
