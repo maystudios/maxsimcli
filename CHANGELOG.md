@@ -1,3 +1,10 @@
+# [3.3.0](https://github.com/maystudios/maxsim/compare/v3.2.2...v3.3.0) (2026-02-26)
+
+
+### Features
+
+* **website:** add full /docs documentation page with sidebar navigation ([ca2ed67](https://github.com/maystudios/maxsim/commit/ca2ed674218ed080b40930528c48f3403b4c93bf))
+
 ## [3.2.2](https://github.com/maystudios/maxsim/compare/v3.2.1...v3.2.2) (2026-02-26)
 
 
