@@ -1,3 +1,10 @@
+## [3.1.4](https://github.com/maystudios/maxsim/compare/v3.1.3...v3.1.4) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** Swiss Style redesign — clean, editorial, minimal ([b2ea012](https://github.com/maystudios/maxsim/commit/b2ea012f8b372e6250383acfecf5031d150b344f))
+
 ## [3.1.3](https://github.com/maystudios/maxsim/compare/v3.1.2...v3.1.3) (2026-02-26)
 
 
