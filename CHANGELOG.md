@@ -1,3 +1,10 @@
+## [3.2.1](https://github.com/maystudios/maxsim/compare/v3.2.0...v3.2.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** mobile-responsive layout with hamburger drawer and adaptive stats ([89d37e6](https://github.com/maystudios/maxsim/commit/89d37e608067ad05fd1022487fbe17b7b2154ccf))
+
 # [3.2.0](https://github.com/maystudios/maxsim/compare/v3.1.6...v3.2.0) (2026-02-26)
 
 
