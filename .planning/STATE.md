@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** `npx maxsimcli@latest` installs a complete AI dev workflow system that works immediately — validated end-to-end from the npm consumer perspective, not the monorepo perspective
-**Current focus:** Phase 26 — Superpowers-Inspired Workflow Enhancements
+**Current focus:** Phase 27 — Fix CI E2E Pipeline
 
 ## Current Position
 
-Phase: 26 — Superpowers-Inspired Workflow Enhancements
-Plan: 26-05 (complete)
-Status: Phase 26 complete — All 5 plans delivered (skills, reviewers, anti-rationalization, doing agents, install pipeline)
-Last activity: 2026-02-26 — Extended install.ts to deliver skills to .agents/skills/
+Phase: 27 — Fix CI E2E Pipeline
+Plan: 27-01 (complete)
+Status: Phase 27 complete — 1/1 plans delivered (e2e CI job, agent count assertion fix)
+Last activity: 2026-02-26 — Added e2e job to publish.yml and fixed agent count assertion
 
-Progress: [██████████] 100% (5/5 plans complete)
+Progress: [██████████] 100% (1/1 plans complete)
 
 ## Performance Metrics
 
@@ -95,6 +95,7 @@ Progress: [██████████] 100% (5/5 plans complete)
 | Phase 26 P04 | 2min | 2 tasks | 3 files |
 | Phase 26 P03 | 3min | 2 tasks | 3 files |
 | Phase 26 P05 | 2min | 2 tasks | 1 files |
+| Phase 27 P01 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -219,6 +220,8 @@ Recent decisions affecting current work:
 - [Phase 26]: Planner gets TDD + Verification skills; researcher and checker get Verification only
 - [Phase 26]: Evidence blocks use CLAIM/EVIDENCE/OUTPUT/VERDICT format; two-stage review gated on quality model_profile; role-specific Iron Laws and rationalizations per agent
 - [Phase 26]: Skills install under agents/skills/ to match .agents/skills/ path in agent prompts; built-in skill names hardcoded for safe upgrade removal
+- [Phase 27]: E2E job does its own checkout+install+build (GitHub Actions does not share artifacts between jobs without upload-artifact)
+- [Phase 27]: Pre-existing DASH-08 failure logged as deferred item, not fixed (out of scope)
 
 ### Roadmap Evolution
 
@@ -244,5 +247,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 26-05-PLAN.md (Skills install pipeline - Phase 26 complete, all 5 plans delivered)
+Stopped at: Completed 27-01-PLAN.md (Fix CI E2E Pipeline - Phase 27 complete, 1/1 plan delivered)
 Resume file: N/A

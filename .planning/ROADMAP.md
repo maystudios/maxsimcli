@@ -24,7 +24,7 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 - [x] **Phase 24: Fix Terminal Status Parsing & Quick Actions** - Fix status parse bug in use-terminal.ts that disables quick-action buttons and breaks status bar (completed 2026-02-25)
 - [x] **Phase 25: Planning Doc Hygiene** - Fix stale traceability, backfill SUMMARY.md frontmatter, add missing VERIFICATIONs, portable pre-push hook (completed 2026-02-25)
 - [x] **Phase 26: Superpowers-Inspired Workflow Enhancements** - Integrate anti-rationalization prompting, evidence-based verification gates, two-stage code review, and on-demand skills into agent prompts and workflows (completed 2026-02-26)
-- [ ] **Phase 27: Fix CI E2E Pipeline & Test Assertions** - Add e2e job to publish.yml, gate release on green E2E, fix agent count assertion (11→13)
+- [x] **Phase 27: Fix CI E2E Pipeline & Test Assertions** - Add e2e job to publish.yml, gate release on green E2E, fix agent count assertion (11→13) (completed 2026-02-26)
 - [ ] **Phase 28: Requirement Reconciliation & Doc Cleanup** - Update outdated E2E-01 requirement wording, fix stale VERIFICATION.md files, remove orphan dirs, backfill SUMMARY.md arrays
 
 ---
@@ -273,5 +273,5 @@ _(none yet)_
 | 24. Fix Terminal Status Parsing & Quick Actions | 1/1 | Complete    | 2026-02-25 |
 | 25. Planning Doc Hygiene | 3/3 | Complete    | 2026-02-25 |
 | 26. Superpowers-Inspired Workflow Enhancements | 5/5 | Complete    | 2026-02-26 |
-| 27. Fix CI E2E Pipeline & Test Assertions | 0/1 | Not Started | — |
+| 27. Fix CI E2E Pipeline & Test Assertions | 1/1 | Complete   | 2026-02-26 |
 | 28. Requirement Reconciliation & Doc Cleanup | 0/0 | Not Started | — |
