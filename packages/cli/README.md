@@ -32,7 +32,6 @@ npx maxsimcli@latest
 The installer prompts you to choose:
 1. **Runtime** — Claude Code, OpenCode, Gemini, Codex, or all
 2. **Location** — Global (all projects) or local (current project only)
-3. **Dashboard network access** — Optionally expose the dashboard on your local network (adds firewall rule)
 
 Verify with:
 - Claude Code / Gemini: `/maxsim:help`
@@ -137,46 +136,34 @@ Loop **discuss → plan → execute → verify** until done. Archive the milesto
 
 ### Live Dashboard
 
+| Command | Description |
+|---------|-------------|
+| `npx maxsimcli dashboard` | Launch the live project dashboard |
+
+MAXSIM includes a real-time web dashboard that shows phase progress, open tasks, blockers,
+and allows inline plan editing.
+
 ```bash
 npx maxsimcli dashboard
 ```
 
-MAXSIM includes a real-time web dashboard. Auto-installed during `npx maxsimcli@latest` — no separate setup needed.
+The dashboard auto-detects a free port starting from 3333 and opens your browser.
+It watches `.planning/` for changes and updates in real-time via WebSocket.
 
-```bash
-npx maxsimcli dashboard           # Launch locally (localhost only)
-npx maxsimcli dashboard --network # Launch on local network (phone/tablet access)
-```
+- **Auto-installed** during `npx maxsimcli@latest` -- no separate setup needed
+- **Works with both global and local installs**
+- **Auto-opens browser** on launch
+- **Detects running instances** -- won't start a duplicate server
+- **Auto-launches** during `/maxsim:execute-phase`
 
-The dashboard auto-detects a free port starting from 3333 and opens your browser automatically. It watches `.planning/` for file changes and updates in real-time via WebSocket.
-
-**Overview & Progress**
-- Milestone progress bar with phase completion stats
-- Current phase indicator, active blockers count, pending todos count
-- Phase list with disk-status indicators (complete / partial / planned)
-- Phase drill-down with plan tasks and progress
-
-**Plan Editing**
-- Inline CodeMirror Markdown editor for `.planning/` files
-- Ctrl+S to save, unsaved-changes indicator
-
-**Todos & Blockers**
-- Create, complete, and reopen todos
-- View and resolve blockers from `STATE.md`
-- Add decisions and blockers via built-in state editor
-
-**Integrated Terminal**
-- Full terminal emulation via xterm.js (WebGL rendering)
-- Quick command bar with configurable preset commands
-- Split-mode: terminal and dashboard side by side
-- Status bar showing process PID, uptime, memory, working directory
-- Stop / Restart process controls
-
-**Local Network Sharing**
-- Enable during install or with `--network` flag at launch
-- Exposes dashboard on your local network (e.g. `http://192.168.1.x:3333`)
-- QR code button in sidebar — scan to open on phone or tablet
-- OS-specific firewall rule applied automatically (Windows UAC elevation, Linux ufw/iptables, macOS no-op)
+**Features:**
+- Real-time updates via WebSocket -- edit a `.planning/` file and the dashboard refreshes instantly
+- Phase overview with animated progress bars and milestone stats
+- Phase drill-down with plan tasks and toggleable checkboxes
+- Inline CodeMirror Markdown editor for plan files (Ctrl+S to save)
+- Todos panel -- create, complete, and manage todos
+- Blockers panel -- view and resolve blockers from STATE.md
+- Swiss Style Design dark theme
 
 ### Phase Management
 

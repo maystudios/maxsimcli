@@ -1,3 +1,31 @@
+## [3.1.5](https://github.com/maystudios/maxsim/compare/v3.1.4...v3.1.5) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** align color scheme to website — blue accent, [#09090](https://github.com/maystudios/maxsim/issues/09090)b bg ([0c2803f](https://github.com/maystudios/maxsim/commit/0c2803fc0de2171171db71c91939e89e9fc11ac5)), closes [#09090b](https://github.com/maystudios/maxsim/issues/09090b) [#09090b](https://github.com/maystudios/maxsim/issues/09090b) [#111111](https://github.com/maystudios/maxsim/issues/111111) [#3b82f6](https://github.com/maystudios/maxsim/issues/3b82f6) [#e63946](https://github.com/maystudios/maxsim/issues/e63946) [#a1a1aa](https://github.com/maystudios/maxsim/issues/a1a1aa) [#777777](https://github.com/maystudios/maxsim/issues/777777) [#27272a](https://github.com/maystudios/maxsim/issues/27272a) [#2a2a2a](https://github.com/maystudios/maxsim/issues/2a2a2a) [#18181b](https://github.com/maystudios/maxsim/issues/18181b) [#161616](https://github.com/maystudios/maxsim/issues/161616)
+
+## [3.1.4](https://github.com/maystudios/maxsim/compare/v3.1.3...v3.1.4) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** Swiss Style redesign — clean, editorial, minimal ([b2ea012](https://github.com/maystudios/maxsim/commit/b2ea012f8b372e6250383acfecf5031d150b344f))
+
+## [3.1.3](https://github.com/maystudios/maxsim/compare/v3.1.2...v3.1.3) (2026-02-26)
+
+
+### Bug Fixes
+
+* **deps:** replace custom utility code with established npm libraries ([3f3c00a](https://github.com/maystudios/maxsim/commit/3f3c00a041e93a0c092b46f1788ac51233974b3d))
+
+## [3.1.2](https://github.com/maystudios/maxsim/compare/v3.1.1...v3.1.2) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** detect task completion from [x] marker in <done> tags ([80a1803](https://github.com/maystudios/maxsim/commit/80a1803e75efb4825f6f1b17e631358572016eb9))
+
 ## [3.1.1](https://github.com/maystudios/maxsim/compare/v3.1.0...v3.1.1) (2026-02-26)
 
 

@@ -57668,7 +57668,21 @@ function getLocalNetworkIp() {
 	for (const iface of Object.values(ifaces)) for (const info of iface ?? []) if (info.family === "IPv4" && !info.internal) return info.address;
 	return null;
 }
+function getTailscaleIp() {
+	const ifaces = node_os.networkInterfaces();
+	for (const [name, iface] of Object.entries(ifaces)) {
+		const isTailscaleIface = name === "Tailscale" || name === "tailscale0" || name.toLowerCase().includes("tailscale");
+		for (const info of iface ?? []) {
+			if (info.family !== "IPv4") continue;
+			const parts = info.address.split(".").map(Number);
+			const isTailscaleRange = parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127;
+			if (isTailscaleIface || isTailscaleRange) return info.address;
+		}
+	}
+	return null;
+}
 const localNetworkIp = networkMode ? getLocalNetworkIp() : null;
+const tailscaleIp = getTailscaleIp();
 log("INFO", "server", `Starting dashboard server, projectCwd=${projectCwd}, networkMode=${networkMode}`);
 const clientDir = node_path.join(__dirname, "client");
 function isWithinPlanning(cwd, targetPath) {
@@ -58246,7 +58260,8 @@ app.get("/api/server-info", (_req, res) => {
 	return res.json({
 		networkEnabled: networkMode,
 		localUrl: `http://localhost:${resolvedPort}`,
-		networkUrl: localNetworkIp ? `http://${localNetworkIp}:${resolvedPort}` : null
+		networkUrl: localNetworkIp ? `http://${localNetworkIp}:${resolvedPort}` : null,
+		tailscaleUrl: tailscaleIp ? `http://${tailscaleIp}:${resolvedPort}` : null
 	});
 });
 if (node_fs.existsSync(clientDir)) app.use(build_default(clientDir, { single: true }));
@@ -58337,11 +58352,15 @@ async function main() {
 	const port = await esm_default(3333);
 	resolvedPort = port;
 	const localUrl = `http://localhost:${port}`;
-	const bindHost = networkMode ? "0.0.0.0" : "127.0.0.1";
+	const bindHost = networkMode || tailscaleIp !== null ? "0.0.0.0" : "127.0.0.1";
 	server.listen(port, bindHost, () => {
 		log("INFO", "server", `Dashboard ready at ${localUrl}, log file: ${logFile}`);
 		console.error(`Dashboard ready at ${localUrl}`);
 		if (networkMode && localNetworkIp) console.error(`Network URL:      http://${localNetworkIp}:${port}`);
+		if (tailscaleIp) {
+			console.error(`Tailscale URL:    http://${tailscaleIp}:${port}`);
+			console.error(`                  → open on any Tailscale device`);
+		}
 		console.error(`Logs: ${logFile}`);
 		open$1(localUrl).catch(() => {});
 	});
