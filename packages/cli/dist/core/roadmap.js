@@ -50,7 +50,7 @@ function cmdRoadmapGetPhase(cwd, phaseNum, raw) {
             ? headerIndex + nextHeaderMatch.index
             : content.length;
         const section = content.slice(headerIndex, sectionEnd).trim();
-        const goalMatch = section.match(/\*\*Goal:\*\*\s*([^\n]+)/i);
+        const goalMatch = section.match(/\*\*Goal(?::\*\*|\*\*:)\s*([^\n]+)/i);
         const goal = goalMatch ? goalMatch[1].trim() : null;
         const criteriaMatch = section.match(/\*\*Success Criteria\*\*[^\n]*:\s*\n((?:\s*\d+\.\s*[^\n]+\n?)+)/i);
         const success_criteria = criteriaMatch
@@ -88,7 +88,7 @@ function cmdRoadmapAnalyze(cwd, raw) {
         const nextHeader = restOfContent.match(/\n#{2,4}\s+Phase\s+\d/i);
         const sectionEnd = nextHeader ? sectionStart + nextHeader.index : content.length;
         const section = content.slice(sectionStart, sectionEnd);
-        const goalMatch = section.match(/\*\*Goal:\*\*\s*([^\n]+)/i);
+        const goalMatch = section.match(/\*\*Goal(?::\*\*|\*\*:)\s*([^\n]+)/i);
         const goal = goalMatch ? goalMatch[1].trim() : null;
         const dependsMatch = section.match(/\*\*Depends on:\*\*\s*([^\n]+)/i);
         const depends_on = dependsMatch ? dependsMatch[1].trim() : null;

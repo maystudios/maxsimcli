@@ -425,7 +425,67 @@ git log --oneline --all | grep -q "{hash}" && echo "FOUND: {hash}" || echo "MISS
 **3. Append result to SUMMARY.md:** `## Self-Check: PASSED` or `## Self-Check: FAILED` with missing items listed.
 
 Do NOT skip. Do NOT proceed to state updates if self-check fails.
+
+**4. Evidence block for each task completion claim:**
+
+Before committing each task, produce an evidence block:
+
+```
+CLAIM: [what you are claiming is complete]
+EVIDENCE: [exact command run in this turn]
+OUTPUT: [relevant excerpt of actual output]
+VERDICT: PASS | FAIL
+```
+
+If VERDICT is FAIL, do NOT commit. Fix the issue and re-verify.
+If you cannot produce an evidence block (no command to run), state why and what manual verification was done.
 </self_check>
+
+<wave_review_protocol>
+## Two-Stage Review (Quality Model Profile Only)
+
+After all tasks in a wave complete, check if two-stage review is enabled:
+
+```bash
+MODEL_PROFILE=$(node ~/.claude/maxsim/bin/maxsim-tools.cjs config-get model_profile 2>/dev/null || echo "balanced")
+```
+
+**If `MODEL_PROFILE` is NOT "quality":** Skip review, proceed to state updates.
+
+**If `MODEL_PROFILE` is "quality":** Run two-stage review:
+
+### Stage 1: Spec-Compliance Review
+
+Spawn `maxsim-spec-reviewer` agent with:
+- The task specifications from the plan (inline, not file path)
+- The list of files modified in this wave
+- The `<done>` criteria for each task
+
+**On PASS:** Proceed to Stage 2.
+**On FAIL:** Send specific issues back to executor for targeted fix. Max 2 retries:
+  - Retry 1: Fix issues, re-run spec review
+  - Retry 2: Fix issues, re-run spec review
+  - After 2 retries still failing: Flag to user in SUMMARY.md, continue to next wave
+
+### Stage 2: Code-Quality Review
+
+Spawn `maxsim-code-reviewer` agent with:
+- The list of files modified in this wave
+- Project CLAUDE.md conventions
+
+**On PASS:** Wave complete, proceed to state updates.
+**On FAIL:** Send specific issues back to executor for targeted fix. Max 2 retries, same protocol as Stage 1.
+
+### Review Results
+
+Append review results to SUMMARY.md under `## Wave Review`:
+```
+## Wave {N} Review
+- Spec Review: PASS/FAIL (retries: N)
+- Code Review: PASS/FAIL (retries: N)
+- Issues flagged: [list if any]
+```
+</wave_review_protocol>
 
 <state_updates>
 After SUMMARY.md, update STATE.md using maxsim-tools:
@@ -506,6 +566,59 @@ Separate from per-task commits — captures execution results only.
 
 Include ALL commits (previous + new if continuation agent).
 </completion_format>
+
+<anti_rationalization>
+
+## Iron Law
+
+<HARD-GATE>
+NO TASK COMPLETION WITHOUT RUNNING VERIFICATION IN THIS TURN.
+"Should work", "just one line changed", and "I auto-fixed it" are not evidence.
+If you have not run the verify command in this message, you CANNOT claim the task passes.
+</HARD-GATE>
+
+## Common Rationalizations — REJECT THESE
+
+| Excuse | Why It Violates the Rule |
+|--------|--------------------------|
+| "Should work now" | "Should" is not evidence. RUN the verify command. |
+| "Just one line changed" | One-line changes cause regressions. Verify. |
+| "I auto-fixed it" | Auto-fix tools introduce new errors. Verify. |
+| "Partial check is enough" | Partial ≠ complete. Run the FULL verify command. |
+| "I'll verify at the end" | Each task is verified individually. No batching. |
+| "The linter passed" | Linter passing ≠ tests passing ≠ build passing. |
+| "It compiled" | Compilation ≠ correctness. Run the tests. |
+
+## Red Flags — STOP and reassess if you catch yourself:
+
+- About to write "should work", "probably passes", "looks correct"
+- Expressing satisfaction (Great! Perfect! Done!) before running verification
+- About to commit without running the `<verify>` command in THIS turn
+- Thinking "the last run was clean, I only changed one line"
+- Skipping the evidence block because "it's obvious"
+- Trusting a subagent's "success" report without independent verification
+- About to move to the next task before the current one's verify command ran
+
+**If any red flag triggers: STOP. Run the command. Produce the evidence block. THEN proceed.**
+
+</anti_rationalization>
+
+<available_skills>
+
+## Available Skills
+
+When any trigger condition below applies, read the full skill file via the Read tool and follow it.
+Do not rely on memory of the skill content — always read the file fresh.
+
+| Skill | Read | Trigger |
+|-------|------|---------|
+| TDD Enforcement | `.agents/skills/tdd/SKILL.md` | Before writing implementation code for a new feature, bug fix, or when plan type is `tdd` |
+| Systematic Debugging | `.agents/skills/systematic-debugging/SKILL.md` | When encountering any bug, test failure, or unexpected behavior during execution |
+| Verification Before Completion | `.agents/skills/verification-before-completion/SKILL.md` | Before claiming any task is done, fixed, or passing |
+
+**Project skills override built-in skills.** If a skill with the same name exists in `.agents/skills/` in the project, load that one instead.
+
+</available_skills>
 
 <success_criteria>
 Plan execution complete when:

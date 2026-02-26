@@ -34,6 +34,17 @@ Goal-backward verification starts from the outcome and works backwards:
 3. What must be WIRED for those artifacts to function?
 
 Then verify each level against the actual codebase.
+
+**Evidence Gate:** Every verification finding must be backed by evidence:
+
+```
+CLAIM: [what you are verifying]
+EVIDENCE: [exact command or file read performed]
+OUTPUT: [relevant excerpt of actual output]
+VERDICT: PASS | FAIL
+```
+
+Do NOT state "verified" without producing an evidence block. Do NOT trust SUMMARY.md claims — verify against actual code and command output.
 </core_principle>
 
 <verification_process>
@@ -587,6 +598,38 @@ return <div>No messages</div>  // Always shows "no messages"
 ```
 
 </stub_detection_patterns>
+
+<anti_rationalization>
+
+## Iron Law
+
+<HARD-GATE>
+NO VERIFICATION PASS WITHOUT INDEPENDENT EVIDENCE FOR EVERY TRUTH.
+SUMMARY.md says it's done. CODE says otherwise. Trust the code.
+</HARD-GATE>
+
+## Common Rationalizations — REJECT THESE
+
+| Excuse | Why It Violates the Rule |
+|--------|--------------------------|
+| "SUMMARY says it's done" | SUMMARYs document what Claude SAID. You verify what EXISTS. |
+| "Task completed = goal achieved" | Task completion ≠ goal achievement. Verify the goal. |
+| "Tests pass = requirements met" | Tests can pass with incomplete implementation. Check requirements individually. |
+| "I trust the executor" | Trust is not verification. Check the code yourself. |
+| "The build succeeds" | A successful build does not prove functional correctness. |
+| "Most truths hold" | ALL truths must hold. Partial ≠ complete. |
+
+## Red Flags — STOP and reassess if you catch yourself:
+
+- About to mark a truth as "verified" without reading the actual code
+- Trusting SUMMARY.md claims without grep/read verification
+- Skipping a truth because "it was tested"
+- Writing "PASS" before checking every must_have individually
+- Feeling rushed to complete verification quickly
+
+**If any red flag triggers: STOP. Read the code. Run the command. Produce the evidence block. THEN make the claim.**
+
+</anti_rationalization>
 
 <success_criteria>
 

@@ -57802,7 +57802,7 @@ function parseRoadmap(cwd) {
 		const nextHeader = content.slice(sectionStart).match(/\n#{2,4}\s+Phase\s+\d/i);
 		const sectionEnd = nextHeader ? sectionStart + nextHeader.index : content.length;
 		const section = content.slice(sectionStart, sectionEnd);
-		const goalMatch = section.match(/\*\*Goal:\*\*\s*([^\n]+)/i);
+		const goalMatch = section.match(/\*\*Goal(?::\*\*|\*\*:)\s*([^\n]+)/i);
 		const goal = goalMatch ? goalMatch[1].trim() : null;
 		const dependsMatch = section.match(/\*\*Depends on:\*\*\s*([^\n]+)/i);
 		const depends_on = dependsMatch ? dependsMatch[1].trim() : null;

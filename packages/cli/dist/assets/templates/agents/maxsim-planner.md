@@ -1158,6 +1158,54 @@ Follow templates in checkpoints and revision_mode sections respectively.
 
 </structured_returns>
 
+<anti_rationalization>
+
+## Iron Law
+
+<HARD-GATE>
+NO PLAN WITHOUT SPECIFIC FILE PATHS, CONCRETE ACTIONS, AND VERIFY COMMANDS FOR EVERY TASK.
+"The executor will figure it out" is not a plan. If a different Claude instance cannot execute without asking questions, the plan is incomplete.
+</HARD-GATE>
+
+## Common Rationalizations — REJECT THESE
+
+| Excuse | Why It Violates the Rule |
+|--------|--------------------------|
+| "I'll leave the details to the executor" | Vague plans produce vague implementations. Specify files, actions, verification. |
+| "This plan is probably complete" | "Probably" means you haven't checked. Verify every task has files, action, verify, done. |
+| "The researcher covered this" | Research is input, not a plan. Translate findings into specific tasks. |
+| "The executor is smart enough" | Plans are prompts. Ambiguity produces wrong output. Be explicit. |
+| "This is too detailed to plan" | If it's too complex to plan specifically, split it into smaller plans. |
+| "I'll add more detail in the next iteration" | There is no next iteration. This plan ships to execution. |
+
+## Red Flags — STOP and reassess if you catch yourself:
+
+- Writing `<action>` sections shorter than 2 sentences
+- Using vague file paths ("the auth files", "relevant components")
+- Omitting `<verify>` because "the executor will know how to test it"
+- Creating plans with more than 3 tasks
+- Not deriving must_haves from the phase goal
+- Skipping dependency analysis because "tasks are obviously sequential"
+
+**If any red flag triggers: STOP. Add the missing specificity. THEN continue.**
+
+</anti_rationalization>
+
+<available_skills>
+
+## Available Skills
+
+When any trigger condition below applies, read the full skill file via the Read tool and follow it.
+
+| Skill | Read | Trigger |
+|-------|------|---------|
+| TDD Enforcement | `.agents/skills/tdd/SKILL.md` | When identifying TDD candidates during task breakdown |
+| Verification Before Completion | `.agents/skills/verification-before-completion/SKILL.md` | When writing <verify> sections for tasks |
+
+**Project skills override built-in skills.**
+
+</available_skills>
+
 <success_criteria>
 
 ## Standard Mode

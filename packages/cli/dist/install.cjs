@@ -8948,6 +8948,11 @@ function writeManifest(configDir, runtime = "claude") {
 	if (node_fs.existsSync(agentsDir)) {
 		for (const file of node_fs.readdirSync(agentsDir)) if (file.startsWith("maxsim-") && file.endsWith(".md")) manifest.files["agents/" + file] = fileHash(node_path.join(agentsDir, file));
 	}
+	const skillsManifestDir = node_path.join(agentsDir, "skills");
+	if (node_fs.existsSync(skillsManifestDir)) {
+		const skillHashes = generateManifest(skillsManifestDir);
+		for (const [rel, hash] of Object.entries(skillHashes)) manifest.files["agents/skills/" + rel] = hash;
+	}
 	node_fs.writeFileSync(node_path.join(configDir, MANIFEST_NAME), JSON.stringify(manifest, null, 2));
 	return manifest;
 }
@@ -9112,6 +9117,39 @@ async function install(isGlobal, runtime = "claude") {
 		else {
 			spinner.fail("Failed to install agents");
 			failures.push("agents");
+		}
+	}
+	const skillsSrc = node_path.join(src, "skills");
+	if (node_fs.existsSync(skillsSrc)) {
+		spinner = ora({
+			text: "Installing skills...",
+			color: "cyan"
+		}).start();
+		const skillsDest = node_path.join(targetDir, "agents", "skills");
+		if (node_fs.existsSync(skillsDest)) for (const skill of [
+			"tdd",
+			"systematic-debugging",
+			"verification-before-completion"
+		]) {
+			const skillDir = node_path.join(skillsDest, skill);
+			if (node_fs.existsSync(skillDir)) node_fs.rmSync(skillDir, { recursive: true });
+		}
+		import_lib.default.copySync(skillsSrc, skillsDest, { overwrite: true });
+		const skillEntries = node_fs.readdirSync(skillsDest, { withFileTypes: true });
+		for (const entry of skillEntries) if (entry.isDirectory()) {
+			const skillMd = node_path.join(skillsDest, entry.name, "SKILL.md");
+			if (node_fs.existsSync(skillMd)) {
+				let content = node_fs.readFileSync(skillMd, "utf8");
+				content = content.replace(/~\/\.claude\//g, pathPrefix);
+				content = processAttribution(content, getCommitAttribution(runtime));
+				node_fs.writeFileSync(skillMd, content);
+			}
+		}
+		const installedSkillDirs = node_fs.readdirSync(skillsDest, { withFileTypes: true }).filter((e) => e.isDirectory()).length;
+		if (installedSkillDirs > 0) spinner.succeed(chalk.green("✓") + ` Installed ${installedSkillDirs} skills to agents/skills/`);
+		else {
+			spinner.fail("Failed to install skills");
+			failures.push("agents/skills");
 		}
 	}
 	const changelogSrc = node_path.join(src, "..", "CHANGELOG.md");

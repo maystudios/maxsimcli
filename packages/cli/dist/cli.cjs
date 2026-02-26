@@ -4970,7 +4970,7 @@ function getRoadmapPhaseInternal(cwd, phaseNum) {
 		const nextHeaderMatch = content.slice(headerIndex).match(/\n#{2,4}\s+Phase\s+\d/i);
 		const sectionEnd = nextHeaderMatch ? headerIndex + nextHeaderMatch.index : content.length;
 		const section = content.slice(headerIndex, sectionEnd).trim();
-		const goalMatch = section.match(/\*\*Goal:\*\*\s*([^\n]+)/i);
+		const goalMatch = section.match(/\*\*Goal(?::\*\*|\*\*:)\s*([^\n]+)/i);
 		const goal = goalMatch ? goalMatch[1].trim() : null;
 		return {
 			found: true,
@@ -12491,7 +12491,7 @@ function cmdRoadmapGetPhase(cwd, phaseNum, raw) {
 		const nextHeaderMatch = content.slice(headerIndex).match(/\n#{2,4}\s+Phase\s+\d/i);
 		const sectionEnd = nextHeaderMatch ? headerIndex + nextHeaderMatch.index : content.length;
 		const section = content.slice(headerIndex, sectionEnd).trim();
-		const goalMatch = section.match(/\*\*Goal:\*\*\s*([^\n]+)/i);
+		const goalMatch = section.match(/\*\*Goal(?::\*\*|\*\*:)\s*([^\n]+)/i);
 		const goal = goalMatch ? goalMatch[1].trim() : null;
 		const criteriaMatch = section.match(/\*\*Success Criteria\*\*[^\n]*:\s*\n((?:\s*\d+\.\s*[^\n]+\n?)+)/i);
 		output({
@@ -12529,7 +12529,7 @@ function cmdRoadmapAnalyze(cwd, raw) {
 		const nextHeader = content.slice(sectionStart).match(/\n#{2,4}\s+Phase\s+\d/i);
 		const sectionEnd = nextHeader ? sectionStart + nextHeader.index : content.length;
 		const section = content.slice(sectionStart, sectionEnd);
-		const goalMatch = section.match(/\*\*Goal:\*\*\s*([^\n]+)/i);
+		const goalMatch = section.match(/\*\*Goal(?::\*\*|\*\*:)\s*([^\n]+)/i);
 		const goal = goalMatch ? goalMatch[1].trim() : null;
 		const dependsMatch = section.match(/\*\*Depends on:\*\*\s*([^\n]+)/i);
 		const depends_on = dependsMatch ? dependsMatch[1].trim() : null;

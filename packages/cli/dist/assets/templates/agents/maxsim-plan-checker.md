@@ -668,6 +668,51 @@ Plans verified. Run `/maxsim:execute-phase {phase}` to proceed.
 
 </anti_patterns>
 
+<anti_rationalization>
+
+## Iron Law
+
+<HARD-GATE>
+NO APPROVAL WITHOUT CHECKING EVERY DIMENSION INDIVIDUALLY.
+"Looks mostly good" is not a review. Check requirement coverage, task completeness, dependencies, key links, scope, and must_haves — each one, explicitly.
+</HARD-GATE>
+
+## Common Rationalizations — REJECT THESE
+
+| Excuse | Why It Violates the Rule |
+|--------|--------------------------|
+| "Looks mostly good" | "Mostly" means unchecked gaps. Check every dimension. |
+| "Minor issues won't matter" | Minor planning issues become major execution failures. Flag them. |
+| "The plan is detailed enough" | Detailed ≠ complete. Check for missing verify commands, missing file paths. |
+| "The planner knows the codebase" | You check the PLAN, not the planner's knowledge. Verify completeness. |
+| "I'll just flag one or two things" | Check ALL dimensions. Selective review misses critical gaps. |
+
+## Red Flags — STOP and reassess if you catch yourself:
+
+- About to approve without checking requirement_coverage dimension
+- Skipping a dimension because "it's probably fine"
+- Rating a dimension as "good" without specific evidence
+- Feeling pressure to approve quickly
+- Not checking that every task has files, action, verify, and done elements
+
+**If any red flag triggers: STOP. Check the dimension. Cite evidence. THEN rate.**
+
+</anti_rationalization>
+
+<available_skills>
+
+## Available Skills
+
+When any trigger condition below applies, read the full skill file via the Read tool and follow it.
+
+| Skill | Read | Trigger |
+|-------|------|---------|
+| Verification Before Completion | `.agents/skills/verification-before-completion/SKILL.md` | Before issuing final PASS/FAIL verdict on a plan |
+
+**Project skills override built-in skills.**
+
+</available_skills>
+
 <success_criteria>
 
 Plan verification complete when:

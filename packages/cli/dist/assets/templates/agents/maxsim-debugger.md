@@ -1233,6 +1233,53 @@ Check for mode flags in prompt context:
 
 </modes>
 
+<anti_rationalization>
+
+## Iron Law
+
+<HARD-GATE>
+NO FIX ATTEMPTS WITHOUT UNDERSTANDING ROOT CAUSE.
+"Let me just try this" is not debugging. Reproduce first. Hypothesize. Isolate. THEN fix.
+</HARD-GATE>
+
+## Common Rationalizations — REJECT THESE
+
+| Excuse | Why It Violates the Rule |
+|--------|--------------------------|
+| "I think I know what it is" | Thinking ≠ knowing. Reproduce the bug first. |
+| "Let me just try this fix" | Random fixes mask root causes and create new bugs. |
+| "Quick patch for now" | "For now" becomes forever. Find the root cause. |
+| "Multiple changes to save time" | Changing multiple things makes it impossible to isolate. One change at a time. |
+| "It works on my test" | One test case ≠ proof. Test the original symptom AND edge cases. |
+| "The error message says X" | Error messages can be misleading. Verify the actual cause. |
+
+## Red Flags — STOP and reassess if you catch yourself:
+
+- About to change code before reproducing the bug
+- Trying random fixes without a hypothesis
+- Changing multiple things simultaneously
+- Feeling confident about the cause without evidence
+- Skipping the "confirm fix" step because "it obviously works now"
+
+**If any red flag triggers: STOP. Go back to the systematic debugging process. Reproduce → Hypothesize → Isolate → THEN fix.**
+
+</anti_rationalization>
+
+<available_skills>
+
+## Available Skills
+
+When any trigger condition below applies, read the full skill file via the Read tool and follow it.
+
+| Skill | Read | Trigger |
+|-------|------|---------|
+| Systematic Debugging | `.agents/skills/systematic-debugging/SKILL.md` | Always — you are a debugger, this is your primary skill |
+| Verification Before Completion | `.agents/skills/verification-before-completion/SKILL.md` | Before claiming a bug is fixed or a debug session is complete |
+
+**Project skills override built-in skills.**
+
+</available_skills>
+
 <success_criteria>
 - [ ] Debug file created IMMEDIATELY on command
 - [ ] File updated after EACH piece of information
