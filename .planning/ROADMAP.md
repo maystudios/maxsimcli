@@ -231,10 +231,10 @@ Plans:
   2. The `release` job has `needs: [build-and-test, e2e]` — a failing E2E suite blocks publish
   3. install.test.ts asserts `toHaveLength(13)` matching the actual 13 agent files in `templates/agents/`
   4. E2E tests pass locally: `cd packages/cli && npx vitest run --config vitest.e2e.config.ts` exits 0
-**Plans**: 0 plans
+**Plans**: 1 plan
 
 Plans:
-_(none yet)_
+- [ ] 27-01-PLAN.md — Add e2e job to publish.yml, gate release, fix agent count assertion
 
 ### Phase 28: Requirement Reconciliation & Doc Cleanup
 
@@ -273,5 +273,5 @@ _(none yet)_
 | 24. Fix Terminal Status Parsing & Quick Actions | 1/1 | Complete    | 2026-02-25 |
 | 25. Planning Doc Hygiene | 3/3 | Complete    | 2026-02-25 |
 | 26. Superpowers-Inspired Workflow Enhancements | 5/5 | Complete    | 2026-02-26 |
-| 27. Fix CI E2E Pipeline & Test Assertions | 0/0 | Not Started | — |
+| 27. Fix CI E2E Pipeline & Test Assertions | 0/1 | Not Started | — |
 | 28. Requirement Reconciliation & Doc Cleanup | 0/0 | Not Started | — |
