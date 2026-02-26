@@ -1,3 +1,57 @@
+## [3.1.1](https://github.com/maystudios/maxsim/compare/v3.1.0...v3.1.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** move QR button to sidebar, add --network flag, admin elevation for firewall ([dcf6830](https://github.com/maystudios/maxsim/commit/dcf683014e17ee00a960ade1f8633a9fcd8d45ae))
+
+# [3.1.0](https://github.com/maystudios/maxsim/compare/v3.0.3...v3.1.0) (2026-02-26)
+
+
+### Features
+
+* **dashboard:** local network sharing with QR code and firewall setup ([241722d](https://github.com/maystudios/maxsim/commit/241722d938d6850d78c239064566210011c8d310))
+
+## [3.0.3](https://github.com/maystudios/maxsim/compare/v3.0.2...v3.0.3) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** skip permissions on by default, enter key confirms quick command ([5a59fbf](https://github.com/maystudios/maxsim/commit/5a59fbfd02231f018e30813d28c7444122c3968b))
+
+## [3.0.2](https://github.com/maystudios/maxsim/compare/v3.0.1...v3.0.2) (2026-02-26)
+
+
+### Bug Fixes
+
+* **ci:** clear NODE_AUTH_TOKEN for npm ci to fix 403 on npm package download ([37fdec7](https://github.com/maystudios/maxsim/commit/37fdec7a161e093224164eee54671d01f5e3ebef))
+
+## [3.0.1](https://github.com/maystudios/maxsim/compare/v3.0.0...v3.0.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **dashboard:** fix 4 terminal bugs — input after restart, scroll in split mode, mouse wheel, command execution ([382d69c](https://github.com/maystudios/maxsim/commit/382d69c721e8de4fd5c1b48de6af3e7e80a67752))
+
+# [3.0.0](https://github.com/maystudios/maxsim/compare/v2.5.6...v3.0.0) (2026-02-25)
+
+
+* refactor!: flatten monorepo — merge core/adapters/hooks/templates/e2e into cli, remove Nx, switch pnpm to npm ([78f37ad](https://github.com/maystudios/maxsim/commit/78f37ada467876fa7f353fefceb85a503642c82a))
+
+
+### Bug Fixes
+
+* add GSD attribution to README and LICENSE ([44b0b5f](https://github.com/maystudios/maxsim/commit/44b0b5f56f2cec7ea9ff18d4e9abf4517bfa3984))
+* **build:** suppress tsdown inlineOnly warning causing CI exit code 1 ([4aaf606](https://github.com/maystudios/maxsim/commit/4aaf606cfc1051e47571b4cad4fcecb2eba90164))
+* **ci:** update husky pre-push hook from pnpm to npm ([2882c94](https://github.com/maystudios/maxsim/commit/2882c94498e560b6567020e55bf2dec108fe4fbe))
+
+
+### BREAKING CHANGES
+
+* Development now requires npm instead of pnpm. No user-facing changes.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+
 ## [2.5.6](https://github.com/maystudios/maxsim/compare/v2.5.5...v2.5.6) (2026-02-25)
 
 

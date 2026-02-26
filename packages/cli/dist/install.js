@@ -40,11 +40,13 @@ const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
 const os = __importStar(require("node:os"));
 const crypto = __importStar(require("node:crypto"));
+const node_child_process_1 = require("node:child_process");
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const chalk_1 = __importDefault(require("chalk"));
 const figlet_1 = __importDefault(require("figlet"));
 const ora_1 = __importDefault(require("ora"));
 const prompts_1 = require("@inquirer/prompts");
+const minimist_1 = __importDefault(require("minimist"));
 const index_js_1 = require("./adapters/index.js");
 // Get version from package.json — read at runtime so semantic-release's version bump
 // is reflected without needing to rebuild dist/install.cjs after the version bump.
@@ -53,15 +55,20 @@ const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'package.js
 const templatesRoot = path.resolve(__dirname, 'assets', 'templates');
 // Parse args
 const args = process.argv.slice(2);
-const hasGlobal = args.includes('--global') || args.includes('-g');
-const hasLocal = args.includes('--local') || args.includes('-l');
-const hasOpencode = args.includes('--opencode');
-const hasClaude = args.includes('--claude');
-const hasGemini = args.includes('--gemini');
-const hasCodex = args.includes('--codex');
-const hasBoth = args.includes('--both'); // Legacy flag, keeps working
-const hasAll = args.includes('--all');
-const hasUninstall = args.includes('--uninstall') || args.includes('-u');
+const argv = (0, minimist_1.default)(args, {
+    boolean: ['global', 'local', 'opencode', 'claude', 'gemini', 'codex', 'both', 'all', 'uninstall', 'help', 'version', 'force-statusline', 'network'],
+    string: ['config-dir'],
+    alias: { g: 'global', l: 'local', u: 'uninstall', h: 'help', c: 'config-dir' },
+});
+const hasGlobal = !!argv['global'];
+const hasLocal = !!argv['local'];
+const hasOpencode = !!argv['opencode'];
+const hasClaude = !!argv['claude'];
+const hasGemini = !!argv['gemini'];
+const hasCodex = !!argv['codex'];
+const hasBoth = !!argv['both']; // Legacy flag, keeps working
+const hasAll = !!argv['all'];
+const hasUninstall = !!argv['uninstall'];
 // Runtime selection - can be set by flags or interactive prompt
 let selectedRuntimes = [];
 if (hasAll) {
@@ -79,6 +86,67 @@ else {
         selectedRuntimes.push('gemini');
     if (hasCodex)
         selectedRuntimes.push('codex');
+}
+/**
+ * Add a firewall rule to allow inbound traffic on the given port.
+ * Handles Windows (netsh), Linux (ufw / iptables), and macOS (no rule needed).
+ */
+/** Check whether the current process is running with admin/root privileges. */
+function isElevated() {
+    if (process.platform === 'win32') {
+        try {
+            (0, node_child_process_1.execSync)('net session', { stdio: 'pipe' });
+            return true;
+        }
+        catch {
+            return false;
+        }
+    }
+    // Linux / macOS: check if uid is 0
+    return process.getuid?.() === 0;
+}
+function applyFirewallRule(port) {
+    const platform = process.platform;
+    try {
+        if (platform === 'win32') {
+            const cmd = `netsh advfirewall firewall add rule name="MAXSIM Dashboard" dir=in action=allow protocol=TCP localport=${port}`;
+            if (isElevated()) {
+                (0, node_child_process_1.execSync)(cmd, { stdio: 'pipe' });
+                console.log(chalk_1.default.green('  ✓ Windows Firewall rule added for port ' + port));
+            }
+            else {
+                // Trigger UAC elevation via PowerShell — this opens the Windows UAC dialog
+                console.log(chalk_1.default.gray('  Requesting administrator privileges for firewall rule...'));
+                const psCmd = `Start-Process cmd -ArgumentList '/c ${cmd}' -Verb RunAs -Wait`;
+                (0, node_child_process_1.execSync)(`powershell -NoProfile -Command "${psCmd}"`, { stdio: 'pipe' });
+                console.log(chalk_1.default.green('  ✓ Windows Firewall rule added for port ' + port));
+            }
+        }
+        else if (platform === 'linux') {
+            const sudoPrefix = isElevated() ? '' : 'sudo ';
+            try {
+                (0, node_child_process_1.execSync)(`${sudoPrefix}ufw allow ${port}/tcp`, { stdio: 'pipe' });
+                console.log(chalk_1.default.green('  ✓ UFW rule added for port ' + port));
+            }
+            catch {
+                try {
+                    (0, node_child_process_1.execSync)(`${sudoPrefix}iptables -A INPUT -p tcp --dport ${port} -j ACCEPT`, { stdio: 'pipe' });
+                    console.log(chalk_1.default.green('  ✓ iptables rule added for port ' + port));
+                }
+                catch {
+                    console.log(chalk_1.default.yellow(`  ⚠ Could not add firewall rule automatically. Run: sudo ufw allow ${port}/tcp`));
+                }
+            }
+        }
+        else if (platform === 'darwin') {
+            // macOS does not block inbound connections by default — no rule needed
+            console.log(chalk_1.default.gray('  macOS: No firewall rule needed (inbound connections are allowed by default)'));
+        }
+    }
+    catch (err) {
+        console.warn(chalk_1.default.yellow(`  ⚠ Firewall rule failed: ${err.message}`));
+        console.warn(chalk_1.default.gray(`  You may need to manually allow port ${port} through your firewall.`));
+    }
 }
 /**
  * Walk up from cwd to find the MAXSIM monorepo root (has packages/dashboard/src/server.ts)
@@ -161,32 +229,11 @@ const banner = '\n' +
     '\n' +
     '  A meta-prompting, context engineering and spec-driven\n' +
     '  development system for Claude Code, OpenCode, Gemini, and Codex.\n';
-// Parse --config-dir argument
-function parseConfigDirArg() {
-    const configDirIndex = args.findIndex((arg) => arg === '--config-dir' || arg === '-c');
-    if (configDirIndex !== -1) {
-        const nextArg = args[configDirIndex + 1];
-        if (!nextArg || nextArg.startsWith('-')) {
-            console.error(`  ${chalk_1.default.yellow('--config-dir requires a path argument')}`);
-            process.exit(1);
-        }
-        return nextArg;
-    }
-    const configDirArg = args.find((arg) => arg.startsWith('--config-dir=') || arg.startsWith('-c='));
-    if (configDirArg) {
-        const value = configDirArg.split('=')[1];
-        if (!value) {
-            console.error(`  ${chalk_1.default.yellow('--config-dir requires a non-empty path')}`);
-            process.exit(1);
-        }
-        return value;
-    }
-    return null;
-}
-const explicitConfigDir = parseConfigDirArg();
-const hasHelp = args.includes('--help') || args.includes('-h');
-const hasVersion = args.includes('--version');
-const forceStatusline = args.includes('--force-statusline');
+// Parse --config-dir argument (minimist handles --config-dir VALUE and --config-dir=VALUE)
+const explicitConfigDir = argv['config-dir'] || null;
+const hasHelp = !!argv['help'];
+const hasVersion = !!argv['version'];
+const forceStatusline = !!argv['force-statusline'];
 // Show version if requested (before banner for clean output)
 if (hasVersion) {
     console.log(pkg.version);
@@ -1000,7 +1047,7 @@ function reportLocalPatches(configDir, runtime = 'claude') {
     }
     return meta.files || [];
 }
-function install(isGlobal, runtime = 'claude') {
+async function install(isGlobal, runtime = 'claude') {
     const isOpencode = runtime === 'opencode';
     const isGemini = runtime === 'gemini';
     const isCodex = runtime === 'codex';
@@ -1232,6 +1279,17 @@ function install(isGlobal, runtime = 'claude') {
     // No node_modules/ needed at destination — all server deps are bundled inline.
     const dashboardSrc = path.resolve(__dirname, 'assets', 'dashboard');
     if (fs.existsSync(dashboardSrc)) {
+        // Ask whether to expose the dashboard on the local network (before spinner)
+        let networkMode = false;
+        try {
+            networkMode = await (0, prompts_1.confirm)({
+                message: 'Allow dashboard to be accessible on your local network? (adds firewall rule, enables QR code)',
+                default: false,
+            });
+        }
+        catch {
+            // Non-interactive terminal — default to false
+        }
         spinner = (0, ora_1.default)({ text: 'Installing dashboard...', color: 'cyan' }).start();
         const dashboardDest = path.join(targetDir, 'dashboard');
         // Clean existing dashboard to prevent stale files from old installs
@@ -1240,12 +1298,15 @@ function install(isGlobal, runtime = 'claude') {
         // Write dashboard.json NEXT TO dashboard/ dir (survives overwrites on upgrade)
         const dashboardConfigDest = path.join(targetDir, 'dashboard.json');
         const projectCwd = isGlobal ? targetDir : process.cwd();
-        fs.writeFileSync(dashboardConfigDest, JSON.stringify({ projectCwd }, null, 2) + '\n');
+        fs.writeFileSync(dashboardConfigDest, JSON.stringify({ projectCwd, networkMode }, null, 2) + '\n');
         if (fs.existsSync(path.join(dashboardDest, 'server.js'))) {
             spinner.succeed(chalk_1.default.green('✓') + ' Installed dashboard');
         }
         else {
             spinner.succeed(chalk_1.default.green('✓') + ' Installed dashboard (server.js not found in bundle)');
+        }
+        if (networkMode) {
+            applyFirewallRule(3333);
         }
     }
     if (failures.length > 0) {
@@ -1463,7 +1524,7 @@ async function promptAgentTeams() {
 async function installAllRuntimes(runtimes, isGlobal, isInteractive) {
     const results = [];
     for (const runtime of runtimes) {
-        const result = install(isGlobal, runtime);
+        const result = await install(isGlobal, runtime);
         results.push(result);
     }
     const statuslineRuntimes = ['claude', 'gemini'];
@@ -1490,7 +1551,7 @@ async function installAllRuntimes(runtimes, isGlobal, isInteractive) {
 }
 // Main logic
 // Subcommand routing — intercept before install flow
-const subcommand = args.find(a => !a.startsWith('-'));
+const subcommand = argv._[0];
 (async () => {
     // Dashboard subcommand
     if (subcommand === 'dashboard') {
@@ -1539,15 +1600,21 @@ const subcommand = args.find(a => !a.startsWith('-'));
             console.log('  Install MAXSIM first: ' + chalk_1.default.cyan('npx maxsimcli@latest') + '\n');
             process.exit(0);
         }
+        // --network flag overrides stored config (lets users enable network mode ad-hoc)
+        const forceNetwork = !!argv['network'];
         // Read projectCwd from dashboard.json (one level up from dashboard/ dir)
         const dashboardDir = path.dirname(serverPath);
         const dashboardConfigPath = path.join(path.dirname(dashboardDir), 'dashboard.json');
         let projectCwd = process.cwd();
+        let networkMode = forceNetwork;
         if (fs.existsSync(dashboardConfigPath)) {
             try {
                 const config = JSON.parse(fs.readFileSync(dashboardConfigPath, 'utf8'));
                 if (config.projectCwd) {
                     projectCwd = config.projectCwd;
+                }
+                if (!forceNetwork) {
+                    networkMode = config.networkMode ?? false;
                 }
             }
             catch {
@@ -1577,7 +1644,11 @@ const subcommand = args.find(a => !a.startsWith('-'));
         }
         console.log(chalk_1.default.blue('Starting dashboard...'));
         console.log(chalk_1.default.gray(`  Project: ${projectCwd}`));
-        console.log(chalk_1.default.gray(`  Server:  ${serverPath}\n`));
+        console.log(chalk_1.default.gray(`  Server:  ${serverPath}`));
+        if (networkMode) {
+            console.log(chalk_1.default.gray('  Network: enabled (local network access + QR code)'));
+        }
+        console.log('');
         // Use stdio: 'ignore' (fully detached) — a piped stderr causes the server to crash on
         // Windows when the read-end is closed after the parent reads the ready message (EPIPE).
         const child = spawnDash(process.execPath, [serverPath], {
@@ -1587,6 +1658,7 @@ const subcommand = args.find(a => !a.startsWith('-'));
             env: {
                 ...process.env,
                 MAXSIM_PROJECT_CWD: projectCwd,
+                MAXSIM_NETWORK_MODE: networkMode ? '1' : '0',
                 NODE_ENV: 'production',
             },
         });

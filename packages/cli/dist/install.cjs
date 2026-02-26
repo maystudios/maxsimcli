@@ -35,6 +35,7 @@ let node_os = require("node:os");
 node_os = __toESM(node_os);
 let node_crypto = require("node:crypto");
 node_crypto = __toESM(node_crypto);
+let node_child_process = require("node:child_process");
 let node_process = require("node:process");
 node_process = __toESM(node_process);
 let node_tty = require("node:tty");
@@ -7516,7 +7517,179 @@ var dist_default = createPrompt((config, done) => {
 });
 
 //#endregion
+//#region ../../node_modules/minimist/index.js
+var require_minimist = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	function hasKey(obj, keys) {
+		var o = obj;
+		keys.slice(0, -1).forEach(function(key) {
+			o = o[key] || {};
+		});
+		return keys[keys.length - 1] in o;
+	}
+	function isNumber(x) {
+		if (typeof x === "number") return true;
+		if (/^0x[0-9a-f]+$/i.test(x)) return true;
+		return /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(e[-+]?\d+)?$/.test(x);
+	}
+	function isConstructorOrProto(obj, key) {
+		return key === "constructor" && typeof obj[key] === "function" || key === "__proto__";
+	}
+	module.exports = function(args, opts) {
+		if (!opts) opts = {};
+		var flags = {
+			bools: {},
+			strings: {},
+			unknownFn: null
+		};
+		if (typeof opts.unknown === "function") flags.unknownFn = opts.unknown;
+		if (typeof opts.boolean === "boolean" && opts.boolean) flags.allBools = true;
+		else [].concat(opts.boolean).filter(Boolean).forEach(function(key) {
+			flags.bools[key] = true;
+		});
+		var aliases = {};
+		function aliasIsBoolean(key) {
+			return aliases[key].some(function(x) {
+				return flags.bools[x];
+			});
+		}
+		Object.keys(opts.alias || {}).forEach(function(key) {
+			aliases[key] = [].concat(opts.alias[key]);
+			aliases[key].forEach(function(x) {
+				aliases[x] = [key].concat(aliases[key].filter(function(y) {
+					return x !== y;
+				}));
+			});
+		});
+		[].concat(opts.string).filter(Boolean).forEach(function(key) {
+			flags.strings[key] = true;
+			if (aliases[key]) [].concat(aliases[key]).forEach(function(k) {
+				flags.strings[k] = true;
+			});
+		});
+		var defaults = opts.default || {};
+		var argv = { _: [] };
+		function argDefined(key, arg) {
+			return flags.allBools && /^--[^=]+$/.test(arg) || flags.strings[key] || flags.bools[key] || aliases[key];
+		}
+		function setKey(obj, keys, value) {
+			var o = obj;
+			for (var i = 0; i < keys.length - 1; i++) {
+				var key = keys[i];
+				if (isConstructorOrProto(o, key)) return;
+				if (o[key] === void 0) o[key] = {};
+				if (o[key] === Object.prototype || o[key] === Number.prototype || o[key] === String.prototype) o[key] = {};
+				if (o[key] === Array.prototype) o[key] = [];
+				o = o[key];
+			}
+			var lastKey = keys[keys.length - 1];
+			if (isConstructorOrProto(o, lastKey)) return;
+			if (o === Object.prototype || o === Number.prototype || o === String.prototype) o = {};
+			if (o === Array.prototype) o = [];
+			if (o[lastKey] === void 0 || flags.bools[lastKey] || typeof o[lastKey] === "boolean") o[lastKey] = value;
+			else if (Array.isArray(o[lastKey])) o[lastKey].push(value);
+			else o[lastKey] = [o[lastKey], value];
+		}
+		function setArg(key, val, arg) {
+			if (arg && flags.unknownFn && !argDefined(key, arg)) {
+				if (flags.unknownFn(arg) === false) return;
+			}
+			var value = !flags.strings[key] && isNumber(val) ? Number(val) : val;
+			setKey(argv, key.split("."), value);
+			(aliases[key] || []).forEach(function(x) {
+				setKey(argv, x.split("."), value);
+			});
+		}
+		Object.keys(flags.bools).forEach(function(key) {
+			setArg(key, defaults[key] === void 0 ? false : defaults[key]);
+		});
+		var notFlags = [];
+		if (args.indexOf("--") !== -1) {
+			notFlags = args.slice(args.indexOf("--") + 1);
+			args = args.slice(0, args.indexOf("--"));
+		}
+		for (var i = 0; i < args.length; i++) {
+			var arg = args[i];
+			var key;
+			var next;
+			if (/^--.+=/.test(arg)) {
+				var m = arg.match(/^--([^=]+)=([\s\S]*)$/);
+				key = m[1];
+				var value = m[2];
+				if (flags.bools[key]) value = value !== "false";
+				setArg(key, value, arg);
+			} else if (/^--no-.+/.test(arg)) {
+				key = arg.match(/^--no-(.+)/)[1];
+				setArg(key, false, arg);
+			} else if (/^--.+/.test(arg)) {
+				key = arg.match(/^--(.+)/)[1];
+				next = args[i + 1];
+				if (next !== void 0 && !/^(-|--)[^-]/.test(next) && !flags.bools[key] && !flags.allBools && (aliases[key] ? !aliasIsBoolean(key) : true)) {
+					setArg(key, next, arg);
+					i += 1;
+				} else if (/^(true|false)$/.test(next)) {
+					setArg(key, next === "true", arg);
+					i += 1;
+				} else setArg(key, flags.strings[key] ? "" : true, arg);
+			} else if (/^-[^-]+/.test(arg)) {
+				var letters = arg.slice(1, -1).split("");
+				var broken = false;
+				for (var j = 0; j < letters.length; j++) {
+					next = arg.slice(j + 2);
+					if (next === "-") {
+						setArg(letters[j], next, arg);
+						continue;
+					}
+					if (/[A-Za-z]/.test(letters[j]) && next[0] === "=") {
+						setArg(letters[j], next.slice(1), arg);
+						broken = true;
+						break;
+					}
+					if (/[A-Za-z]/.test(letters[j]) && /-?\d+(\.\d*)?(e-?\d+)?$/.test(next)) {
+						setArg(letters[j], next, arg);
+						broken = true;
+						break;
+					}
+					if (letters[j + 1] && letters[j + 1].match(/\W/)) {
+						setArg(letters[j], arg.slice(j + 2), arg);
+						broken = true;
+						break;
+					} else setArg(letters[j], flags.strings[letters[j]] ? "" : true, arg);
+				}
+				key = arg.slice(-1)[0];
+				if (!broken && key !== "-") if (args[i + 1] && !/^(-|--)[^-]/.test(args[i + 1]) && !flags.bools[key] && (aliases[key] ? !aliasIsBoolean(key) : true)) {
+					setArg(key, args[i + 1], arg);
+					i += 1;
+				} else if (args[i + 1] && /^(true|false)$/.test(args[i + 1])) {
+					setArg(key, args[i + 1] === "true", arg);
+					i += 1;
+				} else setArg(key, flags.strings[key] ? "" : true, arg);
+			} else {
+				if (!flags.unknownFn || flags.unknownFn(arg) !== false) argv._.push(flags.strings._ || !isNumber(arg) ? arg : Number(arg));
+				if (opts.stopEarly) {
+					argv._.push.apply(argv._, args.slice(i + 1));
+					break;
+				}
+			}
+		}
+		Object.keys(defaults).forEach(function(k) {
+			if (!hasKey(argv, k.split("."))) {
+				setKey(argv, k.split("."), defaults[k]);
+				(aliases[k] || []).forEach(function(x) {
+					setKey(argv, x.split("."), defaults[k]);
+				});
+			}
+		});
+		if (opts["--"]) argv["--"] = notFlags.slice();
+		else notFlags.forEach(function(k) {
+			argv._.push(k);
+		});
+		return argv;
+	};
+}));
+
+//#endregion
 //#region src/adapters/base.ts
+var import_minimist = /* @__PURE__ */ __toESM(require_minimist());
 /**
 * @maxsim/adapters — Shared base utilities extracted from bin/install.js
 */
@@ -8114,16 +8287,40 @@ const codexAdapter = {
 //#region src/install.ts
 const pkg = JSON.parse(node_fs.readFileSync(node_path.resolve(__dirname, "..", "package.json"), "utf-8"));
 const templatesRoot = node_path.resolve(__dirname, "assets", "templates");
-const args = process.argv.slice(2);
-const hasGlobal = args.includes("--global") || args.includes("-g");
-const hasLocal = args.includes("--local") || args.includes("-l");
-const hasOpencode = args.includes("--opencode");
-const hasClaude = args.includes("--claude");
-const hasGemini = args.includes("--gemini");
-const hasCodex = args.includes("--codex");
-const hasBoth = args.includes("--both");
-const hasAll = args.includes("--all");
-const hasUninstall = args.includes("--uninstall") || args.includes("-u");
+const argv = (0, import_minimist.default)(process.argv.slice(2), {
+	boolean: [
+		"global",
+		"local",
+		"opencode",
+		"claude",
+		"gemini",
+		"codex",
+		"both",
+		"all",
+		"uninstall",
+		"help",
+		"version",
+		"force-statusline",
+		"network"
+	],
+	string: ["config-dir"],
+	alias: {
+		g: "global",
+		l: "local",
+		u: "uninstall",
+		h: "help",
+		c: "config-dir"
+	}
+});
+const hasGlobal = !!argv["global"];
+const hasLocal = !!argv["local"];
+const hasOpencode = !!argv["opencode"];
+const hasClaude = !!argv["claude"];
+const hasGemini = !!argv["gemini"];
+const hasCodex = !!argv["codex"];
+const hasBoth = !!argv["both"];
+const hasAll = !!argv["all"];
+const hasUninstall = !!argv["uninstall"];
 let selectedRuntimes = [];
 if (hasAll) selectedRuntimes = [
 	"claude",
@@ -8137,6 +8334,52 @@ else {
 	if (hasClaude) selectedRuntimes.push("claude");
 	if (hasGemini) selectedRuntimes.push("gemini");
 	if (hasCodex) selectedRuntimes.push("codex");
+}
+/**
+* Add a firewall rule to allow inbound traffic on the given port.
+* Handles Windows (netsh), Linux (ufw / iptables), and macOS (no rule needed).
+*/
+/** Check whether the current process is running with admin/root privileges. */
+function isElevated() {
+	if (process.platform === "win32") try {
+		(0, node_child_process.execSync)("net session", { stdio: "pipe" });
+		return true;
+	} catch {
+		return false;
+	}
+	return process.getuid?.() === 0;
+}
+function applyFirewallRule(port) {
+	const platform = process.platform;
+	try {
+		if (platform === "win32") {
+			const cmd = `netsh advfirewall firewall add rule name="MAXSIM Dashboard" dir=in action=allow protocol=TCP localport=${port}`;
+			if (isElevated()) {
+				(0, node_child_process.execSync)(cmd, { stdio: "pipe" });
+				console.log(chalk.green("  ✓ Windows Firewall rule added for port " + port));
+			} else {
+				console.log(chalk.gray("  Requesting administrator privileges for firewall rule..."));
+				(0, node_child_process.execSync)(`powershell -NoProfile -Command "${`Start-Process cmd -ArgumentList '/c ${cmd}' -Verb RunAs -Wait`}"`, { stdio: "pipe" });
+				console.log(chalk.green("  ✓ Windows Firewall rule added for port " + port));
+			}
+		} else if (platform === "linux") {
+			const sudoPrefix = isElevated() ? "" : "sudo ";
+			try {
+				(0, node_child_process.execSync)(`${sudoPrefix}ufw allow ${port}/tcp`, { stdio: "pipe" });
+				console.log(chalk.green("  ✓ UFW rule added for port " + port));
+			} catch {
+				try {
+					(0, node_child_process.execSync)(`${sudoPrefix}iptables -A INPUT -p tcp --dport ${port} -j ACCEPT`, { stdio: "pipe" });
+					console.log(chalk.green("  ✓ iptables rule added for port " + port));
+				} catch {
+					console.log(chalk.yellow(`  ⚠ Could not add firewall rule automatically. Run: sudo ufw allow ${port}/tcp`));
+				}
+			}
+		} else if (platform === "darwin") console.log(chalk.gray("  macOS: No firewall rule needed (inbound connections are allowed by default)"));
+	} catch (err) {
+		console.warn(chalk.yellow(`  ⚠ Firewall rule failed: ${err.message}`));
+		console.warn(chalk.gray(`  You may need to manually allow port ${port} through your firewall.`));
+	}
 }
 /**
 * Adapter registry keyed by runtime name
@@ -8192,31 +8435,10 @@ function getOpencodeGlobalDir() {
 	return opencodeAdapter.getGlobalDir();
 }
 const banner = "\n" + chalk.cyan(figlet.default.textSync("MAXSIM", { font: "ANSI Shadow" }).split("\n").map((line) => "  " + line).join("\n")) + "\n\n  MAXSIM " + chalk.dim("v" + pkg.version) + "\n  A meta-prompting, context engineering and spec-driven\n  development system for Claude Code, OpenCode, Gemini, and Codex.\n";
-function parseConfigDirArg() {
-	const configDirIndex = args.findIndex((arg) => arg === "--config-dir" || arg === "-c");
-	if (configDirIndex !== -1) {
-		const nextArg = args[configDirIndex + 1];
-		if (!nextArg || nextArg.startsWith("-")) {
-			console.error(`  ${chalk.yellow("--config-dir requires a path argument")}`);
-			process.exit(1);
-		}
-		return nextArg;
-	}
-	const configDirArg = args.find((arg) => arg.startsWith("--config-dir=") || arg.startsWith("-c="));
-	if (configDirArg) {
-		const value = configDirArg.split("=")[1];
-		if (!value) {
-			console.error(`  ${chalk.yellow("--config-dir requires a non-empty path")}`);
-			process.exit(1);
-		}
-		return value;
-	}
-	return null;
-}
-const explicitConfigDir = parseConfigDirArg();
-const hasHelp = args.includes("--help") || args.includes("-h");
-const hasVersion = args.includes("--version");
-const forceStatusline = args.includes("--force-statusline");
+const explicitConfigDir = argv["config-dir"] || null;
+const hasHelp = !!argv["help"];
+const hasVersion = !!argv["version"];
+const forceStatusline = !!argv["force-statusline"];
 if (hasVersion) {
 	console.log(pkg.version);
 	process.exit(0);
@@ -8791,7 +9013,7 @@ function reportLocalPatches(configDir, runtime = "claude") {
 	}
 	return meta.files || [];
 }
-function install(isGlobal, runtime = "claude") {
+async function install(isGlobal, runtime = "claude") {
 	const isOpencode = runtime === "opencode";
 	const isGemini = runtime === "gemini";
 	const isCodex = runtime === "codex";
@@ -8971,6 +9193,13 @@ function install(isGlobal, runtime = "claude") {
 	}
 	const dashboardSrc = node_path.resolve(__dirname, "assets", "dashboard");
 	if (node_fs.existsSync(dashboardSrc)) {
+		let networkMode = false;
+		try {
+			networkMode = await dist_default$1({
+				message: "Allow dashboard to be accessible on your local network? (adds firewall rule, enables QR code)",
+				default: false
+			});
+		} catch {}
 		spinner = ora({
 			text: "Installing dashboard...",
 			color: "cyan"
@@ -8980,9 +9209,13 @@ function install(isGlobal, runtime = "claude") {
 		copyDirRecursive(dashboardSrc, dashboardDest);
 		const dashboardConfigDest = node_path.join(targetDir, "dashboard.json");
 		const projectCwd = isGlobal ? targetDir : process.cwd();
-		node_fs.writeFileSync(dashboardConfigDest, JSON.stringify({ projectCwd }, null, 2) + "\n");
+		node_fs.writeFileSync(dashboardConfigDest, JSON.stringify({
+			projectCwd,
+			networkMode
+		}, null, 2) + "\n");
 		if (node_fs.existsSync(node_path.join(dashboardDest, "server.js"))) spinner.succeed(chalk.green("✓") + " Installed dashboard");
 		else spinner.succeed(chalk.green("✓") + " Installed dashboard (server.js not found in bundle)");
+		if (networkMode) applyFirewallRule(3333);
 	}
 	if (failures.length > 0) {
 		console.error(`\n  ${chalk.yellow("Installation incomplete!")} Failed: ${failures.join(", ")}`);
@@ -9163,7 +9396,7 @@ async function promptAgentTeams() {
 async function installAllRuntimes(runtimes, isGlobal, isInteractive) {
 	const results = [];
 	for (const runtime of runtimes) {
-		const result = install(isGlobal, runtime);
+		const result = await install(isGlobal, runtime);
 		results.push(result);
 	}
 	const statuslineRuntimes = ["claude", "gemini"];
@@ -9182,7 +9415,7 @@ async function installAllRuntimes(runtimes, isGlobal, isInteractive) {
 		finishInstall(result.settingsPath, result.settings, result.statuslineCommand, useStatusline, result.runtime, isGlobal);
 	}
 }
-const subcommand = args.find((a) => !a.startsWith("-"));
+const subcommand = argv._[0];
 (async () => {
 	if (subcommand === "dashboard") {
 		const { spawn: spawnDash, execSync: execSyncDash } = await import("node:child_process");
@@ -9211,12 +9444,15 @@ const subcommand = args.find((a) => !a.startsWith("-"));
 			console.log("  Install MAXSIM first: " + chalk.cyan("npx maxsimcli@latest") + "\n");
 			process.exit(0);
 		}
+		const forceNetwork = !!argv["network"];
 		const dashboardDir = node_path.dirname(serverPath);
 		const dashboardConfigPath = node_path.join(node_path.dirname(dashboardDir), "dashboard.json");
 		let projectCwd = process.cwd();
+		let networkMode = forceNetwork;
 		if (node_fs.existsSync(dashboardConfigPath)) try {
 			const config = JSON.parse(node_fs.readFileSync(dashboardConfigPath, "utf8"));
 			if (config.projectCwd) projectCwd = config.projectCwd;
+			if (!forceNetwork) networkMode = config.networkMode ?? false;
 		} catch {}
 		const dashDirForPty = node_path.dirname(serverPath);
 		const ptyModulePath = node_path.join(dashDirForPty, "node_modules", "node-pty");
@@ -9236,7 +9472,9 @@ const subcommand = args.find((a) => !a.startsWith("-"));
 		}
 		console.log(chalk.blue("Starting dashboard..."));
 		console.log(chalk.gray(`  Project: ${projectCwd}`));
-		console.log(chalk.gray(`  Server:  ${serverPath}\n`));
+		console.log(chalk.gray(`  Server:  ${serverPath}`));
+		if (networkMode) console.log(chalk.gray("  Network: enabled (local network access + QR code)"));
+		console.log("");
 		spawnDash(process.execPath, [serverPath], {
 			cwd: dashboardDir,
 			detached: true,
@@ -9244,6 +9482,7 @@ const subcommand = args.find((a) => !a.startsWith("-"));
 			env: {
 				...process.env,
 				MAXSIM_PROJECT_CWD: projectCwd,
+				MAXSIM_NETWORK_MODE: networkMode ? "1" : "0",
 				NODE_ENV: "production"
 			}
 		}).unref();

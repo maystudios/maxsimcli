@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { simpleGit } from 'simple-git';
+import slugify from 'slugify';
 
 import type {
   ModelProfiles,
@@ -410,7 +411,7 @@ export function pathExistsInternal(cwd: string, targetPath: string): boolean {
 
 export function generateSlugInternal(text: string | null | undefined): string | null {
   if (!text) return null;
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return slugify(text, { lower: true, strict: true });
 }
 
 export function getMilestoneInfo(cwd: string): MilestoneInfo {

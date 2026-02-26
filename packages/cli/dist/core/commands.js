@@ -23,6 +23,7 @@ exports.cmdScaffold = cmdScaffold;
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
 const chalk_1 = __importDefault(require("chalk"));
+const slugify_1 = __importDefault(require("slugify"));
 const core_js_1 = require("./core.js");
 const frontmatter_js_1 = require("./frontmatter.js");
 // ─── Slug generation ────────────────────────────────────────────────────────
@@ -30,10 +31,7 @@ function cmdGenerateSlug(text, raw) {
     if (!text) {
         (0, core_js_1.error)('text required for slug generation');
     }
-    const slug = text
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
+    const slug = (0, slugify_1.default)(text, { lower: true, strict: true });
     const result = { slug };
     (0, core_js_1.output)(result, raw, slug);
 }

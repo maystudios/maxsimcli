@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import chalk from 'chalk';
+import slugify from 'slugify';
 import {
   safeReadFile,
   loadConfig,
@@ -44,10 +45,7 @@ export function cmdGenerateSlug(text: string | undefined, raw: boolean): void {
     error('text required for slug generation');
   }
 
-  const slug = text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+  const slug = slugify(text, { lower: true, strict: true });
 
   const result = { slug };
   output(result, raw, slug);

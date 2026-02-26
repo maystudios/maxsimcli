@@ -28,6 +28,8 @@ import type {
 } from '@maxsim/core';
 
 import { watch, type FSWatcher } from 'chokidar';
+import debounce from 'lodash.debounce';
+import slugify from 'slugify';
 import { PtyManager } from './terminal/pty-manager';
 
 // ─── Logging ──────────────────────────────────────────────────────────────
@@ -197,8 +199,16 @@ function setupWatcher(cwd: string, wss: WebSocketServer): FSWatcher {
     depth: 5,
   });
 
-  let changedPaths = new Set<string>();
-  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  const changedPaths = new Set<string>();
+
+  const flushChanges = debounce(() => {
+    if (changedPaths.size > 0) {
+      const changes = Array.from(changedPaths);
+      changedPaths.clear();
+      console.error(`[watcher] Broadcasting ${changes.length} change(s)`);
+      broadcast(wss, { type: 'file-changes', changes, timestamp: Date.now() });
+    }
+  }, 200);
 
   function onFileChange(filePath: string): void {
     const normalized = normalizeFsPath(filePath);
@@ -207,16 +217,7 @@ function setupWatcher(cwd: string, wss: WebSocketServer): FSWatcher {
       return;
     }
     changedPaths.add(normalized);
-    if (debounceTimer !== null) clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      if (changedPaths.size > 0) {
-        const changes = Array.from(changedPaths);
-        changedPaths = new Set();
-        console.error(`[watcher] Broadcasting ${changes.length} change(s)`);
-        broadcast(wss, { type: 'file-changes', changes, timestamp: Date.now() });
-      }
-      debounceTimer = null;
-    }, 200);
+    flushChanges();
   }
 
   watcher.on('add', onFileChange);
@@ -740,7 +741,7 @@ app.post('/api/todos', (req: Request, res: Response) => {
   fs.mkdirSync(pendingDir, { recursive: true });
 
   const timestamp = new Date().toISOString().split('T')[0];
-  const slug = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+  const slug = slugify(text, { lower: true, strict: true }).slice(0, 40);
   const filename = `${timestamp}-${slug}.md`;
   const filePath = path.join(pendingDir, filename);
   const content = `title: ${text}\ncreated: ${timestamp}\narea: general\n\n${text}\n`;

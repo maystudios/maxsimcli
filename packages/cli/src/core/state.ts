@@ -7,6 +7,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import escapeStringRegexp from 'escape-string-regexp';
+
 import { loadConfig, output, error, safeReadFile } from './core.js';
 import type {
   AppConfig,
@@ -21,10 +23,6 @@ import type {
 
 // ─── Internal helpers ────────────────────────────────────────────────────────
 
-function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 export function stateExtractField(content: string, fieldName: string): string | null {
   const pattern = new RegExp(`\\*\\*${fieldName}:\\*\\*\\s*(.+)`, 'i');
   const match = content.match(pattern);
@@ -32,7 +30,7 @@ export function stateExtractField(content: string, fieldName: string): string | 
 }
 
 export function stateReplaceField(content: string, fieldName: string, newValue: string): string | null {
-  const escaped = escapeRegex(fieldName);
+  const escaped = escapeStringRegexp(fieldName);
   const pattern = new RegExp(`(\\*\\*${escaped}:\\*\\*\\s*)(.*)`, 'i');
   if (pattern.test(content)) {
     return content.replace(pattern, (_match, prefix: string) => `${prefix}${newValue}`);
@@ -109,7 +107,7 @@ export function cmdStateGet(cwd: string, section: string | null, raw: boolean): 
       return;
     }
 
-    const fieldEscaped = escapeRegex(section);
+    const fieldEscaped = escapeStringRegexp(section);
 
     // Check for **field:** value
     const fieldPattern = new RegExp(`\\*\\*${fieldEscaped}:\\*\\*\\s*(.*)`, 'i');
@@ -140,7 +138,7 @@ export function cmdStatePatch(cwd: string, patches: Record<string, string>, raw:
     const results: StatePatchResult = { updated: [], failed: [] };
 
     for (const [field, value] of Object.entries(patches)) {
-      const fieldEscaped = escapeRegex(field);
+      const fieldEscaped = escapeStringRegexp(field);
       const pattern = new RegExp(`(\\*\\*${fieldEscaped}:\\*\\*\\s*)(.*)`, 'i');
 
       if (pattern.test(content)) {
@@ -169,7 +167,7 @@ export function cmdStateUpdate(cwd: string, field: string | undefined, value: st
   const statePath = path.join(cwd, '.planning', 'STATE.md');
   try {
     let content = fs.readFileSync(statePath, 'utf-8');
-    const fieldEscaped = escapeRegex(field);
+    const fieldEscaped = escapeStringRegexp(field);
     const pattern = new RegExp(`(\\*\\*${fieldEscaped}:\\*\\*\\s*)(.*)`, 'i');
     if (pattern.test(content)) {
       content = content.replace(pattern, (_match, prefix: string) => `${prefix}${value}`);

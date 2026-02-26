@@ -33,6 +33,8 @@ export default defineConfig({
     'detect-port',
     'open',
     '@maxsim/core',
+    'lodash.debounce',
+    'slugify',
   ],
   alias: {
     '@maxsim/core': '../cli/src/core/index.ts',

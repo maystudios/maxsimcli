@@ -29,6 +29,7 @@ const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
 const node_os_1 = __importDefault(require("node:os"));
 const simple_git_1 = require("simple-git");
+const slugify_1 = __importDefault(require("slugify"));
 // ─── Model Profile Table ─────────────────────────────────────────────────────
 exports.MODEL_PROFILES = {
     'maxsim-planner': { quality: 'opus', balanced: 'opus', budget: 'sonnet', tokenburner: 'opus' },
@@ -392,7 +393,7 @@ function pathExistsInternal(cwd, targetPath) {
 function generateSlugInternal(text) {
     if (!text)
         return null;
-    return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    return (0, slugify_1.default)(text, { lower: true, strict: true });
 }
 function getMilestoneInfo(cwd) {
     try {

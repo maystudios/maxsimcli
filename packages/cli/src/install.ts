@@ -9,6 +9,7 @@ import chalk from 'chalk';
 import figlet from 'figlet';
 import ora from 'ora';
 import { select, checkbox, confirm } from '@inquirer/prompts';
+import minimist from 'minimist';
 
 import type { RuntimeName, AdapterConfig } from './adapters/index.js';
 import {
@@ -38,15 +39,20 @@ const templatesRoot = path.resolve(__dirname, 'assets', 'templates');
 
 // Parse args
 const args = process.argv.slice(2);
-const hasGlobal = args.includes('--global') || args.includes('-g');
-const hasLocal = args.includes('--local') || args.includes('-l');
-const hasOpencode = args.includes('--opencode');
-const hasClaude = args.includes('--claude');
-const hasGemini = args.includes('--gemini');
-const hasCodex = args.includes('--codex');
-const hasBoth = args.includes('--both'); // Legacy flag, keeps working
-const hasAll = args.includes('--all');
-const hasUninstall = args.includes('--uninstall') || args.includes('-u');
+const argv = minimist(args, {
+  boolean: ['global', 'local', 'opencode', 'claude', 'gemini', 'codex', 'both', 'all', 'uninstall', 'help', 'version', 'force-statusline', 'network'],
+  string: ['config-dir'],
+  alias: { g: 'global', l: 'local', u: 'uninstall', h: 'help', c: 'config-dir' },
+});
+const hasGlobal = !!argv['global'];
+const hasLocal = !!argv['local'];
+const hasOpencode = !!argv['opencode'];
+const hasClaude = !!argv['claude'];
+const hasGemini = !!argv['gemini'];
+const hasCodex = !!argv['codex'];
+const hasBoth = !!argv['both']; // Legacy flag, keeps working
+const hasAll = !!argv['all'];
+const hasUninstall = !!argv['uninstall'];
 
 // Runtime selection - can be set by flags or interactive prompt
 let selectedRuntimes: RuntimeName[] = [];
@@ -210,38 +216,11 @@ const banner =
   '  A meta-prompting, context engineering and spec-driven\n' +
   '  development system for Claude Code, OpenCode, Gemini, and Codex.\n';
 
-// Parse --config-dir argument
-function parseConfigDirArg(): string | null {
-  const configDirIndex = args.findIndex(
-    (arg) => arg === '--config-dir' || arg === '-c',
-  );
-  if (configDirIndex !== -1) {
-    const nextArg = args[configDirIndex + 1];
-    if (!nextArg || nextArg.startsWith('-')) {
-      console.error(`  ${chalk.yellow('--config-dir requires a path argument')}`);
-      process.exit(1);
-    }
-    return nextArg;
-  }
-  const configDirArg = args.find(
-    (arg) => arg.startsWith('--config-dir=') || arg.startsWith('-c='),
-  );
-  if (configDirArg) {
-    const value = configDirArg.split('=')[1];
-    if (!value) {
-      console.error(
-        `  ${chalk.yellow('--config-dir requires a non-empty path')}`,
-      );
-      process.exit(1);
-    }
-    return value;
-  }
-  return null;
-}
-const explicitConfigDir = parseConfigDirArg();
-const hasHelp = args.includes('--help') || args.includes('-h');
-const hasVersion = args.includes('--version');
-const forceStatusline = args.includes('--force-statusline');
+// Parse --config-dir argument (minimist handles --config-dir VALUE and --config-dir=VALUE)
+const explicitConfigDir: string | null = argv['config-dir'] || null;
+const hasHelp = !!argv['help'];
+const hasVersion = !!argv['version'];
+const forceStatusline = !!argv['force-statusline'];
 
 // Show version if requested (before banner for clean output)
 if (hasVersion) {
@@ -1914,7 +1893,7 @@ async function installAllRuntimes(
 
 // Main logic
 // Subcommand routing — intercept before install flow
-const subcommand = args.find(a => !a.startsWith('-'));
+const subcommand = argv._[0];
 
 (async () => {
   // Dashboard subcommand
@@ -1973,7 +1952,7 @@ const subcommand = args.find(a => !a.startsWith('-'));
     }
 
     // --network flag overrides stored config (lets users enable network mode ad-hoc)
-    const forceNetwork = args.includes('--network');
+    const forceNetwork = !!argv['network'];
 
     // Read projectCwd from dashboard.json (one level up from dashboard/ dir)
     const dashboardDir = path.dirname(serverPath);
