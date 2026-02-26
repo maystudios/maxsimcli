@@ -43,7 +43,7 @@ export function StatsHeader({ roadmap, state, todos }: StatsHeaderProps) {
       </div>
 
       {/* Progress bar */}
-      <div className="h-px w-full bg-muted mb-5">
+      <div className="h-1 w-full bg-muted mb-5">
         <motion.div
           className="h-full bg-accent"
           initial={{ width: 0 }}

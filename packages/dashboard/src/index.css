@@ -1,22 +1,22 @@
 @import "tailwindcss";
 
-/* Swiss Style dark theme — sharp, editorial, disciplined */
+/* Matches the website's color palette — Swiss Style dark, blue accent */
 :root {
-  --color-background: #111111;
-  --color-foreground: #efefef;
-  --color-muted: #222222;
-  --color-muted-foreground: #777777;
-  --color-accent: #e63946;
-  --color-accent-glow: #e63946;
-  --color-success: #4caf50;
-  --color-warning: #f59e0b;
-  --color-danger: #e63946;
-  --color-border: #2a2a2a;
-  --color-card: #161616;
-  --color-card-hover: #1e1e1e;
+  --color-background: #09090b;
+  --color-foreground: #fafafa;
+  --color-muted: #27272a;
+  --color-muted-foreground: #a1a1aa;
+  --color-accent: #3b82f6;
+  --color-accent-glow: #60a5fa;
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+  --color-danger: #ef4444;
+  --color-border: #27272a;
+  --color-card: #18181b;
+  --color-card-hover: #1f1f23;
 
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-  --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: 'Geist', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
   --radius-sm: 0;
   --radius-md: 0;
@@ -24,21 +24,21 @@
 }
 
 @theme {
-  --color-background: #111111;
-  --color-foreground: #efefef;
-  --color-muted: #222222;
-  --color-muted-foreground: #777777;
-  --color-accent: #e63946;
-  --color-accent-glow: #e63946;
-  --color-success: #4caf50;
-  --color-warning: #f59e0b;
-  --color-danger: #e63946;
-  --color-border: #2a2a2a;
-  --color-card: #161616;
-  --color-card-hover: #1e1e1e;
+  --color-background: #09090b;
+  --color-foreground: #fafafa;
+  --color-muted: #27272a;
+  --color-muted-foreground: #a1a1aa;
+  --color-accent: #3b82f6;
+  --color-accent-glow: #60a5fa;
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+  --color-danger: #ef4444;
+  --color-border: #27272a;
+  --color-card: #18181b;
+  --color-card-hover: #1f1f23;
 
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-  --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: 'Geist', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
   --radius-sm: 0;
   --radius-md: 0;
@@ -50,16 +50,17 @@ body {
   color: var(--color-foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scrollbar — minimal */
+/* Scrollbar — matches website */
 ::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--color-background);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -72,5 +73,5 @@ body {
 
 ::selection {
   background-color: var(--color-accent);
-  color: #ffffff;
+  color: white;
 }
