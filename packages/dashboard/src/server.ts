@@ -123,7 +123,7 @@ interface DashboardPhase {
   dependsOn: string[];
   planCount: number;
   summaryCount: number;
-  diskStatus: 'complete' | 'partial' | 'planned' | 'empty' | 'no_directory';
+  diskStatus: 'complete' | 'partial' | 'planned' | 'discussed' | 'researched' | 'empty' | 'no_directory';
   roadmapComplete: boolean;
   hasContext: boolean;
   hasResearch: boolean;
@@ -443,10 +443,11 @@ function parsePhases(cwd: string): DashboardPhase[] {
       const hasResearch = phaseFiles.some(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
 
       let diskStatus: DashboardPhase['diskStatus'] = 'no_directory';
-      if (planCount === 0 && summaryCount === 0) diskStatus = 'empty';
-      else if (summaryCount >= planCount && planCount > 0) diskStatus = 'complete';
+      if (summaryCount >= planCount && planCount > 0) diskStatus = 'complete';
       else if (summaryCount > 0) diskStatus = 'partial';
       else if (planCount > 0) diskStatus = 'planned';
+      else if (hasResearch) diskStatus = 'researched';
+      else if (hasContext) diskStatus = 'discussed';
       else diskStatus = 'empty';
 
       phases.push({

@@ -4867,9 +4867,9 @@ function comparePhaseNum(a, b) {
 * @param escapedPhaseNum - regex-escaped phase number string to match a specific phase
 * @param flags - regex flags (default: 'gi')
 */
-function getPhasePattern(escapedPhaseNum, flags = "gi") {
-	if (escapedPhaseNum) return new RegExp(`#{2,4}\\s*Phase\\s+${escapedPhaseNum}:\\s*([^\\n]+)`, flags);
-	return new RegExp(`#{2,4}\\s*Phase\\s+(\\d+[A-Z]?(?:\\.\\d+)?)\\s*:\\s*([^\\n]+)`, flags);
+function getPhasePattern(escapedPhaseNum, flags = "gim") {
+	if (escapedPhaseNum) return new RegExp(`^#{2,4}\\s*Phase\\s+${escapedPhaseNum}:\\s*([^\\n]+)`, flags);
+	return new RegExp(`^#{2,4}\\s*Phase\\s+(\\d+[A-Z]?(?:\\.\\d+)?)\\s*:\\s*([^\\n]+)`, flags);
 }
 function searchPhaseInDir(baseDir, relBase, normalized) {
 	try {

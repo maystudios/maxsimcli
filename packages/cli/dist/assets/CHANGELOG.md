@@ -1,3 +1,31 @@
+## [3.5.2](https://github.com/maystudios/maxsimcli/compare/v3.5.1...v3.5.2) (2026-02-26)
+
+
+### Bug Fixes
+
+* **repo:** update all GitHub URLs to new repo name maystudios/maxsimcli ([b260b32](https://github.com/maystudios/maxsimcli/commit/b260b32a1dada6bf85ea0b11588997f45007c8f6))
+
+## [3.5.1](https://github.com/maystudios/maxsim/compare/v3.5.0...v3.5.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **readme:** add early alpha notice at top of README ([06a03e2](https://github.com/maystudios/maxsim/commit/06a03e235a73d70896b1c599a970566ff0aa1a97))
+
+# [3.5.0](https://github.com/maystudios/maxsim/compare/v3.4.0...v3.5.0) (2026-02-26)
+
+
+### Features
+
+* **website:** comprehensive SEO overhaul with meta tags, sitemap, and structured data ([33db639](https://github.com/maystudios/maxsim/commit/33db6392345312f84a2d89a355a64d7d00335612))
+
+# [3.4.0](https://github.com/maystudios/maxsim/compare/v3.3.1...v3.4.0) (2026-02-26)
+
+
+### Features
+
+* **agents:** add self-improvement loop to MAXSIM agents ([48e12c3](https://github.com/maystudios/maxsim/commit/48e12c36a56013a880ca31524f47250aedcbb4bc))
+
 ## [3.3.1](https://github.com/maystudios/maxsim/compare/v3.3.0...v3.3.1) (2026-02-26)
 
 

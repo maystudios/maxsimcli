@@ -48849,9 +48849,9 @@ function comparePhaseNum(a, b) {
 * @param escapedPhaseNum - regex-escaped phase number string to match a specific phase
 * @param flags - regex flags (default: 'gi')
 */
-function getPhasePattern(escapedPhaseNum, flags = "gi") {
-	if (escapedPhaseNum) return new RegExp(`#{2,4}\\s*Phase\\s+${escapedPhaseNum}:\\s*([^\\n]+)`, flags);
-	return new RegExp(`#{2,4}\\s*Phase\\s+(\\d+[A-Z]?(?:\\.\\d+)?)\\s*:\\s*([^\\n]+)`, flags);
+function getPhasePattern(escapedPhaseNum, flags = "gim") {
+	if (escapedPhaseNum) return new RegExp(`^#{2,4}\\s*Phase\\s+${escapedPhaseNum}:\\s*([^\\n]+)`, flags);
+	return new RegExp(`^#{2,4}\\s*Phase\\s+(\\d+[A-Z]?(?:\\.\\d+)?)\\s*:\\s*([^\\n]+)`, flags);
 }
 
 //#endregion
@@ -57919,10 +57919,11 @@ function parsePhases(cwd) {
 			const hasContext = phaseFiles.some((f) => f.endsWith("-CONTEXT.md") || f === "CONTEXT.md");
 			const hasResearch = phaseFiles.some((f) => f.endsWith("-RESEARCH.md") || f === "RESEARCH.md");
 			let diskStatus = "no_directory";
-			if (planCount === 0 && summaryCount === 0) diskStatus = "empty";
-			else if (summaryCount >= planCount && planCount > 0) diskStatus = "complete";
+			if (summaryCount >= planCount && planCount > 0) diskStatus = "complete";
 			else if (summaryCount > 0) diskStatus = "partial";
 			else if (planCount > 0) diskStatus = "planned";
+			else if (hasResearch) diskStatus = "researched";
+			else if (hasContext) diskStatus = "discussed";
 			else diskStatus = "empty";
 			phases.push({
 				number: phaseNum,
