@@ -11,10 +11,10 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 Phase: 26 — Superpowers-Inspired Workflow Enhancements
 Plan: 26-04 (complete)
-Status: Plan 04 complete — Added anti-rationalization and skills to thinking agents
-Last activity: 2026-02-26 — Enhanced planner, researcher, plan-checker agents
+Status: Plan 03 complete — Added anti-rationalization, evidence gates, two-stage review, and skills to doing agents
+Last activity: 2026-02-26 — Enhanced executor, verifier, debugger agents
 
-Progress: [██████----] 60% (3/5 plans complete)
+Progress: [████████--] 80% (4/5 plans complete)
 
 ## Performance Metrics
 
@@ -93,6 +93,7 @@ Progress: [██████----] 60% (3/5 plans complete)
 | Phase 26 P01 | 2min | 1 tasks | 3 files |
 | Phase 26 P02 | 2min | 2 tasks | 2 files |
 | Phase 26 P04 | 2min | 2 tasks | 3 files |
+| Phase 26 P03 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -215,6 +216,7 @@ Recent decisions affecting current work:
 - [Phase 26-02]: HARD-GATE anti-rationalization pattern: XML tag with explicit rule preventing verdict without full check
 - [Phase 26]: Anti-rationalization sections placed before <success_criteria> with role-specific Iron Laws, rationalizations, and red flags
 - [Phase 26]: Planner gets TDD + Verification skills; researcher and checker get Verification only
+- [Phase 26]: Evidence blocks use CLAIM/EVIDENCE/OUTPUT/VERDICT format; two-stage review gated on quality model_profile; role-specific Iron Laws and rationalizations per agent
 
 ### Roadmap Evolution
 
@@ -240,5 +242,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 26-04-PLAN.md (Anti-rationalization and skills for thinking agents)
+Stopped at: Completed 26-03-PLAN.md (Anti-rationalization, evidence gates, two-stage review for doing agents)
 Resume file: N/A

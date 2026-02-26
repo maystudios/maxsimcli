@@ -209,7 +209,7 @@ Plans:
   3. Executor workflow supports an optional two-stage review mode where after each task batch, a spec-compliance review runs followed by a code-quality review (configurable via .planning/config.json)
   4. A `templates/skills/` directory exists with at least 3 foundational skills (TDD enforcement, systematic debugging, verification-before-completion) that subagents can load on-demand via the Skill tool during execution
   5. All existing tests continue to pass — no regressions from prompt changes
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 
 Plans:
 - [ ] 26-01-PLAN.md — Create 3 foundational skill files (tdd, systematic-debugging, verification-before-completion)
@@ -237,4 +237,4 @@ Plans:
 | 23. E2E Wiring & Next.js Cleanup | 2/2 | Complete    | 2026-02-25 |
 | 24. Fix Terminal Status Parsing & Quick Actions | 1/1 | Complete    | 2026-02-25 |
 | 25. Planning Doc Hygiene | 3/3 | Complete    | 2026-02-25 |
-| 26. Superpowers-Inspired Workflow Enhancements | 3/5 | In Progress|  |
+| 26. Superpowers-Inspired Workflow Enhancements | 4/5 | In Progress|  |

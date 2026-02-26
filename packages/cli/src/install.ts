@@ -1145,6 +1145,14 @@ function writeManifest(
       }
     }
   }
+  // Include skills in manifest (agents/skills/<skill-name>/*)
+  const skillsManifestDir = path.join(agentsDir, 'skills');
+  if (fs.existsSync(skillsManifestDir)) {
+    const skillHashes = generateManifest(skillsManifestDir);
+    for (const [rel, hash] of Object.entries(skillHashes)) {
+      manifest.files['agents/skills/' + rel] = hash;
+    }
+  }
 
   fs.writeFileSync(
     path.join(configDir, MANIFEST_NAME),
@@ -1424,6 +1432,51 @@ async function install(
     } else {
       spinner.fail('Failed to install agents');
       failures.push('agents');
+    }
+  }
+
+  // Copy skills to agents/skills/ directory
+  const skillsSrc = path.join(src, 'skills');
+  if (fs.existsSync(skillsSrc)) {
+    spinner = ora({ text: 'Installing skills...', color: 'cyan' }).start();
+    const skillsDest = path.join(targetDir, 'agents', 'skills');
+
+    // Remove old MAXSIM built-in skills before copying new ones (preserve user custom skills)
+    if (fs.existsSync(skillsDest)) {
+      const builtInSkills = ['tdd', 'systematic-debugging', 'verification-before-completion'];
+      for (const skill of builtInSkills) {
+        const skillDir = path.join(skillsDest, skill);
+        if (fs.existsSync(skillDir)) {
+          fs.rmSync(skillDir, { recursive: true });
+        }
+      }
+    }
+
+    // Copy skills directory recursively
+    fsExtra.copySync(skillsSrc, skillsDest, { overwrite: true });
+
+    // Process path prefixes in skill files (replace ~/.claude/ with runtime-specific path)
+    const skillEntries = fs.readdirSync(skillsDest, { withFileTypes: true });
+    for (const entry of skillEntries) {
+      if (entry.isDirectory()) {
+        const skillMd = path.join(skillsDest, entry.name, 'SKILL.md');
+        if (fs.existsSync(skillMd)) {
+          let content = fs.readFileSync(skillMd, 'utf8');
+          const dirRegex = /~\/\.claude\//g;
+          content = content.replace(dirRegex, pathPrefix);
+          content = processAttribution(content, getCommitAttribution(runtime));
+          fs.writeFileSync(skillMd, content);
+        }
+      }
+    }
+
+    const installedSkillDirs = fs.readdirSync(skillsDest, { withFileTypes: true })
+      .filter(e => e.isDirectory()).length;
+    if (installedSkillDirs > 0) {
+      spinner.succeed(chalk.green('\u2713') + ` Installed ${installedSkillDirs} skills to agents/skills/`);
+    } else {
+      spinner.fail('Failed to install skills');
+      failures.push('agents/skills');
     }
   }
 
