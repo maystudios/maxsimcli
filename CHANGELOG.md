@@ -1,3 +1,13 @@
+# [3.7.0](https://github.com/maystudios/maxsimcli/compare/v3.6.0...v3.7.0) (2026-02-27)
+
+
+### Features
+
+* **29-01:** add InitExistingContext type and cmdInitExisting function ([983cea0](https://github.com/maystudios/maxsimcli/commit/983cea0a2c17ed4888af097ee63df60e01929a83))
+* **29-01:** wire init-existing CLI dispatch and update E2E assertion ([357dcd1](https://github.com/maystudios/maxsimcli/commit/357dcd17db61cd59860e0a5f2772364d9e79945a))
+* **29-02:** create init-existing command entry point ([cea9fbd](https://github.com/maystudios/maxsimcli/commit/cea9fbd497e5a19125f32fe322be312249c7b9cc))
+* **29-03:** create init-existing workflow with scan-first initialization ([1979d97](https://github.com/maystudios/maxsimcli/commit/1979d97d5f332201597bd07cbceac0e21f48316a))
+
 # [3.6.0](https://github.com/maystudios/maxsimcli/compare/v3.5.3...v3.6.0) (2026-02-27)
 
 
