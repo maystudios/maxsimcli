@@ -43,7 +43,7 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 
 ### Dashboard Write Tests
 
-- [x] **DASH-06**: Task checkbox toggle via dashboard API (e.g. PATCH /api/phases/:id/tasks/:taskId) updates the corresponding plan `.md` file on disk with `[x]` marking
+- [x] **DASH-06**: Task checkbox toggle via dashboard API (PUT /api/plan/:path with updated content) updates the corresponding plan `.md` file on disk with `[x]` marking
 - [x] **DASH-07**: STATE.md edit via dashboard API (PUT /api/state) writes updated content to the mock STATE.md file on disk
 
 ### Dashboard Terminal
@@ -110,9 +110,9 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 | DASH-TERM-03 | Phase 21 | Satisfied |
 | DASH-TERM-04 | Phase 21 → Phase 24 | Satisfied |
 | DASH-TERM-05 | Phase 21 | Satisfied |
-| INIT-EX-01 | Phase 29 | In Progress |
-| INIT-EX-02 | Phase 29 | In Progress |
-| INIT-EX-03 | Phase 29 | In Progress |
-| INIT-EX-04 | Phase 29 | In Progress |
-| INIT-EX-05 | Phase 29 | In Progress |
-| INIT-EX-06 | Phase 29 | In Progress |
+| INIT-EX-01 | Phase 29 | Satisfied |
+| INIT-EX-02 | Phase 29 | Satisfied |
+| INIT-EX-03 | Phase 29 | Satisfied |
+| INIT-EX-04 | Phase 29 | Satisfied |
+| INIT-EX-05 | Phase 29 | Satisfied |
+| INIT-EX-06 | Phase 29 | Satisfied |

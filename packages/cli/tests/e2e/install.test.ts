@@ -31,6 +31,14 @@ describe('install file structure (E2E-03)', () => {
     const workflowsDir = join(installDir, '.claude', 'maxsim', 'workflows');
     expect(existsSync(workflowsDir)).toBe(true);
   });
+
+  it('installs skills directory with skill files', () => {
+    const installDir = inject('installDir');
+    const skillsDir = join(installDir, '.claude', 'agents', 'skills');
+    expect(existsSync(skillsDir)).toBe(true);
+    const dirs = readdirSync(skillsDir);
+    expect(dirs.length).toBeGreaterThanOrEqual(3);
+  });
 });
 
 describe('binary smoke test (E2E-04)', () => {
