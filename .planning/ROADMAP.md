@@ -48,12 +48,12 @@ Plans:
 - [x] 15-01-PLAN.md — Create packages/e2e scaffold and verify ROADMAP.md cleanup
 
 ### Phase 16: Pack + Install + Tool Tests
-**Goal**: The full E2E pipeline runs — `npm pack` produces a local tarball, install writes files to a temp directory, and passing assertions prove exactly 31 commands, exactly 11 agents, binary execution, and correct tool behavior against a mock project fixture
+**Goal**: The full E2E pipeline runs — `npm pack` produces a local tarball, install writes files to a temp directory, and passing assertions prove exactly 32 commands, exactly 13 agents, binary execution, and correct tool behavior against a mock project fixture
 **Depends on**: Phase 15
 **Requirements**: E2E-02, E2E-03, E2E-04, TOOL-01, TOOL-02, TOOL-03, TOOL-04, TOOL-05, TOOL-06
 **Success Criteria** (what must be TRUE):
   1. `globalSetup.ts` runs `npm pack` from `packages/cli/` and installs via local tarball to a `mkdtempSync` temp directory — registry is never contacted
-  2. `install.test.ts` asserts exactly 31 command `.md` files, exactly 11 agent `.md` files, and a known workflow directory structure in the installed temp path
+  2. `install.test.ts` asserts exactly 32 command `.md` files, exactly 13 agent `.md` files, and a known workflow directory structure in the installed temp path
   3. `node install.cjs --version` exits 0 from the installed temp path (binary smoke test)
   4. `tools.test.ts` runs phase, state, roadmap, and todo commands against a mock project fixture and all exit 0 with expected output
   5. The mock project fixture is a reusable shared helper covering all command groups — any test file can import and use it without re-creating it
@@ -278,7 +278,7 @@ Plans:
   3. Phase 27 VERIFICATION.md status updated from `human_needed` to `passed`
   4. Phase 28 VERIFICATION.md status updated from `gaps_found` to `passed`
   5. Phase 29 VERIFICATION.md status updated from `gaps_found` to `passed`
-  6. All 26 SUMMARY.md files with empty `requirements_completed` arrays are backfilled with actual REQ-IDs
+  6. All v2.0 phase SUMMARY.md files (phases 15-29) with empty `requirements_completed` arrays are backfilled with actual REQ-IDs
   7. install.test.ts includes an assertion that skills files are delivered (templates/skills/ directory)
   8. DASH-06 requirement wording in REQUIREMENTS.md updated to match actual API surface (PUT /api/plan/:path)
 **Plans:** 3 plans
