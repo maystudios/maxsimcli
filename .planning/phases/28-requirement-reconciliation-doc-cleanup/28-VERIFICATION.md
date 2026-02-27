@@ -1,24 +1,16 @@
 ---
 phase: 28-requirement-reconciliation-doc-cleanup
 verified: 2026-02-26T17:00:00Z
-status: gaps_found
-score: 5/6 must-haves verified
-gaps:
-  - truth: "All 76 SUMMARY.md files have a requirements-completed field in frontmatter"
-    status: partial
-    reason: "The must-have target was 76 files; there are now 77 SUMMARY.md files (28-01-SUMMARY.md was created during execution). 77/77 files DO have the field. However, the pre-push docs check fails because ROADMAP.md line '- [ ] 28-01-PLAN.md' is unchecked despite 28-01-SUMMARY.md existing — the same DOCS-01 pattern that Phase 23 suffered. The check blocks any push of this verification artifact."
-    artifacts:
-      - path: ".planning/ROADMAP.md"
-        issue: "Line shows '- [ ] 28-01-PLAN.md' but 28-01-SUMMARY.md exists. pre-push-docs-check.cjs exits 1 with 'Plan 28-01 has 28-01-SUMMARY.md but is not marked [x] in ROADMAP'."
-    missing:
-      - "Mark '28-01-PLAN.md' checkbox as [x] in ROADMAP.md Phase 28 Plans section"
+status: passed
+score: 6/6 must-haves verified
+resolved_by: "Phase 30 (tech debt closure — ROADMAP checkbox confirmed [x])"
 ---
 
 # Phase 28: Requirement Reconciliation & Doc Cleanup — Verification Report
 
 **Phase Goal:** Close all remaining documentation debt from the v2.0 audit: mark E2E-01/DOCS-01 as satisfied, fix two inconsistent VERIFICATION.md files, remove two orphan phase directories, and backfill the 17 SUMMARY.md files still missing requirements-completed frontmatter.
 **Verified:** 2026-02-26T17:00:00Z
-**Status:** gaps_found
+**Status:** passed (gap resolved)
 **Re-verification:** No — initial verification
 
 ---
@@ -34,9 +26,9 @@ gaps:
 | 3 | Phase 21 VERIFICATION.md body says passed with Phase 24 resolution note, gaps marked resolved | VERIFIED | Body line 44: `**Status:** passed (gaps resolved by Phase 24)`; frontmatter has 3 gaps with `status: resolved` and `resolved_by: "Phase 24 (24-01-PLAN.md)"`; body score: `11/11 truths verified (3 gaps fixed by Phase 24)`; Gaps Summary section begins with resolution blockquote |
 | 4 | Phase 23 VERIFICATION.md status is passed with Phase 25 resolution note | VERIFIED | Frontmatter `status: passed`, `score: 4/4 success criteria verified (gaps resolved by Phase 25)`, `resolved_by: "Phase 25 (25-01-PLAN.md, 25-02-PLAN.md)"`; body `**Status:** passed (gaps resolved by Phase 25)`; both gap entries have `status: resolved` and `resolved_by: "Phase 25"` |
 | 5 | No directories named 20-dashboard-migrate-vite-express or 20-new-phase exist | VERIFIED | Both orphan dirs gone: `test ! -d .planning/phases/20-dashboard-migrate-vite-express` passes; `test ! -d .planning/phases/20-new-phase` passes; canonical `20-dashboard-migrate-to-vite-express` untouched |
-| 6 | All 76 SUMMARY.md files have a requirements-completed field in frontmatter | PARTIAL | 77/77 SUMMARY.md files have the field (76 pre-existing + 28-01-SUMMARY.md created during execution). However, ROADMAP.md shows `- [ ] 28-01-PLAN.md` despite `28-01-SUMMARY.md` existing — `pre-push-docs-check.cjs` exits 1 and blocks pushes. This is the same DOCS-01 pattern from Phase 23. |
+| 6 | All 76 SUMMARY.md files have a requirements-completed field in frontmatter | ✓ VERIFIED | 77/77 SUMMARY.md files have the field. ROADMAP.md checkbox for 28-01-PLAN.md is now [x]. pre-push-docs-check.cjs passes. |
 
-**Score:** 5/6 truths verified
+**Score:** 6/6 truths verified
 
 ---
 
@@ -58,7 +50,7 @@ gaps:
 |------|----|-----|--------|---------|
 | `.planning/REQUIREMENTS.md` | E2E-01 traceability row | Status column | VERIFIED | Line 80: `\| E2E-01 \| Phase 15 → Phase 23 → Phase 28 \| Satisfied \|` matches pattern `E2E-01.*Satisfied` |
 | `.planning/REQUIREMENTS.md` | DOCS-01 traceability row | Status column | VERIFIED | Line 81: `\| DOCS-01 \| Phase 15 → Phase 23 → Phase 28 \| Satisfied \|` matches pattern `DOCS-01.*Satisfied` |
-| `.planning/ROADMAP.md` | `28-01-PLAN.md` plan checkbox | `[x]` mark | NOT WIRED | Line shows `- [ ] 28-01-PLAN.md` despite `28-01-SUMMARY.md` existing. `pre-push-docs-check.cjs` exits 1 and blocks pushes. |
+| `.planning/ROADMAP.md` | `28-01-PLAN.md` plan checkbox | `[x]` mark | ✓ WIRED | Checkbox now [x] — `pre-push-docs-check.cjs` passes. |
 
 ---
 
@@ -90,6 +82,8 @@ None — all items are verifiable programmatically.
 ---
 
 ## Gaps Summary
+
+> **Resolved (Phase 30):** ROADMAP.md 28-01-PLAN.md checkbox is now [x]. pre-push-docs-check.cjs exits 0.
 
 ### Gap: Unchecked 28-01-PLAN.md checkbox in ROADMAP.md (self-referential DOCS-01 failure)
 
