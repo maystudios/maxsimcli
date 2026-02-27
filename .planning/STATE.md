@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** `npx maxsimcli@latest` installs a complete AI dev workflow system that works immediately — validated end-to-end from the npm consumer perspective, not the monorepo perspective
-**Current focus:** Phase 28 — Requirement Reconciliation & Doc Cleanup
+**Current focus:** Phase 29 — Add init-existing Command for Existing Project Initialization
 
 ## Current Position
 
-Phase: 28 — Requirement Reconciliation & Doc Cleanup
-Plan: 28-01 (complete)
-Status: Phase 28 complete — 1/1 plans delivered (E2E-01/DOCS-01 closed, VERIFICATIONs fixed, SUMMARYs backfilled)
-Last activity: 2026-02-26 — Closed E2E-01/DOCS-01, fixed Phase 21/23 VERIFICATIONs, backfilled 17 SUMMARYs
+Phase: 29 — Add init-existing Command for Existing Project Initialization
+Plan: 29-01 (complete)
+Status: Plan 29-01 complete — CLI infrastructure for init-existing added (InitExistingContext, cmdInitExisting, router dispatch, E2E update)
+Last activity: 2026-02-27 — Added InitExistingContext type, cmdInitExisting function, CLI router dispatch, E2E assertion update
 
-Progress: [██████████] 100% (1/1 plans complete)
+Progress: [███-------] 33% (1/3 plans complete)
 
 ## Performance Metrics
 
@@ -98,6 +98,7 @@ Progress: [██████████] 100% (1/1 plans complete)
 | Phase 27 P01 | 2min | 2 tasks | 2 files |
 | Phase 28 P01 | 5min | 2 tasks | 21 files |
 | Phase 29 P02 | 1min | 1 tasks | 1 files |
+| Phase 29 P01 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -227,6 +228,7 @@ Recent decisions affecting current work:
 - [Phase 28]: VERIFICATION.md gaps marked resolved with resolved_by attribution (not deleted) to preserve audit trail
 - [Phase 28]: requirements-completed: [] is now mandatory in all SUMMARY.md frontmatter (76/76 coverage achieved)
 - [Phase 29]: Followed exact new-project.md structure for init-existing command consistency
+- [Phase 29]: cmdInitExisting follows exact same pattern as cmdInitNewProject for code/package detection
 
 ### Roadmap Evolution
 
@@ -252,6 +254,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-26
-Stopped at: Completed 28-01-PLAN.md (Requirement Reconciliation & Doc Cleanup - Phase 28 complete, 1/1 plan delivered)
+Last session: 2026-02-27
+Stopped at: Completed 29-01-PLAN.md (CLI infrastructure for init-existing — InitExistingContext, cmdInitExisting, router dispatch, E2E update)
 Resume file: N/A

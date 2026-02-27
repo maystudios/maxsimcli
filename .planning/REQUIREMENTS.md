@@ -69,7 +69,7 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 - [ ] **INIT-EX-03**: Conflict detection handles existing `.planning/` with overwrite/merge/cancel dialog — merge creates only missing files and fills gaps, overwrite offers backup, cancel suggests `/maxsim:health`
 - [ ] **INIT-EX-04**: Question flow produces stage-aware documents (PROJECT.md with current state summary, REQUIREMENTS.md with stage-appropriate format, ROADMAP.md with 3-5 real suggested phases, STATE.md pre-populated with constraints and risks)
 - [ ] **INIT-EX-05**: `--auto` mode runs fully autonomously — scans codebase, infers all answers, generates all documents without user interaction, flags output as auto-generated
-- [ ] **INIT-EX-06**: E2E install test updated to assert correct command count (32) after adding init-existing command
+- [x] **INIT-EX-06**: E2E install test updated to assert correct command count (32) after adding init-existing command
 
 ---
 

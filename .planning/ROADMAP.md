@@ -258,7 +258,7 @@ Plans:
 **Goal:** A working `/maxsim:init-existing` command that initializes MAXSIM in an existing codebase through scan-first-then-ask flow — runs all 4 codebase mapper agents, handles `.planning/` conflict detection with overwrite/merge/cancel dialog, asks scan-informed questions with smart defaults, generates stage-aware planning documents, and supports `--auto` mode for fully autonomous initialization
 **Requirements**: INIT-EX-01, INIT-EX-02, INIT-EX-03, INIT-EX-04, INIT-EX-05, INIT-EX-06
 **Depends on:** Phase 28
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 - [ ] 29-01-PLAN.md — CLI infrastructure: InitExistingContext type, cmdInitExisting function, router dispatch, E2E assertion update
