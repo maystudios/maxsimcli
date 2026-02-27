@@ -1,3 +1,11 @@
+## [3.7.1](https://github.com/maystudios/maxsimcli/compare/v3.7.0...v3.7.1) (2026-02-27)
+
+
+### Bug Fixes
+
+* **30-01:** add skills E2E assertion and align DASH-06 wording ([1cb57aa](https://github.com/maystudios/maxsimcli/commit/1cb57aaffd323871e9af0840308a04c40b1b45f6))
+* **30-01:** correct stale Phase 16 narrative counts and Phase 30 scope text ([c1b04f1](https://github.com/maystudios/maxsimcli/commit/c1b04f14f932e3f12f3ae0f8484ccbdd70b71b0b))
+
 # [3.7.0](https://github.com/maystudios/maxsimcli/compare/v3.6.0...v3.7.0) (2026-02-27)
 
 
