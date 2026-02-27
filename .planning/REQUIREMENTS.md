@@ -1,118 +1,99 @@
-# Requirements: MAXSIM v2.0.0 Stabilization
+# Requirements: MAXSIM
 
-**Defined:** 2026-02-24
-**Core Value:** `npx maxsimcli@latest` installs a complete AI dev workflow system that works immediately — validated end-to-end from the npm consumer perspective, not the monorepo perspective.
-
----
-
-## v1.0 Requirements (Archived — all satisfied)
-
-All 42 v1.0 requirements (NX-01 through PUB-04) are satisfied. See `.planning/v1.0-MILESTONE-AUDIT.md` for the full audit report.
+**Defined:** 2026-02-27
+**Core Value:** Consistent, high-quality AI-assisted development without context rot — accessible via CLI and a simple browser UI.
+**Stage:** MVP
 
 ---
 
-## v2.0.0 Requirements
+## v1 Requirements
 
-### E2E Infrastructure
+User stories for the Simple Dashboard Mode milestone.
 
-- [x] **E2E-01**: E2E test package exists with correct wiring — tests run via `npx vitest run --config vitest.e2e.config.ts` from `packages/cli/`, with build dependencies satisfied before execution
-- [x] **E2E-02**: globalSetup runs `npm pack` from `packages/cli/dist/` and installs via local tarball to a `mkdtempSync` temp directory — never hits the npm registry
-- [x] **E2E-03**: install.test.ts validates exact file counts post-install: exactly 31 command `.md` files, exactly 13 agent `.md` files, known workflow directory structure
-- [x] **E2E-04**: Binary smoke test: `maxsimcli --version` exits 0 from the installed temp path
+### Simple Dashboard Mode
 
-### Tool Behavioral Tests
+- [ ] **DASH-01**: As a user, I can open a "Simple Mode" view in the dashboard so that I can manage phases without a terminal
+  - Acceptance: Simple mode accessible via toggle/button from dashboard; terminal panel hidden
+- [ ] **DASH-02**: As a user, I can select "Plan new phase" or "Add phase" from a simple action screen so that I can start work with one click
+  - Acceptance: Action screen shows available phase actions; selecting one initiates the flow
+- [ ] **DASH-03**: As a user, I can enter a phase description in the dashboard UI so that I don't need to type in a terminal
+  - Acceptance: Text input in browser captures phase description; passed to planning workflow
+- [ ] **DASH-04**: As a user, I can answer discussion questions from the dashboard so that the planning discussion happens entirely in the browser
+  - Acceptance: AskUserQuestion-equivalent prompts rendered as UI elements; responses captured and sent to workflow
+- [ ] **DASH-05**: As a user, I can choose "Ask me more" or "I'm done, execute" at the end of discussion so that I control when planning ends
+  - Acceptance: Two clear CTA buttons shown after discussion; selecting "execute" triggers execution
+- [ ] **DASH-06**: As a user, I can see phase execution progress in simple mode so that I know what's happening without reading terminal output
+  - Acceptance: Progress indicator, current step name, and completion percentage shown during execution
+- [ ] **DASH-07**: As a user, I can type free-form answers to discussion questions in the dashboard so that I'm not limited to button choices
+  - Acceptance: Text input available alongside option buttons for any discussion question
 
-All tests use a shared **mock project fixture** — a temp directory with realistic `.planning/` structure (PROJECT.md, ROADMAP.md, STATE.md, phases/, todos/pending/, todos/completed/). Tests simulate real user interactions against installed `maxsim-tools.cjs`.
+### Hook System for Dashboard Interaction
 
-- [x] **TOOL-01**: User runs `phases list` against mock project → returns list of phases matching mock ROADMAP.md; user runs `phase add "Test Phase"` → phase appears in ROADMAP.md; user runs `phase complete` → phase marked complete in ROADMAP.md
-- [x] **TOOL-02**: User runs state commands against mock project: `state read` → returns STATE.md content; `log-decision "decision" "rationale"` → STATE.md updated; `add-blocker "blocker"` → STATE.md updated
-- [x] **TOOL-03**: User runs roadmap commands against mock project: `roadmap parse` → returns structured data matching mock ROADMAP.md
-- [x] **TOOL-04**: User runs todo commands against mock project: `todo add "task"` → creates file in `todos/pending/`; `todo list` → returns pending todos; `todo complete` → moves file to `todos/completed/`
-- [x] **TOOL-05**: User runs `milestone` and `verify` commands against mock project — exit 0 with expected output
-- [x] **TOOL-06**: Mock project fixture is a reusable test helper covering all command groups (produces valid PROJECT.md, ROADMAP.md with phases, STATE.md with decisions, phase dirs with PLAN.md files, todos)
+- [ ] **HOOK-01**: As a user, workflow AskUserQuestion calls are intercepted by the dashboard so that questions appear in the browser UI
+  - Acceptance: When a workflow triggers a question, it appears in simple mode UI within 1 second
+- [ ] **HOOK-02**: As a developer, I can register hooks that bridge Claude Code workflow events to the dashboard so that simple mode stays in sync
+  - Acceptance: Hook API documented; events (question asked, answer given, phase started, phase complete) fire reliably
 
-### Dashboard Read Tests
+### Full Auto-Run Foundation
 
-Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture. Tests assert API responses match the mock data files.
+- [ ] **AUTO-01**: As a user, I can trigger a phase to execute automatically after planning completes so that I don't manually initiate each step
+  - Acceptance: "Execute automatically" option in simple mode; execution starts without terminal interaction
 
-- [x] **DASH-01**: Dashboard server spawns from installed path, starts without errors, `/api/health` returns `{ status: 'ok' }` within 30s
-- [x] **DASH-02**: `/api/project` returns data matching mock PROJECT.md (project name, core value present)
-- [x] **DASH-03**: `/api/phases` returns phases array matching mock ROADMAP.md (correct phase count, names, statuses)
-- [x] **DASH-04**: `/api/state` returns data matching mock STATE.md (decisions, blockers present)
-- [x] **DASH-05**: `/api/todos` returns todos array matching mock `todos/` directory (pending todos present)
+### Superpowers-Style Extensibility
 
-### Dashboard Write Tests
-
-- [x] **DASH-06**: Task checkbox toggle via dashboard API (PUT /api/plan/:path with updated content) updates the corresponding plan `.md` file on disk with `[x]` marking
-- [x] **DASH-07**: STATE.md edit via dashboard API (PUT /api/state) writes updated content to the mock STATE.md file on disk
-
-### Dashboard Terminal
-
-- [x] **DASH-TERM-01**: Terminal tab spawns Claude Code as PTY child process on the server with configurable `--dangerously-skip-permissions` flag
-- [x] **DASH-TERM-02**: All stdout/stderr including ANSI escape codes streamed via WebSocket and rendered in xterm.js
-- [x] **DASH-TERM-03**: Keyboard input forwarded from browser to server process stdin in real-time
-- [x] **DASH-TERM-04**: Quick-action buttons send predefined MAXSIM slash commands to the running process
-- [x] **DASH-TERM-05**: WebSocket reconnection within 60 seconds reattaches to still-running process with scrollback preserved
-
-### Planning Cleanup
-
-- [x] **DOCS-01**: ROADMAP.md phase statuses match actual codebase state — all completed phases marked `[x]`, no stale "In Progress" entries that have shipped
-
-### CI Integration
-
-- [x] **CI-01**: GitHub Actions E2E job runs E2E tests on push to main, after build with `STANDALONE_BUILD=true`, and gates on green E2E before publish
-
-### Init-Existing Command
-
-- [x] **INIT-EX-01**: `/maxsim:init-existing` command exists with CLI wiring — `node maxsim-tools.cjs init init-existing` returns valid JSON context with conflict detection fields
-- [x] **INIT-EX-02**: Codebase scan runs all 4 mapper agents (tech, arch, quality, concerns) before any user questions, saving to `.planning/codebase/`
-- [x] **INIT-EX-03**: Conflict detection handles existing `.planning/` with overwrite/merge/cancel dialog — merge creates only missing files and fills gaps, overwrite offers backup, cancel suggests `/maxsim:health`
-- [x] **INIT-EX-04**: Question flow produces stage-aware documents (PROJECT.md with current state summary, REQUIREMENTS.md with stage-appropriate format, ROADMAP.md with 3-5 real suggested phases, STATE.md pre-populated with constraints and risks)
-- [x] **INIT-EX-05**: `--auto` mode runs fully autonomously — scans codebase, infers all answers, generates all documents without user interaction, flags output as auto-generated
-- [x] **INIT-EX-06**: E2E install test updated to assert correct command count (32) after adding init-existing command
+- [ ] **EXT-01**: As a developer, I can add new skills/commands that appear in the simple dashboard action menu so that the system is extensible
+  - Acceptance: Simple mode action menu is data-driven; new actions added via config without code changes
 
 ---
 
-## Future Requirements (v2.x+)
+## v2 Requirements
 
-- Multi-runtime install validation (OpenCode, Gemini, Codex) — after Claude runtime is green
-- Browser-level Playwright dashboard tests (visual correctness) — v3 scope
-- Content-level frontmatter validation of installed command files — low priority
-- Dashboard data write tests: plan file creation, state reset — v2.1
+Deferred to future releases.
+
+- **DASH-08**: Mobile-responsive simple mode layout — touch-optimized for phone/tablet use
+- **DASH-09**: QR code to open simple mode on mobile from the dashboard
+- **AUTO-02**: Full auto-run — entire project executes phase by phase without any manual steps
+- **AUTO-03**: Scheduled auto-run — phases execute on a timer or trigger
+- **EXT-02**: Deeper Superpowers integration — skill marketplace, shared skill library
+- **EXT-03**: Multi-user dashboard — team members see same project state in real-time
+- **PERF-01**: STATE.md compaction command — archive old entries, prevent unbounded growth
+- **TEST-01**: Unit tests for core parsing (frontmatter, state field extraction, phase sorting)
+- **TEST-02**: E2E tests for all 4 runtime adapter transforms
+
+---
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| External database for state | File-based state is a core design principle; git-trackable |
+| Breaking changes to CLI commands | External users depend on stability; additive only |
+| Removing advanced dashboard mode | Simple mode is additive; power users keep terminal access |
+| Authentication/user accounts | MAXSIM is local-only by design |
 
 ---
 
 ## Traceability
 
-| REQ-ID | Phase | Status |
-|--------|-------|--------|
-| E2E-01 | Phase 15 → Phase 23 → Phase 28 | Satisfied |
-| DOCS-01 | Phase 15 → Phase 23 → Phase 28 | Satisfied |
-| E2E-02 | Phase 16 | Satisfied |
-| E2E-03 | Phase 16 → Phase 27 | Complete |
-| E2E-04 | Phase 16 | Satisfied |
-| TOOL-01 | Phase 16 | Satisfied |
-| TOOL-02 | Phase 16 | Satisfied |
-| TOOL-03 | Phase 16 | Satisfied |
-| TOOL-04 | Phase 16 | Satisfied |
-| TOOL-05 | Phase 16 | Satisfied |
-| TOOL-06 | Phase 16 | Satisfied |
-| DASH-01 | Phase 17 → Phase 22 | Satisfied |
-| DASH-02 | Phase 17 → Phase 22 | Satisfied |
-| DASH-03 | Phase 17 → Phase 22 | Satisfied |
-| DASH-04 | Phase 17 → Phase 22 | Satisfied |
-| DASH-05 | Phase 17 → Phase 22 | Satisfied |
-| DASH-06 | Phase 18 → Phase 22 | Satisfied |
-| DASH-07 | Phase 18 → Phase 22 | Satisfied |
-| CI-01 | Phase 19 → Phase 22 → Phase 27 | Complete |
-| DASH-TERM-01 | Phase 21 → Phase 22 | Satisfied |
-| DASH-TERM-02 | Phase 21 | Satisfied |
-| DASH-TERM-03 | Phase 21 | Satisfied |
-| DASH-TERM-04 | Phase 21 → Phase 24 | Satisfied |
-| DASH-TERM-05 | Phase 21 | Satisfied |
-| INIT-EX-01 | Phase 29 | Satisfied |
-| INIT-EX-02 | Phase 29 | Satisfied |
-| INIT-EX-03 | Phase 29 | Satisfied |
-| INIT-EX-04 | Phase 29 | Satisfied |
-| INIT-EX-05 | Phase 29 | Satisfied |
-| INIT-EX-06 | Phase 29 | Satisfied |
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| DASH-01 | Phase 31 | Pending |
+| DASH-02 | Phase 31 | Pending |
+| DASH-03 | Phase 31 | Pending |
+| DASH-04 | Phase 32 | Pending |
+| DASH-05 | Phase 32 | Pending |
+| DASH-07 | Phase 32 | Pending |
+| HOOK-01 | Phase 33 | Pending |
+| HOOK-02 | Phase 33 | Pending |
+| DASH-06 | Phase 34 | Pending |
+| AUTO-01 | Phase 34 | Pending |
+| EXT-01 | Phase 35 | Pending |
+
+**Coverage:**
+- v1 requirements: 11 total
+- Mapped to phases: 11
+- Unmapped: 0
+
+---
+
+*Requirements defined: 2026-02-27*
