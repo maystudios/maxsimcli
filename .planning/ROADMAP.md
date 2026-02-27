@@ -284,9 +284,9 @@ Plans:
 **Plans:** 3/3 plans complete
 
 Plans:
-- [ ] 30-01-PLAN.md — Fix stale counts in ROADMAP/test, add skills E2E assertion, align DASH-06 wording
-- [ ] 30-02-PLAN.md — Update 3 VERIFICATION.md statuses (phases 27, 28, 29) to passed
-- [ ] 30-03-PLAN.md — Backfill requirements_completed in 15 SUMMARY.md files with actual REQ-IDs
+- [x] 30-01-PLAN.md — Fix stale counts in ROADMAP/test, add skills E2E assertion, align DASH-06 wording
+- [x] 30-02-PLAN.md — Update 3 VERIFICATION.md statuses (phases 27, 28, 29) to passed
+- [x] 30-03-PLAN.md — Backfill requirements_completed in 15 SUMMARY.md files with actual REQ-IDs
 
 ---
 
