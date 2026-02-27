@@ -27,7 +27,7 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 - [x] **Phase 27: Fix CI E2E Pipeline & Test Assertions** - Add e2e job to publish.yml, gate release on green E2E, fix agent count assertion (11→13) (completed 2026-02-26)
 - [x] **Phase 28: Requirement Reconciliation & Doc Cleanup** - Update outdated E2E-01 requirement wording, fix stale VERIFICATION.md files, remove orphan dirs, backfill SUMMARY.md arrays (completed 2026-02-26)
 - [x] **Phase 29: Add init-existing Command** - New /maxsim:init-existing command with scan-first initialization, conflict resolution, stage-aware document generation (completed 2026-02-27)
-- [ ] **Phase 30: Tech Debt Cleanup — Doc, Test & Metadata Hygiene** - Fix stale narrative counts, VERIFICATION.md statuses, backfill SUMMARY.md arrays, add skills E2E assertion, align DASH-06 wording
+- [x] **Phase 30: Tech Debt Cleanup — Doc, Test & Metadata Hygiene** - Fix stale narrative counts, VERIFICATION.md statuses, backfill SUMMARY.md arrays, add skills E2E assertion, align DASH-06 wording (completed 2026-02-27)
 
 ---
 
@@ -281,7 +281,7 @@ Plans:
   6. All v2.0 phase SUMMARY.md files (phases 15-29) with empty `requirements_completed` arrays are backfilled with actual REQ-IDs
   7. install.test.ts includes an assertion that skills files are delivered (templates/skills/ directory)
   8. DASH-06 requirement wording in REQUIREMENTS.md updated to match actual API surface (PUT /api/plan/:path)
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 30-01-PLAN.md — Fix stale counts in ROADMAP/test, add skills E2E assertion, align DASH-06 wording
@@ -311,4 +311,4 @@ Plans:
 | 27. Fix CI E2E Pipeline & Test Assertions | 1/1 | Complete    | 2026-02-26 |
 | 28. Requirement Reconciliation & Doc Cleanup | 1/1 | Complete    | 2026-02-26 |
 | 29. Add init-existing Command | 3/3 | Complete    | 2026-02-27 |
-| 30. Tech Debt Cleanup | 0/3 | Pending | — |
+| 30. Tech Debt Cleanup | 3/3 | Complete    | 2026-02-27 |
