@@ -5,12 +5,12 @@ import { join } from 'node:path';
 import { execSync } from 'node:child_process';
 
 describe('install file structure (E2E-03)', () => {
-  it('installs exactly 31 command .md files', () => {
+  it('installs exactly 32 command .md files', () => {
     const installDir = inject('installDir');
     const commandsDir = join(installDir, '.claude', 'commands', 'maxsim');
     expect(existsSync(commandsDir)).toBe(true);
     const files = readdirSync(commandsDir).filter((f) => f.endsWith('.md'));
-    expect(files).toHaveLength(31);
+    expect(files).toHaveLength(32);
   });
 
   it('installs exactly 13 agent .md files', () => {

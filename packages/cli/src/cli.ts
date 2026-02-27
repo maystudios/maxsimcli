@@ -80,6 +80,7 @@ import {
   cmdInitTodos,
   cmdInitMilestoneOp,
   cmdInitMapCodebase,
+  cmdInitExisting,
   cmdInitProgress,
 } from './core/index.js';
 
@@ -290,11 +291,12 @@ const handleInit: Handler = (args, cwd, raw) => {
     'todos': () => cmdInitTodos(cwd, args[2], raw),
     'milestone-op': () => cmdInitMilestoneOp(cwd, raw),
     'map-codebase': () => cmdInitMapCodebase(cwd, raw),
+    'init-existing': () => cmdInitExisting(cwd, raw),
     'progress': () => cmdInitProgress(cwd, raw),
   };
   const handler = workflow ? handlers[workflow] : undefined;
   if (handler) return handler();
-  error(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, progress`);
+  error(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, init-existing, progress`);
 };
 
 // ─── Command registry ────────────────────────────────────────────────────────

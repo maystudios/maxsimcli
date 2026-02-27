@@ -97,6 +97,7 @@ Progress: [██████████] 100% (1/1 plans complete)
 | Phase 26 P05 | 2min | 2 tasks | 1 files |
 | Phase 27 P01 | 2min | 2 tasks | 2 files |
 | Phase 28 P01 | 5min | 2 tasks | 21 files |
+| Phase 29 P02 | 1min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -225,9 +226,11 @@ Recent decisions affecting current work:
 - [Phase 27]: Pre-existing DASH-08 failure logged as deferred item, not fixed (out of scope)
 - [Phase 28]: VERIFICATION.md gaps marked resolved with resolved_by attribution (not deleted) to preserve audit trail
 - [Phase 28]: requirements-completed: [] is now mandatory in all SUMMARY.md frontmatter (76/76 coverage achieved)
+- [Phase 29]: Followed exact new-project.md structure for init-existing command consistency
 
 ### Roadmap Evolution
 
+- Phase 29 added: Add init-existing command for existing project initialization
 - Phase 9 added: End-to-end install and publish test loop
 - Phase 10 added: CLI UX — chalk, ora spinners, @inquirer/prompts
 - Phase 11 added: Remove Discord command and deploy website via GitHub Actions to GitHub Pages

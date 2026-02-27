@@ -62,6 +62,15 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 
 - [x] **CI-01**: GitHub Actions E2E job runs E2E tests on push to main, after build with `STANDALONE_BUILD=true`, and gates on green E2E before publish
 
+### Init-Existing Command
+
+- [x] **INIT-EX-01**: `/maxsim:init-existing` command exists with CLI wiring — `node maxsim-tools.cjs init init-existing` returns valid JSON context with conflict detection fields
+- [ ] **INIT-EX-02**: Codebase scan runs all 4 mapper agents (tech, arch, quality, concerns) before any user questions, saving to `.planning/codebase/`
+- [ ] **INIT-EX-03**: Conflict detection handles existing `.planning/` with overwrite/merge/cancel dialog — merge creates only missing files and fills gaps, overwrite offers backup, cancel suggests `/maxsim:health`
+- [ ] **INIT-EX-04**: Question flow produces stage-aware documents (PROJECT.md with current state summary, REQUIREMENTS.md with stage-appropriate format, ROADMAP.md with 3-5 real suggested phases, STATE.md pre-populated with constraints and risks)
+- [ ] **INIT-EX-05**: `--auto` mode runs fully autonomously — scans codebase, infers all answers, generates all documents without user interaction, flags output as auto-generated
+- [ ] **INIT-EX-06**: E2E install test updated to assert correct command count (32) after adding init-existing command
+
 ---
 
 ## Future Requirements (v2.x+)
@@ -101,3 +110,9 @@ Dashboard spawned with `MAXSIM_PROJECT_CWD` pointing to the mock project fixture
 | DASH-TERM-03 | Phase 21 | Satisfied |
 | DASH-TERM-04 | Phase 21 → Phase 24 | Satisfied |
 | DASH-TERM-05 | Phase 21 | Satisfied |
+| INIT-EX-01 | Phase 29 | In Progress |
+| INIT-EX-02 | Phase 29 | In Progress |
+| INIT-EX-03 | Phase 29 | In Progress |
+| INIT-EX-04 | Phase 29 | In Progress |
+| INIT-EX-05 | Phase 29 | In Progress |
+| INIT-EX-06 | Phase 29 | In Progress |
