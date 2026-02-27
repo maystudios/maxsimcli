@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 ## Current Position
 
-Phase: 29 — Add init-existing Command for Existing Project Initialization
-Plan: 29-01 (complete)
-Status: Plan 29-01 complete — CLI infrastructure for init-existing added (InitExistingContext, cmdInitExisting, router dispatch, E2E update)
-Last activity: 2026-02-27 — Added InitExistingContext type, cmdInitExisting function, CLI router dispatch, E2E assertion update
+Phase: 29 — Add init-existing Command for Existing Project Initialization (COMPLETE)
+Plan: 3/3 (all complete)
+Status: Phase 29 complete — init-existing command fully implemented (CLI infrastructure, command entry point, workflow)
+Last activity: 2026-02-27 — Created init-existing workflow with scan-first initialization
 
-Progress: [███-------] 33% (1/3 plans complete)
+Progress: [██████████] 100% (3/3 plans complete)
 
 ## Performance Metrics
 
@@ -99,6 +99,7 @@ Progress: [███-------] 33% (1/3 plans complete)
 | Phase 28 P01 | 5min | 2 tasks | 21 files |
 | Phase 29 P02 | 1min | 1 tasks | 1 files |
 | Phase 29 P01 | 3min | 2 tasks | 4 files |
+| Phase 29 P03 | 4min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -229,6 +230,7 @@ Recent decisions affecting current work:
 - [Phase 28]: requirements-completed: [] is now mandatory in all SUMMARY.md frontmatter (76/76 coverage achieved)
 - [Phase 29]: Followed exact new-project.md structure for init-existing command consistency
 - [Phase 29]: cmdInitExisting follows exact same pattern as cmdInitNewProject for code/package detection
+- [Phase 29]: Workflow spawns mapper agents directly via Task tool (not via /maxsim:map-codebase command)
 
 ### Roadmap Evolution
 
@@ -255,5 +257,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 29-01-PLAN.md (CLI infrastructure for init-existing — InitExistingContext, cmdInitExisting, router dispatch, E2E update)
+Stopped at: Completed 29-03-PLAN.md (init-existing workflow with scan-first initialization) — Phase 29 fully complete
 Resume file: N/A

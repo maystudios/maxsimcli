@@ -26,6 +26,7 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 - [x] **Phase 26: Superpowers-Inspired Workflow Enhancements** - Integrate anti-rationalization prompting, evidence-based verification gates, two-stage code review, and on-demand skills into agent prompts and workflows (completed 2026-02-26)
 - [x] **Phase 27: Fix CI E2E Pipeline & Test Assertions** - Add e2e job to publish.yml, gate release on green E2E, fix agent count assertion (11→13) (completed 2026-02-26)
 - [x] **Phase 28: Requirement Reconciliation & Doc Cleanup** - Update outdated E2E-01 requirement wording, fix stale VERIFICATION.md files, remove orphan dirs, backfill SUMMARY.md arrays (completed 2026-02-26)
+- [x] **Phase 29: Add init-existing Command** - New /maxsim:init-existing command with scan-first initialization, conflict resolution, stage-aware document generation (completed 2026-02-27)
 
 ---
 
@@ -258,12 +259,12 @@ Plans:
 **Goal:** A working `/maxsim:init-existing` command that initializes MAXSIM in an existing codebase through scan-first-then-ask flow — runs all 4 codebase mapper agents, handles `.planning/` conflict detection with overwrite/merge/cancel dialog, asks scan-informed questions with smart defaults, generates stage-aware planning documents, and supports `--auto` mode for fully autonomous initialization
 **Requirements**: INIT-EX-01, INIT-EX-02, INIT-EX-03, INIT-EX-04, INIT-EX-05, INIT-EX-06
 **Depends on:** Phase 28
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
-- [ ] 29-01-PLAN.md — CLI infrastructure: InitExistingContext type, cmdInitExisting function, router dispatch, E2E assertion update
-- [ ] 29-02-PLAN.md — Command markdown: templates/commands/maxsim/init-existing.md
-- [ ] 29-03-PLAN.md — Workflow markdown: templates/workflows/init-existing.md (conflict handling, scan, questions, doc generation)
+- [x] 29-01-PLAN.md — CLI infrastructure: InitExistingContext type, cmdInitExisting function, router dispatch, E2E assertion update
+- [x] 29-02-PLAN.md — Command markdown: templates/commands/maxsim/init-existing.md
+- [x] 29-03-PLAN.md — Workflow markdown: templates/workflows/init-existing.md (conflict handling, scan, questions, doc generation)
 
 ---
 
@@ -287,3 +288,4 @@ Plans:
 | 26. Superpowers-Inspired Workflow Enhancements | 5/5 | Complete    | 2026-02-26 |
 | 27. Fix CI E2E Pipeline & Test Assertions | 1/1 | Complete    | 2026-02-26 |
 | 28. Requirement Reconciliation & Doc Cleanup | 1/1 | Complete    | 2026-02-26 |
+| 29. Add init-existing Command | 3/3 | Complete | 2026-02-27 |
