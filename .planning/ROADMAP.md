@@ -281,6 +281,12 @@ Plans:
   6. All 26 SUMMARY.md files with empty `requirements_completed` arrays are backfilled with actual REQ-IDs
   7. install.test.ts includes an assertion that skills files are delivered (templates/skills/ directory)
   8. DASH-06 requirement wording in REQUIREMENTS.md updated to match actual API surface (PUT /api/plan/:path)
+**Plans:** 3 plans
+
+Plans:
+- [ ] 30-01-PLAN.md — Fix stale counts in ROADMAP/test, add skills E2E assertion, align DASH-06 wording
+- [ ] 30-02-PLAN.md — Update 3 VERIFICATION.md statuses (phases 27, 28, 29) to passed
+- [ ] 30-03-PLAN.md — Backfill requirements_completed in 15 SUMMARY.md files with actual REQ-IDs
 
 ---
 
@@ -305,4 +311,4 @@ Plans:
 | 27. Fix CI E2E Pipeline & Test Assertions | 1/1 | Complete    | 2026-02-26 |
 | 28. Requirement Reconciliation & Doc Cleanup | 1/1 | Complete    | 2026-02-26 |
 | 29. Add init-existing Command | 3/3 | Complete    | 2026-02-27 |
-| 30. Tech Debt Cleanup | 0/0 | Pending | — |
+| 30. Tech Debt Cleanup | 0/3 | Pending | — |
