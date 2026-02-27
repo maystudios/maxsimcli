@@ -34,7 +34,7 @@ patterns-established:
   - "Skills delivery: templates/skills/ -> dist/assets/templates/skills/ -> .agents/skills/ at install"
   - "Upgrade safety: only remove known built-in skill names, preserve user custom skills"
 
-requirements-completed: []
+requirements-completed: [DOCS-01]
 
 # Metrics
 duration: 2min
