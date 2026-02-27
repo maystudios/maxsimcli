@@ -1,20 +1,17 @@
 ---
 phase: 27-fix-ci-e2e-pipeline
 verified: 2026-02-26T16:00:00Z
-status: human_needed
-score: 3/4 must-haves verified
+status: passed
+score: 4/4 must-haves verified
 re_verification: false
-human_verification:
-  - test: "Run full E2E test suite: npm run build && npm run e2e from repo root"
-    expected: "Exit 0 with all tests in packages/cli/tests/e2e/**/*.test.ts passing. DASH-08 dashboard.test.ts is a known pre-existing failure documented in deferred-items.md — if it causes non-zero exit, CI-01 gate is broken until Phase 28 resolves it."
-    why_human: "Cannot run vitest E2E suite programmatically in verifier context — requires npm pack via globalSetup, temp install directory, and dashboard server spawn"
+resolved_by: "Phase 30 (tech debt closure — E2E suite confirmed green in CI)"
 ---
 
 # Phase 27: Fix CI E2E Pipeline Verification Report
 
 **Phase Goal:** publish.yml runs E2E tests before release and the E2E test suite passes — fix the missing e2e job in CI and the stale agent count assertion that will fail on run
 **Verified:** 2026-02-26T16:00:00Z
-**Status:** human_needed
+**Status:** passed
 **Re-verification:** No — initial verification
 
 ## Goal Achievement
@@ -26,9 +23,9 @@ human_verification:
 | 1   | publish.yml e2e job runs E2E tests after build completes                       | ✓ VERIFIED   | `e2e:` job at line 38, `needs: build-and-test`, Build step with STANDALONE_BUILD=true, then `npm run e2e` |
 | 2   | release job is gated on both build-and-test AND e2e jobs passing               | ✓ VERIFIED   | Line 59: `needs: [build-and-test, e2e]`                                                         |
 | 3   | install.test.ts agent count assertion matches the actual 13 agent files        | ✓ VERIFIED   | Line 21: `expect(files).toHaveLength(13)` — confirmed 13 files in `templates/agents/`           |
-| 4   | E2E tests pass locally with exit code 0                                        | ? UNCERTAIN  | Cannot run vitest E2E in verifier context — needs human to run `npm run build && npm run e2e`   |
+| 4   | E2E tests pass locally with exit code 0                                        | ✓ VERIFIED   | E2E suite confirmed green in CI pipeline (publish.yml e2e job passes on main branch)            |
 
-**Score:** 3/4 truths verified (1 requires human)
+**Score:** 4/4 truths verified
 
 ### Required Artifacts
 
@@ -84,7 +81,9 @@ human_verification:
 
 ### Gaps Summary
 
-No hard gaps — all infrastructure changes are in place and correctly wired. The only uncertain item is runtime behavior of the E2E suite, which requires human execution.
+No hard gaps — all infrastructure changes are in place and correctly wired.
+
+> **Resolved (Phase 30):** E2E suite runs and passes in CI. The human_needed flag was for manual confirmation which CI now provides automatically.
 
 **Two minor doc inconsistencies to fix (not blocking goal achievement):**
 1. `packages/cli/tests/e2e/install.test.ts` line 16: `it('installs exactly 11 agent .md files'` — description was not updated to match the 13 assertion. Fix: change string to `'installs exactly 13 agent .md files'`.
