@@ -1,3 +1,24 @@
+# [3.6.0](https://github.com/maystudios/maxsimcli/compare/v3.5.3...v3.6.0) (2026-02-27)
+
+
+### Bug Fixes
+
+* **27-01:** add e2e job to publish.yml and gate release on it ([4afbb97](https://github.com/maystudios/maxsimcli/commit/4afbb97fab53b0a641fc87ea0f2838b986939ddf))
+* **27-01:** fix Goal regex and build order for E2E green ([12c379b](https://github.com/maystudios/maxsimcli/commit/12c379bd5b894319e7806d22ca54a88f25164d69))
+* **ci:** disable husky hooks during semantic-release push ([5972ffb](https://github.com/maystudios/maxsimcli/commit/5972ffbc95164f36b81f331501bec9bb4b49edc6))
+
+
+### Features
+
+* **26-01:** create 3 foundational skill files for on-demand agent loading ([2805fe2](https://github.com/maystudios/maxsimcli/commit/2805fe2e15b8f587200a8b6c0e4825f0616e5b26))
+* **26-02:** create maxsim-code-reviewer agent prompt ([679a8ed](https://github.com/maystudios/maxsimcli/commit/679a8ed23fbde621c8184182b77fcb1e5101022b))
+* **26-02:** create maxsim-spec-reviewer agent prompt ([970df2a](https://github.com/maystudios/maxsimcli/commit/970df2add0c9dadb26bcc3d191a8ad722be71e57))
+* **26-03:** enhance executor with anti-rationalization, evidence gate, two-stage review, and skills ([f490731](https://github.com/maystudios/maxsimcli/commit/f49073101364de21972649996b68b196eaeaadf5))
+* **26-03:** enhance verifier and debugger with anti-rationalization, evidence gates, and skills ([aa19f23](https://github.com/maystudios/maxsimcli/commit/aa19f23f0ab0a0b4e543fbfbf461eab071672020))
+* **26-04:** add anti-rationalization and skills sections to planner agent ([c0c9fcd](https://github.com/maystudios/maxsimcli/commit/c0c9fcd2c50fae09135d0c280d9d13e0d3314d69))
+* **26-04:** add anti-rationalization and skills sections to researcher and plan-checker agents ([48c668f](https://github.com/maystudios/maxsimcli/commit/48c668fb2d3bcb93ab60b75eff2ea3df0fcdf709))
+* **26-05:** extend install.ts to copy skills directory to .agents/skills/ ([c07ff01](https://github.com/maystudios/maxsimcli/commit/c07ff01b1d8f8eb2d1c585091188028fe1eef09e))
+
 ## [3.5.3](https://github.com/maystudios/maxsimcli/compare/v3.5.2...v3.5.3) (2026-02-26)
 
 
