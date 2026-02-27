@@ -24,7 +24,7 @@ decisions:
 metrics:
   duration: 2min
   completed: 2026-02-25
-requirements-completed: []
+requirements-completed: [DOCS-01]
 ---
 
 # Phase 25 Plan 02: Install Husky and Portable Pre-Push Hook Summary

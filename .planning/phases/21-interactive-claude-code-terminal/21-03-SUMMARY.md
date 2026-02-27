@@ -34,11 +34,10 @@ key-decisions:
 patterns-established:
   - "Persistent mount pattern: always render component, toggle visibility via inline style display"
 
-requirements-completed: [DASH-TERM-01, DASH-TERM-02]
+requirements-completed: [DASH-TERM-02, DASH-TERM-03]
 
 duration: 2min
 completed: 2026-02-25
-requirements_completed: []
 ---
 
 # Phase 21 Plan 03: Terminal Dashboard Layout Integration Summary
