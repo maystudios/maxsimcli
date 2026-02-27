@@ -27,6 +27,7 @@ All 14 v1.0 phases are archived. v2.0.0 continues from Phase 15.
 - [x] **Phase 27: Fix CI E2E Pipeline & Test Assertions** - Add e2e job to publish.yml, gate release on green E2E, fix agent count assertion (11→13) (completed 2026-02-26)
 - [x] **Phase 28: Requirement Reconciliation & Doc Cleanup** - Update outdated E2E-01 requirement wording, fix stale VERIFICATION.md files, remove orphan dirs, backfill SUMMARY.md arrays (completed 2026-02-26)
 - [x] **Phase 29: Add init-existing Command** - New /maxsim:init-existing command with scan-first initialization, conflict resolution, stage-aware document generation (completed 2026-02-27)
+- [ ] **Phase 30: Tech Debt Cleanup — Doc, Test & Metadata Hygiene** - Fix stale narrative counts, VERIFICATION.md statuses, backfill SUMMARY.md arrays, add skills E2E assertion, align DASH-06 wording
 
 ---
 
@@ -266,6 +267,21 @@ Plans:
 - [x] 29-02-PLAN.md — Command markdown: templates/commands/maxsim/init-existing.md
 - [x] 29-03-PLAN.md — Workflow markdown: templates/workflows/init-existing.md (conflict handling, scan, questions, doc generation)
 
+### Phase 30: Tech Debt Cleanup — Doc, Test & Metadata Hygiene
+
+**Goal:** Close all 9 actionable tech debt items from the v2.0 milestone audit — fix stale narrative counts in ROADMAP/test descriptions, update 3 VERIFICATION.md statuses, backfill 26 empty SUMMARY.md `requirements_completed` arrays, add skills directory E2E assertion, and align DASH-06 requirement wording with implementation
+**Depends on:** Phase 29
+**Gap Closure:** Closes all actionable tech debt from v2.0-MILESTONE-AUDIT.md (2 items deferred as inherently untestable: DASH-TERM-02/03/05 require live claude binary)
+**Success Criteria** (what must be TRUE):
+  1. ROADMAP.md Phase 16 Goal text says "32 commands, 13 agents" (not 31/11)
+  2. install.test.ts `it()` description says "13 agent" (not 11) — matching the assertion value
+  3. Phase 27 VERIFICATION.md status updated from `human_needed` to `passed`
+  4. Phase 28 VERIFICATION.md status updated from `gaps_found` to `passed`
+  5. Phase 29 VERIFICATION.md status updated from `gaps_found` to `passed`
+  6. All 26 SUMMARY.md files with empty `requirements_completed` arrays are backfilled with actual REQ-IDs
+  7. install.test.ts includes an assertion that skills files are delivered (templates/skills/ directory)
+  8. DASH-06 requirement wording in REQUIREMENTS.md updated to match actual API surface (PUT /api/plan/:path)
+
 ---
 
 ## Progress
@@ -288,4 +304,5 @@ Plans:
 | 26. Superpowers-Inspired Workflow Enhancements | 5/5 | Complete    | 2026-02-26 |
 | 27. Fix CI E2E Pipeline & Test Assertions | 1/1 | Complete    | 2026-02-26 |
 | 28. Requirement Reconciliation & Doc Cleanup | 1/1 | Complete    | 2026-02-26 |
-| 29. Add init-existing Command | 3/3 | Complete | 2026-02-27 |
+| 29. Add init-existing Command | 3/3 | Complete    | 2026-02-27 |
+| 30. Tech Debt Cleanup | 0/0 | Pending | — |
