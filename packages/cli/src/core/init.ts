@@ -43,6 +43,7 @@ export type WorkflowType =
   | 'todos'
   | 'milestone-op'
   | 'map-codebase'
+  | 'init-existing'
   | 'progress';
 
 export interface ExecutePhaseContext {
@@ -255,6 +256,28 @@ export interface MapCodebaseContext {
   codebase_dir_exists: boolean;
 }
 
+export interface InitExistingContext {
+  researcher_model: ModelResolution;
+  synthesizer_model: ModelResolution;
+  roadmapper_model: ModelResolution;
+  mapper_model: ModelResolution;
+  commit_docs: boolean;
+  project_exists: boolean;
+  planning_exists: boolean;
+  planning_files: string[];
+  has_codebase_map: boolean;
+  has_existing_code: boolean;
+  has_package_file: boolean;
+  has_git: boolean;
+  has_readme: boolean;
+  conflict_detected: boolean;
+  existing_file_count: number;
+  brave_search_available: boolean;
+  parallelization: boolean;
+  project_path: string;
+  codebase_dir: string;
+}
+
 interface ProgressPhaseInfo {
   number: string;
   name: string | null;
@@ -300,6 +323,7 @@ export type InitContext =
   | TodosContext
   | MilestoneOpContext
   | MapCodebaseContext
+  | InitExistingContext
   | ProgressContext;
 
 // ─── Helper: extract requirement IDs from roadmap phase section ─────────────
@@ -801,6 +825,72 @@ export function cmdInitMapCodebase(cwd: string, raw: boolean): void {
     has_maps: existingMaps.length > 0,
     planning_exists: pathExistsInternal(cwd, '.planning'),
     codebase_dir_exists: pathExistsInternal(cwd, '.planning/codebase'),
+  };
+
+  output(result, raw);
+}
+
+export function cmdInitExisting(cwd: string, raw: boolean): void {
+  const config = loadConfig(cwd);
+
+  const homedir = os.homedir();
+  const braveKeyFile = path.join(homedir, '.maxsim', 'brave_api_key');
+  const hasBraveSearch = !!(process.env.BRAVE_API_KEY || fs.existsSync(braveKeyFile));
+
+  // Detect existing code (same logic as cmdInitNewProject)
+  let hasCode = false;
+  let hasPackageFile = false;
+  try {
+    const files = execSync(
+      'find . -maxdepth 3 \\( -name "*.ts" -o -name "*.js" -o -name "*.py" -o -name "*.go" -o -name "*.rs" -o -name "*.swift" -o -name "*.java" \\) 2>/dev/null | grep -v node_modules | grep -v .git | head -5',
+      { cwd, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] }
+    );
+    hasCode = files.trim().length > 0;
+  } catch (e) {
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
+
+  hasPackageFile =
+    pathExistsInternal(cwd, 'package.json') ||
+    pathExistsInternal(cwd, 'requirements.txt') ||
+    pathExistsInternal(cwd, 'Cargo.toml') ||
+    pathExistsInternal(cwd, 'go.mod') ||
+    pathExistsInternal(cwd, 'Package.swift');
+
+  // Detect existing .planning/ content for conflict dialog
+  let planningFiles: string[] = [];
+  try {
+    const planDir = path.join(cwd, '.planning');
+    if (fs.existsSync(planDir)) {
+      planningFiles = fs
+        .readdirSync(planDir, { recursive: true })
+        .map((f) => String(f))
+        .filter((f) => !f.startsWith('.'));
+    }
+  } catch (e) {
+    if (process.env.MAXSIM_DEBUG) console.error(e);
+  }
+
+  const result: InitExistingContext = {
+    researcher_model: resolveModelInternal(cwd, 'maxsim-project-researcher'),
+    synthesizer_model: resolveModelInternal(cwd, 'maxsim-research-synthesizer'),
+    roadmapper_model: resolveModelInternal(cwd, 'maxsim-roadmapper'),
+    mapper_model: resolveModelInternal(cwd, 'maxsim-codebase-mapper'),
+    commit_docs: config.commit_docs,
+    project_exists: pathExistsInternal(cwd, '.planning/PROJECT.md'),
+    planning_exists: pathExistsInternal(cwd, '.planning'),
+    planning_files: planningFiles,
+    has_codebase_map: pathExistsInternal(cwd, '.planning/codebase'),
+    has_existing_code: hasCode,
+    has_package_file: hasPackageFile,
+    has_git: pathExistsInternal(cwd, '.git'),
+    has_readme: pathExistsInternal(cwd, 'README.md'),
+    conflict_detected: planningFiles.length > 0,
+    existing_file_count: planningFiles.length,
+    brave_search_available: hasBraveSearch,
+    parallelization: config.parallelization,
+    project_path: '.planning/PROJECT.md',
+    codebase_dir: '.planning/codebase',
   };
 
   output(result, raw);

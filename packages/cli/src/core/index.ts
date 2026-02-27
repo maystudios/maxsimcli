@@ -233,6 +233,7 @@ export type {
   TodosContext,
   MilestoneOpContext,
   MapCodebaseContext,
+  InitExistingContext,
   ProgressContext,
 } from './init.js';
 
@@ -248,5 +249,6 @@ export {
   cmdInitTodos,
   cmdInitMilestoneOp,
   cmdInitMapCodebase,
+  cmdInitExisting,
   cmdInitProgress,
 } from './init.js';
