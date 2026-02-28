@@ -53,8 +53,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 32-01-PLAN.md — DiscussionProvider state machine, QuestionCard, OptionCard, AnsweredCard, SkeletonCard, OptionPreviewPanel, react-markdown dependency
-- [ ] 32-02-PLAN.md — DiscussionView container, DiscussionFooter, ConfirmationDialog, DiscussionCompleteCard, SimpleModeView wiring, mock questions
+- [x] 32-01-PLAN.md — DiscussionProvider state machine, QuestionCard, OptionCard, AnsweredCard, SkeletonCard, OptionPreviewPanel, react-markdown dependency
+- [x] 32-02-PLAN.md — DiscussionView container, DiscussionFooter, ConfirmationDialog, DiscussionCompleteCard, SimpleModeView wiring, mock questions
 
 ### Phase 32.1: Verify Phase 31 + Fix Ask-Me-More Bug
 **Goal**: Close audit gaps — verify Phase 31 requirements are satisfied and fix the "Ask me more" dead-end bug in the mock layer
@@ -68,7 +68,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 32.1-01-PLAN.md — Write Phase 31 VERIFICATION.md (DASH-01/02/03) and fix useMockQuestions "Ask me more" dead-end bug
+- [x] 32.1-01-PLAN.md — Write Phase 31 VERIFICATION.md (DASH-01/02/03) and fix useMockQuestions "Ask me more" dead-end bug
 
 ### Phase 33: Workflow-Dashboard Hook Bridge
 **Goal**: Claude Code workflow events (questions asked, phase started, phase complete) are reliably bridged to the dashboard UI in real time
