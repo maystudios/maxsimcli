@@ -147,9 +147,24 @@ export function DiscussionProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "QUESTIONS_RECEIVED", questions });
   }, []);
 
-  const submitAnswer = useCallback((answer: AnsweredQuestion) => {
+  const submitAnswer = useCallback(async (answer: AnsweredQuestion) => {
     dispatch({ type: "SUBMIT_ANSWER", answer });
-    // For now (Phase 32), immediately accept — no server round-trip
+
+    // Determine the answer text: free text if provided, otherwise selected labels joined
+    const answerText = answer.freeText.trim()
+      ? answer.freeText
+      : answer.selectedLabels.join(', ');
+
+    try {
+      await fetch('/api/mcp-answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questionId: answer.questionId, answer: answerText }),
+      });
+    } catch (err) {
+      console.error('[discussion] Failed to submit answer:', err);
+    }
+
     dispatch({ type: "ANSWER_ACCEPTED" });
   }, []);
 

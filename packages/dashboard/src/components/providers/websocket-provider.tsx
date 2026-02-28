@@ -5,16 +5,32 @@ import {
   useRef,
   useState,
   type ReactNode,
+  type MutableRefObject,
 } from "react";
+import type { DiscussionQuestion } from "./discussion-provider";
+
+interface LifecycleEvent {
+  event_type: string;
+  phase_name?: string;
+  phase_number?: string;
+  step?: number;
+  total_steps?: number;
+}
 
 interface WSContextValue {
   connected: boolean;
   lastChange: number;
+  lifecycleEvent: LifecycleEvent | null;
+  pendingQuestionCount: number;
+  onQuestionReceivedRef: MutableRefObject<((questions: DiscussionQuestion[]) => void) | null>;
 }
 
 const WSContext = createContext<WSContextValue>({
   connected: false,
   lastChange: 0,
+  lifecycleEvent: null,
+  pendingQuestionCount: 0,
+  onQuestionReceivedRef: { current: null },
 });
 
 const INITIAL_RECONNECT_DELAY = 2000;
@@ -24,10 +40,13 @@ const RECONNECT_MULTIPLIER = 1.5;
 export function WebSocketProvider({ children }: { children: ReactNode }) {
   const [connected, setConnected] = useState(false);
   const [lastChange, setLastChange] = useState(0);
+  const [lifecycleEvent, setLifecycleEvent] = useState<LifecycleEvent | null>(null);
+  const [pendingQuestionCount, setPendingQuestionCount] = useState(0);
 
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectDelayRef = useRef(INITIAL_RECONNECT_DELAY);
+  const onQuestionReceivedRef = useRef<((questions: DiscussionQuestion[]) => void) | null>(null);
 
   useEffect(() => {
     function connect() {
@@ -58,8 +77,57 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data as string);
-          if (data.type === "file-changes" && typeof data.timestamp === "number") {
-            setLastChange(data.timestamp);
+          switch (data.type) {
+            case "file-changes":
+              if (typeof data.timestamp === "number") {
+                setLastChange(data.timestamp);
+              }
+              break;
+
+            case "question-received": {
+              const sq = data.question;
+              const dq: DiscussionQuestion = {
+                id: sq.id,
+                header: "Question",
+                question: sq.question,
+                multiSelect: false,
+                options: (sq.options || []).map((o: { value: string; label: string; description?: string }) => ({
+                  id: o.value,
+                  label: o.label,
+                  description: o.description || "",
+                })),
+              };
+              onQuestionReceivedRef.current?.([dq]);
+              setPendingQuestionCount(data.queueLength ?? 0);
+              break;
+            }
+
+            case "questions-queued": {
+              const dqs: DiscussionQuestion[] = (data.questions || []).map(
+                (sq: { id: string; question: string; options?: Array<{ value: string; label: string; description?: string }> }) => ({
+                  id: sq.id,
+                  header: "Question",
+                  question: sq.question,
+                  multiSelect: false,
+                  options: (sq.options || []).map((o) => ({
+                    id: o.value,
+                    label: o.label,
+                    description: o.description || "",
+                  })),
+                })
+              );
+              onQuestionReceivedRef.current?.(dqs);
+              setPendingQuestionCount(data.count ?? 0);
+              break;
+            }
+
+            case "answer-given":
+              setPendingQuestionCount(data.remainingQueue ?? 0);
+              break;
+
+            case "lifecycle":
+              setLifecycleEvent(data.event);
+              break;
           }
         } catch {
           // Ignore unparseable messages
@@ -88,14 +156,14 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <WSContext.Provider value={{ connected, lastChange }}>
+    <WSContext.Provider value={{ connected, lastChange, lifecycleEvent, pendingQuestionCount, onQuestionReceivedRef }}>
       {children}
     </WSContext.Provider>
   );
 }
 
 /**
- * Hook to access WebSocket connection state and last file change timestamp.
+ * Hook to access WebSocket connection state, MCP events, and last file change timestamp.
  */
 export function useWebSocket(): WSContextValue {
   return useContext(WSContext);
