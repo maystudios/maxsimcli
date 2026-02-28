@@ -909,6 +909,37 @@ app.post('/api/shutdown', (_req: Request, res: Response) => {
   setTimeout(() => shutdownFn?.(), 100);
 });
 
+// ─── Simple Mode Config ───────────────────────────────────────────────────
+
+const simpleModeConfigPath = path.join(__dirname, 'simple-mode-config.json');
+
+app.get('/api/simple-mode-config', (_req: Request, res: Response) => {
+  try {
+    if (!fs.existsSync(simpleModeConfigPath)) {
+      return res.json({});
+    }
+    const data = JSON.parse(fs.readFileSync(simpleModeConfigPath, 'utf-8'));
+    return res.json(data);
+  } catch {
+    return res.json({});
+  }
+});
+
+app.post('/api/simple-mode-config', (req: Request, res: Response) => {
+  const { default_mode } = req.body as { default_mode?: string };
+  if (default_mode !== 'simple' && default_mode !== 'advanced') {
+    return res.status(400).json({ error: 'default_mode must be "simple" or "advanced"' });
+  }
+  let existing: Record<string, unknown> = {};
+  if (fs.existsSync(simpleModeConfigPath)) {
+    try { existing = JSON.parse(fs.readFileSync(simpleModeConfigPath, 'utf-8')); } catch { /* ignore */ }
+  }
+  existing.default_mode = default_mode;
+  fs.writeFileSync(simpleModeConfigPath, JSON.stringify(existing, null, 2), 'utf-8');
+  log('INFO', 'simple-mode-config', `default_mode set to ${default_mode}`);
+  return res.json({ written: true, default_mode });
+});
+
 // ── Static client (Vite build) ──
 if (fs.existsSync(clientDir)) {
   app.use(sirv(clientDir, { single: true }));

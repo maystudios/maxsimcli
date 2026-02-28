@@ -15,6 +15,6 @@ export { cmdVerifySummary, cmdVerifyPlanStructure, cmdVerifyPhaseCompleteness, c
 export { cmdPhasesList, cmdPhaseNextDecimal, cmdFindPhase, cmdPhasePlanIndex, cmdPhaseAdd, cmdPhaseInsert, cmdPhaseRemove, cmdPhaseComplete, } from './phase.js';
 export type { TemplateSelectResult, TemplateFillOptions, TemplateFillResult, } from './template.js';
 export { cmdTemplateSelect, cmdTemplateFill, } from './template.js';
-export type { WorkflowType, InitContext, ExecutePhaseContext, PlanPhaseContext, NewProjectContext, NewMilestoneContext, QuickContext, ResumeContext, VerifyWorkContext, PhaseOpContext, TodosContext, MilestoneOpContext, MapCodebaseContext, ProgressContext, } from './init.js';
-export { cmdInitExecutePhase, cmdInitPlanPhase, cmdInitNewProject, cmdInitNewMilestone, cmdInitQuick, cmdInitResume, cmdInitVerifyWork, cmdInitPhaseOp, cmdInitTodos, cmdInitMilestoneOp, cmdInitMapCodebase, cmdInitProgress, } from './init.js';
+export type { WorkflowType, InitContext, ExecutePhaseContext, PlanPhaseContext, NewProjectContext, NewMilestoneContext, QuickContext, ResumeContext, VerifyWorkContext, PhaseOpContext, TodosContext, MilestoneOpContext, MapCodebaseContext, InitExistingContext, ProgressContext, } from './init.js';
+export { cmdInitExecutePhase, cmdInitPlanPhase, cmdInitNewProject, cmdInitNewMilestone, cmdInitQuick, cmdInitResume, cmdInitVerifyWork, cmdInitPhaseOp, cmdInitTodos, cmdInitMilestoneOp, cmdInitMapCodebase, cmdInitExisting, cmdInitProgress, } from './init.js';
 //# sourceMappingURL=index.d.ts.map

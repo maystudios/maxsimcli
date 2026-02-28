@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { useWebSocket } from "@/components/providers/websocket-provider";
 import { NetworkQRButton } from "@/components/network/NetworkQRButton";
@@ -11,6 +11,7 @@ interface SidebarProps {
   activeView: ActiveView;
   activePhaseId: string | null;
   onNavigate: (view: ActiveView, id?: string) => void;
+  logoAction?: ReactNode;
 }
 
 function statusDotClass(status: DashboardPhase["diskStatus"]): string {
@@ -28,7 +29,7 @@ function statusDotClass(status: DashboardPhase["diskStatus"]): string {
   }
 }
 
-export function Sidebar({ activeView, activePhaseId, onNavigate }: SidebarProps) {
+export function Sidebar({ activeView, activePhaseId, onNavigate, logoAction }: SidebarProps) {
   const { roadmap, state, todos } = useDashboardData();
   const { connected } = useWebSocket();
   const [confirmShutdown, setConfirmShutdown] = useState(false);
@@ -71,7 +72,7 @@ export function Sidebar({ activeView, activePhaseId, onNavigate }: SidebarProps)
   return (
     <aside className="flex h-full w-56 shrink-0 flex-col border-r border-border bg-card">
       {/* Logo — matches website navbar style */}
-      <div className="border-b border-border px-5 py-4">
+      <div className="border-b border-border px-5 py-4 flex items-center justify-between">
         <button
           type="button"
           onClick={() => onNavigate("overview")}
@@ -84,6 +85,7 @@ export function Sidebar({ activeView, activePhaseId, onNavigate }: SidebarProps)
             Dashboard
           </span>
         </button>
+        {logoAction}
       </div>
 
       {/* Phase section */}

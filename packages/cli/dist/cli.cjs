@@ -15453,6 +15453,56 @@ function cmdInitMapCodebase(cwd, raw) {
 		codebase_dir_exists: pathExistsInternal(cwd, ".planning/codebase")
 	}, raw);
 }
+function cmdInitExisting(cwd, raw) {
+	const config = loadConfig(cwd);
+	const homedir = node_os.default.homedir();
+	const braveKeyFile = node_path.default.join(homedir, ".maxsim", "brave_api_key");
+	const hasBraveSearch = !!(process.env.BRAVE_API_KEY || node_fs.default.existsSync(braveKeyFile));
+	let hasCode = false;
+	let hasPackageFile = false;
+	try {
+		hasCode = (0, node_child_process.execSync)("find . -maxdepth 3 \\( -name \"*.ts\" -o -name \"*.js\" -o -name \"*.py\" -o -name \"*.go\" -o -name \"*.rs\" -o -name \"*.swift\" -o -name \"*.java\" \\) 2>/dev/null | grep -v node_modules | grep -v .git | head -5", {
+			cwd,
+			encoding: "utf-8",
+			stdio: [
+				"pipe",
+				"pipe",
+				"pipe"
+			]
+		}).trim().length > 0;
+	} catch (e) {
+		if (process.env.MAXSIM_DEBUG) console.error(e);
+	}
+	hasPackageFile = pathExistsInternal(cwd, "package.json") || pathExistsInternal(cwd, "requirements.txt") || pathExistsInternal(cwd, "Cargo.toml") || pathExistsInternal(cwd, "go.mod") || pathExistsInternal(cwd, "Package.swift");
+	let planningFiles = [];
+	try {
+		const planDir = node_path.default.join(cwd, ".planning");
+		if (node_fs.default.existsSync(planDir)) planningFiles = node_fs.default.readdirSync(planDir, { recursive: true }).map((f) => String(f)).filter((f) => !f.startsWith("."));
+	} catch (e) {
+		if (process.env.MAXSIM_DEBUG) console.error(e);
+	}
+	output({
+		researcher_model: resolveModelInternal(cwd, "maxsim-project-researcher"),
+		synthesizer_model: resolveModelInternal(cwd, "maxsim-research-synthesizer"),
+		roadmapper_model: resolveModelInternal(cwd, "maxsim-roadmapper"),
+		mapper_model: resolveModelInternal(cwd, "maxsim-codebase-mapper"),
+		commit_docs: config.commit_docs,
+		project_exists: pathExistsInternal(cwd, ".planning/PROJECT.md"),
+		planning_exists: pathExistsInternal(cwd, ".planning"),
+		planning_files: planningFiles,
+		has_codebase_map: pathExistsInternal(cwd, ".planning/codebase"),
+		has_existing_code: hasCode,
+		has_package_file: hasPackageFile,
+		has_git: pathExistsInternal(cwd, ".git"),
+		has_readme: pathExistsInternal(cwd, "README.md"),
+		conflict_detected: planningFiles.length > 0,
+		existing_file_count: planningFiles.length,
+		brave_search_available: hasBraveSearch,
+		parallelization: config.parallelization,
+		project_path: ".planning/PROJECT.md",
+		codebase_dir: ".planning/codebase"
+	}, raw);
+}
 function cmdInitProgress(cwd, raw) {
 	const config = loadConfig(cwd);
 	const milestone = getMilestoneInfo(cwd);
@@ -15712,10 +15762,11 @@ const handleInit = (args, cwd, raw) => {
 		"todos": () => cmdInitTodos(cwd, args[2], raw),
 		"milestone-op": () => cmdInitMilestoneOp(cwd, raw),
 		"map-codebase": () => cmdInitMapCodebase(cwd, raw),
+		"init-existing": () => cmdInitExisting(cwd, raw),
 		"progress": () => cmdInitProgress(cwd, raw)
 	}[workflow] : void 0;
 	if (handler) return handler();
-	error(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, progress`);
+	error(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, init-existing, progress`);
 };
 const COMMANDS = {
 	"state": handleState,

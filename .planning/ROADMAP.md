@@ -106,7 +106,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 31. Simple Mode UI Shell | v1.1 | 0/2 | Not started | - |
+| 31. Simple Mode UI Shell | 2/2 | Complete   | 2026-02-28 | - |
 | 32. Question-Driven Discussion Flow | v1.1 | 0/2 | Not started | - |
 | 33. Workflow-Dashboard Hook Bridge | v1.1 | 0/2 | Not started | - |
 | 34. Execution Progress View | v1.1 | 0/2 | Not started | - |

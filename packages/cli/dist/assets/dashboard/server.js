@@ -58279,6 +58279,31 @@ app.post("/api/shutdown", (_req, res) => {
 	res.json({ shutdown: true });
 	setTimeout(() => shutdownFn?.(), 100);
 });
+const simpleModeConfigPath = node_path.join(__dirname, "simple-mode-config.json");
+app.get("/api/simple-mode-config", (_req, res) => {
+	try {
+		if (!node_fs.existsSync(simpleModeConfigPath)) return res.json({});
+		const data = JSON.parse(node_fs.readFileSync(simpleModeConfigPath, "utf-8"));
+		return res.json(data);
+	} catch {
+		return res.json({});
+	}
+});
+app.post("/api/simple-mode-config", (req, res) => {
+	const { default_mode } = req.body;
+	if (default_mode !== "simple" && default_mode !== "advanced") return res.status(400).json({ error: "default_mode must be \"simple\" or \"advanced\"" });
+	let existing = {};
+	if (node_fs.existsSync(simpleModeConfigPath)) try {
+		existing = JSON.parse(node_fs.readFileSync(simpleModeConfigPath, "utf-8"));
+	} catch {}
+	existing.default_mode = default_mode;
+	node_fs.writeFileSync(simpleModeConfigPath, JSON.stringify(existing, null, 2), "utf-8");
+	log("INFO", "simple-mode-config", `default_mode set to ${default_mode}`);
+	return res.json({
+		written: true,
+		default_mode
+	});
+});
 if (node_fs.existsSync(clientDir)) app.use(build_default(clientDir, { single: true }));
 else app.get("/", (_req, res) => {
 	res.send("<html><body><p>Dashboard client not found. Run <code>pnpm run build</code> first.</p></body></html>");

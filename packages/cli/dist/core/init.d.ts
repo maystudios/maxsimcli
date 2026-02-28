@@ -4,7 +4,7 @@
  * Ported from maxsim/bin/lib/init.cjs
  */
 import type { ModelResolution } from './types.js';
-export type WorkflowType = 'execute-phase' | 'plan-phase' | 'new-project' | 'new-milestone' | 'quick' | 'resume' | 'verify-work' | 'phase-op' | 'todos' | 'milestone-op' | 'map-codebase' | 'progress';
+export type WorkflowType = 'execute-phase' | 'plan-phase' | 'new-project' | 'new-milestone' | 'quick' | 'resume' | 'verify-work' | 'phase-op' | 'todos' | 'milestone-op' | 'map-codebase' | 'init-existing' | 'progress';
 export interface ExecutePhaseContext {
     executor_model: ModelResolution;
     verifier_model: ModelResolution;
@@ -204,6 +204,27 @@ export interface MapCodebaseContext {
     planning_exists: boolean;
     codebase_dir_exists: boolean;
 }
+export interface InitExistingContext {
+    researcher_model: ModelResolution;
+    synthesizer_model: ModelResolution;
+    roadmapper_model: ModelResolution;
+    mapper_model: ModelResolution;
+    commit_docs: boolean;
+    project_exists: boolean;
+    planning_exists: boolean;
+    planning_files: string[];
+    has_codebase_map: boolean;
+    has_existing_code: boolean;
+    has_package_file: boolean;
+    has_git: boolean;
+    has_readme: boolean;
+    conflict_detected: boolean;
+    existing_file_count: number;
+    brave_search_available: boolean;
+    parallelization: boolean;
+    project_path: string;
+    codebase_dir: string;
+}
 interface ProgressPhaseInfo {
     number: string;
     name: string | null;
@@ -235,7 +256,7 @@ export interface ProgressContext {
     project_path: string;
     config_path: string;
 }
-export type InitContext = ExecutePhaseContext | PlanPhaseContext | NewProjectContext | NewMilestoneContext | QuickContext | ResumeContext | VerifyWorkContext | PhaseOpContext | TodosContext | MilestoneOpContext | MapCodebaseContext | ProgressContext;
+export type InitContext = ExecutePhaseContext | PlanPhaseContext | NewProjectContext | NewMilestoneContext | QuickContext | ResumeContext | VerifyWorkContext | PhaseOpContext | TodosContext | MilestoneOpContext | MapCodebaseContext | InitExistingContext | ProgressContext;
 export declare function cmdInitExecutePhase(cwd: string, phase: string | undefined, raw: boolean): void;
 export declare function cmdInitPlanPhase(cwd: string, phase: string | undefined, raw: boolean): void;
 export declare function cmdInitNewProject(cwd: string, raw: boolean): void;
@@ -247,6 +268,7 @@ export declare function cmdInitPhaseOp(cwd: string, phase: string | undefined, r
 export declare function cmdInitTodos(cwd: string, area: string | undefined, raw: boolean): void;
 export declare function cmdInitMilestoneOp(cwd: string, raw: boolean): void;
 export declare function cmdInitMapCodebase(cwd: string, raw: boolean): void;
+export declare function cmdInitExisting(cwd: string, raw: boolean): void;
 export declare function cmdInitProgress(cwd: string, raw: boolean): void;
 export {};
 //# sourceMappingURL=init.d.ts.map

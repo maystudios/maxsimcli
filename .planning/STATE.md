@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-27)
 ## Current Position
 
 Phase: 31 of 35 (Simple Mode UI Shell)
-Plan: 0 of 2 in current phase
-Status: Ready to plan
-Last activity: 2026-02-27 — Roadmap created for Simple Dashboard Mode milestone (phases 31-35)
+Plan: 2 of 2 in current phase — COMPLETE
+Status: Phase 31 complete — Simple Mode UI Shell built and committed
+Last activity: 2026-02-28 — Phase 31 executed: SimpleModeProvider, useDashboardMode, ModeToggleButton, FirstRunCard, RecommendationCard, ActionGrid with tabs/slide/accordion, ActionForm with auto-resize+command output
 
 Progress: [████████████████████░░░░░░░░░░] 60% (phases 1-30 complete; milestone v1.1 begins)
 

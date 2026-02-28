@@ -244,12 +244,13 @@ const handleInit = (args, cwd, raw) => {
         'todos': () => (0, index_js_1.cmdInitTodos)(cwd, args[2], raw),
         'milestone-op': () => (0, index_js_1.cmdInitMilestoneOp)(cwd, raw),
         'map-codebase': () => (0, index_js_1.cmdInitMapCodebase)(cwd, raw),
+        'init-existing': () => (0, index_js_1.cmdInitExisting)(cwd, raw),
         'progress': () => (0, index_js_1.cmdInitProgress)(cwd, raw),
     };
     const handler = workflow ? handlers[workflow] : undefined;
     if (handler)
         return handler();
-    (0, index_js_1.error)(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, progress`);
+    (0, index_js_1.error)(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, init-existing, progress`);
 };
 // ─── Command registry ────────────────────────────────────────────────────────
 const COMMANDS = {

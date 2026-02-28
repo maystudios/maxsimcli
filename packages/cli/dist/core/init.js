@@ -19,6 +19,7 @@ exports.cmdInitPhaseOp = cmdInitPhaseOp;
 exports.cmdInitTodos = cmdInitTodos;
 exports.cmdInitMilestoneOp = cmdInitMilestoneOp;
 exports.cmdInitMapCodebase = cmdInitMapCodebase;
+exports.cmdInitExisting = cmdInitExisting;
 exports.cmdInitProgress = cmdInitProgress;
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
@@ -491,6 +492,66 @@ function cmdInitMapCodebase(cwd, raw) {
         has_maps: existingMaps.length > 0,
         planning_exists: (0, core_js_1.pathExistsInternal)(cwd, '.planning'),
         codebase_dir_exists: (0, core_js_1.pathExistsInternal)(cwd, '.planning/codebase'),
+    };
+    (0, core_js_1.output)(result, raw);
+}
+function cmdInitExisting(cwd, raw) {
+    const config = (0, core_js_1.loadConfig)(cwd);
+    const homedir = node_os_1.default.homedir();
+    const braveKeyFile = node_path_1.default.join(homedir, '.maxsim', 'brave_api_key');
+    const hasBraveSearch = !!(process.env.BRAVE_API_KEY || node_fs_1.default.existsSync(braveKeyFile));
+    // Detect existing code (same logic as cmdInitNewProject)
+    let hasCode = false;
+    let hasPackageFile = false;
+    try {
+        const files = (0, node_child_process_1.execSync)('find . -maxdepth 3 \\( -name "*.ts" -o -name "*.js" -o -name "*.py" -o -name "*.go" -o -name "*.rs" -o -name "*.swift" -o -name "*.java" \\) 2>/dev/null | grep -v node_modules | grep -v .git | head -5', { cwd, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
+        hasCode = files.trim().length > 0;
+    }
+    catch (e) {
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
+    hasPackageFile =
+        (0, core_js_1.pathExistsInternal)(cwd, 'package.json') ||
+            (0, core_js_1.pathExistsInternal)(cwd, 'requirements.txt') ||
+            (0, core_js_1.pathExistsInternal)(cwd, 'Cargo.toml') ||
+            (0, core_js_1.pathExistsInternal)(cwd, 'go.mod') ||
+            (0, core_js_1.pathExistsInternal)(cwd, 'Package.swift');
+    // Detect existing .planning/ content for conflict dialog
+    let planningFiles = [];
+    try {
+        const planDir = node_path_1.default.join(cwd, '.planning');
+        if (node_fs_1.default.existsSync(planDir)) {
+            planningFiles = node_fs_1.default
+                .readdirSync(planDir, { recursive: true })
+                .map((f) => String(f))
+                .filter((f) => !f.startsWith('.'));
+        }
+    }
+    catch (e) {
+        if (process.env.MAXSIM_DEBUG)
+            console.error(e);
+    }
+    const result = {
+        researcher_model: (0, core_js_1.resolveModelInternal)(cwd, 'maxsim-project-researcher'),
+        synthesizer_model: (0, core_js_1.resolveModelInternal)(cwd, 'maxsim-research-synthesizer'),
+        roadmapper_model: (0, core_js_1.resolveModelInternal)(cwd, 'maxsim-roadmapper'),
+        mapper_model: (0, core_js_1.resolveModelInternal)(cwd, 'maxsim-codebase-mapper'),
+        commit_docs: config.commit_docs,
+        project_exists: (0, core_js_1.pathExistsInternal)(cwd, '.planning/PROJECT.md'),
+        planning_exists: (0, core_js_1.pathExistsInternal)(cwd, '.planning'),
+        planning_files: planningFiles,
+        has_codebase_map: (0, core_js_1.pathExistsInternal)(cwd, '.planning/codebase'),
+        has_existing_code: hasCode,
+        has_package_file: hasPackageFile,
+        has_git: (0, core_js_1.pathExistsInternal)(cwd, '.git'),
+        has_readme: (0, core_js_1.pathExistsInternal)(cwd, 'README.md'),
+        conflict_detected: planningFiles.length > 0,
+        existing_file_count: planningFiles.length,
+        brave_search_available: hasBraveSearch,
+        parallelization: config.parallelization,
+        project_path: '.planning/PROJECT.md',
+        codebase_dir: '.planning/codebase',
     };
     (0, core_js_1.output)(result, raw);
 }

@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
 interface AppShellProps {
@@ -6,6 +7,8 @@ interface AppShellProps {
   mobileMenuOpen?: boolean;
   onMobileMenuToggle?: () => void;
   onMobileMenuClose?: () => void;
+  headerRight?: ReactNode;
+  simpleMode?: boolean;
 }
 
 /**
@@ -20,31 +23,39 @@ export function AppShell({
   mobileMenuOpen = false,
   onMobileMenuToggle,
   onMobileMenuClose,
+  headerRight,
+  simpleMode = false,
 }: AppShellProps) {
   return (
     <div className="flex h-screen flex-col overflow-hidden md:flex-row">
       {/* Mobile top bar */}
-      <div className="flex shrink-0 items-center justify-between border-b border-border bg-card px-4 py-3 md:hidden">
+      <div className={cn(
+        "flex shrink-0 items-center justify-between border-b bg-card px-4 py-3 md:hidden",
+        simpleMode ? "border-simple-accent/30 bg-simple-accent/5" : "border-border"
+      )}>
         <span className="text-sm font-bold tracking-tight text-foreground">
           MAXSIM
           <span className="ml-1.5 text-xs font-normal text-muted-foreground">Dashboard</span>
         </span>
-        <button
-          type="button"
-          onClick={onMobileMenuToggle}
-          className="flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? (
-            <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M3 3l10 10M13 3L3 13" />
-            </svg>
-          ) : (
-            <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M2 4h12M2 8h12M2 12h12" />
-            </svg>
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          {headerRight}
+          <button
+            type="button"
+            onClick={onMobileMenuToggle}
+            className="flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? (
+              <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 3l10 10M13 3L3 13" />
+              </svg>
+            ) : (
+              <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M2 4h12M2 8h12M2 12h12" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Mobile sidebar overlay */}

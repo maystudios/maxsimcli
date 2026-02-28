@@ -1,3 +1,6 @@
+/** Dashboard display mode — persisted in localStorage and server config */
+export type DashboardMode = "simple" | "advanced";
+
 /** Phase data as displayed in the dashboard */
 export interface DashboardPhase {
   number: string;

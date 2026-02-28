@@ -1,6 +1,8 @@
 import { useState, useCallback, useRef } from "react";
 import { WebSocketProvider } from "@/components/providers/websocket-provider";
+import { SimpleModeProvider } from "@/components/providers/simple-mode-provider";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
+import { useDashboardMode } from "@/hooks/use-dashboard-mode";
 import { StatsHeader } from "@/components/dashboard/stats-header";
 import { PhaseList } from "@/components/dashboard/phase-list";
 import { PhaseDetail } from "@/components/dashboard/phase-detail";
@@ -10,6 +12,9 @@ import { AppShell } from "@/components/layout/app-shell";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Terminal } from "@/components/terminal/Terminal";
 import { TerminalToggle, useTerminalLayout } from "@/components/terminal/TerminalTab";
+import { ModeToggleButton } from "@/components/simple-mode/mode-toggle-button";
+import { FirstRunCard } from "@/components/simple-mode/first-run-card";
+import { SimpleModeView } from "@/components/simple-mode/simple-mode-view";
 import type { DashboardPhase } from "@/lib/types";
 
 export type ActiveView = "overview" | "phase" | "todos" | "blockers" | "terminal";
@@ -72,10 +77,19 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 /** Inner app that depends on WebSocket context being available */
 function DashboardApp() {
   const { roadmap, state, todos, loading, error } = useDashboardData();
+  const { mode, setMode, initialized } = useDashboardMode();
   const [activeView, setActiveView] = useState<ActiveView>("overview");
   const [activePhaseId, setActivePhaseId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { splitMode, toggleSplit } = useTerminalLayout();
+
+  const toggleMode = useCallback(() => {
+    setMode(mode === "simple" ? "advanced" : "simple");
+  }, [mode, setMode]);
+
+  const modeToggle = initialized ? (
+    <ModeToggleButton mode={mode} onToggle={toggleMode} />
+  ) : null;
   /** Track the last non-terminal view for split mode dashboard content */
   const lastDashboardViewRef = useRef<{ view: ActiveView; phaseId: string | null }>({ view: "overview", phaseId: null });
 
@@ -191,39 +205,58 @@ function DashboardApp() {
   }
 
   const isTerminalView = activeView === "terminal";
+  const isSimple = mode === "simple";
 
   return (
     <AppShell
       mobileMenuOpen={mobileMenuOpen}
       onMobileMenuToggle={() => setMobileMenuOpen((v) => !v)}
       onMobileMenuClose={() => setMobileMenuOpen(false)}
+      headerRight={modeToggle}
+      simpleMode={isSimple}
       sidebar={
-        <Sidebar
-          activeView={activeView}
-          activePhaseId={activePhaseId}
-          onNavigate={handleNavigate}
-        />
+        <div style={{ display: isSimple ? "none" : "contents" }}>
+          <Sidebar
+            activeView={activeView}
+            activePhaseId={activePhaseId}
+            onNavigate={handleNavigate}
+            logoAction={modeToggle}
+          />
+        </div>
       }
     >
-      {/* Dashboard content: hidden when terminal is full-height, visible in split top half */}
-      <div
-        style={{ display: isTerminalView && !splitMode ? "none" : "block" }}
-        className={
-          isTerminalView && splitMode
-            ? "h-1/2 min-h-0 overflow-auto border-b border-border p-4 sm:p-6"
-            : "flex-1 overflow-y-auto p-4 sm:p-6"
-        }
-      >
-        {renderContent()}
-      </div>
+      {/* First-run card — shown above everything when mode is not yet chosen */}
+      {initialized && mode === null && <FirstRunCard onChoose={setMode} />}
 
-      {/* Terminal: always mounted, visibility toggled via CSS */}
-      <div
-        style={{ display: isTerminalView ? "flex" : "none" }}
-        className={`relative min-h-0 flex-col overflow-hidden ${isTerminalView && splitMode ? "h-1/2" : "flex-1"}`}
-      >
-        <TerminalToggle splitMode={splitMode} onToggle={toggleSplit} />
-        <Terminal />
+      {/* Simple Mode content area */}
+      {isSimple && initialized && (
+        <div className="flex flex-col flex-1 min-h-0">
+          <SimpleModeView />
+        </div>
+      )}
+
+      {/* Advanced Mode content — always mounted, hidden when in Simple Mode */}
+      <div style={{ display: isSimple ? "none" : "contents" }}>
+        {/* Dashboard content: hidden when terminal is full-height, visible in split top half */}
+        <div
+          style={{ display: isTerminalView && !splitMode ? "none" : "block" }}
+          className={
+            isTerminalView && splitMode
+              ? "h-1/2 min-h-0 overflow-auto border-b border-border p-4 sm:p-6"
+              : "flex-1 overflow-y-auto p-4 sm:p-6"
+          }
+        >
+          {renderContent()}
+        </div>
+
+        {/* Terminal: always mounted, visibility toggled via CSS */}
+        <div
+          style={{ display: isTerminalView ? "flex" : "none" }}
+          className={`relative min-h-0 flex-col overflow-hidden ${isTerminalView && splitMode ? "h-1/2" : "flex-1"}`}
+        >
+          <TerminalToggle splitMode={splitMode} onToggle={toggleSplit} />
+          <Terminal />
+        </div>
       </div>
     </AppShell>
   );
@@ -236,7 +269,9 @@ function DashboardApp() {
 export function App() {
   return (
     <WebSocketProvider>
-      <DashboardApp />
+      <SimpleModeProvider>
+        <DashboardApp />
+      </SimpleModeProvider>
     </WebSocketProvider>
   );
 }
