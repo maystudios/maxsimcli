@@ -1,3 +1,10 @@
+## [3.10.1](https://github.com/maystudios/maxsimcli/compare/v3.10.0...v3.10.1) (2026-02-28)
+
+
+### Bug Fixes
+
+* **dashboard:** correct New Project command and send newline for execution ([709617b](https://github.com/maystudios/maxsimcli/commit/709617b909ea1a1a101dfde9d654d84bbd6b7d94))
+
 # [3.10.0](https://github.com/maystudios/maxsimcli/compare/v3.9.0...v3.10.0) (2026-02-28)
 
 
