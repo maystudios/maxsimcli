@@ -82,8 +82,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 33-01-PLAN.md — MCP server embedded in Express (ask_question, submit_lifecycle_event, get_phase_status tools), question queue, WebSocket broadcast, answer submission endpoint
-- [ ] 33-02-PLAN.md — WebSocket event routing for MCP events, real question flow (replace mocks), StatusBar, pending badge, MCP server registration in ~/.claude.json
+- [x] 33-01-PLAN.md — MCP server embedded in Express (ask_question, submit_lifecycle_event, get_phase_status tools), question queue, WebSocket broadcast, answer submission endpoint
+- [x] 33-02-PLAN.md — WebSocket event routing for MCP events, real question flow (replace mocks), StatusBar, pending badge, MCP server registration in ~/.claude.json
 
 ### Phase 34: Execution Progress View
 **Goal**: Users can trigger automatic phase execution from Simple Mode and see visible progress without reading terminal output
@@ -123,6 +123,6 @@ Plans:
 | 31. Simple Mode UI Shell | 2/2 | Complete   | 2026-02-28 | - |
 | 32. Question-Driven Discussion Flow | 2/2 | Complete    | 2026-02-28 | - |
 | 32.1. Verify Phase 31 + Fix Ask-Me-More Bug | 1/1 | Complete    | 2026-02-28 | - |
-| 33. Workflow-Dashboard Hook Bridge | 2/2 | Complete   | 2026-02-28 | - |
+| 33. Workflow-Dashboard Hook Bridge | 2/2 | Complete    | 2026-02-28 | - |
 | 34. Execution Progress View | v1.1 | 0/2 | Not started | - |
 | 35. Action Menu Extensibility | v1.1 | 0/2 | Not started | - |
