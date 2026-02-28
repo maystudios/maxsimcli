@@ -106,10 +106,29 @@ function DashboardApp() {
     setMobileMenuOpen(false);
   }, []);
 
+  const pendingCommandRef = useRef<string | null>(null);
+
   const executeInTerminal = useCallback((cmd: string) => {
-    terminalWriteRef.current?.(cmd + "\n");
+    if (terminalWriteRef.current) {
+      terminalWriteRef.current(cmd + "\r");
+    } else {
+      // Terminal not ready yet — queue for when it connects
+      pendingCommandRef.current = cmd;
+    }
     handleNavigate("terminal");
   }, [handleNavigate]);
+
+  // Flush pending command once terminal writeInput becomes available
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (pendingCommandRef.current && terminalWriteRef.current) {
+        terminalWriteRef.current(pendingCommandRef.current + "\r");
+        pendingCommandRef.current = null;
+        clearInterval(interval);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
 
   const handlePhaseClick = useCallback((phaseNumber: string) => {
     setActiveView("phase");
