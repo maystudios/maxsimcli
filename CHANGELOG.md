@@ -1,3 +1,18 @@
+# [3.9.0](https://github.com/maystudios/maxsimcli/compare/v3.8.1...v3.9.0) (2026-02-28)
+
+
+### Bug Fixes
+
+* **32.1-01:** fix useMockQuestions "Ask me more" dead-end bug ([96a0d6f](https://github.com/maystudios/maxsimcli/commit/96a0d6f73f46e9966ba5f14466259fe406d9bbbe))
+
+
+### Features
+
+* **32-01:** add DiscussionProvider state machine and react-markdown dependency ([31493c9](https://github.com/maystudios/maxsimcli/commit/31493c95d9ce0672b6ee2423a03d410604177d22))
+* **32-01:** add QuestionCard, OptionCard, AnsweredCard, SkeletonCard, OptionPreviewPanel ([bf35fa5](https://github.com/maystudios/maxsimcli/commit/bf35fa546202f2df018404ff93d0908324865b61))
+* **32-02:** add DiscussionView, DiscussionFooter, ConfirmationDialog, DiscussionCompleteCard ([d7125d5](https://github.com/maystudios/maxsimcli/commit/d7125d5cbeafc1fb2547a186d6844336904b6976))
+* **32-02:** wire DiscussionView into SimpleModeView and App.tsx ([4c16771](https://github.com/maystudios/maxsimcli/commit/4c16771eefb2d928210ca9f6475d9602e00e3abf))
+
 ## [3.8.1](https://github.com/maystudios/maxsimcli/compare/v3.8.0...v3.8.1) (2026-02-28)
 
 
