@@ -29,9 +29,9 @@ User stories for the Simple Dashboard Mode milestone.
 
 ### Hook System for Dashboard Interaction
 
-- [ ] **HOOK-01**: As a user, workflow AskUserQuestion calls are intercepted by the dashboard so that questions appear in the browser UI
+- [x] **HOOK-01**: As a user, workflow AskUserQuestion calls are intercepted by the dashboard so that questions appear in the browser UI
   - Acceptance: When a workflow triggers a question, it appears in simple mode UI within 1 second
-- [ ] **HOOK-02**: As a developer, I can register hooks that bridge Claude Code workflow events to the dashboard so that simple mode stays in sync
+- [x] **HOOK-02**: As a developer, I can register hooks that bridge Claude Code workflow events to the dashboard so that simple mode stays in sync
   - Acceptance: Hook API documented; events (question asked, answer given, phase started, phase complete) fire reliably
 
 ### Full Auto-Run Foundation
@@ -83,8 +83,8 @@ Deferred to future releases.
 | DASH-04 | Phase 32 | Complete |
 | DASH-05 | Phase 32 | Complete |
 | DASH-07 | Phase 32 | Complete |
-| HOOK-01 | Phase 33 | Pending |
-| HOOK-02 | Phase 33 | Pending |
+| HOOK-01 | Phase 33 | Complete |
+| HOOK-02 | Phase 33 | Complete |
 | DASH-06 | Phase 34 | Pending |
 | AUTO-01 | Phase 34 | Pending |
 | EXT-01 | Phase 35 | Pending |
