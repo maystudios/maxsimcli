@@ -961,6 +961,57 @@ if (fs.existsSync(clientDir)) {
 
 const AUTO_SHUTDOWN_DELAY_MS = 60_000; // 60 seconds
 
+// ─── MCP Registration ────────────────────────────────────────────────────
+
+function registerMcpServerInClaudeJson(projectPath: string, port: number): void {
+  const claudeJsonPath = path.join(os.homedir(), '.claude.json');
+  let claudeJson: Record<string, unknown> = {};
+
+  if (fs.existsSync(claudeJsonPath)) {
+    try {
+      claudeJson = JSON.parse(fs.readFileSync(claudeJsonPath, 'utf-8'));
+    } catch {
+      log('WARN', 'mcp-register', 'Failed to parse ~/.claude.json, starting fresh');
+    }
+  }
+
+  const projects = (claudeJson.projects as Record<string, Record<string, unknown>>) ?? {};
+  const projectConfig = projects[projectPath] ?? {};
+  const mcpServers = (projectConfig.mcpServers as Record<string, unknown>) ?? {};
+
+  mcpServers['maxsim-dashboard'] = {
+    type: 'http',
+    url: `http://localhost:${port}/mcp`,
+  };
+
+  projectConfig.mcpServers = mcpServers;
+  projects[projectPath] = projectConfig;
+  claudeJson.projects = projects;
+
+  // Atomic write
+  const tmp = claudeJsonPath + '.tmp.' + Date.now();
+  fs.writeFileSync(tmp, JSON.stringify(claudeJson, null, 2) + '\n', 'utf-8');
+  fs.renameSync(tmp, claudeJsonPath);
+
+  log('INFO', 'mcp-register', `MCP server registered at http://localhost:${port}/mcp for ${projectPath}`);
+}
+
+function unregisterMcpServerFromClaudeJson(projectPath: string): void {
+  const claudeJsonPath = path.join(os.homedir(), '.claude.json');
+  if (!fs.existsSync(claudeJsonPath)) return;
+  try {
+    const claudeJson = JSON.parse(fs.readFileSync(claudeJsonPath, 'utf-8')) as Record<string, unknown>;
+    const projects = (claudeJson.projects as Record<string, Record<string, unknown>>) ?? {};
+    if (projects[projectPath]?.mcpServers) {
+      delete (projects[projectPath].mcpServers as Record<string, unknown>)['maxsim-dashboard'];
+    }
+    const tmp = claudeJsonPath + '.tmp.' + Date.now();
+    fs.writeFileSync(tmp, JSON.stringify(claudeJson, null, 2) + '\n', 'utf-8');
+    fs.renameSync(tmp, claudeJsonPath);
+    log('INFO', 'mcp-register', `MCP server unregistered for ${projectPath}`);
+  } catch { /* silent */ }
+}
+
 async function main(): Promise<void> {
   let autoShutdownTimer: NodeJS.Timeout | null = null;
 
@@ -1152,11 +1203,14 @@ async function main(): Promise<void> {
     log('INFO', 'mcp', `MCP server available at http://localhost:${port}/mcp`);
     console.error(`MCP endpoint: http://localhost:${port}/mcp`);
     console.error(`Logs: ${logFile}`);
+    registerMcpServerInClaudeJson(projectCwd, port);
+    console.error('MCP server registered. Restart Claude Code to activate dashboard tools.');
     open(localUrl).catch(() => {});
   });
 
   function shutdown(): void {
     console.error('\n[server] Shutting down...');
+    unregisterMcpServerFromClaudeJson(projectCwd);
     ptyManager.kill();
     if (watcher) watcher.close().catch(() => {});
     terminalWss.close(() => {});
