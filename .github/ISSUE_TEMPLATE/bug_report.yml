@@ -1,0 +1,95 @@
+name: Bug Report
+description: Something isn't working as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill in as much detail as possible so we can reproduce and fix it quickly.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+      placeholder: "When I run `npx maxsimcli@latest install`, it fails with..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Step-by-step instructions to reproduce the issue.
+      placeholder: |
+        1. Run `npx maxsimcli@latest install`
+        2. Select runtime "Claude Code"
+        3. See error output
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened? Include the full error message/stack trace if available.
+    validations:
+      required: true
+
+  - type: input
+    id: maxsimcli_version
+    attributes:
+      label: maxsimcli Version
+      description: Run `npx maxsimcli@latest --version` or check your package.json
+      placeholder: "3.10.3"
+    validations:
+      required: true
+
+  - type: input
+    id: node_version
+    attributes:
+      label: Node.js Version
+      description: Run `node --version`
+      placeholder: "v22.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - macOS
+        - Linux
+        - Windows
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: AI Runtime
+      description: Which AI runtime are you installing MAXSIM into?
+      options:
+        - Claude Code
+        - OpenCode
+        - Gemini CLI
+        - Codex
+        - Other / Not applicable
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context, screenshots, or log output that might help.

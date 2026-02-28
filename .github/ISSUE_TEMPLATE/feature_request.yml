@@ -1,0 +1,55 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea to make MAXSIM better? We'd love to hear it!
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Motivation
+      description: What problem does this feature solve? What's the current pain point?
+      placeholder: "When I try to run parallel phases, there's no way to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the feature or change you'd like to see. Be as specific as possible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any workarounds or alternative approaches? Why aren't they sufficient?
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of MAXSIM does this affect?
+      options:
+        - CLI / install
+        - Commands (templates/commands/)
+        - Workflows (templates/workflows/)
+        - Agents (templates/agents/)
+        - Dashboard
+        - Hooks
+        - Core tooling (cli.ts / core modules)
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Mockups, examples, links to related issues or prior art — anything that helps explain the idea.
