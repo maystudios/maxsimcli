@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-27)
 ## Current Position
 
 Phase: 33 of 35 (Hook-Bridge)
-Plan: 1 of 2 in current phase
-Status: Plan 01 complete — MCP server embedded in dashboard with blocking question bridge
-Last activity: 2026-02-28 — Phase 33 Plan 01 executed: MCP server with ask_question, submit_lifecycle_event, get_phase_status tools
+Plan: 2 of 2 in current phase
+Status: Phase 33 complete — MCP bridge fully wired to browser UI with auto-registration
+Last activity: 2026-02-28 — Phase 33 Plan 02 executed: Browser UI integration, StatusBar, MCP auto-registration
 
-Progress: [██████████████████████░░░░░░░░] 66% (phases 1-32 complete, 33 in progress)
+Progress: [███████████████████████░░░░░░░] 69% (phases 1-33 complete, 34 next)
 
 ## Performance Metrics
 
@@ -31,6 +31,7 @@ Progress: [██████████████████████░
 | 32 (plan 01) | 2 tasks | 3min | 1.5min |
 | 32 (plan 02) | 3 tasks | 14min | 4.7min |
 | 33 (plan 01) | 2 tasks | 5min | 2.5min |
+| 33 (plan 02) | 3 tasks | 3min | 1.0min |
 
 **Recent Trend:**
 - Trend: Stable (30 phases completed successfully)
@@ -52,6 +53,8 @@ Progress: [██████████████████████░
 - [Phase 33]: MCP routes registered inside main() after wss creation to avoid null WebSocketServer
 - [Phase 33]: StreamableHTTPServerTransport with stateless per-request operation (no session persistence)
 - [Phase 33]: Second wss connection listener for reconnect delivery (WSS supports multiple listeners)
+- [Phase 33]: onQuestionReceivedRef callback bridges WebSocket provider to discussion provider
+- [Phase 33]: MCP server auto-registered in ~/.claude.json on startup, unregistered on shutdown
 
 ### Pending Todos
 
@@ -61,10 +64,10 @@ None yet.
 
 - node-pty is a fragile native dependency — terminal may degrade on some platforms (pre-existing, not blocking v1.1)
 - install.ts monolith (2157 lines) — not blocking but worth splitting in a future phase
-- Hook bridge design needs research: how to intercept AskUserQuestion without patching Claude Code internals
+- Hook bridge implemented via MCP tools (Phase 33 complete) — Claude Code calls ask_question tool instead of intercepting internals
 
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 33-01-PLAN.md
+Stopped at: Completed 33-02-PLAN.md
 Resume file: None

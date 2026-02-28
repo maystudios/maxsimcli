@@ -123,6 +123,6 @@ Plans:
 | 31. Simple Mode UI Shell | 2/2 | Complete   | 2026-02-28 | - |
 | 32. Question-Driven Discussion Flow | 2/2 | Complete    | 2026-02-28 | - |
 | 32.1. Verify Phase 31 + Fix Ask-Me-More Bug | 1/1 | Complete    | 2026-02-28 | - |
-| 33. Workflow-Dashboard Hook Bridge | 1/2 | In Progress|  | - |
+| 33. Workflow-Dashboard Hook Bridge | 2/2 | Complete   | 2026-02-28 | - |
 | 34. Execution Progress View | v1.1 | 0/2 | Not started | - |
 | 35. Action Menu Extensibility | v1.1 | 0/2 | Not started | - |
