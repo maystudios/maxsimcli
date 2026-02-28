@@ -50,11 +50,11 @@ Plans:
   2. User can type a free-form text answer to any discussion question in an input field
   3. After each answer, user sees "Ask me more" and "I'm done, execute" buttons
   4. Selecting "I'm done, execute" closes the discussion and queues execution
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 32-01: Question renderer component and free-form text input
-- [ ] 32-02: Discussion flow state machine (question → answer → more/done)
+- [ ] 32-01-PLAN.md — DiscussionProvider state machine, QuestionCard, OptionCard, AnsweredCard, SkeletonCard, OptionPreviewPanel, react-markdown dependency
+- [ ] 32-02-PLAN.md — DiscussionView container, DiscussionFooter, ConfirmationDialog, DiscussionCompleteCard, SimpleModeView wiring, mock questions
 
 ### Phase 33: Workflow-Dashboard Hook Bridge
 **Goal**: Claude Code workflow events (questions asked, phase started, phase complete) are reliably bridged to the dashboard UI in real time
@@ -107,7 +107,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 31. Simple Mode UI Shell | 2/2 | Complete   | 2026-02-28 | - |
-| 32. Question-Driven Discussion Flow | v1.1 | 0/2 | Not started | - |
+| 32. Question-Driven Discussion Flow | v1.1 | 0/2 | Planned | - |
 | 33. Workflow-Dashboard Hook Bridge | v1.1 | 0/2 | Not started | - |
 | 34. Execution Progress View | v1.1 | 0/2 | Not started | - |
 | 35. Action Menu Extensibility | v1.1 | 0/2 | Not started | - |

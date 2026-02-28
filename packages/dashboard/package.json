@@ -29,6 +29,7 @@
     "qrcode": "^1",
     "react": "^19",
     "react-dom": "^19",
+    "react-markdown": "^10.1.0",
     "sirv": "^3",
     "slugify": "^1.6.6",
     "tailwind-merge": "^3",
