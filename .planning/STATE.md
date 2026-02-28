@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Consistent, high-quality AI-assisted development without context rot — accessible via CLI and a simple browser UI.
-**Current focus:** Phase 31 — Simple Mode UI Shell
+**Current focus:** Phase 32 — Question-Driven Discussion Flow
 
 ## Current Position
 
-Phase: 31 of 35 (Simple Mode UI Shell)
-Plan: 2 of 2 in current phase — COMPLETE
-Status: Phase 31 complete — Simple Mode UI Shell built and committed
-Last activity: 2026-02-28 — Phase 31 executed: SimpleModeProvider, useDashboardMode, ModeToggleButton, FirstRunCard, RecommendationCard, ActionGrid with tabs/slide/accordion, ActionForm with auto-resize+command output
+Phase: 32 of 35 (Question-Driven Discussion Flow)
+Plan: 1 of 2 in current phase — COMPLETE
+Status: Plan 01 complete — DiscussionProvider state machine and core presentation components built
+Last activity: 2026-02-28 — Phase 32 Plan 01 executed: DiscussionProvider state machine, QuestionCard, OptionCard, AnsweredCard, SkeletonCard, OptionPreviewPanel, react-markdown added
 
-Progress: [████████████████████░░░░░░░░░░] 60% (phases 1-30 complete; milestone v1.1 begins)
+Progress: [█████████████████████░░░░░░░░░] 62% (phases 1-31 complete, phase 32 plan 1/2)
 
 ## Performance Metrics
 
@@ -28,6 +28,7 @@ Progress: [████████████████████░░░
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1-30 (v1.0) | ~70 | - | - |
+| 32 (plan 01) | 2 tasks | 3min | 1.5min |
 
 **Recent Trend:**
 - Trend: Stable (30 phases completed successfully)
@@ -42,6 +43,8 @@ Progress: [████████████████████░░░
 - [Milestone]: Simple Dashboard Mode chosen as highest-value next unlock
 - [Architecture]: Simple mode is additive — advanced terminal mode must remain fully intact
 - [Architecture]: Dashboard additions must work via `npx maxsimcli@latest` for external users
+- [Phase 32]: Separate DiscussionProvider from SimpleModeProvider — isolated discussion lifecycle
+- [Phase 32]: Callback refs (onQuestionReceived, onExecutionQueued) as extension points for Phase 33/34
 
 ### Pending Todos
 
@@ -55,6 +58,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-27
-Stopped at: Roadmap created — phases 31-35 defined and written to ROADMAP.md
+Last session: 2026-02-28
+Stopped at: Completed 32-01-PLAN.md
 Resume file: None

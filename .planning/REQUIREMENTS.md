@@ -18,13 +18,13 @@ User stories for the Simple Dashboard Mode milestone.
   - Acceptance: Action screen shows available phase actions; selecting one initiates the flow
 - [ ] **DASH-03**: As a user, I can enter a phase description in the dashboard UI so that I don't need to type in a terminal
   - Acceptance: Text input in browser captures phase description; passed to planning workflow
-- [ ] **DASH-04**: As a user, I can answer discussion questions from the dashboard so that the planning discussion happens entirely in the browser
+- [x] **DASH-04**: As a user, I can answer discussion questions from the dashboard so that the planning discussion happens entirely in the browser
   - Acceptance: AskUserQuestion-equivalent prompts rendered as UI elements; responses captured and sent to workflow
 - [ ] **DASH-05**: As a user, I can choose "Ask me more" or "I'm done, execute" at the end of discussion so that I control when planning ends
   - Acceptance: Two clear CTA buttons shown after discussion; selecting "execute" triggers execution
 - [ ] **DASH-06**: As a user, I can see phase execution progress in simple mode so that I know what's happening without reading terminal output
   - Acceptance: Progress indicator, current step name, and completion percentage shown during execution
-- [ ] **DASH-07**: As a user, I can type free-form answers to discussion questions in the dashboard so that I'm not limited to button choices
+- [x] **DASH-07**: As a user, I can type free-form answers to discussion questions in the dashboard so that I'm not limited to button choices
   - Acceptance: Text input available alongside option buttons for any discussion question
 
 ### Hook System for Dashboard Interaction
@@ -80,9 +80,9 @@ Deferred to future releases.
 | DASH-01 | Phase 31 | Pending |
 | DASH-02 | Phase 31 | Pending |
 | DASH-03 | Phase 31 | Pending |
-| DASH-04 | Phase 32 | Pending |
+| DASH-04 | Phase 32 | Complete |
 | DASH-05 | Phase 32 | Pending |
-| DASH-07 | Phase 32 | Pending |
+| DASH-07 | Phase 32 | Complete |
 | HOOK-01 | Phase 33 | Pending |
 | HOOK-02 | Phase 33 | Pending |
 | DASH-06 | Phase 34 | Pending |
