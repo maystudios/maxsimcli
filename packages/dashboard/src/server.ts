@@ -8,6 +8,8 @@ import type { Duplex } from 'node:stream';
 import express, { type Request, type Response, type NextFunction } from 'express';
 import sirv from 'sirv';
 import { WebSocketServer, WebSocket } from 'ws';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { createMcpServer, type PendingQuestion } from './mcp-server';
 import detectPort from 'detect-port';
 import open from 'open';
 
@@ -187,6 +189,12 @@ function normalizeFsPath(p: string): string {
 // ─── WebSocket ─────────────────────────────────────────────────────────────
 
 let clientCount = 0;
+
+// ─── MCP Shared State ──────────────────────────────────────────────────────
+
+const questionQueue: PendingQuestion[] = [];
+const pendingAnswers = new Map<string, (answer: string) => void>();
+const currentLifecycleState: { value: Record<string, unknown> | null } = { value: null };
 
 function createWSS(onClientCountChange?: (count: number) => void): WebSocketServer {
   const wss = new WebSocketServer({ noServer: true });
@@ -973,6 +981,55 @@ async function main(): Promise<void> {
       log('INFO', 'server', `Auto-shutdown scheduled in ${AUTO_SHUTDOWN_DELAY_MS / 1000}s (no clients)`);
     }
   });
+  // ── MCP Server ──
+  const mcpServer = createMcpServer({
+    wss,
+    questionQueue,
+    pendingAnswers,
+    currentLifecycleState,
+    broadcast,
+  });
+
+  app.post('/mcp', async (req: Request, res: Response) => {
+    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+    await mcpServer.connect(transport);
+    await transport.handleRequest(req, res, req.body);
+  });
+
+  app.get('/mcp', async (req: Request, res: Response) => {
+    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+    await mcpServer.connect(transport);
+    await transport.handleRequest(req, res);
+  });
+
+  app.delete('/mcp', (_req: Request, res: Response) => {
+    res.status(200).end();
+  });
+
+  app.post('/api/mcp-answer', (req: Request, res: Response) => {
+    const { questionId, answer } = req.body as { questionId: string; answer: string };
+    if (!questionId || !answer) return res.status(400).json({ error: 'questionId and answer are required' });
+    const resolve = pendingAnswers.get(questionId);
+    if (!resolve) return res.status(404).json({ error: 'No pending question with that ID' });
+    pendingAnswers.delete(questionId);
+    resolve(answer);
+    return res.json({ answered: true });
+  });
+
+  // Deliver queued questions and lifecycle state on WebSocket reconnect
+  wss.on('connection', (ws) => {
+    if (questionQueue.length > 0) {
+      ws.send(JSON.stringify({
+        type: 'questions-queued',
+        questions: questionQueue,
+        count: questionQueue.length,
+      }));
+    }
+    if (currentLifecycleState.value) {
+      ws.send(JSON.stringify({ type: 'lifecycle', event: currentLifecycleState.value }));
+    }
+  });
+
   const terminalWss = new WebSocketServer({ noServer: true });
   const ptyManager = PtyManager.getInstance();
 
@@ -1092,6 +1149,8 @@ async function main(): Promise<void> {
       console.error(`[firewall] Run once as Administrator to allow it:`);
       console.error(`[firewall]   netsh advfirewall firewall add rule name="MAXSIM Dashboard" dir=in action=allow protocol=TCP localport=${port}`);
     }
+    log('INFO', 'mcp', `MCP server available at http://localhost:${port}/mcp`);
+    console.error(`MCP endpoint: http://localhost:${port}/mcp`);
     console.error(`Logs: ${logFile}`);
     open(localUrl).catch(() => {});
   });
