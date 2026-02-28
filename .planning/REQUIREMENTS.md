@@ -77,9 +77,9 @@ Deferred to future releases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DASH-01 | Phase 31 | Pending |
-| DASH-02 | Phase 31 | Pending |
-| DASH-03 | Phase 31 | Pending |
+| DASH-01 | Phase 32.1 (gap closure) | Pending |
+| DASH-02 | Phase 32.1 (gap closure) | Pending |
+| DASH-03 | Phase 32.1 (gap closure) | Pending |
 | DASH-04 | Phase 32 | Complete |
 | DASH-05 | Phase 32 | Complete |
 | DASH-07 | Phase 32 | Complete |

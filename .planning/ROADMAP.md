@@ -56,6 +56,20 @@ Plans:
 - [ ] 32-01-PLAN.md — DiscussionProvider state machine, QuestionCard, OptionCard, AnsweredCard, SkeletonCard, OptionPreviewPanel, react-markdown dependency
 - [ ] 32-02-PLAN.md — DiscussionView container, DiscussionFooter, ConfirmationDialog, DiscussionCompleteCard, SimpleModeView wiring, mock questions
 
+### Phase 32.1: Verify Phase 31 + Fix Ask-Me-More Bug
+**Goal**: Close audit gaps — verify Phase 31 requirements are satisfied and fix the "Ask me more" dead-end bug in the mock layer
+**Depends on**: Phase 32
+**Requirements**: DASH-01, DASH-02, DASH-03
+**Gap Closure**: Closes gaps from v1.1 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. Phase 31 has a VERIFICATION.md confirming DASH-01, DASH-02, DASH-03 are satisfied
+  2. "Ask me more" button delivers new questions instead of entering permanent skeleton loading state
+  3. E2E flow "Ask me more → receive more questions" passes
+**Plans**: 1 plan
+
+Plans:
+- [ ] 32.1-01-PLAN.md — Write Phase 31 VERIFICATION.md (DASH-01/02/03) and fix useMockQuestions "Ask me more" dead-end bug
+
 ### Phase 33: Workflow-Dashboard Hook Bridge
 **Goal**: Claude Code workflow events (questions asked, phase started, phase complete) are reliably bridged to the dashboard UI in real time
 **Depends on**: Phase 32
@@ -102,12 +116,13 @@ Plans:
 
 ## Progress
 
-**Execution Order:** 31 → 32 → 33 → 34 → 35
+**Execution Order:** 31 → 32 → 32.1 → 33 → 34 → 35
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 31. Simple Mode UI Shell | 2/2 | Complete   | 2026-02-28 | - |
-| 32. Question-Driven Discussion Flow | 2/2 | Complete   | 2026-02-28 | - |
+| 32. Question-Driven Discussion Flow | 2/2 | Complete    | 2026-02-28 | - |
+| 32.1. Verify Phase 31 + Fix Ask-Me-More Bug | v1.1 | 0/1 | Not started | - |
 | 33. Workflow-Dashboard Hook Bridge | v1.1 | 0/2 | Not started | - |
 | 34. Execution Progress View | v1.1 | 0/2 | Not started | - |
 | 35. Action Menu Extensibility | v1.1 | 0/2 | Not started | - |
