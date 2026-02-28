@@ -1,3 +1,20 @@
+# [3.10.0](https://github.com/maystudios/maxsimcli/compare/v3.9.0...v3.10.0) (2026-02-28)
+
+
+### Bug Fixes
+
+* bundle MCP SDK subpath imports into dashboard server.js ([e85ba8a](https://github.com/maystudios/maxsimcli/commit/e85ba8a7253635529d5a7892b13290238b50451d))
+
+
+### Features
+
+* **33-01:** add MCP SDK and create mcp-server.ts with tool registrations ([14ff308](https://github.com/maystudios/maxsimcli/commit/14ff308ba3d52331c9e1466b5baac321bf8857a6))
+* **33-01:** wire MCP routes and answer endpoint into server.ts ([0deed2c](https://github.com/maystudios/maxsimcli/commit/0deed2c85856012fd13a5e5f2302f4284d963fdc))
+* **33-02:** add StatusBar, pending badge, and MCP server auto-registration ([c0a17ee](https://github.com/maystudios/maxsimcli/commit/c0a17ee57c3c8be705f6789a2a1eb89fec76f1a9))
+* **33-02:** wire MCP events to browser UI and replace mock questions ([addcd98](https://github.com/maystudios/maxsimcli/commit/addcd988b0b48ef1b8ba3fa728156f308e91e729))
+* **33:** complete Hook Bridge — MCP server, browser integration, and build artifacts ([9ab0732](https://github.com/maystudios/maxsimcli/commit/9ab073282f40be7600fe8e595ce195b45edc48f2))
+* add dashboard MCP bridge to all workflow templates ([6a2e0b3](https://github.com/maystudios/maxsimcli/commit/6a2e0b368ef763213bbf3a286b0760e372bcfab9))
+
 # [3.9.0](https://github.com/maystudios/maxsimcli/compare/v3.8.1...v3.9.0) (2026-02-28)
 
 
