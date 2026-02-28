@@ -7,6 +7,7 @@ Start a new milestone cycle for an existing project. Loads project context, gath
 <required_reading>
 
 Read all files referenced by the invoking prompt's execution_context before starting.
+@./references/dashboard-bridge.md
 
 </required_reading>
 

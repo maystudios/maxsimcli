@@ -14,6 +14,8 @@ Orchestrator coordinates, not executes. Each subagent loads the full execute-pla
 
 <required_reading>
 Read STATE.md before any operation to load project context.
+
+@./references/dashboard-bridge.md
 </required_reading>
 
 <process>
@@ -46,6 +48,15 @@ This is idempotent: if the dashboard is already running, it prints the URL. If n
 The dashboard provides a real-time visual companion showing phase progress, plan tasks, and blockers as execution proceeds.
 
 **Best-effort:** If the dashboard fails to start (e.g., not installed, build missing), execution continues without it. Do NOT gate phase execution on dashboard availability.
+
+**Dashboard MCP probe:** After the dashboard launch attempt, probe for MCP availability (see @dashboard-bridge). If `DASHBOARD_ACTIVE`, emit:
+```
+mcp__maxsim-dashboard__submit_lifecycle_event(
+  event_type: "phase-started",
+  phase_name: PHASE_NAME,
+  phase_number: PHASE_NUMBER
+)
+```
 </step>
 
 <step name="handle_branching">
@@ -114,7 +125,16 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
    - Bad: "Executing terrain generation plan"
    - Good: "Procedural terrain generator using Perlin noise — creates height maps, biome zones, and collision meshes. Required before vehicle physics can interact with ground."
 
-2. **Spawn executor agents:**
+2. **Emit plan-started lifecycle event** (if `DASHBOARD_ACTIVE`):
+   ```
+   mcp__maxsim-dashboard__submit_lifecycle_event(
+     event_type: "plan-started",
+     phase_name: PHASE_NAME, phase_number: PHASE_NUMBER,
+     step: plan_index, total_steps: total_plans
+   )
+   ```
+
+3. **Spawn executor agents:**
 
    Pass paths only — executors read files themselves with their fresh 200k context.
    This keeps orchestrator context lean (~10-15%).
@@ -167,7 +187,16 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
 
    If ANY spot-check fails: report which plan failed, route to failure handler — ask "Retry plan?" or "Continue with remaining waves?"
 
-   If pass:
+   If pass — **emit plan-complete lifecycle event** (if `DASHBOARD_ACTIVE`):
+   ```
+   mcp__maxsim-dashboard__submit_lifecycle_event(
+     event_type: "plan-complete",
+     phase_name: PHASE_NAME, phase_number: PHASE_NUMBER,
+     step: plan_index, total_steps: total_plans
+   )
+   ```
+
+   Then report:
    ```
    ---
    ## Wave {N} Complete
@@ -392,6 +421,15 @@ Extract from result: `next_phase`, `next_phase_name`, `is_last_phase`.
 
 ```bash
 node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs(phase-{X}): complete phase execution" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md {phase_dir}/*-VERIFICATION.md
+```
+
+**Emit phase-complete lifecycle event** (if `DASHBOARD_ACTIVE`):
+```
+mcp__maxsim-dashboard__submit_lifecycle_event(
+  event_type: "phase-complete",
+  phase_name: PHASE_NAME,
+  phase_number: PHASE_NUMBER
+)
 ```
 </step>
 

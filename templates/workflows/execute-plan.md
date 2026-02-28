@@ -7,6 +7,7 @@ Read STATE.md before any operation to load project context.
 Read config.json for planning behavior settings.
 
 @./references/git-integration.md
+@./references/dashboard-bridge.md
 </required_reading>
 
 <process>
@@ -269,6 +270,11 @@ Display: `CHECKPOINT: [Type]` box → Progress {X}/{Y} → Task name → type-sp
 | human-verify (90%) | What was built + verification steps (commands/URLs) | "approved" or describe issues |
 | decision (9%) | Decision needed + context + options with pros/cons | "Select: option-id" |
 | human-action (1%) | What was automated + ONE manual step + verification plan | "done" |
+
+**Dashboard mode:** If `DASHBOARD_ACTIVE` (see @dashboard-bridge), present checkpoint content via `mcp__maxsim-dashboard__ask_question` instead of plain text:
+- human-verify: `options: [{value: "approved", label: "Approved"}, {value: "issues", label: "Report issues"}]`, `allow_free_text: true`
+- decision: one option per decision choice
+- human-action: `options: [{value: "done", label: "Done"}]`, `allow_free_text: true`
 
 After response: verify if specified. Pass → continue. Fail → inform, wait. WAIT for user — do NOT hallucinate completion.
 

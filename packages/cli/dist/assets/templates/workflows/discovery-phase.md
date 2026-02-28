@@ -7,6 +7,10 @@ Called from plan-phase.md's mandatory_discovery step with a depth parameter.
 NOTE: For comprehensive ecosystem research ("how do experts build this"), use /maxsim:research-phase instead, which produces RESEARCH.md.
 </purpose>
 
+<required_reading>
+@./references/dashboard-bridge.md
+</required_reading>
+
 <depth_levels>
 **This workflow supports three depth levels:**
 

@@ -12,6 +12,7 @@ With `--full` flag: enables plan-checking (max 2 iterations) and post-execution 
 
 <required_reading>
 Read all files referenced by the invoking prompt's execution_context before starting.
+@./references/dashboard-bridge.md
 </required_reading>
 
 <process>

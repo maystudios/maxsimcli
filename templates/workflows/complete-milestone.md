@@ -11,6 +11,7 @@ Mark a shipped version (v1.0, v1.1, v2.0) as complete. Creates historical record
 3. `.planning/ROADMAP.md`
 4. `.planning/REQUIREMENTS.md`
 5. `.planning/PROJECT.md`
+@./references/dashboard-bridge.md
 
 </required_reading>
 

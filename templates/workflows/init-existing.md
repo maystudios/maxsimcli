@@ -6,6 +6,7 @@ Output: `.planning/` directory with config.json, PROJECT.md, REQUIREMENTS.md, RO
 
 <required_reading>
 Read all files referenced by the invoking prompt's execution_context before starting.
+@./references/dashboard-bridge.md
 </required_reading>
 
 <auto_mode>

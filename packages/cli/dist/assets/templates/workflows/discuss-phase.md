@@ -10,10 +10,14 @@ Extract implementation decisions that downstream agents need. Analyze the phase 
 You are a thinking partner, not an interviewer. The user is the visionary — you are the builder. Your job is to capture decisions that will guide research and planning, not to figure out implementation yourself.
 </purpose>
 
-<tool_mandate>
-**CRITICAL — AskUserQuestion is MANDATORY for ALL user interactions.**
+<required_reading>
+@./references/dashboard-bridge.md
+</required_reading>
 
-Every question directed at the user MUST use the `AskUserQuestion` tool. NEVER write a question as plain text and wait for the user to respond. This applies to:
+<tool_mandate>
+**CRITICAL — Structured user interaction is MANDATORY.**
+
+Every question directed at the user MUST use a structured tool. NEVER write a question as plain text and wait for the user to respond. This applies to:
 
 - Gray area selection (multiSelect)
 - Every deep-dive question within an area
@@ -22,9 +26,13 @@ Every question directed at the user MUST use the `AskUserQuestion` tool. NEVER w
 - Any clarification or follow-up question
 - Existing context handling (update/view/skip)
 
-**Why:** Plain-text questions create a worse UX — the user has to type free-form answers instead of selecting from well-designed options. AskUserQuestion provides structured choices, which is the entire point of the discuss workflow.
+**Tool selection:** At workflow start, probe for the dashboard (see @dashboard-bridge). Then:
+- **DASHBOARD_ACTIVE = true** → use `mcp__maxsim-dashboard__ask_question` (questions appear in browser). Follow the schema translation rules from @dashboard-bridge.
+- **DASHBOARD_ACTIVE = false** → use `AskUserQuestion` (questions appear in terminal).
 
-**The rule is simple:** If you need input from the user → use `AskUserQuestion`. Zero exceptions.
+**Why:** Plain-text questions create a worse UX — the user has to type free-form answers instead of selecting from well-designed options. Structured choices are the entire point of the discuss workflow.
+
+**The rule is simple:** If you need input from the user → use the appropriate structured tool based on dashboard availability. Zero exceptions.
 </tool_mandate>
 
 <downstream_awareness>

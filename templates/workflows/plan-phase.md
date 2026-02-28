@@ -12,6 +12,7 @@ Create executable phase prompts (PLAN.md files) for a roadmap phase with integra
 Read all files referenced by the invoking prompt's execution_context before starting.
 
 @./references/ui-brand.md
+@./references/dashboard-bridge.md
 </required_reading>
 
 <process>

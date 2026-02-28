@@ -9,6 +9,7 @@ Archive accumulated phase directories from completed milestones into `.planning/
 1. `.planning/MILESTONES.md`
 2. `.planning/milestones/` directory listing
 3. `.planning/phases/` directory listing
+@./references/dashboard-bridge.md
 
 </required_reading>
 
