@@ -13,6 +13,7 @@
     "@codemirror/lang-markdown": "^6",
     "@codemirror/theme-one-dark": "^6",
     "@codemirror/view": "6",
+    "@modelcontextprotocol/sdk": "^1.27.1",
     "@uiw/react-codemirror": "^4",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/addon-serialize": "^0.14.0",

@@ -35,6 +35,8 @@ export default defineConfig({
     '@maxsim/core',
     'lodash.debounce',
     'slugify',
+    '@modelcontextprotocol/sdk',
+    'zod',
   ],
   alias: {
     '@maxsim/core': '../cli/src/core/index.ts',

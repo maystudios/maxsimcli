@@ -79,11 +79,11 @@ Plans:
   2. Answers submitted in the browser are relayed back to the waiting workflow without terminal interaction
   3. Hook API fires reliably for: question asked, answer given, phase started, phase complete
   4. Hook registration is documented and a developer can add a new hook without modifying core workflow files
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 33-01: Hook bridge event bus (server-side) + WebSocket relay
-- [ ] 33-02: AskUserQuestion intercept wiring + hook API documentation
+- [ ] 33-01-PLAN.md — MCP server embedded in Express (ask_question, submit_lifecycle_event, get_phase_status tools), question queue, WebSocket broadcast, answer submission endpoint
+- [ ] 33-02-PLAN.md — WebSocket event routing for MCP events, real question flow (replace mocks), StatusBar, pending badge, MCP server registration in ~/.claude.json
 
 ### Phase 34: Execution Progress View
 **Goal**: Users can trigger automatic phase execution from Simple Mode and see visible progress without reading terminal output
@@ -123,6 +123,6 @@ Plans:
 | 31. Simple Mode UI Shell | 2/2 | Complete   | 2026-02-28 | - |
 | 32. Question-Driven Discussion Flow | 2/2 | Complete    | 2026-02-28 | - |
 | 32.1. Verify Phase 31 + Fix Ask-Me-More Bug | 1/1 | Complete    | 2026-02-28 | - |
-| 33. Workflow-Dashboard Hook Bridge | v1.1 | 0/2 | Not started | - |
+| 33. Workflow-Dashboard Hook Bridge | v1.1 | 0/2 | Planned | - |
 | 34. Execution Progress View | v1.1 | 0/2 | Not started | - |
 | 35. Action Menu Extensibility | v1.1 | 0/2 | Not started | - |

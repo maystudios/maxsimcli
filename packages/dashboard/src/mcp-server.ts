@@ -1,0 +1,151 @@
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { z } from 'zod';
+import { randomUUID } from 'node:crypto';
+import type { WebSocketServer } from 'ws';
+
+// ─── Types ──────────────────────────────────────────────────────────────────
+
+export interface PendingQuestion {
+  id: string;
+  question: string;
+  options: Array<{ value: string; label: string; description?: string }>;
+  allowFreeText: boolean;
+  receivedAt: number;
+}
+
+// ─── Factory ────────────────────────────────────────────────────────────────
+
+export function createMcpServer(deps: {
+  wss: WebSocketServer;
+  questionQueue: PendingQuestion[];
+  pendingAnswers: Map<string, (answer: string) => void>;
+  currentLifecycleState: { value: Record<string, unknown> | null };
+  broadcast: (wss: WebSocketServer, msg: Record<string, unknown>) => void;
+}): McpServer {
+  const { wss, questionQueue, pendingAnswers, currentLifecycleState, broadcast } = deps;
+
+  const server = new McpServer({ name: 'maxsim-dashboard', version: '1.0.0' });
+
+  // ── ask_question ──────────────────────────────────────────────────────────
+
+  server.tool(
+    'ask_question',
+    'Present a question to the dashboard user and wait for their answer',
+    {
+      question: z.string(),
+      options: z
+        .array(
+          z.object({
+            value: z.string(),
+            label: z.string(),
+            description: z.string().optional(),
+          }),
+        )
+        .optional(),
+      allow_free_text: z.boolean().default(true),
+    },
+    async ({ question, options, allow_free_text }) => {
+      const questionId = randomUUID();
+
+      const pending: PendingQuestion = {
+        id: questionId,
+        question,
+        options: options ?? [],
+        allowFreeText: allow_free_text,
+        receivedAt: Date.now(),
+      };
+
+      questionQueue.push(pending);
+
+      broadcast(wss, {
+        type: 'question-received',
+        question: pending,
+        queueLength: questionQueue.length,
+      });
+
+      // Block until the browser submits an answer
+      const answer = await new Promise<string>((resolve) => {
+        pendingAnswers.set(questionId, resolve);
+      });
+
+      // Remove from queue
+      const idx = questionQueue.findIndex((q) => q.id === questionId);
+      if (idx !== -1) questionQueue.splice(idx, 1);
+
+      broadcast(wss, {
+        type: 'answer-given',
+        questionId,
+        remainingQueue: questionQueue.length,
+      });
+
+      return { content: [{ type: 'text' as const, text: answer }] };
+    },
+  );
+
+  // ── submit_lifecycle_event ────────────────────────────────────────────────
+
+  server.tool(
+    'submit_lifecycle_event',
+    'Broadcast a workflow lifecycle event to connected dashboard clients',
+    {
+      event_type: z.enum([
+        'phase-started',
+        'phase-complete',
+        'plan-started',
+        'plan-complete',
+      ]),
+      phase_name: z.string(),
+      phase_number: z.string(),
+      step: z.number().optional(),
+      total_steps: z.number().optional(),
+    },
+    async ({ event_type, phase_name, phase_number, step, total_steps }) => {
+      const event = {
+        event_type,
+        phase_name,
+        phase_number,
+        step: step ?? null,
+        total_steps: total_steps ?? null,
+        timestamp: Date.now(),
+      };
+
+      currentLifecycleState.value = event;
+
+      broadcast(wss, { type: 'lifecycle', event });
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Event recorded: ${event_type} for Phase ${phase_number} (${phase_name})`,
+          },
+        ],
+      };
+    },
+  );
+
+  // ── get_phase_status ──────────────────────────────────────────────────────
+
+  server.tool(
+    'get_phase_status',
+    'Get current question queue length and lifecycle state',
+    {},
+    async () => {
+      const status = {
+        pendingQuestions: questionQueue.length,
+        questions: questionQueue.map((q) => ({
+          id: q.id,
+          question: q.question,
+          receivedAt: q.receivedAt,
+        })),
+        lifecycleState: currentLifecycleState.value,
+      };
+
+      return {
+        content: [{ type: 'text' as const, text: JSON.stringify(status, null, 2) }],
+      };
+    },
+  );
+
+  return server;
+}
