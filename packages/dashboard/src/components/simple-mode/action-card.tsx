@@ -9,9 +9,10 @@ import { ActionForm } from "./action-form";
 interface ActionCardProps {
   action: ActionDef;
   roadmap: RoadmapAnalysis | null;
+  onExecute: (cmd: string) => void;
 }
 
-export function ActionCard({ action, roadmap }: ActionCardProps) {
+export function ActionCard({ action, roadmap, onExecute }: ActionCardProps) {
   const { expandedCardId, setExpanded } = useSimpleMode();
   const { roadmap: roadmapData } = useDashboardData();
   const isOpen = expandedCardId === action.id;
@@ -38,18 +39,12 @@ export function ActionCard({ action, roadmap }: ActionCardProps) {
   return (
     <div
       className={cn(
-        "relative bg-card border-0 transition-all duration-200",
+        "bg-card border-0 transition-all duration-200",
         isDisabled ? "opacity-50" : "cursor-pointer hover:shadow-md hover:-translate-y-px",
         isOpen && "ring-1 ring-simple-accent/40"
       )}
       title={isDisabled ? action.unavailableReason : undefined}
     >
-      {isRecommended && !isDisabled && (
-        <span className="absolute top-2 right-2 z-10 bg-simple-accent/20 border border-simple-accent/40 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider text-simple-accent">
-          Recommended
-        </span>
-      )}
-
       <button
         type="button"
         disabled={isDisabled}
@@ -63,9 +58,14 @@ export function ActionCard({ action, roadmap }: ActionCardProps) {
         )}>
           {action.icon}
         </span>
-        <div className="flex-1 min-w-0 pr-6">
+        <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground leading-tight">{action.title}</p>
           <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{action.description}</p>
+          {isRecommended && !isDisabled && (
+            <span className="mt-1 inline-block bg-simple-accent/20 border border-simple-accent/40 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider text-simple-accent">
+              Recommended
+            </span>
+          )}
         </div>
         <svg
           className={cn("mt-1 h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-200", isOpen && "rotate-180")}
@@ -90,7 +90,7 @@ export function ActionCard({ action, roadmap }: ActionCardProps) {
             className="overflow-hidden border-t border-border/60"
           >
             <div className="p-4">
-              <ActionForm action={action} />
+              <ActionForm action={action} onExecute={onExecute} />
             </div>
           </motion.div>
         )}

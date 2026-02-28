@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from "react";
+import type React from "react";
 import { Terminal as XTerm } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { WebglAddon } from "@xterm/addon-webgl";
@@ -10,9 +11,10 @@ import { QuickActionBar } from "./QuickActionBar";
 
 interface TerminalProps {
   onReady?: (term: XTerm) => void;
+  writeInputRef?: React.MutableRefObject<((data: string) => void) | null>;
 }
 
-export function Terminal({ onReady }: TerminalProps) {
+export function Terminal({ onReady, writeInputRef }: TerminalProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const termRef = useRef<XTerm | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
@@ -32,6 +34,16 @@ export function Terminal({ onReady }: TerminalProps) {
     onOutput,
     onScrollback,
   } = useTerminal({ autoSpawn: true, skipPermissions });
+
+  // Expose writeInput via ref so external components can send commands
+  useEffect(() => {
+    if (writeInputRef) {
+      writeInputRef.current = writeInput;
+    }
+    return () => {
+      if (writeInputRef) writeInputRef.current = null;
+    };
+  }, [writeInput, writeInputRef]);
 
   // Wire up output callbacks
   const handleOutput = useCallback((data: string) => {

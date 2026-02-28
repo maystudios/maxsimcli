@@ -82,6 +82,7 @@ function DashboardApp() {
   const [activePhaseId, setActivePhaseId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { splitMode, toggleSplit } = useTerminalLayout();
+  const terminalWriteRef = useRef<((data: string) => void) | null>(null);
 
   const toggleMode = useCallback(() => {
     setMode(mode === "simple" ? "advanced" : "simple");
@@ -103,6 +104,11 @@ function DashboardApp() {
     }
     setMobileMenuOpen(false);
   }, []);
+
+  const executeInTerminal = useCallback((cmd: string) => {
+    terminalWriteRef.current?.(cmd + "\r");
+    handleNavigate("terminal");
+  }, [handleNavigate]);
 
   const handlePhaseClick = useCallback((phaseNumber: string) => {
     setActiveView("phase");
@@ -231,7 +237,7 @@ function DashboardApp() {
       {/* Simple Mode content area */}
       {isSimple && initialized && (
         <div className="flex flex-col flex-1 min-h-0">
-          <SimpleModeView />
+          <SimpleModeView onExecute={executeInTerminal} />
         </div>
       )}
 
@@ -255,7 +261,7 @@ function DashboardApp() {
           className={`relative min-h-0 flex-col overflow-hidden ${isTerminalView && splitMode ? "h-1/2" : "flex-1"}`}
         >
           <TerminalToggle splitMode={splitMode} onToggle={toggleSplit} />
-          <Terminal />
+          <Terminal writeInputRef={terminalWriteRef} />
         </div>
       </div>
     </AppShell>

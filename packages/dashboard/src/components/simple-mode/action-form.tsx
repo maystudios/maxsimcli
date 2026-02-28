@@ -6,14 +6,13 @@ import type { ActionDef } from "@/lib/simple-mode-actions";
 
 interface ActionFormProps {
   action: ActionDef;
+  onExecute: (cmd: string) => void;
 }
 
-export function ActionForm({ action }: ActionFormProps) {
+export function ActionForm({ action, onExecute }: ActionFormProps) {
   const { inputValues, setInput, reset } = useSimpleMode();
   const { roadmap } = useDashboardData();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [submitted, setSubmitted] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
 
@@ -64,16 +63,8 @@ export function ActionForm({ action }: ActionFormProps) {
   function handleSubmit() {
     if (action.requiresInput && !value.trim()) return;
     if (action.id === "view-roadmap") return;
-    setSubmitted(true);
-  }
-
-  async function handleCopy() {
     const cmd = buildCommandString();
-    try {
-      await navigator.clipboard.writeText(cmd);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch { /* ignore */ }
+    if (cmd) onExecute(cmd);
   }
 
   function handleResetClick() {
@@ -88,34 +79,6 @@ export function ActionForm({ action }: ActionFormProps) {
   }
 
   const isDisabledSubmit = action.requiresInput && !value.trim();
-
-  if (submitted && action.id !== "view-roadmap") {
-    const cmd = buildCommandString();
-    return (
-      <div className="flex flex-col gap-3">
-        <p className="text-xs text-muted-foreground">
-          Paste this command in your Claude Code terminal to start:
-        </p>
-        <div className="flex items-center gap-2 border border-border bg-muted/20 px-3 py-2">
-          <code className="flex-1 font-mono text-xs text-foreground break-all">{cmd}</code>
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="shrink-0 border border-border px-2 py-1 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground hover:bg-card-hover"
-          >
-            {copied ? "Copied!" : "Copy"}
-          </button>
-        </div>
-        <button
-          type="button"
-          onClick={() => setSubmitted(false)}
-          className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground self-start"
-        >
-          Back
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-3 relative">
@@ -154,7 +117,7 @@ export function ActionForm({ action }: ActionFormProps) {
           <svg className="h-3 w-3" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
             <path d="M2 2l8 4-8 4V2z" />
           </svg>
-          Start Planning
+          Run in Terminal
         </button>
 
         <div className="relative ml-auto">

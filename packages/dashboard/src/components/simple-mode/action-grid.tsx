@@ -9,7 +9,11 @@ import { ActionCard } from "./action-card";
 
 const PAGE_SIZE = 6;
 
-export function ActionGrid() {
+interface ActionGridProps {
+  onExecute: (cmd: string) => void;
+}
+
+export function ActionGrid({ onExecute }: ActionGridProps) {
   const { roadmap } = useDashboardData();
   const { activeTab, setTab } = useSimpleMode();
   const prevTabRef = useRef<SimpleTab>(activeTab);
@@ -84,6 +88,7 @@ export function ActionGrid() {
                       key={action.id}
                       action={action}
                       roadmap={roadmapData}
+                      onExecute={onExecute}
                     />
                   ))}
                 </div>

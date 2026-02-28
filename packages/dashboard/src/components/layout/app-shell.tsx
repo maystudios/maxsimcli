@@ -80,6 +80,15 @@ export function AppShell({
 
       {/* Main content */}
       <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        {/* Desktop simple mode header — only shown in simple mode since sidebar is hidden on desktop */}
+        {simpleMode && (
+          <div className="hidden md:flex shrink-0 items-center justify-between border-b border-simple-accent/30 bg-simple-accent/5 px-6 py-3">
+            <span className="text-sm font-bold tracking-tight text-foreground">
+              MAXSIM <span className="ml-1.5 text-xs font-normal text-muted-foreground">Simple Mode</span>
+            </span>
+            {headerRight}
+          </div>
+        )}
         {children}
       </main>
     </div>
