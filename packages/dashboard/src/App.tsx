@@ -107,7 +107,7 @@ function DashboardApp() {
   }, []);
 
   const executeInTerminal = useCallback((cmd: string) => {
-    terminalWriteRef.current?.(cmd + "\r");
+    terminalWriteRef.current?.(cmd + "\n");
     handleNavigate("terminal");
   }, [handleNavigate]);
 

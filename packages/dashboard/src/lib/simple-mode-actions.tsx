@@ -99,7 +99,7 @@ export const ACTION_DEFS: ActionDef[] = [
       </svg>
     ),
     requiresInput: false,
-    command: "/maxsim:quick",
+    command: "/maxsim:new-project",
     isAvailable: () => true,
     unavailableReason: "",
   },
