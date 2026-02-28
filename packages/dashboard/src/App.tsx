@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import { WebSocketProvider } from "@/components/providers/websocket-provider";
 import { SimpleModeProvider } from "@/components/providers/simple-mode-provider";
+import { DiscussionProvider } from "@/components/providers/discussion-provider";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { useDashboardMode } from "@/hooks/use-dashboard-mode";
 import { StatsHeader } from "@/components/dashboard/stats-header";
@@ -276,7 +277,9 @@ export function App() {
   return (
     <WebSocketProvider>
       <SimpleModeProvider>
-        <DashboardApp />
+        <DiscussionProvider>
+          <DashboardApp />
+        </DiscussionProvider>
       </SimpleModeProvider>
     </WebSocketProvider>
   );
