@@ -36,6 +36,8 @@ export default defineConfig({
     'lodash.debounce',
     'slugify',
     '@modelcontextprotocol/sdk',
+    '@modelcontextprotocol/sdk/server/mcp.js',
+    '@modelcontextprotocol/sdk/server/streamableHttp.js',
     'zod',
   ],
   alias: {
