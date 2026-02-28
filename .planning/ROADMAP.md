@@ -38,8 +38,8 @@ Phases 1-30 delivered the full MAXSIM CLI and advanced dashboard:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 31-01-PLAN.md — SimpleModeProvider, useDashboardMode hook, ModeToggleButton, FirstRunCard, AppShell/Sidebar slots, /api/simple-mode-config server endpoint, teal color token
-- [ ] 31-02-PLAN.md — Action definitions, RecommendationCard, ActionGrid with tabs + slide animation, ActionCard accordion, ActionForm auto-resize textarea, SimpleModeView wiring into App.tsx
+- [x] 31-01-PLAN.md — SimpleModeProvider, useDashboardMode hook, ModeToggleButton, FirstRunCard, AppShell/Sidebar slots, /api/simple-mode-config server endpoint, teal color token
+- [x] 31-02-PLAN.md — Action definitions, RecommendationCard, ActionGrid with tabs + slide animation, ActionCard accordion, ActionForm auto-resize textarea, SimpleModeView wiring into App.tsx
 
 ### Phase 32: Question-Driven Discussion Flow
 **Goal**: Users can answer planning discussion questions entirely in the browser with free-form text and control when discussion ends
