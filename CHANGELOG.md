@@ -1,3 +1,10 @@
+## [3.10.2](https://github.com/maystudios/maxsimcli/compare/v3.10.1...v3.10.2) (2026-02-28)
+
+
+### Bug Fixes
+
+* **dashboard:** use \r for PTY and queue command if terminal not ready ([e140d2c](https://github.com/maystudios/maxsimcli/commit/e140d2c2321617083a1191aebeaf78d61f42d98c))
+
 ## [3.10.1](https://github.com/maystudios/maxsimcli/compare/v3.10.0...v3.10.1) (2026-02-28)
 
 
