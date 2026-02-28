@@ -1,3 +1,10 @@
+## [3.8.1](https://github.com/maystudios/maxsimcli/compare/v3.8.0...v3.8.1) (2026-02-28)
+
+
+### Bug Fixes
+
+* **dashboard:** wire simple mode to terminal execution + fix visual bugs ([b75987b](https://github.com/maystudios/maxsimcli/commit/b75987b7411af199cec7c168c25991eac17ce483))
+
 # [3.8.0](https://github.com/maystudios/maxsimcli/compare/v3.7.1...v3.8.0) (2026-02-28)
 
 
