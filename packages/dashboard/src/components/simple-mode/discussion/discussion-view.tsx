@@ -10,6 +10,57 @@ import { DiscussionCompleteCard } from "./discussion-complete-card";
 
 // --- Mock Questions (temporary for Phase 32) ---
 
+const MOCK_QUESTIONS_BATCH_2: DiscussionQuestion[] = [
+  {
+    id: "mock-q5",
+    header: "Deployment",
+    question: "Where do you plan to deploy this service?",
+    multiSelect: false,
+    options: [
+      {
+        id: "dep-cloud",
+        label: "Cloud (AWS/GCP/Azure)",
+        description: "Managed infrastructure with auto-scaling",
+      },
+      {
+        id: "dep-vps",
+        label: "VPS / Self-hosted",
+        description: "Full control, lower cost, more ops overhead",
+      },
+      {
+        id: "dep-serverless",
+        label: "Serverless (Lambda/Functions)",
+        description:
+          "Zero idle cost, automatic scaling, cold start tradeoff",
+      },
+    ],
+  },
+  {
+    id: "mock-q6",
+    header: "Team Size",
+    question: "How many developers will work on this codebase?",
+    multiSelect: false,
+    options: [
+      {
+        id: "team-solo",
+        label: "Solo",
+        description: "Single developer — keep it simple",
+      },
+      {
+        id: "team-small",
+        label: "2-5 developers",
+        description: "Small team — lightweight conventions recommended",
+      },
+      {
+        id: "team-large",
+        label: "6+ developers",
+        description:
+          "Larger team — enforce patterns via tooling and code review",
+      },
+    ],
+  },
+];
+
 const MOCK_QUESTIONS: DiscussionQuestion[] = [
   {
     id: "mock-q1",
@@ -98,22 +149,33 @@ const MOCK_QUESTIONS: DiscussionQuestion[] = [
 ];
 
 function useMockQuestions() {
-  const { phase, receiveQuestions, answeredQuestions } = useDiscussion();
-  const hasSentRef = useRef(false);
+  const { phase, receiveQuestions } = useDiscussion();
+  const hasSentBatch1Ref = useRef(false);
+  const hasSentBatch2Ref = useRef(false);
 
   useEffect(() => {
-    if (phase === "loading" && !hasSentRef.current) {
-      hasSentRef.current = true;
-      const timer = setTimeout(() => {
-        receiveQuestions(MOCK_QUESTIONS);
-      }, 500);
-      return () => clearTimeout(timer);
+    if (phase === "loading") {
+      if (!hasSentBatch1Ref.current) {
+        hasSentBatch1Ref.current = true;
+        const timer = setTimeout(() => receiveQuestions(MOCK_QUESTIONS), 500);
+        return () => clearTimeout(timer);
+      }
+      if (!hasSentBatch2Ref.current) {
+        hasSentBatch2Ref.current = true;
+        const timer = setTimeout(
+          () => receiveQuestions(MOCK_QUESTIONS_BATCH_2),
+          500,
+        );
+        return () => clearTimeout(timer);
+      }
+      // Both batches exhausted — skeleton stays visible (Phase 33 replaces this)
     }
     // Reset when discussion is reset
     if (phase === "idle") {
-      hasSentRef.current = false;
+      hasSentBatch1Ref.current = false;
+      hasSentBatch2Ref.current = false;
     }
-  }, [phase, receiveQuestions, answeredQuestions.length]);
+  }, [phase, receiveQuestions]);
 }
 
 // --- DiscussionView ---
