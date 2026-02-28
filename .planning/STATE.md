@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-27)
 ## Current Position
 
 Phase: 32 of 35 (Question-Driven Discussion Flow)
-Plan: 1 of 2 in current phase — COMPLETE
-Status: Plan 01 complete — DiscussionProvider state machine and core presentation components built
-Last activity: 2026-02-28 — Phase 32 Plan 01 executed: DiscussionProvider state machine, QuestionCard, OptionCard, AnsweredCard, SkeletonCard, OptionPreviewPanel, react-markdown added
+Plan: 2 of 2 in current phase — COMPLETE
+Status: Phase 32 complete — Full discussion flow with chat scroll, sticky footer, confirmation dialog, mock questions, wired into SimpleModeView
+Last activity: 2026-02-28 — Phase 32 Plan 02 executed: DiscussionView, DiscussionFooter, ConfirmationDialog, DiscussionCompleteCard, SimpleModeView wiring
 
-Progress: [█████████████████████░░░░░░░░░] 62% (phases 1-31 complete, phase 32 plan 1/2)
+Progress: [██████████████████████░░░░░░░░] 64% (phases 1-32 complete)
 
 ## Performance Metrics
 
@@ -29,6 +29,7 @@ Progress: [█████████████████████░░
 |-------|-------|-------|----------|
 | 1-30 (v1.0) | ~70 | - | - |
 | 32 (plan 01) | 2 tasks | 3min | 1.5min |
+| 32 (plan 02) | 3 tasks | 14min | 4.7min |
 
 **Recent Trend:**
 - Trend: Stable (30 phases completed successfully)
@@ -45,6 +46,8 @@ Progress: [█████████████████████░░
 - [Architecture]: Dashboard additions must work via `npx maxsimcli@latest` for external users
 - [Phase 32]: Separate DiscussionProvider from SimpleModeProvider — isolated discussion lifecycle
 - [Phase 32]: Callback refs (onQuestionReceived, onExecutionQueued) as extension points for Phase 33/34
+- [Phase 32]: Intercept /maxsim:discuss-phase in SimpleModeView to open discussion UI instead of terminal
+- [Phase 32]: Mock questions hook (useMockQuestions) temporary for Phase 32, replaced in Phase 33
 
 ### Pending Todos
 
@@ -59,5 +62,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 32-01-PLAN.md
+Stopped at: Completed 32-02-PLAN.md
 Resume file: None

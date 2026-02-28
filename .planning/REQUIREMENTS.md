@@ -20,7 +20,7 @@ User stories for the Simple Dashboard Mode milestone.
   - Acceptance: Text input in browser captures phase description; passed to planning workflow
 - [x] **DASH-04**: As a user, I can answer discussion questions from the dashboard so that the planning discussion happens entirely in the browser
   - Acceptance: AskUserQuestion-equivalent prompts rendered as UI elements; responses captured and sent to workflow
-- [ ] **DASH-05**: As a user, I can choose "Ask me more" or "I'm done, execute" at the end of discussion so that I control when planning ends
+- [x] **DASH-05**: As a user, I can choose "Ask me more" or "I'm done, execute" at the end of discussion so that I control when planning ends
   - Acceptance: Two clear CTA buttons shown after discussion; selecting "execute" triggers execution
 - [ ] **DASH-06**: As a user, I can see phase execution progress in simple mode so that I know what's happening without reading terminal output
   - Acceptance: Progress indicator, current step name, and completion percentage shown during execution
@@ -81,7 +81,7 @@ Deferred to future releases.
 | DASH-02 | Phase 31 | Pending |
 | DASH-03 | Phase 31 | Pending |
 | DASH-04 | Phase 32 | Complete |
-| DASH-05 | Phase 32 | Pending |
+| DASH-05 | Phase 32 | Complete |
 | DASH-07 | Phase 32 | Complete |
 | HOOK-01 | Phase 33 | Pending |
 | HOOK-02 | Phase 33 | Pending |
