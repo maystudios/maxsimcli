@@ -11,6 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.summaryId = exports.planId = exports.isSummaryFile = exports.isPlanFile = exports.CliError = exports.CliOutput = exports.MODEL_PROFILES = void 0;
 exports.output = output;
 exports.error = error;
+exports.rethrowCliSignals = rethrowCliSignals;
 exports.writeOutput = writeOutput;
 exports.todayISO = todayISO;
 exports.planningPath = planningPath;
@@ -82,6 +83,11 @@ function output(result, raw, rawValue) {
 }
 function error(message) {
     throw new CliError(message);
+}
+/** Re-throw CliOutput/CliError signals so catch blocks don't intercept them */
+function rethrowCliSignals(e) {
+    if (e instanceof CliOutput || e instanceof CliError)
+        throw e;
 }
 /**
  * Handle a CliOutput by writing to stdout. Extracted so cli.ts can use it.

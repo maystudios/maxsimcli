@@ -19,6 +19,8 @@ export declare class CliError {
 }
 export declare function output(result: unknown, raw?: boolean, rawValue?: unknown): never;
 export declare function error(message: string): never;
+/** Re-throw CliOutput/CliError signals so catch blocks don't intercept them */
+export declare function rethrowCliSignals(e: unknown): void;
 /**
  * Handle a CliOutput by writing to stdout. Extracted so cli.ts can use it.
  */

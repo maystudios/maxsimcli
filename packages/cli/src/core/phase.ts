@@ -16,6 +16,7 @@ import {
   generateSlugInternal,
   output,
   error,
+  rethrowCliSignals,
   phasesPath,
   roadmapPath,
   statePath,
@@ -427,6 +428,7 @@ export function cmdPhasesList(cwd: string, options: PhasesListOptions, raw: bool
 
     output({ directories: dirs, count: dirs.length }, raw, dirs.join('\n'));
   } catch (e: unknown) {
+    rethrowCliSignals(e);
     error('Failed to list phases: ' + (e as Error).message);
   }
 }
@@ -482,6 +484,7 @@ export function cmdPhaseNextDecimal(cwd: string, basePhase: string, raw: boolean
       nextDecimal,
     );
   } catch (e: unknown) {
+    rethrowCliSignals(e);
     error('Failed to calculate next decimal phase: ' + (e as Error).message);
   }
 }
@@ -526,7 +529,8 @@ export function cmdFindPhase(cwd: string, phase: string | undefined, raw: boolea
     };
 
     output(result, raw, result.directory);
-  } catch {
+  } catch (e: unknown) {
+    rethrowCliSignals(e);
     output(notFound, raw, '');
   }
 }
@@ -648,6 +652,7 @@ export function cmdPhaseAdd(cwd: string, description: string | undefined, raw: b
       result.padded,
     );
   } catch (e) {
+    rethrowCliSignals(e);
     error((e as Error).message);
   }
 }
@@ -667,6 +672,7 @@ export function cmdPhaseInsert(cwd: string, afterPhase: string | undefined, desc
       result.phase_number,
     );
   } catch (e) {
+    rethrowCliSignals(e);
     error((e as Error).message);
   }
 }
@@ -922,6 +928,7 @@ export function cmdPhaseComplete(cwd: string, phaseNum: string | undefined, raw:
       state_updated: result.state_updated,
     }, raw);
   } catch (e) {
+    rethrowCliSignals(e);
     error((e as Error).message);
   }
 }

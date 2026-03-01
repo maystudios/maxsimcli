@@ -9,7 +9,7 @@ import path from 'node:path';
 
 import escapeStringRegexp from 'escape-string-regexp';
 
-import { loadConfig, output, error, safeReadFile, planningPath, statePath as statePathUtil, configPath, roadmapPath, phasesPath, debugLog, todayISO, isPlanFile, isSummaryFile } from './core.js';
+import { loadConfig, output, error, rethrowCliSignals, safeReadFile, planningPath, statePath as statePathUtil, configPath, roadmapPath, phasesPath, debugLog, todayISO, isPlanFile, isSummaryFile } from './core.js';
 import type {
   AppConfig,
   StatePatchResult,
@@ -146,7 +146,8 @@ export function cmdStateGet(cwd: string, section: string | null, raw: boolean): 
     }
 
     output({ error: `Section or field "${section}" not found` }, raw, '');
-  } catch {
+  } catch (e: unknown) {
+    rethrowCliSignals(e);
     error('STATE.md not found');
   }
 }
@@ -174,7 +175,8 @@ export function cmdStatePatch(cwd: string, patches: Record<string, string>, raw:
     }
 
     output(results, raw, results.updated.length > 0 ? 'true' : 'false');
-  } catch {
+  } catch (e: unknown) {
+    rethrowCliSignals(e);
     error('STATE.md not found');
   }
 }
@@ -196,7 +198,8 @@ export function cmdStateUpdate(cwd: string, field: string | undefined, value: st
     } else {
       output({ updated: false, reason: `Field "${field}" not found in STATE.md` });
     }
-  } catch {
+  } catch (e: unknown) {
+    rethrowCliSignals(e);
     output({ updated: false, reason: 'STATE.md not found' });
   }
 }

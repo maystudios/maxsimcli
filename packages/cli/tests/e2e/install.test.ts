@@ -18,7 +18,7 @@ describe('install file structure (E2E-03)', () => {
     const agentsDir = join(installDir, '.claude', 'agents');
     expect(existsSync(agentsDir)).toBe(true);
     const files = readdirSync(agentsDir).filter((f) => f.endsWith('.md'));
-    expect(files).toHaveLength(13);
+    expect(files).toHaveLength(14);
   });
 
   it('installs maxsim-tools.cjs at expected path', () => {

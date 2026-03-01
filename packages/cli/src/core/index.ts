@@ -84,6 +84,7 @@ export {
   error,
   CliOutput,
   CliError,
+  rethrowCliSignals,
   writeOutput,
   safeReadFile,
   loadConfig,

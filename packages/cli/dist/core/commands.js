@@ -114,7 +114,8 @@ function cmdVerifyPathExists(cwd, targetPath, raw) {
         const result = { exists: true, type };
         (0, core_js_1.output)(result, raw, 'true');
     }
-    catch {
+    catch (e) {
+        (0, core_js_1.rethrowCliSignals)(e);
         const result = { exists: false, type: null };
         (0, core_js_1.output)(result, raw, 'false');
     }
@@ -215,6 +216,7 @@ function cmdHistoryDigest(cwd, raw) {
         (0, core_js_1.output)(outputDigest, raw);
     }
     catch (e) {
+        (0, core_js_1.rethrowCliSignals)(e);
         (0, core_js_1.error)('Failed to generate history digest: ' + e.message);
     }
 }
@@ -376,6 +378,7 @@ async function cmdWebsearch(query, options, raw) {
         }, raw, results.map(r => `${r.title}\n${r.url}\n${r.description}`).join('\n\n'));
     }
     catch (err) {
+        (0, core_js_1.rethrowCliSignals)(err);
         (0, core_js_1.output)({ available: false, error: err.message }, raw, '');
     }
 }

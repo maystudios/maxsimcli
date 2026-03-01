@@ -66,6 +66,7 @@ function cmdRoadmapGetPhase(cwd, phaseNum, raw) {
         }, raw, section);
     }
     catch (e) {
+        (0, core_js_1.rethrowCliSignals)(e);
         (0, core_js_1.error)('Failed to read ROADMAP.md: ' + e.message);
     }
 }

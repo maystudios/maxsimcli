@@ -72,6 +72,11 @@ export function error(message: string): never {
   throw new CliError(message);
 }
 
+/** Re-throw CliOutput/CliError signals so catch blocks don't intercept them */
+export function rethrowCliSignals(e: unknown): void {
+  if (e instanceof CliOutput || e instanceof CliError) throw e;
+}
+
 /**
  * Handle a CliOutput by writing to stdout. Extracted so cli.ts can use it.
  */

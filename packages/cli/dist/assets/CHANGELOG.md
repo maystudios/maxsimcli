@@ -1,3 +1,22 @@
+# [3.11.0](https://github.com/maystudios/maxsimcli/compare/v3.10.3...v3.11.0) (2026-03-01)
+
+
+### Bug Fixes
+
+* **build:** increase Node heap size to 8GB for CLI build ([83d0e09](https://github.com/maystudios/maxsimcli/commit/83d0e091591f3edfc9eadc45bc996484bee32f77))
+* **core:** deduplicate inline patterns, extract shared CRUD helpers, and fix MCP regex bug ([cb96698](https://github.com/maystudios/maxsimcli/commit/cb96698ab4c0174a520aececa4fd185c5ab52e15))
+
+
+### Features
+
+* **01-01:** create MCP server entry point with utilities and start-server command ([2fd414b](https://github.com/maystudios/maxsimcli/commit/2fd414b83e85a808de26f52c421a4f38a72790a9))
+* **01-01:** implement 5 phase CRUD MCP tools ([366706a](https://github.com/maystudios/maxsimcli/commit/366706a9acfd6de6841afe486c3d222932e157ac))
+* **01-02:** implement state management MCP tools ([82ba947](https://github.com/maystudios/maxsimcli/commit/82ba947cba5903221c886ad49464a4cf31cdf10c))
+* **01-02:** implement todo CRUD MCP tools ([086d528](https://github.com/maystudios/maxsimcli/commit/086d5285e9e6a59465dbd043400a1bd503ab4d04))
+* **01-03:** add MCP fallback guidance to execute-plan workflow ([5d6e40a](https://github.com/maystudios/maxsimcli/commit/5d6e40ae73bd170cc089d35e5c4c2deb9126e504))
+* **01-03:** add mcp-server.cjs to install flow and write .mcp.json ([01056b0](https://github.com/maystudios/maxsimcli/commit/01056b095836e2c7b5b5ccb5f746485c7c26ecc7))
+* **01-04:** scaffold CONTEXT.md and RESEARCH.md stubs in phase tools ([ac514d8](https://github.com/maystudios/maxsimcli/commit/ac514d8a439bc108b9879d8b05d2df255fc4e920))
+
 ## [3.10.3](https://github.com/maystudios/maxsimcli/compare/v3.10.2...v3.10.3) (2026-02-28)
 
 

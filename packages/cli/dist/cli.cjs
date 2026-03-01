@@ -4734,6 +4734,10 @@ function output(result, raw, rawValue) {
 function error(message) {
 	throw new CliError(message);
 }
+/** Re-throw CliOutput/CliError signals so catch blocks don't intercept them */
+function rethrowCliSignals(e) {
+	if (e instanceof CliOutput || e instanceof CliError) throw e;
+}
 /**
 * Handle a CliOutput by writing to stdout. Extracted so cli.ts can use it.
 */
@@ -12142,7 +12146,8 @@ function cmdStateGet(cwd, section, raw) {
 			return;
 		}
 		output({ error: `Section or field "${section}" not found` }, raw, "");
-	} catch {
+	} catch (e) {
+		rethrowCliSignals(e);
 		error("STATE.md not found");
 	}
 }
@@ -12164,7 +12169,8 @@ function cmdStatePatch(cwd, patches, raw) {
 		}
 		if (results.updated.length > 0) node_fs.default.writeFileSync(statePath$3, content, "utf-8");
 		output(results, raw, results.updated.length > 0 ? "true" : "false");
-	} catch {
+	} catch (e) {
+		rethrowCliSignals(e);
 		error("STATE.md not found");
 	}
 }
@@ -12183,7 +12189,8 @@ function cmdStateUpdate(cwd, field, value) {
 			updated: false,
 			reason: `Field "${field}" not found in STATE.md`
 		});
-	} catch {
+	} catch (e) {
+		rethrowCliSignals(e);
 		output({
 			updated: false,
 			reason: "STATE.md not found"
@@ -12577,6 +12584,7 @@ function cmdRoadmapGetPhase(cwd, phaseNum, raw) {
 			section
 		}, raw, section);
 	} catch (e) {
+		rethrowCliSignals(e);
 		error("Failed to read ROADMAP.md: " + e.message);
 	}
 }
@@ -13349,7 +13357,8 @@ function cmdVerifyPathExists(cwd, targetPath, raw) {
 			exists: true,
 			type: stats.isDirectory() ? "directory" : stats.isFile() ? "file" : "other"
 		}, raw, "true");
-	} catch {
+	} catch (e) {
+		rethrowCliSignals(e);
 		output({
 			exists: false,
 			type: null
@@ -13430,6 +13439,7 @@ function cmdHistoryDigest(cwd, raw) {
 		};
 		output(outputDigest, raw);
 	} catch (e) {
+		rethrowCliSignals(e);
 		error("Failed to generate history digest: " + e.message);
 	}
 }
@@ -13602,6 +13612,7 @@ async function cmdWebsearch(query, options, raw) {
 			results
 		}, raw, results.map((r) => `${r.title}\n${r.url}\n${r.description}`).join("\n\n"));
 	} catch (err) {
+		rethrowCliSignals(err);
 		output({
 			available: false,
 			error: err.message
@@ -14619,6 +14630,7 @@ function cmdPhasesList(cwd, options, raw) {
 			count: dirs.length
 		}, raw, dirs.join("\n"));
 	} catch (e) {
+		rethrowCliSignals(e);
 		error("Failed to list phases: " + e.message);
 	}
 }
@@ -14659,6 +14671,7 @@ function cmdPhaseNextDecimal(cwd, basePhase, raw) {
 			existing: existingDecimals
 		}, raw, nextDecimal);
 	} catch (e) {
+		rethrowCliSignals(e);
 		error("Failed to calculate next decimal phase: " + e.message);
 	}
 }
@@ -14696,7 +14709,8 @@ function cmdFindPhase(cwd, phase, raw) {
 			summaries
 		};
 		output(result, raw, result.directory);
-	} catch {
+	} catch (e) {
+		rethrowCliSignals(e);
 		output(notFound, raw, "");
 	}
 }
@@ -14778,6 +14792,7 @@ function cmdPhaseAdd(cwd, description, raw) {
 			directory: result.directory
 		}, raw, result.padded);
 	} catch (e) {
+		rethrowCliSignals(e);
 		error(e.message);
 	}
 }
@@ -14793,6 +14808,7 @@ function cmdPhaseInsert(cwd, afterPhase, description, raw) {
 			directory: result.directory
 		}, raw, result.phase_number);
 	} catch (e) {
+		rethrowCliSignals(e);
 		error(e.message);
 	}
 }
@@ -14976,6 +14992,7 @@ function cmdPhaseComplete(cwd, phaseNum, raw) {
 			state_updated: result.state_updated
 		}, raw);
 	} catch (e) {
+		rethrowCliSignals(e);
 		error(e.message);
 	}
 }

@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { normalizePhaseName, getPhasePattern, output, error, findPhaseInternal, roadmapPath, phasesPath, listSubDirs, isPlanFile, isSummaryFile, debugLog, todayISO } from './core.js';
+import { normalizePhaseName, getPhasePattern, output, error, rethrowCliSignals, findPhaseInternal, roadmapPath, phasesPath, listSubDirs, isPlanFile, isSummaryFile, debugLog, todayISO } from './core.js';
 import type {
   PhaseStatus,
   RoadmapPhase,
@@ -88,6 +88,7 @@ export function cmdRoadmapGetPhase(cwd: string, phaseNum: string, raw: boolean):
       section
     );
   } catch (e: unknown) {
+    rethrowCliSignals(e);
     error('Failed to read ROADMAP.md: ' + (e as Error).message);
   }
 }

@@ -134,7 +134,8 @@ function cmdStateGet(cwd, section, raw) {
         }
         (0, core_js_1.output)({ error: `Section or field "${section}" not found` }, raw, '');
     }
-    catch {
+    catch (e) {
+        (0, core_js_1.rethrowCliSignals)(e);
         (0, core_js_1.error)('STATE.md not found');
     }
 }
@@ -159,7 +160,8 @@ function cmdStatePatch(cwd, patches, raw) {
         }
         (0, core_js_1.output)(results, raw, results.updated.length > 0 ? 'true' : 'false');
     }
-    catch {
+    catch (e) {
+        (0, core_js_1.rethrowCliSignals)(e);
         (0, core_js_1.error)('STATE.md not found');
     }
 }
@@ -181,7 +183,8 @@ function cmdStateUpdate(cwd, field, value) {
             (0, core_js_1.output)({ updated: false, reason: `Field "${field}" not found in STATE.md` });
         }
     }
-    catch {
+    catch (e) {
+        (0, core_js_1.rethrowCliSignals)(e);
         (0, core_js_1.output)({ updated: false, reason: 'STATE.md not found' });
     }
 }

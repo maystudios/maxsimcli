@@ -281,6 +281,7 @@ function cmdPhasesList(cwd, options, raw) {
         (0, core_js_1.output)({ directories: dirs, count: dirs.length }, raw, dirs.join('\n'));
     }
     catch (e) {
+        (0, core_js_1.rethrowCliSignals)(e);
         (0, core_js_1.error)('Failed to list phases: ' + e.message);
     }
 }
@@ -320,6 +321,7 @@ function cmdPhaseNextDecimal(cwd, basePhase, raw) {
         (0, core_js_1.output)({ found: baseExists, base_phase: normalized, next: nextDecimal, existing: existingDecimals }, raw, nextDecimal);
     }
     catch (e) {
+        (0, core_js_1.rethrowCliSignals)(e);
         (0, core_js_1.error)('Failed to calculate next decimal phase: ' + e.message);
     }
 }
@@ -355,7 +357,8 @@ function cmdFindPhase(cwd, phase, raw) {
         };
         (0, core_js_1.output)(result, raw, result.directory);
     }
-    catch {
+    catch (e) {
+        (0, core_js_1.rethrowCliSignals)(e);
         (0, core_js_1.output)(notFound, raw, '');
     }
 }
@@ -443,6 +446,7 @@ function cmdPhaseAdd(cwd, description, raw) {
         (0, core_js_1.output)({ phase_number: result.phase_number, padded: result.padded, name: result.description, slug: result.slug, directory: result.directory }, raw, result.padded);
     }
     catch (e) {
+        (0, core_js_1.rethrowCliSignals)(e);
         (0, core_js_1.error)(e.message);
     }
 }
@@ -456,6 +460,7 @@ function cmdPhaseInsert(cwd, afterPhase, description, raw) {
         (0, core_js_1.output)({ phase_number: result.phase_number, after_phase: result.after_phase, name: result.description, slug: result.slug, directory: result.directory }, raw, result.phase_number);
     }
     catch (e) {
+        (0, core_js_1.rethrowCliSignals)(e);
         (0, core_js_1.error)(e.message);
     }
 }
@@ -655,6 +660,7 @@ function cmdPhaseComplete(cwd, phaseNum, raw) {
         }, raw);
     }
     catch (e) {
+        (0, core_js_1.rethrowCliSignals)(e);
         (0, core_js_1.error)(e.message);
     }
 }

@@ -22,6 +22,7 @@ import {
   MODEL_PROFILES,
   output,
   error,
+  rethrowCliSignals,
   findPhaseInternal,
   todayISO,
   planningPath,
@@ -158,7 +159,8 @@ export function cmdVerifyPathExists(cwd: string, targetPath: string | undefined,
     const type = stats.isDirectory() ? 'directory' : stats.isFile() ? 'file' : 'other';
     const result = { exists: true, type };
     output(result, raw, 'true');
-  } catch {
+  } catch (e: unknown) {
+    rethrowCliSignals(e);
     const result = { exists: false, type: null };
     output(result, raw, 'false');
   }
@@ -278,6 +280,7 @@ export function cmdHistoryDigest(cwd: string, raw: boolean): void {
 
     output(outputDigest, raw);
   } catch (e: unknown) {
+    rethrowCliSignals(e);
     error('Failed to generate history digest: ' + (e as Error).message);
   }
 }
@@ -493,6 +496,7 @@ export async function cmdWebsearch(
       results.map(r => `${r.title}\n${r.url}\n${r.description}`).join('\n\n'),
     );
   } catch (err: unknown) {
+    rethrowCliSignals(err);
     output({ available: false, error: (err as Error).message }, raw, '');
   }
 }
