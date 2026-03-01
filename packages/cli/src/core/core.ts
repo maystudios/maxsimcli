@@ -65,6 +65,48 @@ export function error(message: string): never {
   process.exit(1);
 }
 
+// ─── Shared micro-utilities ─────────────────────────────────────────────────
+
+/** Today's date as YYYY-MM-DD. */
+export function todayISO(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
+/** Canonical .planning/ sub-paths. */
+export function planningPath(cwd: string, ...segments: string[]): string {
+  return path.join(cwd, '.planning', ...segments);
+}
+export function statePath(cwd: string): string { return planningPath(cwd, 'STATE.md'); }
+export function roadmapPath(cwd: string): string { return planningPath(cwd, 'ROADMAP.md'); }
+export function configPath(cwd: string): string { return planningPath(cwd, 'config.json'); }
+export function phasesPath(cwd: string): string { return planningPath(cwd, 'phases'); }
+
+/** Phase-file predicates. */
+export const isPlanFile = (f: string): boolean => f.endsWith('-PLAN.md') || f === 'PLAN.md';
+export const isSummaryFile = (f: string): boolean => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md';
+
+/** Strip suffix to get plan/summary ID. */
+export const planId = (f: string): string => f.replace('-PLAN.md', '').replace('PLAN.md', '');
+export const summaryId = (f: string): string => f.replace('-SUMMARY.md', '').replace('SUMMARY.md', '');
+
+/** List subdirectory names, optionally sorted by phase number. */
+export function listSubDirs(dir: string, sortByPhase = false): string[] {
+  const dirs = fs.readdirSync(dir, { withFileTypes: true })
+    .filter(e => e.isDirectory())
+    .map(e => e.name);
+  return sortByPhase ? dirs.sort((a, b) => comparePhaseNum(a, b)) : dirs;
+}
+
+/** Log only when MAXSIM_DEBUG is set. */
+export function debugLog(e: unknown): void {
+  if (process.env.MAXSIM_DEBUG) console.error(e);
+}
+
+/** Escape a phase number for use in regex. */
+export function escapePhaseNum(phase: string | number): string {
+  return String(phase).replace(/\./g, '\\.');
+}
+
 // ─── File & Config utilities ─────────────────────────────────────────────────
 
 export function safeReadFile(filePath: string): string | null {
@@ -75,8 +117,11 @@ export function safeReadFile(filePath: string): string | null {
   }
 }
 
+let _configCache: { cwd: string; config: AppConfig } | null = null;
+
 export function loadConfig(cwd: string): AppConfig {
-  const configPath = path.join(cwd, '.planning', 'config.json');
+  if (_configCache && _configCache.cwd === cwd) return _configCache.config;
+  const cfgPath = configPath(cwd);
   const defaults: AppConfig = {
     model_profile: 'balanced',
     commit_docs: true,
@@ -92,7 +137,7 @@ export function loadConfig(cwd: string): AppConfig {
   };
 
   try {
-    const raw = fs.readFileSync(configPath, 'utf-8');
+    const raw = fs.readFileSync(cfgPath, 'utf-8');
     const parsed: Record<string, unknown> = JSON.parse(raw) as Record<string, unknown>;
 
     const get = (key: string, nested?: { section: string; field: string }): unknown => {
@@ -115,7 +160,7 @@ export function loadConfig(cwd: string): AppConfig {
       return defaults.parallelization;
     })();
 
-    return {
+    const result: AppConfig = {
       model_profile: (get('model_profile') as ModelProfileName | undefined) ?? defaults.model_profile,
       commit_docs: (get('commit_docs', { section: 'planning', field: 'commit_docs' }) as boolean | undefined) ?? defaults.commit_docs,
       search_gitignored: (get('search_gitignored', { section: 'planning', field: 'search_gitignored' }) as boolean | undefined) ?? defaults.search_gitignored,
@@ -129,7 +174,10 @@ export function loadConfig(cwd: string): AppConfig {
       brave_search: (get('brave_search') as boolean | undefined) ?? defaults.brave_search,
       model_overrides: parsed['model_overrides'] as AppConfig['model_overrides'],
     };
+    _configCache = { cwd, config: result };
+    return result;
   } catch {
+    _configCache = { cwd, config: defaults };
     return defaults;
   }
 }
@@ -224,8 +272,7 @@ export function getPhasePattern(escapedPhaseNum?: string, flags = 'gim'): RegExp
 
 function searchPhaseInDir(baseDir: string, relBase: string, normalized: string): PhaseSearchResult | null {
   try {
-    const entries = fs.readdirSync(baseDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort((a, b) => comparePhaseNum(a, b));
+    const dirs = listSubDirs(baseDir, true);
     const match = dirs.find(d => d.startsWith(normalized));
     if (!match) return null;
 
@@ -235,19 +282,14 @@ function searchPhaseInDir(baseDir: string, relBase: string, normalized: string):
     const phaseDir = path.join(baseDir, match);
     const phaseFiles = fs.readdirSync(phaseDir);
 
-    const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md').sort();
-    const summaries = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md').sort();
+    const plans = phaseFiles.filter(isPlanFile).sort();
+    const summaries = phaseFiles.filter(isSummaryFile).sort();
     const hasResearch = phaseFiles.some(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
     const hasContext = phaseFiles.some(f => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
     const hasVerification = phaseFiles.some(f => f.endsWith('-VERIFICATION.md') || f === 'VERIFICATION.md');
 
-    const completedPlanIds = new Set(
-      summaries.map(s => s.replace('-SUMMARY.md', '').replace('SUMMARY.md', ''))
-    );
-    const incompletePlans = plans.filter(p => {
-      const planId = p.replace('-PLAN.md', '').replace('PLAN.md', '');
-      return !completedPlanIds.has(planId);
-    });
+    const completedPlanIds = new Set(summaries.map(summaryId));
+    const incompletePlans = plans.filter(p => !completedPlanIds.has(planId(p)));
 
     return {
       found: true,
@@ -270,14 +312,19 @@ function searchPhaseInDir(baseDir: string, relBase: string, normalized: string):
 export function findPhaseInternal(cwd: string, phase: string): PhaseSearchResult | null {
   if (!phase) return null;
 
-  const phasesDir = path.join(cwd, '.planning', 'phases');
+  const pd = phasesPath(cwd);
   const normalized = normalizePhaseName(phase);
 
-  const current = searchPhaseInDir(phasesDir, path.join('.planning', 'phases'), normalized);
+  const current = searchPhaseInDir(pd, path.join('.planning', 'phases'), normalized);
   if (current) return current;
 
-  const milestonesDir = path.join(cwd, '.planning', 'milestones');
-  if (!fs.existsSync(milestonesDir)) return null;
+  const milestonesDir = planningPath(cwd, 'milestones');
+
+  try {
+    fs.statSync(milestonesDir);
+  } catch {
+    return null;
+  }
 
   try {
     const milestoneEntries = fs.readdirSync(milestonesDir, { withFileTypes: true });
@@ -300,18 +347,15 @@ export function findPhaseInternal(cwd: string, phase: string): PhaseSearchResult
       }
     }
   } catch (e) {
-    /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   return null;
 }
 
 export function getArchivedPhaseDirs(cwd: string): ArchivedPhaseDir[] {
-  const milestonesDir = path.join(cwd, '.planning', 'milestones');
+  const milestonesDir = planningPath(cwd, 'milestones');
   const results: ArchivedPhaseDir[] = [];
-
-  if (!fs.existsSync(milestonesDir)) return results;
 
   try {
     const milestoneEntries = fs.readdirSync(milestonesDir, { withFileTypes: true });
@@ -326,8 +370,7 @@ export function getArchivedPhaseDirs(cwd: string): ArchivedPhaseDir[] {
       if (!versionMatch) continue;
       const version = versionMatch[1];
       const archivePath = path.join(milestonesDir, archiveName);
-      const entries = fs.readdirSync(archivePath, { withFileTypes: true });
-      const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort((a, b) => comparePhaseNum(a, b));
+      const dirs = listSubDirs(archivePath, true);
 
       for (const dir of dirs) {
         results.push({
@@ -339,8 +382,7 @@ export function getArchivedPhaseDirs(cwd: string): ArchivedPhaseDir[] {
       }
     }
   } catch (e) {
-    /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   return results;
@@ -350,12 +392,11 @@ export function getArchivedPhaseDirs(cwd: string): ArchivedPhaseDir[] {
 
 export function getRoadmapPhaseInternal(cwd: string, phaseNum: string | number): RoadmapPhaseInfo | null {
   if (!phaseNum) return null;
-  const roadmapPath = path.join(cwd, '.planning', 'ROADMAP.md');
-  if (!fs.existsSync(roadmapPath)) return null;
+  const rp = roadmapPath(cwd);
 
   try {
-    const content = fs.readFileSync(roadmapPath, 'utf-8');
-    const escapedPhase = phaseNum.toString().replace(/\./g, '\\.');
+    const content = fs.readFileSync(rp, 'utf-8');
+    const escapedPhase = escapePhaseNum(phaseNum);
     const phasePattern = getPhasePattern(escapedPhase, 'i');
     const headerMatch = content.match(phasePattern);
     if (!headerMatch) return null;
@@ -382,8 +423,8 @@ export function getRoadmapPhaseInternal(cwd: string, phaseNum: string | number):
   }
 }
 
-export function resolveModelInternal(cwd: string, agentType: AgentType): ModelResolution {
-  const config = loadConfig(cwd);
+export function resolveModelInternal(cwd: string, agentType: AgentType, config?: AppConfig): ModelResolution {
+  config = config ?? loadConfig(cwd);
 
   const override = config.model_overrides?.[agentType];
   if (override) {
@@ -416,7 +457,7 @@ export function generateSlugInternal(text: string | null | undefined): string | 
 
 export function getMilestoneInfo(cwd: string): MilestoneInfo {
   try {
-    const roadmap = fs.readFileSync(path.join(cwd, '.planning', 'ROADMAP.md'), 'utf-8');
+    const roadmap = fs.readFileSync(roadmapPath(cwd), 'utf-8');
     const versionMatch = roadmap.match(/v(\d+\.\d+)/);
     const nameMatch = roadmap.match(/## .*v\d+\.\d+[:\s]+([^\n(]+)/);
     return {
