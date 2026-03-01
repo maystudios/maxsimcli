@@ -26,7 +26,7 @@ const hookShared = {
 export default defineConfig([
   {
     ...shared,
-    entry: { install: 'src/install.ts' },
+    entry: { install: 'src/install/index.ts' },
     clean: true,
   },
   {
