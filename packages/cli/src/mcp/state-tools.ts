@@ -7,12 +7,12 @@
  */
 
 import fs from 'node:fs';
-import path from 'node:path';
 import { z } from 'zod';
 import escapeStringRegexp from 'escape-string-regexp';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
-import { stateExtractField, stateReplaceField } from '../core/state.js';
+import { statePath } from '../core/core.js';
+import { stateExtractField, stateReplaceField, appendToStateSection } from '../core/state.js';
 import { detectProjectRoot, mcpSuccess, mcpError } from './utils.js';
 
 /**
@@ -37,12 +37,12 @@ export function registerStateTools(server: McpServer): void {
           return mcpError('No .planning/ directory found', 'Project not detected');
         }
 
-        const statePath = path.join(cwd, '.planning', 'STATE.md');
-        if (!fs.existsSync(statePath)) {
+        const stPath = statePath(cwd);
+        if (!fs.existsSync(stPath)) {
           return mcpError('STATE.md not found', 'STATE.md missing');
         }
 
-        const content = fs.readFileSync(statePath, 'utf-8');
+        const content = fs.readFileSync(stPath, 'utf-8');
 
         if (!field) {
           return mcpSuccess({ content }, 'Full STATE.md retrieved');
@@ -97,12 +97,12 @@ export function registerStateTools(server: McpServer): void {
           return mcpError('No .planning/ directory found', 'Project not detected');
         }
 
-        const statePath = path.join(cwd, '.planning', 'STATE.md');
-        if (!fs.existsSync(statePath)) {
+        const stPath = statePath(cwd);
+        if (!fs.existsSync(stPath)) {
           return mcpError('STATE.md not found', 'STATE.md missing');
         }
 
-        const content = fs.readFileSync(statePath, 'utf-8');
+        const content = fs.readFileSync(stPath, 'utf-8');
         const updated = stateReplaceField(content, field, value);
 
         if (!updated) {
@@ -112,7 +112,7 @@ export function registerStateTools(server: McpServer): void {
           );
         }
 
-        fs.writeFileSync(statePath, updated, 'utf-8');
+        fs.writeFileSync(stPath, updated, 'utf-8');
 
         return mcpSuccess(
           { updated: true, field, value },
@@ -141,37 +141,26 @@ export function registerStateTools(server: McpServer): void {
           return mcpError('No .planning/ directory found', 'Project not detected');
         }
 
-        const statePath = path.join(cwd, '.planning', 'STATE.md');
-        if (!fs.existsSync(statePath)) {
+        const stPath = statePath(cwd);
+        if (!fs.existsSync(stPath)) {
           return mcpError('STATE.md not found', 'STATE.md missing');
         }
 
-        let content = fs.readFileSync(statePath, 'utf-8');
+        const content = fs.readFileSync(stPath, 'utf-8');
         const entry = `- [Phase ${phase || '?'}]: ${summary}${rationale ? ` -- ${rationale}` : ''}`;
 
         const sectionPattern =
           /(###?\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
-        const match = content.match(sectionPattern);
+        const updated = appendToStateSection(content, sectionPattern, entry, [/None yet\.?\s*\n?/gi, /No decisions yet\.?\s*\n?/gi]);
 
-        if (!match) {
+        if (!updated) {
           return mcpError(
             'Decisions section not found in STATE.md',
             'Section not found',
           );
         }
 
-        let sectionBody = match[2];
-        sectionBody = sectionBody
-          .replace(/None yet\.?\s*\n?/gi, '')
-          .replace(/No decisions yet\.?\s*\n?/gi, '');
-        sectionBody = sectionBody.trimEnd() + '\n' + entry + '\n';
-
-        content = content.replace(
-          sectionPattern,
-          (_match, header: string) => `${header}${sectionBody}`,
-        );
-
-        fs.writeFileSync(statePath, content, 'utf-8');
+        fs.writeFileSync(stPath, updated, 'utf-8');
 
         return mcpSuccess(
           { added: true, decision: entry },
@@ -198,37 +187,26 @@ export function registerStateTools(server: McpServer): void {
           return mcpError('No .planning/ directory found', 'Project not detected');
         }
 
-        const statePath = path.join(cwd, '.planning', 'STATE.md');
-        if (!fs.existsSync(statePath)) {
+        const stPath = statePath(cwd);
+        if (!fs.existsSync(stPath)) {
           return mcpError('STATE.md not found', 'STATE.md missing');
         }
 
-        let content = fs.readFileSync(statePath, 'utf-8');
+        const content = fs.readFileSync(stPath, 'utf-8');
         const entry = `- ${text}`;
 
         const sectionPattern =
           /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
-        const match = content.match(sectionPattern);
+        const updated = appendToStateSection(content, sectionPattern, entry, [/None\.?\s*\n?/gi, /None yet\.?\s*\n?/gi]);
 
-        if (!match) {
+        if (!updated) {
           return mcpError(
             'Blockers section not found in STATE.md',
             'Section not found',
           );
         }
 
-        let sectionBody = match[2];
-        sectionBody = sectionBody
-          .replace(/None\.?\s*\n?/gi, '')
-          .replace(/None yet\.?\s*\n?/gi, '');
-        sectionBody = sectionBody.trimEnd() + '\n' + entry + '\n';
-
-        content = content.replace(
-          sectionPattern,
-          (_match, header: string) => `${header}${sectionBody}`,
-        );
-
-        fs.writeFileSync(statePath, content, 'utf-8');
+        fs.writeFileSync(stPath, updated, 'utf-8');
 
         return mcpSuccess(
           { added: true, blocker: text },
@@ -257,12 +235,12 @@ export function registerStateTools(server: McpServer): void {
           return mcpError('No .planning/ directory found', 'Project not detected');
         }
 
-        const statePath = path.join(cwd, '.planning', 'STATE.md');
-        if (!fs.existsSync(statePath)) {
+        const stPath = statePath(cwd);
+        if (!fs.existsSync(stPath)) {
           return mcpError('STATE.md not found', 'STATE.md missing');
         }
 
-        let content = fs.readFileSync(statePath, 'utf-8');
+        let content = fs.readFileSync(stPath, 'utf-8');
 
         const sectionPattern =
           /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
@@ -292,7 +270,7 @@ export function registerStateTools(server: McpServer): void {
           (_match, header: string) => `${header}${newBody}`,
         );
 
-        fs.writeFileSync(statePath, content, 'utf-8');
+        fs.writeFileSync(stPath, content, 'utf-8');
 
         return mcpSuccess(
           { resolved: true, blocker: text },

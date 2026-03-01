@@ -6,6 +6,11 @@
 import type { StateMetricOptions, StateDecisionOptions, StateBlockerOptions, StateSessionOptions } from './types.js';
 export declare function stateExtractField(content: string, fieldName: string): string | null;
 export declare function stateReplaceField(content: string, fieldName: string, newValue: string): string | null;
+/**
+ * Append an entry to a section in STATE.md content, removing placeholder text.
+ * Returns updated content or null if section not found.
+ */
+export declare function appendToStateSection(content: string, sectionPattern: RegExp, entry: string, placeholderPatterns?: RegExp[]): string | null;
 export declare function cmdStateLoad(cwd: string, raw: boolean): void;
 export declare function cmdStateGet(cwd: string, section: string | null, raw: boolean): void;
 export declare function cmdStatePatch(cwd: string, patches: Record<string, string>, raw: boolean): void;

@@ -1,3 +1,49 @@
+## [3.10.2](https://github.com/maystudios/maxsimcli/compare/v3.10.1...v3.10.2) (2026-02-28)
+
+
+### Bug Fixes
+
+* **dashboard:** use \r for PTY and queue command if terminal not ready ([e140d2c](https://github.com/maystudios/maxsimcli/commit/e140d2c2321617083a1191aebeaf78d61f42d98c))
+
+## [3.10.1](https://github.com/maystudios/maxsimcli/compare/v3.10.0...v3.10.1) (2026-02-28)
+
+
+### Bug Fixes
+
+* **dashboard:** correct New Project command and send newline for execution ([709617b](https://github.com/maystudios/maxsimcli/commit/709617b909ea1a1a101dfde9d654d84bbd6b7d94))
+
+# [3.10.0](https://github.com/maystudios/maxsimcli/compare/v3.9.0...v3.10.0) (2026-02-28)
+
+
+### Bug Fixes
+
+* bundle MCP SDK subpath imports into dashboard server.js ([e85ba8a](https://github.com/maystudios/maxsimcli/commit/e85ba8a7253635529d5a7892b13290238b50451d))
+
+
+### Features
+
+* **33-01:** add MCP SDK and create mcp-server.ts with tool registrations ([14ff308](https://github.com/maystudios/maxsimcli/commit/14ff308ba3d52331c9e1466b5baac321bf8857a6))
+* **33-01:** wire MCP routes and answer endpoint into server.ts ([0deed2c](https://github.com/maystudios/maxsimcli/commit/0deed2c85856012fd13a5e5f2302f4284d963fdc))
+* **33-02:** add StatusBar, pending badge, and MCP server auto-registration ([c0a17ee](https://github.com/maystudios/maxsimcli/commit/c0a17ee57c3c8be705f6789a2a1eb89fec76f1a9))
+* **33-02:** wire MCP events to browser UI and replace mock questions ([addcd98](https://github.com/maystudios/maxsimcli/commit/addcd988b0b48ef1b8ba3fa728156f308e91e729))
+* **33:** complete Hook Bridge — MCP server, browser integration, and build artifacts ([9ab0732](https://github.com/maystudios/maxsimcli/commit/9ab073282f40be7600fe8e595ce195b45edc48f2))
+* add dashboard MCP bridge to all workflow templates ([6a2e0b3](https://github.com/maystudios/maxsimcli/commit/6a2e0b368ef763213bbf3a286b0760e372bcfab9))
+
+# [3.9.0](https://github.com/maystudios/maxsimcli/compare/v3.8.1...v3.9.0) (2026-02-28)
+
+
+### Bug Fixes
+
+* **32.1-01:** fix useMockQuestions "Ask me more" dead-end bug ([96a0d6f](https://github.com/maystudios/maxsimcli/commit/96a0d6f73f46e9966ba5f14466259fe406d9bbbe))
+
+
+### Features
+
+* **32-01:** add DiscussionProvider state machine and react-markdown dependency ([31493c9](https://github.com/maystudios/maxsimcli/commit/31493c95d9ce0672b6ee2423a03d410604177d22))
+* **32-01:** add QuestionCard, OptionCard, AnsweredCard, SkeletonCard, OptionPreviewPanel ([bf35fa5](https://github.com/maystudios/maxsimcli/commit/bf35fa546202f2df018404ff93d0908324865b61))
+* **32-02:** add DiscussionView, DiscussionFooter, ConfirmationDialog, DiscussionCompleteCard ([d7125d5](https://github.com/maystudios/maxsimcli/commit/d7125d5cbeafc1fb2547a186d6844336904b6976))
+* **32-02:** wire DiscussionView into SimpleModeView and App.tsx ([4c16771](https://github.com/maystudios/maxsimcli/commit/4c16771eefb2d928210ca9f6475d9602e00e3abf))
+
 ## [3.8.1](https://github.com/maystudios/maxsimcli/compare/v3.8.0...v3.8.1) (2026-02-28)
 
 

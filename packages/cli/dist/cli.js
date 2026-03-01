@@ -317,6 +317,11 @@ const COMMANDS = {
         }, raw);
     },
     'dashboard': (args) => handleDashboard(args.slice(1)),
+    'start-server': async () => {
+        const serverPath = path.join(__dirname, 'mcp-server.cjs');
+        const child = (0, node_child_process_1.spawn)(process.execPath, [serverPath], { stdio: 'inherit' });
+        child.on('exit', (code) => process.exit(code ?? 0));
+    },
 };
 // ─── Main ────────────────────────────────────────────────────────────────────
 async function main() {

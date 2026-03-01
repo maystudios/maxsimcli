@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { output, error } from './core.js';
+import { output, error, planningPath, roadmapPath as roadmapPathUtil, statePath as statePathUtil, phasesPath, todayISO, listSubDirs, isPlanFile, isSummaryFile, debugLog } from './core.js';
 import { extractFrontmatter } from './frontmatter.js';
 import type {
   MilestoneCompleteOptions,
@@ -33,7 +33,7 @@ export function cmdRequirementsMarkComplete(cwd: string, reqIdsRaw: string[], ra
     error('no valid requirement IDs found');
   }
 
-  const reqPath = path.join(cwd, '.planning', 'REQUIREMENTS.md');
+  const reqPath = planningPath(cwd, 'REQUIREMENTS.md');
   if (!fs.existsSync(reqPath)) {
     output({ updated: false, reason: 'REQUIREMENTS.md not found', ids: reqIds }, raw, 'no requirements file');
     return;
@@ -94,13 +94,13 @@ export function cmdMilestoneComplete(
     error('version required for milestone complete (e.g., v1.0)');
   }
 
-  const roadmapPath = path.join(cwd, '.planning', 'ROADMAP.md');
-  const reqPath = path.join(cwd, '.planning', 'REQUIREMENTS.md');
-  const statePath = path.join(cwd, '.planning', 'STATE.md');
-  const milestonesPath = path.join(cwd, '.planning', 'MILESTONES.md');
-  const archiveDir = path.join(cwd, '.planning', 'milestones');
-  const phasesDir = path.join(cwd, '.planning', 'phases');
-  const today = new Date().toISOString().split('T')[0];
+  const roadmapPath = roadmapPathUtil(cwd);
+  const reqPath = planningPath(cwd, 'REQUIREMENTS.md');
+  const statePath = statePathUtil(cwd);
+  const milestonesPath = planningPath(cwd, 'MILESTONES.md');
+  const archiveDir = planningPath(cwd, 'milestones');
+  const phasesDir = phasesPath(cwd);
+  const today = todayISO();
   const milestoneName = options.name || version;
 
   fs.mkdirSync(archiveDir, { recursive: true });
@@ -111,14 +111,13 @@ export function cmdMilestoneComplete(
   const accomplishments: string[] = [];
 
   try {
-    const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
+    const dirs = listSubDirs(phasesDir, true);
 
     for (const dir of dirs) {
       phaseCount++;
       const phaseFiles = fs.readdirSync(path.join(phasesDir, dir));
-      const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md');
-      const summaries = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+      const plans = phaseFiles.filter(isPlanFile);
+      const summaries = phaseFiles.filter(isSummaryFile);
       totalPlans += plans.length;
 
       for (const s of summaries) {
@@ -132,13 +131,13 @@ export function cmdMilestoneComplete(
           totalTasks += taskMatches.length;
         } catch (e) {
           /* optional op, ignore */
-          if (process.env.MAXSIM_DEBUG) console.error(e);
+          debugLog(e);
         }
       }
     }
   } catch (e) {
     /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   // Archive ROADMAP.md
@@ -196,15 +195,14 @@ export function cmdMilestoneComplete(
       const phaseArchiveDir = path.join(archiveDir, `${version}-phases`);
       fs.mkdirSync(phaseArchiveDir, { recursive: true });
 
-      const phaseEntries = fs.readdirSync(phasesDir, { withFileTypes: true });
-      const phaseDirNames = phaseEntries.filter(e => e.isDirectory()).map(e => e.name);
+      const phaseDirNames = listSubDirs(phasesDir);
       for (const dir of phaseDirNames) {
         fs.renameSync(path.join(phasesDir, dir), path.join(phaseArchiveDir, dir));
       }
       phasesArchived = phaseDirNames.length > 0;
     } catch (e) {
       /* optional op, ignore */
-      if (process.env.MAXSIM_DEBUG) console.error(e);
+      debugLog(e);
     }
   }
 

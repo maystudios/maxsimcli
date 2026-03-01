@@ -11,7 +11,8 @@ import path from 'node:path';
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
-import { generateSlugInternal } from '../core/core.js';
+import { generateSlugInternal, todayISO, planningPath } from '../core/core.js';
+import { parseTodoFrontmatter } from '../core/commands.js';
 import { detectProjectRoot, mcpSuccess, mcpError } from './utils.js';
 
 /**
@@ -36,10 +37,10 @@ export function registerTodoTools(server: McpServer): void {
           return mcpError('No .planning/ directory found', 'Project not detected');
         }
 
-        const pendingDir = path.join(cwd, '.planning', 'todos', 'pending');
+        const pendingDir = planningPath(cwd, 'todos', 'pending');
         fs.mkdirSync(pendingDir, { recursive: true });
 
-        const today = new Date().toISOString().split('T')[0];
+        const today = todayISO();
         const slug = generateSlugInternal(title) || 'untitled';
         const timestamp = Date.now();
         const filename = `${timestamp}-${slug}.md`;
@@ -79,8 +80,8 @@ export function registerTodoTools(server: McpServer): void {
           return mcpError('No .planning/ directory found', 'Project not detected');
         }
 
-        const pendingDir = path.join(cwd, '.planning', 'todos', 'pending');
-        const completedDir = path.join(cwd, '.planning', 'todos', 'completed');
+        const pendingDir = planningPath(cwd, 'todos', 'pending');
+        const completedDir = planningPath(cwd, 'todos', 'completed');
         const sourcePath = path.join(pendingDir, todo_id);
 
         if (!fs.existsSync(sourcePath)) {
@@ -90,7 +91,7 @@ export function registerTodoTools(server: McpServer): void {
         fs.mkdirSync(completedDir, { recursive: true });
 
         let content = fs.readFileSync(sourcePath, 'utf-8');
-        const today = new Date().toISOString().split('T')[0];
+        const today = todayISO();
         content = `completed: ${today}\n` + content;
 
         fs.writeFileSync(path.join(completedDir, todo_id), content, 'utf-8');
@@ -126,7 +127,7 @@ export function registerTodoTools(server: McpServer): void {
           return mcpError('No .planning/ directory found', 'Project not detected');
         }
 
-        const todosBase = path.join(cwd, '.planning', 'todos');
+        const todosBase = planningPath(cwd, 'todos');
         const dirs: string[] = [];
 
         if (status === 'pending' || status === 'all') {
@@ -159,19 +160,15 @@ export function registerTodoTools(server: McpServer): void {
           for (const file of files) {
             try {
               const content = fs.readFileSync(path.join(dir, file), 'utf-8');
-              const createdMatch = content.match(/^created:\s*(.+)$/m);
-              const titleMatch = content.match(/^title:\s*(.+)$/m);
-              const areaMatch = content.match(/^area:\s*(.+)$/m);
+              const fm = parseTodoFrontmatter(content);
 
-              const todoArea = areaMatch ? areaMatch[1].trim() : 'general';
-
-              if (area && todoArea !== area) continue;
+              if (area && fm.area !== area) continue;
 
               todos.push({
                 file,
-                created: createdMatch ? createdMatch[1].trim() : 'unknown',
-                title: titleMatch ? titleMatch[1].trim() : 'Untitled',
-                area: todoArea,
+                created: fm.created,
+                title: fm.title,
+                area: fm.area,
                 status: dirStatus,
                 path: `.planning/todos/${dirStatus}/${file}`,
               });

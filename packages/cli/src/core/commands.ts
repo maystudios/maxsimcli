@@ -23,6 +23,13 @@ import {
   output,
   error,
   findPhaseInternal,
+  todayISO,
+  planningPath,
+  phasesPath,
+  listSubDirs,
+  isPlanFile,
+  isSummaryFile,
+  debugLog,
 } from './core.js';
 import { extractFrontmatter } from './frontmatter.js';
 import type {
@@ -37,6 +44,29 @@ import type {
   AgentType,
   FrontmatterData,
 } from './types.js';
+
+// ─── Todo frontmatter parsing ────────────────────────────────────────────────
+
+export interface TodoFrontmatter {
+  created: string;
+  title: string;
+  area: string;
+  completed?: string;
+}
+
+export function parseTodoFrontmatter(content: string): TodoFrontmatter {
+  const createdMatch = content.match(/^created:\s*(.+)$/m);
+  const titleMatch = content.match(/^title:\s*(.+)$/m);
+  const areaMatch = content.match(/^area:\s*(.+)$/m);
+  const completedMatch = content.match(/^completed:\s*(.+)$/m);
+
+  return {
+    created: createdMatch ? createdMatch[1].trim() : 'unknown',
+    title: titleMatch ? titleMatch[1].trim() : 'Untitled',
+    area: areaMatch ? areaMatch[1].trim() : 'general',
+    ...(completedMatch && { completed: completedMatch[1].trim() }),
+  };
+}
 
 // ─── Slug generation ────────────────────────────────────────────────────────
 
@@ -59,7 +89,7 @@ export function cmdCurrentTimestamp(format: TimestampFormat, raw: boolean): void
 
   switch (format) {
     case 'date':
-      result = now.toISOString().split('T')[0];
+      result = todayISO();
       break;
     case 'filename':
       result = now.toISOString().replace(/:/g, '-').replace(/\..+/, '');
@@ -76,7 +106,7 @@ export function cmdCurrentTimestamp(format: TimestampFormat, raw: boolean): void
 // ─── Todos ──────────────────────────────────────────────────────────────────
 
 export function cmdListTodos(cwd: string, area: string | undefined, raw: boolean): void {
-  const pendingDir = path.join(cwd, '.planning', 'todos', 'pending');
+  const pendingDir = planningPath(cwd, 'todos', 'pending');
 
   let count = 0;
   const todos: TodoItem[] = [];
@@ -87,31 +117,27 @@ export function cmdListTodos(cwd: string, area: string | undefined, raw: boolean
     for (const file of files) {
       try {
         const content = fs.readFileSync(path.join(pendingDir, file), 'utf-8');
-        const createdMatch = content.match(/^created:\s*(.+)$/m);
-        const titleMatch = content.match(/^title:\s*(.+)$/m);
-        const areaMatch = content.match(/^area:\s*(.+)$/m);
-
-        const todoArea = areaMatch ? areaMatch[1].trim() : 'general';
+        const fm = parseTodoFrontmatter(content);
 
         // Apply area filter if specified
-        if (area && todoArea !== area) continue;
+        if (area && fm.area !== area) continue;
 
         count++;
         todos.push({
           file,
-          created: createdMatch ? createdMatch[1].trim() : 'unknown',
-          title: titleMatch ? titleMatch[1].trim() : 'Untitled',
-          area: todoArea,
+          created: fm.created,
+          title: fm.title,
+          area: fm.area,
           path: path.join('.planning', 'todos', 'pending', file),
         });
       } catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG) console.error(e);
+        debugLog(e);
       }
     }
   } catch (e) {
     /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   const result = { count, todos };
@@ -141,7 +167,7 @@ export function cmdVerifyPathExists(cwd: string, targetPath: string | undefined,
 // ─── History digest ─────────────────────────────────────────────────────────
 
 export function cmdHistoryDigest(cwd: string, raw: boolean): void {
-  const phasesDir = path.join(cwd, '.planning', 'phases');
+  const phasesDir = phasesPath(cwd);
   const digest: {
     phases: Record<string, { name: string; provides: Set<string>; affects: Set<string>; patterns: Set<string> }>;
     decisions: Array<{ phase: string; decision: string }>;
@@ -160,16 +186,13 @@ export function cmdHistoryDigest(cwd: string, raw: boolean): void {
   // Add current phases
   if (fs.existsSync(phasesDir)) {
     try {
-      const currentDirs = fs.readdirSync(phasesDir, { withFileTypes: true })
-        .filter(e => e.isDirectory())
-        .map(e => e.name)
-        .sort();
+      const currentDirs = listSubDirs(phasesDir, true);
       for (const dir of currentDirs) {
         allPhaseDirs.push({ name: dir, fullPath: path.join(phasesDir, dir), milestone: null });
       }
     } catch (e) {
       /* optional op, ignore */
-      if (process.env.MAXSIM_DEBUG) console.error(e);
+      debugLog(e);
     }
   }
 
@@ -181,7 +204,7 @@ export function cmdHistoryDigest(cwd: string, raw: boolean): void {
 
   try {
     for (const { name: dir, fullPath: dirPath } of allPhaseDirs) {
-      const summaries = fs.readdirSync(dirPath).filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+      const summaries = fs.readdirSync(dirPath).filter(f => isSummaryFile(f));
 
       for (const summary of summaries) {
         try {
@@ -233,7 +256,7 @@ export function cmdHistoryDigest(cwd: string, raw: boolean): void {
           }
         } catch (e) {
           /* optional op, ignore */
-          if (process.env.MAXSIM_DEBUG) console.error(e);
+          debugLog(e);
         }
       }
     }
@@ -477,7 +500,7 @@ export async function cmdWebsearch(
 // ─── Progress render ────────────────────────────────────────────────────────
 
 export function cmdProgressRender(cwd: string, format: string, raw: boolean): void {
-  const phasesDir = path.join(cwd, '.planning', 'phases');
+  const phasesDir = phasesPath(cwd);
   const milestone = getMilestoneInfo(cwd);
 
   const phases: Array<{ number: string; name: string; plans: number; summaries: number; status: string }> = [];
@@ -500,8 +523,8 @@ export function cmdProgressRender(cwd: string, format: string, raw: boolean): vo
       const phaseNum = dm ? dm[1] : dir;
       const phaseName = dm && dm[2] ? dm[2].replace(/-/g, ' ') : '';
       const phaseFiles = fs.readdirSync(path.join(phasesDir, dir));
-      const planCount = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md').length;
-      const summaryCount = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md').length;
+      const planCount = phaseFiles.filter(f => isPlanFile(f)).length;
+      const summaryCount = phaseFiles.filter(f => isSummaryFile(f)).length;
 
       totalPlans += planCount;
       totalSummaries += summaryCount;
@@ -516,7 +539,7 @@ export function cmdProgressRender(cwd: string, format: string, raw: boolean): vo
     }
   } catch (e) {
     /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   const percent = totalPlans > 0 ? Math.min(100, Math.round((totalSummaries / totalPlans) * 100)) : 0;
@@ -591,8 +614,8 @@ export function cmdTodoComplete(cwd: string, filename: string | undefined, raw: 
     error('filename required for todo complete');
   }
 
-  const pendingDir = path.join(cwd, '.planning', 'todos', 'pending');
-  const completedDir = path.join(cwd, '.planning', 'todos', 'completed');
+  const pendingDir = planningPath(cwd, 'todos', 'pending');
+  const completedDir = planningPath(cwd, 'todos', 'completed');
   const sourcePath = path.join(pendingDir, filename);
 
   if (!fs.existsSync(sourcePath)) {
@@ -604,7 +627,7 @@ export function cmdTodoComplete(cwd: string, filename: string | undefined, raw: 
 
   // Read, add completion timestamp, move
   let content = fs.readFileSync(sourcePath, 'utf-8');
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayISO();
   content = `completed: ${today}\n` + content;
 
   fs.writeFileSync(path.join(completedDir, filename), content, 'utf-8');
@@ -623,7 +646,7 @@ export function cmdScaffold(
 ): void {
   const { phase, name } = options;
   const padded = phase ? normalizePhaseName(phase) : '00';
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayISO();
 
   // Find phase directory
   const phaseInfo = phase ? findPhaseInternal(cwd, phase) : null;
@@ -658,7 +681,7 @@ export function cmdScaffold(
       }
       const slug = generateSlugInternal(name);
       const dirName = `${padded}-${slug}`;
-      const phasesParent = path.join(cwd, '.planning', 'phases');
+      const phasesParent = phasesPath(cwd);
       fs.mkdirSync(phasesParent, { recursive: true });
       const dirPath = path.join(phasesParent, dirName);
       fs.mkdirSync(dirPath, { recursive: true });

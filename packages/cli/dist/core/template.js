@@ -67,7 +67,7 @@ function cmdTemplateFill(cwd, templateType, options, raw) {
         return;
     }
     const padded = (0, core_js_1.normalizePhaseName)(options.phase);
-    const today = new Date().toISOString().split('T')[0];
+    const today = (0, core_js_1.todayISO)();
     const phaseName = options.name || phaseInfo.phase_name || 'Unnamed';
     const phaseSlug = phaseInfo.phase_slug || (0, core_js_1.generateSlugInternal)(phaseName);
     const phaseId = `${padded}-${phaseSlug}`;

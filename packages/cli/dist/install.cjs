@@ -9199,6 +9199,13 @@ async function install(isGlobal, runtime = "claude") {
 			console.warn(`  ${chalk.yellow("!")} cli.cjs not found at ${toolSrc} — maxsim-tools.cjs not installed`);
 			failures.push("maxsim-tools.cjs");
 		}
+		const mcpSrc = node_path.resolve(__dirname, "mcp-server.cjs");
+		const mcpDest = node_path.join(binDir, "mcp-server.cjs");
+		if (node_fs.existsSync(mcpSrc)) {
+			node_fs.mkdirSync(binDir, { recursive: true });
+			node_fs.copyFileSync(mcpSrc, mcpDest);
+			console.log(`  ${chalk.green("✓")} Installed mcp-server.cjs`);
+		} else console.warn(`  ${chalk.yellow("!")} mcp-server.cjs not found — MCP server not installed`);
 		let hooksSrc = null;
 		const bundledHooksDir = node_path.resolve(__dirname, "assets", "hooks");
 		if (node_fs.existsSync(bundledHooksDir)) hooksSrc = bundledHooksDir;
@@ -9254,6 +9261,22 @@ async function install(isGlobal, runtime = "claude") {
 		if (node_fs.existsSync(node_path.join(dashboardDest, "server.js"))) spinner.succeed(chalk.green("✓") + " Installed dashboard");
 		else spinner.succeed(chalk.green("✓") + " Installed dashboard (server.js not found in bundle)");
 		if (networkMode) applyFirewallRule(3333);
+	}
+	if (!isOpencode && !isCodex && !isGemini) {
+		const mcpJsonPath = isGlobal ? node_path.join(targetDir, "..", ".mcp.json") : node_path.join(process.cwd(), ".mcp.json");
+		let mcpConfig = {};
+		if (node_fs.existsSync(mcpJsonPath)) try {
+			mcpConfig = JSON.parse(node_fs.readFileSync(mcpJsonPath, "utf-8"));
+		} catch {}
+		const mcpServers = mcpConfig.mcpServers ?? {};
+		mcpServers["maxsim"] = {
+			command: "node",
+			args: [".claude/maxsim/bin/mcp-server.cjs"],
+			env: {}
+		};
+		mcpConfig.mcpServers = mcpServers;
+		node_fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + "\n", "utf-8");
+		console.log(`  ${chalk.green("✓")} Configured .mcp.json for MCP server auto-discovery`);
 	}
 	if (failures.length > 0) {
 		console.error(`\n  ${chalk.yellow("Installation incomplete!")} Failed: ${failures.join(", ")}`);

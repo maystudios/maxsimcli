@@ -59,8 +59,7 @@ function scanPhaseArtifacts(cwd, phaseDirectory) {
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     return result;
 }
@@ -176,8 +175,7 @@ function cmdInitNewProject(cwd, raw) {
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     hasPackageFile = (0, core_js_1.pathExistsInternal)(cwd, 'package.json') ||
         (0, core_js_1.pathExistsInternal)(cwd, 'requirements.txt') ||
@@ -226,7 +224,7 @@ function cmdInitQuick(cwd, description, raw) {
     const config = (0, core_js_1.loadConfig)(cwd);
     const now = new Date();
     const slug = description ? (0, core_js_1.generateSlugInternal)(description)?.substring(0, 40) ?? null : null;
-    const quickDir = node_path_1.default.join(cwd, '.planning', 'quick');
+    const quickDir = (0, core_js_1.planningPath)(cwd, 'quick');
     let nextNum = 1;
     try {
         const existing = node_fs_1.default.readdirSync(quickDir)
@@ -239,8 +237,7 @@ function cmdInitQuick(cwd, description, raw) {
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     const result = {
         planner_model: (0, core_js_1.resolveModelInternal)(cwd, 'maxsim-planner'),
@@ -251,7 +248,7 @@ function cmdInitQuick(cwd, description, raw) {
         next_num: nextNum,
         slug,
         description: description ?? null,
-        date: now.toISOString().split('T')[0],
+        date: (0, core_js_1.todayISO)(),
         timestamp: now.toISOString(),
         quick_dir: '.planning/quick',
         task_dir: slug ? `.planning/quick/${nextNum}-${slug}` : null,
@@ -264,12 +261,11 @@ function cmdInitResume(cwd, raw) {
     const config = (0, core_js_1.loadConfig)(cwd);
     let interruptedAgentId = null;
     try {
-        interruptedAgentId = node_fs_1.default.readFileSync(node_path_1.default.join(cwd, '.planning', 'current-agent-id.txt'), 'utf-8').trim();
+        interruptedAgentId = node_fs_1.default.readFileSync((0, core_js_1.planningPath)(cwd, 'current-agent-id.txt'), 'utf-8').trim();
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     const result = {
         state_exists: (0, core_js_1.pathExistsInternal)(cwd, '.planning/STATE.md'),
@@ -361,7 +357,7 @@ function cmdInitPhaseOp(cwd, phase, raw) {
 function cmdInitTodos(cwd, area, raw) {
     const config = (0, core_js_1.loadConfig)(cwd);
     const now = new Date();
-    const pendingDir = node_path_1.default.join(cwd, '.planning', 'todos', 'pending');
+    const pendingDir = (0, core_js_1.planningPath)(cwd, 'todos', 'pending');
     let count = 0;
     const todos = [];
     try {
@@ -386,19 +382,17 @@ function cmdInitTodos(cwd, area, raw) {
             }
             catch (e) {
                 /* optional op, ignore */
-                if (process.env.MAXSIM_DEBUG)
-                    console.error(e);
+                (0, core_js_1.debugLog)(e);
             }
         }
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     const result = {
         commit_docs: config.commit_docs,
-        date: now.toISOString().split('T')[0],
+        date: (0, core_js_1.todayISO)(),
         timestamp: now.toISOString(),
         todo_count: count,
         todos,
@@ -416,41 +410,35 @@ function cmdInitMilestoneOp(cwd, raw) {
     const milestone = (0, core_js_1.getMilestoneInfo)(cwd);
     let phaseCount = 0;
     let completedPhases = 0;
-    const phasesDir = node_path_1.default.join(cwd, '.planning', 'phases');
+    const phasesDir = (0, core_js_1.phasesPath)(cwd);
     try {
-        const entries = node_fs_1.default.readdirSync(phasesDir, { withFileTypes: true });
-        const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+        const dirs = (0, core_js_1.listSubDirs)(phasesDir);
         phaseCount = dirs.length;
         for (const dir of dirs) {
             try {
                 const phaseFiles = node_fs_1.default.readdirSync(node_path_1.default.join(phasesDir, dir));
-                const hasSummary = phaseFiles.some(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+                const hasSummary = phaseFiles.some(f => (0, core_js_1.isSummaryFile)(f));
                 if (hasSummary)
                     completedPhases++;
             }
             catch (e) {
                 /* optional op, ignore */
-                if (process.env.MAXSIM_DEBUG)
-                    console.error(e);
+                (0, core_js_1.debugLog)(e);
             }
         }
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
-    const archiveDir = node_path_1.default.join(cwd, '.planning', 'archive');
+    const archiveDir = (0, core_js_1.planningPath)(cwd, 'archive');
     let archivedMilestones = [];
     try {
-        archivedMilestones = node_fs_1.default.readdirSync(archiveDir, { withFileTypes: true })
-            .filter(e => e.isDirectory())
-            .map(e => e.name);
+        archivedMilestones = (0, core_js_1.listSubDirs)(archiveDir);
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     const result = {
         commit_docs: config.commit_docs,
@@ -472,15 +460,14 @@ function cmdInitMilestoneOp(cwd, raw) {
 }
 function cmdInitMapCodebase(cwd, raw) {
     const config = (0, core_js_1.loadConfig)(cwd);
-    const codebaseDir = node_path_1.default.join(cwd, '.planning', 'codebase');
+    const codebaseDir = (0, core_js_1.planningPath)(cwd, 'codebase');
     let existingMaps = [];
     try {
         existingMaps = node_fs_1.default.readdirSync(codebaseDir).filter(f => f.endsWith('.md'));
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     const result = {
         mapper_model: (0, core_js_1.resolveModelInternal)(cwd, 'maxsim-codebase-mapper'),
@@ -508,8 +495,7 @@ function cmdInitExisting(cwd, raw) {
         hasCode = files.trim().length > 0;
     }
     catch (e) {
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     hasPackageFile =
         (0, core_js_1.pathExistsInternal)(cwd, 'package.json') ||
@@ -520,7 +506,7 @@ function cmdInitExisting(cwd, raw) {
     // Detect existing .planning/ content for conflict dialog
     let planningFiles = [];
     try {
-        const planDir = node_path_1.default.join(cwd, '.planning');
+        const planDir = (0, core_js_1.planningPath)(cwd);
         if (node_fs_1.default.existsSync(planDir)) {
             planningFiles = node_fs_1.default
                 .readdirSync(planDir, { recursive: true })
@@ -529,8 +515,7 @@ function cmdInitExisting(cwd, raw) {
         }
     }
     catch (e) {
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     const result = {
         researcher_model: (0, core_js_1.resolveModelInternal)(cwd, 'maxsim-project-researcher'),
@@ -558,21 +543,20 @@ function cmdInitExisting(cwd, raw) {
 function cmdInitProgress(cwd, raw) {
     const config = (0, core_js_1.loadConfig)(cwd);
     const milestone = (0, core_js_1.getMilestoneInfo)(cwd);
-    const phasesDir = node_path_1.default.join(cwd, '.planning', 'phases');
+    const progressPhasesDir = (0, core_js_1.phasesPath)(cwd);
     const phases = [];
     let currentPhase = null;
     let nextPhase = null;
     try {
-        const entries = node_fs_1.default.readdirSync(phasesDir, { withFileTypes: true });
-        const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
+        const dirs = (0, core_js_1.listSubDirs)(progressPhasesDir, true);
         for (const dir of dirs) {
             const match = dir.match(/^(\d+(?:\.\d+)?)-?(.*)/);
             const phaseNumber = match ? match[1] : dir;
             const phaseName = match && match[2] ? match[2] : null;
-            const phasePath = node_path_1.default.join(phasesDir, dir);
-            const phaseFiles = node_fs_1.default.readdirSync(phasePath);
-            const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md');
-            const summaries = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+            const phaseDirPath = node_path_1.default.join(progressPhasesDir, dir);
+            const phaseFiles = node_fs_1.default.readdirSync(phaseDirPath);
+            const plans = phaseFiles.filter(f => (0, core_js_1.isPlanFile)(f));
+            const summaries = phaseFiles.filter(f => (0, core_js_1.isSummaryFile)(f));
             const hasResearch = phaseFiles.some(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
             const status = summaries.length >= plans.length && plans.length > 0 ? 'complete' :
                 plans.length > 0 ? 'in_progress' :
@@ -597,20 +581,18 @@ function cmdInitProgress(cwd, raw) {
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     let pausedAt = null;
     try {
-        const state = node_fs_1.default.readFileSync(node_path_1.default.join(cwd, '.planning', 'STATE.md'), 'utf-8');
+        const state = node_fs_1.default.readFileSync((0, core_js_1.planningPath)(cwd, 'STATE.md'), 'utf-8');
         const pauseMatch = state.match(/\*\*Paused At:\*\*\s*(.+)/);
         if (pauseMatch)
             pausedAt = pauseMatch[1].trim();
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     const result = {
         executor_model: (0, core_js_1.resolveModelInternal)(cwd, 'maxsim-executor'),

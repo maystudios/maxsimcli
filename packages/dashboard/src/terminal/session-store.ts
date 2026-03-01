@@ -5,7 +5,8 @@ export class SessionStore {
 
   append(data: string): void {
     this.scrollback.push(data);
-    if (this.scrollback.length > MAX_SCROLLBACK) {
+    // Trim in larger batches to amortize array copy cost
+    if (this.scrollback.length > MAX_SCROLLBACK * 1.5) {
       this.scrollback = this.scrollback.slice(-MAX_SCROLLBACK);
     }
   }

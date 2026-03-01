@@ -12,7 +12,14 @@ import path from 'node:path';
  * Walk up from startDir to find a directory containing `.planning/`.
  * Returns the directory containing `.planning/` or null if not found.
  */
+let _cachedRoot: string | null | undefined;
+
 export function detectProjectRoot(startDir?: string): string | null {
+  // Only cache when using default startDir (cwd)
+  if (startDir === undefined && _cachedRoot !== undefined) {
+    return _cachedRoot;
+  }
+
   let dir = startDir || process.cwd();
 
   // Safety limit to prevent infinite loops
@@ -21,6 +28,7 @@ export function detectProjectRoot(startDir?: string): string | null {
     try {
       const stat = fs.statSync(planningDir);
       if (stat.isDirectory()) {
+        if (startDir === undefined) _cachedRoot = dir;
         return dir;
       }
     } catch {
@@ -30,11 +38,13 @@ export function detectProjectRoot(startDir?: string): string | null {
     const parent = path.dirname(dir);
     if (parent === dir) {
       // Reached filesystem root
+      if (startDir === undefined) _cachedRoot = null;
       return null;
     }
     dir = parent;
   }
 
+  if (startDir === undefined) _cachedRoot = null;
   return null;
 }
 

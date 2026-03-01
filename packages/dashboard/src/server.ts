@@ -167,6 +167,17 @@ function isWithinPlanning(cwd: string, targetPath: string): boolean {
 const suppressedPaths = new Map<string, number>();
 const SUPPRESS_TTL_MS = 500;
 
+// Periodically clean up stale entries from suppressedPaths
+const CLEANUP_INTERVAL_MS = 60_000;
+setInterval(() => {
+  const now = Date.now();
+  for (const [p, ts] of suppressedPaths.entries()) {
+    if (now - ts > SUPPRESS_TTL_MS) {
+      suppressedPaths.delete(p);
+    }
+  }
+}, CLEANUP_INTERVAL_MS).unref();
+
 function suppressPath(filePath: string): void {
   suppressedPaths.set(normalizeFsPath(filePath), Date.now());
 }

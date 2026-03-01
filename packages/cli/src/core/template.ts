@@ -13,6 +13,7 @@ import {
   generateSlugInternal,
   output,
   error,
+  todayISO,
 } from './core.js';
 import { reconstructFrontmatter } from './frontmatter.js';
 import type { FrontmatterData } from './types.js';
@@ -115,7 +116,7 @@ export function cmdTemplateFill(
   }
 
   const padded = normalizePhaseName(options.phase);
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayISO();
   const phaseName = options.name || phaseInfo.phase_name || 'Unnamed';
   const phaseSlug = phaseInfo.phase_slug || generateSlugInternal(phaseName);
   const phaseId = `${padded}-${phaseSlug}`;

@@ -7,6 +7,26 @@ import type { ModelProfiles, ModelResolution, AgentType, PhaseSearchResult, Road
 export declare const MODEL_PROFILES: ModelProfiles;
 export declare function output(result: unknown, raw?: boolean, rawValue?: unknown): never;
 export declare function error(message: string): never;
+/** Today's date as YYYY-MM-DD. */
+export declare function todayISO(): string;
+/** Canonical .planning/ sub-paths. */
+export declare function planningPath(cwd: string, ...segments: string[]): string;
+export declare function statePath(cwd: string): string;
+export declare function roadmapPath(cwd: string): string;
+export declare function configPath(cwd: string): string;
+export declare function phasesPath(cwd: string): string;
+/** Phase-file predicates. */
+export declare const isPlanFile: (f: string) => boolean;
+export declare const isSummaryFile: (f: string) => boolean;
+/** Strip suffix to get plan/summary ID. */
+export declare const planId: (f: string) => string;
+export declare const summaryId: (f: string) => string;
+/** List subdirectory names, optionally sorted by phase number. */
+export declare function listSubDirs(dir: string, sortByPhase?: boolean): string[];
+/** Log only when MAXSIM_DEBUG is set. */
+export declare function debugLog(e: unknown): void;
+/** Escape a phase number for use in regex. */
+export declare function escapePhaseNum(phase: string | number): string;
 export declare function safeReadFile(filePath: string): string | null;
 export declare function loadConfig(cwd: string): AppConfig;
 export declare function isGitIgnored(cwd: string, targetPath: string): Promise<boolean>;
@@ -32,7 +52,7 @@ export declare function getPhasePattern(escapedPhaseNum?: string, flags?: string
 export declare function findPhaseInternal(cwd: string, phase: string): PhaseSearchResult | null;
 export declare function getArchivedPhaseDirs(cwd: string): ArchivedPhaseDir[];
 export declare function getRoadmapPhaseInternal(cwd: string, phaseNum: string | number): RoadmapPhaseInfo | null;
-export declare function resolveModelInternal(cwd: string, agentType: AgentType): ModelResolution;
+export declare function resolveModelInternal(cwd: string, agentType: AgentType, config?: AppConfig): ModelResolution;
 export declare function pathExistsInternal(cwd: string, targetPath: string): boolean;
 export declare function generateSlugInternal(text: string | null | undefined): string | null;
 export declare function getMilestoneInfo(cwd: string): MilestoneInfo;

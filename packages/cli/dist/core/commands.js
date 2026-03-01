@@ -8,6 +8,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.parseTodoFrontmatter = parseTodoFrontmatter;
 exports.cmdGenerateSlug = cmdGenerateSlug;
 exports.cmdCurrentTimestamp = cmdCurrentTimestamp;
 exports.cmdListTodos = cmdListTodos;
@@ -26,6 +27,18 @@ const chalk_1 = __importDefault(require("chalk"));
 const slugify_1 = __importDefault(require("slugify"));
 const core_js_1 = require("./core.js");
 const frontmatter_js_1 = require("./frontmatter.js");
+function parseTodoFrontmatter(content) {
+    const createdMatch = content.match(/^created:\s*(.+)$/m);
+    const titleMatch = content.match(/^title:\s*(.+)$/m);
+    const areaMatch = content.match(/^area:\s*(.+)$/m);
+    const completedMatch = content.match(/^completed:\s*(.+)$/m);
+    return {
+        created: createdMatch ? createdMatch[1].trim() : 'unknown',
+        title: titleMatch ? titleMatch[1].trim() : 'Untitled',
+        area: areaMatch ? areaMatch[1].trim() : 'general',
+        ...(completedMatch && { completed: completedMatch[1].trim() }),
+    };
+}
 // ─── Slug generation ────────────────────────────────────────────────────────
 function cmdGenerateSlug(text, raw) {
     if (!text) {
@@ -41,7 +54,7 @@ function cmdCurrentTimestamp(format, raw) {
     let result;
     switch (format) {
         case 'date':
-            result = now.toISOString().split('T')[0];
+            result = (0, core_js_1.todayISO)();
             break;
         case 'filename':
             result = now.toISOString().replace(/:/g, '-').replace(/\..+/, '');
@@ -55,7 +68,7 @@ function cmdCurrentTimestamp(format, raw) {
 }
 // ─── Todos ──────────────────────────────────────────────────────────────────
 function cmdListTodos(cwd, area, raw) {
-    const pendingDir = node_path_1.default.join(cwd, '.planning', 'todos', 'pending');
+    const pendingDir = (0, core_js_1.planningPath)(cwd, 'todos', 'pending');
     let count = 0;
     const todos = [];
     try {
@@ -63,33 +76,28 @@ function cmdListTodos(cwd, area, raw) {
         for (const file of files) {
             try {
                 const content = node_fs_1.default.readFileSync(node_path_1.default.join(pendingDir, file), 'utf-8');
-                const createdMatch = content.match(/^created:\s*(.+)$/m);
-                const titleMatch = content.match(/^title:\s*(.+)$/m);
-                const areaMatch = content.match(/^area:\s*(.+)$/m);
-                const todoArea = areaMatch ? areaMatch[1].trim() : 'general';
+                const fm = parseTodoFrontmatter(content);
                 // Apply area filter if specified
-                if (area && todoArea !== area)
+                if (area && fm.area !== area)
                     continue;
                 count++;
                 todos.push({
                     file,
-                    created: createdMatch ? createdMatch[1].trim() : 'unknown',
-                    title: titleMatch ? titleMatch[1].trim() : 'Untitled',
-                    area: todoArea,
+                    created: fm.created,
+                    title: fm.title,
+                    area: fm.area,
                     path: node_path_1.default.join('.planning', 'todos', 'pending', file),
                 });
             }
             catch (e) {
                 /* optional op, ignore */
-                if (process.env.MAXSIM_DEBUG)
-                    console.error(e);
+                (0, core_js_1.debugLog)(e);
             }
         }
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     const result = { count, todos };
     (0, core_js_1.output)(result, raw, count.toString());
@@ -113,7 +121,7 @@ function cmdVerifyPathExists(cwd, targetPath, raw) {
 }
 // ─── History digest ─────────────────────────────────────────────────────────
 function cmdHistoryDigest(cwd, raw) {
-    const phasesDir = node_path_1.default.join(cwd, '.planning', 'phases');
+    const phasesDir = (0, core_js_1.phasesPath)(cwd);
     const digest = { phases: {}, decisions: [], tech_stack: new Set() };
     // Collect all phase directories: archived + current
     const allPhaseDirs = [];
@@ -125,18 +133,14 @@ function cmdHistoryDigest(cwd, raw) {
     // Add current phases
     if (node_fs_1.default.existsSync(phasesDir)) {
         try {
-            const currentDirs = node_fs_1.default.readdirSync(phasesDir, { withFileTypes: true })
-                .filter(e => e.isDirectory())
-                .map(e => e.name)
-                .sort();
+            const currentDirs = (0, core_js_1.listSubDirs)(phasesDir, true);
             for (const dir of currentDirs) {
                 allPhaseDirs.push({ name: dir, fullPath: node_path_1.default.join(phasesDir, dir), milestone: null });
             }
         }
         catch (e) {
             /* optional op, ignore */
-            if (process.env.MAXSIM_DEBUG)
-                console.error(e);
+            (0, core_js_1.debugLog)(e);
         }
     }
     if (allPhaseDirs.length === 0) {
@@ -146,7 +150,7 @@ function cmdHistoryDigest(cwd, raw) {
     }
     try {
         for (const { name: dir, fullPath: dirPath } of allPhaseDirs) {
-            const summaries = node_fs_1.default.readdirSync(dirPath).filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+            const summaries = node_fs_1.default.readdirSync(dirPath).filter(f => (0, core_js_1.isSummaryFile)(f));
             for (const summary of summaries) {
                 try {
                     const content = node_fs_1.default.readFileSync(node_path_1.default.join(dirPath, summary), 'utf-8');
@@ -190,8 +194,7 @@ function cmdHistoryDigest(cwd, raw) {
                 }
                 catch (e) {
                     /* optional op, ignore */
-                    if (process.env.MAXSIM_DEBUG)
-                        console.error(e);
+                    (0, core_js_1.debugLog)(e);
                 }
             }
         }
@@ -378,7 +381,7 @@ async function cmdWebsearch(query, options, raw) {
 }
 // ─── Progress render ────────────────────────────────────────────────────────
 function cmdProgressRender(cwd, format, raw) {
-    const phasesDir = node_path_1.default.join(cwd, '.planning', 'phases');
+    const phasesDir = (0, core_js_1.phasesPath)(cwd);
     const milestone = (0, core_js_1.getMilestoneInfo)(cwd);
     const phases = [];
     let totalPlans = 0;
@@ -398,8 +401,8 @@ function cmdProgressRender(cwd, format, raw) {
             const phaseNum = dm ? dm[1] : dir;
             const phaseName = dm && dm[2] ? dm[2].replace(/-/g, ' ') : '';
             const phaseFiles = node_fs_1.default.readdirSync(node_path_1.default.join(phasesDir, dir));
-            const planCount = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md').length;
-            const summaryCount = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md').length;
+            const planCount = phaseFiles.filter(f => (0, core_js_1.isPlanFile)(f)).length;
+            const summaryCount = phaseFiles.filter(f => (0, core_js_1.isSummaryFile)(f)).length;
             totalPlans += planCount;
             totalSummaries += summaryCount;
             let status;
@@ -416,8 +419,7 @@ function cmdProgressRender(cwd, format, raw) {
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     const percent = totalPlans > 0 ? Math.min(100, Math.round((totalSummaries / totalPlans) * 100)) : 0;
     if (format === 'table') {
@@ -485,8 +487,8 @@ function cmdTodoComplete(cwd, filename, raw) {
     if (!filename) {
         (0, core_js_1.error)('filename required for todo complete');
     }
-    const pendingDir = node_path_1.default.join(cwd, '.planning', 'todos', 'pending');
-    const completedDir = node_path_1.default.join(cwd, '.planning', 'todos', 'completed');
+    const pendingDir = (0, core_js_1.planningPath)(cwd, 'todos', 'pending');
+    const completedDir = (0, core_js_1.planningPath)(cwd, 'todos', 'completed');
     const sourcePath = node_path_1.default.join(pendingDir, filename);
     if (!node_fs_1.default.existsSync(sourcePath)) {
         (0, core_js_1.error)(`Todo not found: ${filename}`);
@@ -495,7 +497,7 @@ function cmdTodoComplete(cwd, filename, raw) {
     node_fs_1.default.mkdirSync(completedDir, { recursive: true });
     // Read, add completion timestamp, move
     let content = node_fs_1.default.readFileSync(sourcePath, 'utf-8');
-    const today = new Date().toISOString().split('T')[0];
+    const today = (0, core_js_1.todayISO)();
     content = `completed: ${today}\n` + content;
     node_fs_1.default.writeFileSync(node_path_1.default.join(completedDir, filename), content, 'utf-8');
     node_fs_1.default.unlinkSync(sourcePath);
@@ -505,7 +507,7 @@ function cmdTodoComplete(cwd, filename, raw) {
 function cmdScaffold(cwd, type, options, raw) {
     const { phase, name } = options;
     const padded = phase ? (0, core_js_1.normalizePhaseName)(phase) : '00';
-    const today = new Date().toISOString().split('T')[0];
+    const today = (0, core_js_1.todayISO)();
     // Find phase directory
     const phaseInfo = phase ? (0, core_js_1.findPhaseInternal)(cwd, phase) : null;
     const phaseDir = phaseInfo ? node_path_1.default.join(cwd, phaseInfo.directory) : null;
@@ -536,7 +538,7 @@ function cmdScaffold(cwd, type, options, raw) {
             }
             const slug = (0, core_js_1.generateSlugInternal)(name);
             const dirName = `${padded}-${slug}`;
-            const phasesParent = node_path_1.default.join(cwd, '.planning', 'phases');
+            const phasesParent = (0, core_js_1.phasesPath)(cwd);
             node_fs_1.default.mkdirSync(phasesParent, { recursive: true });
             const dirPath = node_path_1.default.join(phasesParent, dirName);
             node_fs_1.default.mkdirSync(dirPath, { recursive: true });

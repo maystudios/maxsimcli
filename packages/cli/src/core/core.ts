@@ -11,6 +11,7 @@ import { simpleGit } from 'simple-git';
 import slugify from 'slugify';
 
 import type {
+  BranchingStrategy,
   ModelProfiles,
   ModelProfileName,
   ModelResolution,
@@ -164,7 +165,7 @@ export function loadConfig(cwd: string): AppConfig {
       model_profile: (get('model_profile') as ModelProfileName | undefined) ?? defaults.model_profile,
       commit_docs: (get('commit_docs', { section: 'planning', field: 'commit_docs' }) as boolean | undefined) ?? defaults.commit_docs,
       search_gitignored: (get('search_gitignored', { section: 'planning', field: 'search_gitignored' }) as boolean | undefined) ?? defaults.search_gitignored,
-      branching_strategy: (get('branching_strategy', { section: 'git', field: 'branching_strategy' }) as string | undefined) ?? defaults.branching_strategy,
+      branching_strategy: (get('branching_strategy', { section: 'git', field: 'branching_strategy' }) as BranchingStrategy | undefined) ?? defaults.branching_strategy,
       phase_branch_template: (get('phase_branch_template', { section: 'git', field: 'phase_branch_template' }) as string | undefined) ?? defaults.phase_branch_template,
       milestone_branch_template: (get('milestone_branch_template', { section: 'git', field: 'milestone_branch_template' }) as string | undefined) ?? defaults.milestone_branch_template,
       research: (get('research', { section: 'workflow', field: 'research' }) as boolean | undefined) ?? defaults.research,

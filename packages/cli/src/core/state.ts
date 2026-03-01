@@ -9,7 +9,7 @@ import path from 'node:path';
 
 import escapeStringRegexp from 'escape-string-regexp';
 
-import { loadConfig, output, error, safeReadFile } from './core.js';
+import { loadConfig, output, error, safeReadFile, planningPath, statePath as statePathUtil, configPath, roadmapPath, phasesPath, debugLog, todayISO, isPlanFile, isSummaryFile } from './core.js';
 import type {
   AppConfig,
   StatePatchResult,
@@ -48,22 +48,43 @@ function readTextArgOrFile(cwd: string, value: string | undefined, filePath: str
   }
 }
 
+/**
+ * Append an entry to a section in STATE.md content, removing placeholder text.
+ * Returns updated content or null if section not found.
+ */
+export function appendToStateSection(
+  content: string,
+  sectionPattern: RegExp,
+  entry: string,
+  placeholderPatterns?: RegExp[],
+): string | null {
+  const match = content.match(sectionPattern);
+  if (!match) return null;
+
+  let sectionBody = match[2];
+  const defaults = [/None yet\.?\s*\n?/gi, /No decisions yet\.?\s*\n?/gi, /None\.?\s*\n?/gi];
+  for (const pat of placeholderPatterns || defaults) {
+    sectionBody = sectionBody.replace(pat, '');
+  }
+  sectionBody = sectionBody.trimEnd() + '\n' + entry + '\n';
+
+  return content.replace(sectionPattern, (_m, header: string) => `${header}${sectionBody}`);
+}
+
 // ─── State commands ──────────────────────────────────────────────────────────
 
 export function cmdStateLoad(cwd: string, raw: boolean): void {
   const config: AppConfig = loadConfig(cwd);
-  const planningDir = path.join(cwd, '.planning');
-
   let stateRaw = '';
   try {
-    stateRaw = fs.readFileSync(path.join(planningDir, 'STATE.md'), 'utf-8');
+    stateRaw = fs.readFileSync(statePathUtil(cwd), 'utf-8');
   } catch (e) {
     /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
-  const configExists = fs.existsSync(path.join(planningDir, 'config.json'));
-  const roadmapExists = fs.existsSync(path.join(planningDir, 'ROADMAP.md'));
+  const configExists = fs.existsSync(configPath(cwd));
+  const roadmapExists = fs.existsSync(roadmapPath(cwd));
   const stateExists = stateRaw.length > 0;
 
   const result = {
@@ -98,7 +119,7 @@ export function cmdStateLoad(cwd: string, raw: boolean): void {
 }
 
 export function cmdStateGet(cwd: string, section: string | null, raw: boolean): void {
-  const statePath = path.join(cwd, '.planning', 'STATE.md');
+  const statePath = statePathUtil(cwd);
   try {
     const content = fs.readFileSync(statePath, 'utf-8');
 
@@ -132,7 +153,7 @@ export function cmdStateGet(cwd: string, section: string | null, raw: boolean): 
 }
 
 export function cmdStatePatch(cwd: string, patches: Record<string, string>, raw: boolean): void {
-  const statePath = path.join(cwd, '.planning', 'STATE.md');
+  const statePath = statePathUtil(cwd);
   try {
     let content = fs.readFileSync(statePath, 'utf-8');
     const results: StatePatchResult = { updated: [], failed: [] };
@@ -164,7 +185,7 @@ export function cmdStateUpdate(cwd: string, field: string | undefined, value: st
     error('field and value required for state update');
   }
 
-  const statePath = path.join(cwd, '.planning', 'STATE.md');
+  const statePath = statePathUtil(cwd);
   try {
     let content = fs.readFileSync(statePath, 'utf-8');
     const fieldEscaped = escapeStringRegexp(field);
@@ -184,13 +205,13 @@ export function cmdStateUpdate(cwd: string, field: string | undefined, value: st
 // ─── State Progression Engine ────────────────────────────────────────────────
 
 export function cmdStateAdvancePlan(cwd: string, raw: boolean): void {
-  const statePath = path.join(cwd, '.planning', 'STATE.md');
+  const statePath = statePathUtil(cwd);
   if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
 
   let content = fs.readFileSync(statePath, 'utf-8');
   const currentPlan = parseInt(stateExtractField(content, 'Current Plan') ?? '', 10);
   const totalPlans = parseInt(stateExtractField(content, 'Total Plans in Phase') ?? '', 10);
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayISO();
 
   if (isNaN(currentPlan) || isNaN(totalPlans)) {
     output({ error: 'Cannot parse Current Plan or Total Plans in Phase from STATE.md' }, raw);
@@ -213,7 +234,7 @@ export function cmdStateAdvancePlan(cwd: string, raw: boolean): void {
 }
 
 export function cmdStateRecordMetric(cwd: string, options: StateMetricOptions, raw: boolean): void {
-  const statePath = path.join(cwd, '.planning', 'STATE.md');
+  const statePath = statePathUtil(cwd);
   if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
 
   let content = fs.readFileSync(statePath, 'utf-8');
@@ -246,12 +267,12 @@ export function cmdStateRecordMetric(cwd: string, options: StateMetricOptions, r
 }
 
 export function cmdStateUpdateProgress(cwd: string, raw: boolean): void {
-  const statePath = path.join(cwd, '.planning', 'STATE.md');
+  const statePath = statePathUtil(cwd);
   if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
 
   let content = fs.readFileSync(statePath, 'utf-8');
 
-  const phasesDir = path.join(cwd, '.planning', 'phases');
+  const phasesDir = phasesPath(cwd);
   let totalPlans = 0;
   let totalSummaries = 0;
 
@@ -260,8 +281,8 @@ export function cmdStateUpdateProgress(cwd: string, raw: boolean): void {
       .filter(e => e.isDirectory()).map(e => e.name);
     for (const dir of phaseDirs) {
       const files = fs.readdirSync(path.join(phasesDir, dir));
-      totalPlans += files.filter(f => f.match(/-PLAN\.md$/i)).length;
-      totalSummaries += files.filter(f => f.match(/-SUMMARY\.md$/i)).length;
+      totalPlans += files.filter(f => isPlanFile(f)).length;
+      totalSummaries += files.filter(f => isSummaryFile(f)).length;
     }
   }
 
@@ -282,7 +303,7 @@ export function cmdStateUpdateProgress(cwd: string, raw: boolean): void {
 }
 
 export function cmdStateAddDecision(cwd: string, options: StateDecisionOptions, raw: boolean): void {
-  const statePath = path.join(cwd, '.planning', 'STATE.md');
+  const statePath = statePathUtil(cwd);
   if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
 
   const { phase, summary, summary_file, rationale, rationale_file } = options;
@@ -300,18 +321,14 @@ export function cmdStateAddDecision(cwd: string, options: StateDecisionOptions, 
 
   if (!summaryText) { output({ error: 'summary required' }, raw); return; }
 
-  let content = fs.readFileSync(statePath, 'utf-8');
+  const content = fs.readFileSync(statePath, 'utf-8');
   const entry = `- [Phase ${phase || '?'}]: ${summaryText}${rationaleText ? ` — ${rationaleText}` : ''}`;
 
   const sectionPattern = /(###?\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
-  const match = content.match(sectionPattern);
+  const updated = appendToStateSection(content, sectionPattern, entry, [/None yet\.?\s*\n?/gi, /No decisions yet\.?\s*\n?/gi]);
 
-  if (match) {
-    let sectionBody = match[2];
-    sectionBody = sectionBody.replace(/None yet\.?\s*\n?/gi, '').replace(/No decisions yet\.?\s*\n?/gi, '');
-    sectionBody = sectionBody.trimEnd() + '\n' + entry + '\n';
-    content = content.replace(sectionPattern, (_match, header: string) => `${header}${sectionBody}`);
-    fs.writeFileSync(statePath, content, 'utf-8');
+  if (updated) {
+    fs.writeFileSync(statePath, updated, 'utf-8');
     output({ added: true, decision: entry }, raw, 'true');
   } else {
     output({ added: false, reason: 'Decisions section not found in STATE.md' }, raw, 'false');
@@ -319,7 +336,7 @@ export function cmdStateAddDecision(cwd: string, options: StateDecisionOptions, 
 }
 
 export function cmdStateAddBlocker(cwd: string, text: string | StateBlockerOptions, raw: boolean): void {
-  const statePath = path.join(cwd, '.planning', 'STATE.md');
+  const statePath = statePathUtil(cwd);
   if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
   const blockerOptions: StateBlockerOptions = typeof text === 'object' && text !== null ? text : { text: text as string };
   let blockerText: string | undefined;
@@ -334,18 +351,14 @@ export function cmdStateAddBlocker(cwd: string, text: string | StateBlockerOptio
 
   if (!blockerText) { output({ error: 'text required' }, raw); return; }
 
-  let content = fs.readFileSync(statePath, 'utf-8');
+  const content = fs.readFileSync(statePath, 'utf-8');
   const entry = `- ${blockerText}`;
 
   const sectionPattern = /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
-  const match = content.match(sectionPattern);
+  const updated = appendToStateSection(content, sectionPattern, entry, [/None\.?\s*\n?/gi, /None yet\.?\s*\n?/gi]);
 
-  if (match) {
-    let sectionBody = match[2];
-    sectionBody = sectionBody.replace(/None\.?\s*\n?/gi, '').replace(/None yet\.?\s*\n?/gi, '');
-    sectionBody = sectionBody.trimEnd() + '\n' + entry + '\n';
-    content = content.replace(sectionPattern, (_match, header: string) => `${header}${sectionBody}`);
-    fs.writeFileSync(statePath, content, 'utf-8');
+  if (updated) {
+    fs.writeFileSync(statePath, updated, 'utf-8');
     output({ added: true, blocker: blockerText }, raw, 'true');
   } else {
     output({ added: false, reason: 'Blockers section not found in STATE.md' }, raw, 'false');
@@ -353,7 +366,7 @@ export function cmdStateAddBlocker(cwd: string, text: string | StateBlockerOptio
 }
 
 export function cmdStateResolveBlocker(cwd: string, text: string | null, raw: boolean): void {
-  const statePath = path.join(cwd, '.planning', 'STATE.md');
+  const statePath = statePathUtil(cwd);
   if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
   if (!text) { output({ error: 'text required' }, raw); return; }
 
@@ -384,7 +397,7 @@ export function cmdStateResolveBlocker(cwd: string, text: string | null, raw: bo
 }
 
 export function cmdStateRecordSession(cwd: string, options: StateSessionOptions, raw: boolean): void {
-  const statePath = path.join(cwd, '.planning', 'STATE.md');
+  const statePath = statePathUtil(cwd);
   if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
 
   let content = fs.readFileSync(statePath, 'utf-8');
@@ -416,7 +429,7 @@ export function cmdStateRecordSession(cwd: string, options: StateSessionOptions,
 }
 
 export function cmdStateSnapshot(cwd: string, raw: boolean): void {
-  const statePath = path.join(cwd, '.planning', 'STATE.md');
+  const statePath = statePathUtil(cwd);
 
   if (!fs.existsSync(statePath)) {
     output({ error: 'STATE.md not found' }, raw);

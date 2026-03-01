@@ -77514,7 +77514,7 @@ var SessionStore = class {
 	scrollback = [];
 	append(data) {
 		this.scrollback.push(data);
-		if (this.scrollback.length > MAX_SCROLLBACK) this.scrollback = this.scrollback.slice(-MAX_SCROLLBACK);
+		if (this.scrollback.length > MAX_SCROLLBACK * 1.5) this.scrollback = this.scrollback.slice(-MAX_SCROLLBACK);
 	}
 	getAll() {
 		return this.scrollback.join("");
@@ -77746,6 +77746,10 @@ function isWithinPlanning(cwd, targetPath) {
 }
 const suppressedPaths = /* @__PURE__ */ new Map();
 const SUPPRESS_TTL_MS = 500;
+setInterval(() => {
+	const now = Date.now();
+	for (const [p, ts] of suppressedPaths.entries()) if (now - ts > SUPPRESS_TTL_MS) suppressedPaths.delete(p);
+}, 6e4).unref();
 function suppressPath(filePath) {
 	suppressedPaths.set(normalizeFsPath(filePath), Date.now());
 }

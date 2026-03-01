@@ -28,7 +28,7 @@ function cmdRequirementsMarkComplete(cwd, reqIdsRaw, raw) {
     if (reqIds.length === 0) {
         (0, core_js_1.error)('no valid requirement IDs found');
     }
-    const reqPath = node_path_1.default.join(cwd, '.planning', 'REQUIREMENTS.md');
+    const reqPath = (0, core_js_1.planningPath)(cwd, 'REQUIREMENTS.md');
     if (!node_fs_1.default.existsSync(reqPath)) {
         (0, core_js_1.output)({ updated: false, reason: 'REQUIREMENTS.md not found', ids: reqIds }, raw, 'no requirements file');
         return;
@@ -71,13 +71,13 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
     if (!version) {
         (0, core_js_1.error)('version required for milestone complete (e.g., v1.0)');
     }
-    const roadmapPath = node_path_1.default.join(cwd, '.planning', 'ROADMAP.md');
-    const reqPath = node_path_1.default.join(cwd, '.planning', 'REQUIREMENTS.md');
-    const statePath = node_path_1.default.join(cwd, '.planning', 'STATE.md');
-    const milestonesPath = node_path_1.default.join(cwd, '.planning', 'MILESTONES.md');
-    const archiveDir = node_path_1.default.join(cwd, '.planning', 'milestones');
-    const phasesDir = node_path_1.default.join(cwd, '.planning', 'phases');
-    const today = new Date().toISOString().split('T')[0];
+    const roadmapPath = (0, core_js_1.roadmapPath)(cwd);
+    const reqPath = (0, core_js_1.planningPath)(cwd, 'REQUIREMENTS.md');
+    const statePath = (0, core_js_1.statePath)(cwd);
+    const milestonesPath = (0, core_js_1.planningPath)(cwd, 'MILESTONES.md');
+    const archiveDir = (0, core_js_1.planningPath)(cwd, 'milestones');
+    const phasesDir = (0, core_js_1.phasesPath)(cwd);
+    const today = (0, core_js_1.todayISO)();
     const milestoneName = options.name || version;
     node_fs_1.default.mkdirSync(archiveDir, { recursive: true });
     let phaseCount = 0;
@@ -85,13 +85,12 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
     let totalTasks = 0;
     const accomplishments = [];
     try {
-        const entries = node_fs_1.default.readdirSync(phasesDir, { withFileTypes: true });
-        const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
+        const dirs = (0, core_js_1.listSubDirs)(phasesDir, true);
         for (const dir of dirs) {
             phaseCount++;
             const phaseFiles = node_fs_1.default.readdirSync(node_path_1.default.join(phasesDir, dir));
-            const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md');
-            const summaries = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+            const plans = phaseFiles.filter(core_js_1.isPlanFile);
+            const summaries = phaseFiles.filter(core_js_1.isSummaryFile);
             totalPlans += plans.length;
             for (const s of summaries) {
                 try {
@@ -105,16 +104,14 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
                 }
                 catch (e) {
                     /* optional op, ignore */
-                    if (process.env.MAXSIM_DEBUG)
-                        console.error(e);
+                    (0, core_js_1.debugLog)(e);
                 }
             }
         }
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     // Archive ROADMAP.md
     if (node_fs_1.default.existsSync(roadmapPath)) {
@@ -156,8 +153,7 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
         try {
             const phaseArchiveDir = node_path_1.default.join(archiveDir, `${version}-phases`);
             node_fs_1.default.mkdirSync(phaseArchiveDir, { recursive: true });
-            const phaseEntries = node_fs_1.default.readdirSync(phasesDir, { withFileTypes: true });
-            const phaseDirNames = phaseEntries.filter(e => e.isDirectory()).map(e => e.name);
+            const phaseDirNames = (0, core_js_1.listSubDirs)(phasesDir);
             for (const dir of phaseDirNames) {
                 node_fs_1.default.renameSync(node_path_1.default.join(phasesDir, dir), node_path_1.default.join(phaseArchiveDir, dir));
             }
@@ -165,8 +161,7 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
         }
         catch (e) {
             /* optional op, ignore */
-            if (process.env.MAXSIM_DEBUG)
-                console.error(e);
+            (0, core_js_1.debugLog)(e);
         }
     }
     const result = {

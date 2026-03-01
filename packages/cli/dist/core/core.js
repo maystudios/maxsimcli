@@ -8,9 +8,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MODEL_PROFILES = void 0;
+exports.summaryId = exports.planId = exports.isSummaryFile = exports.isPlanFile = exports.MODEL_PROFILES = void 0;
 exports.output = output;
 exports.error = error;
+exports.todayISO = todayISO;
+exports.planningPath = planningPath;
+exports.statePath = statePath;
+exports.roadmapPath = roadmapPath;
+exports.configPath = configPath;
+exports.phasesPath = phasesPath;
+exports.listSubDirs = listSubDirs;
+exports.debugLog = debugLog;
+exports.escapePhaseNum = escapePhaseNum;
 exports.safeReadFile = safeReadFile;
 exports.loadConfig = loadConfig;
 exports.isGitIgnored = isGitIgnored;
@@ -69,6 +78,45 @@ function error(message) {
     process.stderr.write('Error: ' + message + '\n');
     process.exit(1);
 }
+// ─── Shared micro-utilities ─────────────────────────────────────────────────
+/** Today's date as YYYY-MM-DD. */
+function todayISO() {
+    return new Date().toISOString().split('T')[0];
+}
+/** Canonical .planning/ sub-paths. */
+function planningPath(cwd, ...segments) {
+    return node_path_1.default.join(cwd, '.planning', ...segments);
+}
+function statePath(cwd) { return planningPath(cwd, 'STATE.md'); }
+function roadmapPath(cwd) { return planningPath(cwd, 'ROADMAP.md'); }
+function configPath(cwd) { return planningPath(cwd, 'config.json'); }
+function phasesPath(cwd) { return planningPath(cwd, 'phases'); }
+/** Phase-file predicates. */
+const isPlanFile = (f) => f.endsWith('-PLAN.md') || f === 'PLAN.md';
+exports.isPlanFile = isPlanFile;
+const isSummaryFile = (f) => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md';
+exports.isSummaryFile = isSummaryFile;
+/** Strip suffix to get plan/summary ID. */
+const planId = (f) => f.replace('-PLAN.md', '').replace('PLAN.md', '');
+exports.planId = planId;
+const summaryId = (f) => f.replace('-SUMMARY.md', '').replace('SUMMARY.md', '');
+exports.summaryId = summaryId;
+/** List subdirectory names, optionally sorted by phase number. */
+function listSubDirs(dir, sortByPhase = false) {
+    const dirs = node_fs_1.default.readdirSync(dir, { withFileTypes: true })
+        .filter(e => e.isDirectory())
+        .map(e => e.name);
+    return sortByPhase ? dirs.sort((a, b) => comparePhaseNum(a, b)) : dirs;
+}
+/** Log only when MAXSIM_DEBUG is set. */
+function debugLog(e) {
+    if (process.env.MAXSIM_DEBUG)
+        console.error(e);
+}
+/** Escape a phase number for use in regex. */
+function escapePhaseNum(phase) {
+    return String(phase).replace(/\./g, '\\.');
+}
 // ─── File & Config utilities ─────────────────────────────────────────────────
 function safeReadFile(filePath) {
     try {
@@ -78,8 +126,11 @@ function safeReadFile(filePath) {
         return null;
     }
 }
+let _configCache = null;
 function loadConfig(cwd) {
-    const configPath = node_path_1.default.join(cwd, '.planning', 'config.json');
+    if (_configCache && _configCache.cwd === cwd)
+        return _configCache.config;
+    const cfgPath = configPath(cwd);
     const defaults = {
         model_profile: 'balanced',
         commit_docs: true,
@@ -94,7 +145,7 @@ function loadConfig(cwd) {
         brave_search: false,
     };
     try {
-        const raw = node_fs_1.default.readFileSync(configPath, 'utf-8');
+        const raw = node_fs_1.default.readFileSync(cfgPath, 'utf-8');
         const parsed = JSON.parse(raw);
         const get = (key, nested) => {
             if (parsed[key] !== undefined)
@@ -116,7 +167,7 @@ function loadConfig(cwd) {
             }
             return defaults.parallelization;
         })();
-        return {
+        const result = {
             model_profile: get('model_profile') ?? defaults.model_profile,
             commit_docs: get('commit_docs', { section: 'planning', field: 'commit_docs' }) ?? defaults.commit_docs,
             search_gitignored: get('search_gitignored', { section: 'planning', field: 'search_gitignored' }) ?? defaults.search_gitignored,
@@ -130,8 +181,11 @@ function loadConfig(cwd) {
             brave_search: get('brave_search') ?? defaults.brave_search,
             model_overrides: parsed['model_overrides'],
         };
+        _configCache = { cwd, config: result };
+        return result;
     }
     catch {
+        _configCache = { cwd, config: defaults };
         return defaults;
     }
 }
@@ -218,8 +272,7 @@ function getPhasePattern(escapedPhaseNum, flags = 'gim') {
 }
 function searchPhaseInDir(baseDir, relBase, normalized) {
     try {
-        const entries = node_fs_1.default.readdirSync(baseDir, { withFileTypes: true });
-        const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort((a, b) => comparePhaseNum(a, b));
+        const dirs = listSubDirs(baseDir, true);
         const match = dirs.find(d => d.startsWith(normalized));
         if (!match)
             return null;
@@ -228,16 +281,13 @@ function searchPhaseInDir(baseDir, relBase, normalized) {
         const phaseName = dirMatch && dirMatch[2] ? dirMatch[2] : null;
         const phaseDir = node_path_1.default.join(baseDir, match);
         const phaseFiles = node_fs_1.default.readdirSync(phaseDir);
-        const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md').sort();
-        const summaries = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md').sort();
+        const plans = phaseFiles.filter(exports.isPlanFile).sort();
+        const summaries = phaseFiles.filter(exports.isSummaryFile).sort();
         const hasResearch = phaseFiles.some(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
         const hasContext = phaseFiles.some(f => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
         const hasVerification = phaseFiles.some(f => f.endsWith('-VERIFICATION.md') || f === 'VERIFICATION.md');
-        const completedPlanIds = new Set(summaries.map(s => s.replace('-SUMMARY.md', '').replace('SUMMARY.md', '')));
-        const incompletePlans = plans.filter(p => {
-            const planId = p.replace('-PLAN.md', '').replace('PLAN.md', '');
-            return !completedPlanIds.has(planId);
-        });
+        const completedPlanIds = new Set(summaries.map(exports.summaryId));
+        const incompletePlans = plans.filter(p => !completedPlanIds.has((0, exports.planId)(p)));
         return {
             found: true,
             directory: node_path_1.default.join(relBase, match),
@@ -259,14 +309,18 @@ function searchPhaseInDir(baseDir, relBase, normalized) {
 function findPhaseInternal(cwd, phase) {
     if (!phase)
         return null;
-    const phasesDir = node_path_1.default.join(cwd, '.planning', 'phases');
+    const pd = phasesPath(cwd);
     const normalized = normalizePhaseName(phase);
-    const current = searchPhaseInDir(phasesDir, node_path_1.default.join('.planning', 'phases'), normalized);
+    const current = searchPhaseInDir(pd, node_path_1.default.join('.planning', 'phases'), normalized);
     if (current)
         return current;
-    const milestonesDir = node_path_1.default.join(cwd, '.planning', 'milestones');
-    if (!node_fs_1.default.existsSync(milestonesDir))
+    const milestonesDir = planningPath(cwd, 'milestones');
+    try {
+        node_fs_1.default.statSync(milestonesDir);
+    }
+    catch {
         return null;
+    }
     try {
         const milestoneEntries = node_fs_1.default.readdirSync(milestonesDir, { withFileTypes: true });
         const archiveDirs = milestoneEntries
@@ -289,17 +343,13 @@ function findPhaseInternal(cwd, phase) {
         }
     }
     catch (e) {
-        /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        debugLog(e);
     }
     return null;
 }
 function getArchivedPhaseDirs(cwd) {
-    const milestonesDir = node_path_1.default.join(cwd, '.planning', 'milestones');
+    const milestonesDir = planningPath(cwd, 'milestones');
     const results = [];
-    if (!node_fs_1.default.existsSync(milestonesDir))
-        return results;
     try {
         const milestoneEntries = node_fs_1.default.readdirSync(milestonesDir, { withFileTypes: true });
         const phaseDirs = milestoneEntries
@@ -313,8 +363,7 @@ function getArchivedPhaseDirs(cwd) {
                 continue;
             const version = versionMatch[1];
             const archivePath = node_path_1.default.join(milestonesDir, archiveName);
-            const entries = node_fs_1.default.readdirSync(archivePath, { withFileTypes: true });
-            const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort((a, b) => comparePhaseNum(a, b));
+            const dirs = listSubDirs(archivePath, true);
             for (const dir of dirs) {
                 results.push({
                     name: dir,
@@ -326,9 +375,7 @@ function getArchivedPhaseDirs(cwd) {
         }
     }
     catch (e) {
-        /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        debugLog(e);
     }
     return results;
 }
@@ -336,12 +383,10 @@ function getArchivedPhaseDirs(cwd) {
 function getRoadmapPhaseInternal(cwd, phaseNum) {
     if (!phaseNum)
         return null;
-    const roadmapPath = node_path_1.default.join(cwd, '.planning', 'ROADMAP.md');
-    if (!node_fs_1.default.existsSync(roadmapPath))
-        return null;
+    const rp = roadmapPath(cwd);
     try {
-        const content = node_fs_1.default.readFileSync(roadmapPath, 'utf-8');
-        const escapedPhase = phaseNum.toString().replace(/\./g, '\\.');
+        const content = node_fs_1.default.readFileSync(rp, 'utf-8');
+        const escapedPhase = escapePhaseNum(phaseNum);
         const phasePattern = getPhasePattern(escapedPhase, 'i');
         const headerMatch = content.match(phasePattern);
         if (!headerMatch)
@@ -366,8 +411,8 @@ function getRoadmapPhaseInternal(cwd, phaseNum) {
         return null;
     }
 }
-function resolveModelInternal(cwd, agentType) {
-    const config = loadConfig(cwd);
+function resolveModelInternal(cwd, agentType, config) {
+    config = config ?? loadConfig(cwd);
     const override = config.model_overrides?.[agentType];
     if (override) {
         return override === 'opus' ? 'inherit' : override;
@@ -397,7 +442,7 @@ function generateSlugInternal(text) {
 }
 function getMilestoneInfo(cwd) {
     try {
-        const roadmap = node_fs_1.default.readFileSync(node_path_1.default.join(cwd, '.planning', 'ROADMAP.md'), 'utf-8');
+        const roadmap = node_fs_1.default.readFileSync(roadmapPath(cwd), 'utf-8');
         const versionMatch = roadmap.match(/v(\d+\.\d+)/);
         const nameMatch = roadmap.match(/## .*v\d+\.\d+[:\s]+([^\n(]+)/);
         return {

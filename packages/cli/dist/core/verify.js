@@ -191,10 +191,10 @@ function cmdVerifyPhaseCompleteness(cwd, phase, raw) {
         (0, core_js_1.output)({ error: 'Cannot read phase directory' }, raw);
         return;
     }
-    const plans = files.filter(f => /-PLAN\.md$/i.test(f));
-    const summaries = files.filter(f => /-SUMMARY\.md$/i.test(f));
-    const planIds = new Set(plans.map(p => p.replace(/-PLAN\.md$/i, '')));
-    const summaryIds = new Set(summaries.map(s => s.replace(/-SUMMARY\.md$/i, '')));
+    const plans = files.filter(f => (0, core_js_1.isPlanFile)(f));
+    const summaries = files.filter(f => (0, core_js_1.isSummaryFile)(f));
+    const planIds = new Set(plans.map(p => (0, core_js_1.planId)(p)));
+    const summaryIds = new Set(summaries.map(s => (0, core_js_1.summaryId)(s)));
     const incompletePlans = [...planIds].filter(id => !summaryIds.has(id));
     if (incompletePlans.length > 0) {
         errors.push(`Plans without summaries: ${incompletePlans.join(', ')}`);
@@ -421,16 +421,16 @@ function cmdVerifyKeyLinks(cwd, planFilePath, raw) {
 }
 // ─── Validate Consistency ────────────────────────────────────────────────────
 function cmdValidateConsistency(cwd, raw) {
-    const roadmapPath = node_path_1.default.join(cwd, '.planning', 'ROADMAP.md');
-    const phasesDir = node_path_1.default.join(cwd, '.planning', 'phases');
+    const rmPath = (0, core_js_1.roadmapPath)(cwd);
+    const phasesDir = (0, core_js_1.phasesPath)(cwd);
     const errors = [];
     const warnings = [];
-    if (!node_fs_1.default.existsSync(roadmapPath)) {
+    if (!node_fs_1.default.existsSync(rmPath)) {
         errors.push('ROADMAP.md not found');
         (0, core_js_1.output)({ passed: false, errors, warnings }, raw, 'failed');
         return;
     }
-    const roadmapContent = node_fs_1.default.readFileSync(roadmapPath, 'utf-8');
+    const roadmapContent = node_fs_1.default.readFileSync(rmPath, 'utf-8');
     const roadmapPhases = new Set();
     const phasePattern = (0, core_js_1.getPhasePattern)();
     let m;
@@ -439,8 +439,7 @@ function cmdValidateConsistency(cwd, raw) {
     }
     const diskPhases = new Set();
     try {
-        const entries = node_fs_1.default.readdirSync(phasesDir, { withFileTypes: true });
-        const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+        const dirs = (0, core_js_1.listSubDirs)(phasesDir);
         for (const dir of dirs) {
             const dm = dir.match(/^(\d+[A-Z]?(?:\.\d+)?)/i);
             if (dm)
@@ -449,8 +448,7 @@ function cmdValidateConsistency(cwd, raw) {
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     for (const p of roadmapPhases) {
         if (!diskPhases.has(p) && !diskPhases.has((0, core_js_1.normalizePhaseName)(p))) {
@@ -473,11 +471,10 @@ function cmdValidateConsistency(cwd, raw) {
         }
     }
     try {
-        const entries = node_fs_1.default.readdirSync(phasesDir, { withFileTypes: true });
-        const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
+        const dirs = (0, core_js_1.listSubDirs)(phasesDir, true);
         for (const dir of dirs) {
             const phaseFiles = node_fs_1.default.readdirSync(node_path_1.default.join(phasesDir, dir));
-            const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md')).sort();
+            const plans = phaseFiles.filter(f => (0, core_js_1.isPlanFile)(f)).sort();
             const planNums = plans.map(p => {
                 const pm = p.match(/-(\d{2})-PLAN\.md$/);
                 return pm ? parseInt(pm[1], 10) : null;
@@ -487,9 +484,9 @@ function cmdValidateConsistency(cwd, raw) {
                     warnings.push(`Gap in plan numbering in ${dir}: plan ${planNums[i - 1]} → ${planNums[i]}`);
                 }
             }
-            const summaries = phaseFiles.filter(f => f.endsWith('-SUMMARY.md'));
-            const planIdsSet = new Set(plans.map(p => p.replace('-PLAN.md', '')));
-            const summaryIdsSet = new Set(summaries.map(s => s.replace('-SUMMARY.md', '')));
+            const summaries = phaseFiles.filter(f => (0, core_js_1.isSummaryFile)(f));
+            const planIdsSet = new Set(plans.map(p => (0, core_js_1.planId)(p)));
+            const summaryIdsSet = new Set(summaries.map(s => (0, core_js_1.summaryId)(s)));
             for (const sid of summaryIdsSet) {
                 if (!planIdsSet.has(sid)) {
                     warnings.push(`Summary ${sid}-SUMMARY.md in ${dir} has no matching PLAN.md`);
@@ -499,15 +496,13 @@ function cmdValidateConsistency(cwd, raw) {
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     try {
-        const entries = node_fs_1.default.readdirSync(phasesDir, { withFileTypes: true });
-        const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+        const dirs = (0, core_js_1.listSubDirs)(phasesDir);
         for (const dir of dirs) {
             const phaseFiles = node_fs_1.default.readdirSync(node_path_1.default.join(phasesDir, dir));
-            const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md'));
+            const plans = phaseFiles.filter(f => (0, core_js_1.isPlanFile)(f));
             for (const plan of plans) {
                 const content = node_fs_1.default.readFileSync(node_path_1.default.join(phasesDir, dir, plan), 'utf-8');
                 const fm = (0, frontmatter_js_1.extractFrontmatter)(content);
@@ -519,8 +514,7 @@ function cmdValidateConsistency(cwd, raw) {
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     const passed = errors.length === 0;
     const result = { passed, errors, warnings, warning_count: warnings.length };
@@ -528,12 +522,12 @@ function cmdValidateConsistency(cwd, raw) {
 }
 // ─── Validate Health ─────────────────────────────────────────────────────────
 function cmdValidateHealth(cwd, options, raw) {
-    const planningDir = node_path_1.default.join(cwd, '.planning');
-    const projectPath = node_path_1.default.join(planningDir, 'PROJECT.md');
-    const roadmapPath = node_path_1.default.join(planningDir, 'ROADMAP.md');
-    const statePath = node_path_1.default.join(planningDir, 'STATE.md');
-    const configPath = node_path_1.default.join(planningDir, 'config.json');
-    const phasesDir = node_path_1.default.join(planningDir, 'phases');
+    const planningDir = (0, core_js_1.planningPath)(cwd);
+    const projectPath = (0, core_js_1.planningPath)(cwd, 'PROJECT.md');
+    const rmPath = (0, core_js_1.roadmapPath)(cwd);
+    const stPath = (0, core_js_1.statePath)(cwd);
+    const cfgPath = (0, core_js_1.configPath)(cwd);
+    const phasesDir = (0, core_js_1.phasesPath)(cwd);
     const errors = [];
     const warnings = [];
     const info = [];
@@ -573,32 +567,28 @@ function cmdValidateHealth(cwd, options, raw) {
         }
     }
     // Check 3: ROADMAP.md
-    if (!node_fs_1.default.existsSync(roadmapPath)) {
+    if (!node_fs_1.default.existsSync(rmPath)) {
         addIssue('error', 'E003', 'ROADMAP.md not found', 'Run /maxsim:new-milestone to create roadmap');
     }
     // Check 4: STATE.md
-    if (!node_fs_1.default.existsSync(statePath)) {
+    if (!node_fs_1.default.existsSync(stPath)) {
         addIssue('error', 'E004', 'STATE.md not found', 'Run /maxsim:health --repair to regenerate', true);
         repairs.push('regenerateState');
     }
     else {
-        const stateContent = node_fs_1.default.readFileSync(statePath, 'utf-8');
+        const stateContent = node_fs_1.default.readFileSync(stPath, 'utf-8');
         const phaseRefs = [...stateContent.matchAll(/[Pp]hase\s+(\d+(?:\.\d+)?)/g)].map(m => m[1]);
         const diskPhases = new Set();
         try {
-            const entries = node_fs_1.default.readdirSync(phasesDir, { withFileTypes: true });
-            for (const e of entries) {
-                if (e.isDirectory()) {
-                    const dm = e.name.match(/^(\d+(?:\.\d+)?)/);
-                    if (dm)
-                        diskPhases.add(dm[1]);
-                }
+            for (const dir of (0, core_js_1.listSubDirs)(phasesDir)) {
+                const dm = dir.match(/^(\d+(?:\.\d+)?)/);
+                if (dm)
+                    diskPhases.add(dm[1]);
             }
         }
         catch (e) {
             /* optional op, ignore */
-            if (process.env.MAXSIM_DEBUG)
-                console.error(e);
+            (0, core_js_1.debugLog)(e);
         }
         for (const ref of phaseRefs) {
             const normalizedRef = String(parseInt(ref, 10)).padStart(2, '0');
@@ -612,13 +602,13 @@ function cmdValidateHealth(cwd, options, raw) {
         }
     }
     // Check 5: config.json
-    if (!node_fs_1.default.existsSync(configPath)) {
+    if (!node_fs_1.default.existsSync(cfgPath)) {
         addIssue('warning', 'W003', 'config.json not found', 'Run /maxsim:health --repair to create with defaults', true);
         repairs.push('createConfig');
     }
     else {
         try {
-            const rawContent = node_fs_1.default.readFileSync(configPath, 'utf-8');
+            const rawContent = node_fs_1.default.readFileSync(cfgPath, 'utf-8');
             const parsed = JSON.parse(rawContent);
             const validProfiles = ['quality', 'balanced', 'budget', 'tokenburner'];
             if (parsed.model_profile && !validProfiles.includes(parsed.model_profile)) {
@@ -633,44 +623,39 @@ function cmdValidateHealth(cwd, options, raw) {
     }
     // Check 6: Phase directory naming
     try {
-        const entries = node_fs_1.default.readdirSync(phasesDir, { withFileTypes: true });
-        for (const e of entries) {
-            if (e.isDirectory() && !e.name.match(/^\d{2}(?:\.\d+)?-[\w-]+$/)) {
-                addIssue('warning', 'W005', `Phase directory "${e.name}" doesn't follow NN-name format`, 'Rename to match pattern (e.g., 01-setup)');
+        for (const dirName of (0, core_js_1.listSubDirs)(phasesDir)) {
+            if (!dirName.match(/^\d{2}(?:\.\d+)?-[\w-]+$/)) {
+                addIssue('warning', 'W005', `Phase directory "${dirName}" doesn't follow NN-name format`, 'Rename to match pattern (e.g., 01-setup)');
             }
         }
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     // Check 7: Orphaned plans
     try {
-        const entries = node_fs_1.default.readdirSync(phasesDir, { withFileTypes: true });
-        for (const e of entries) {
-            if (!e.isDirectory())
-                continue;
-            const phaseFiles = node_fs_1.default.readdirSync(node_path_1.default.join(phasesDir, e.name));
-            const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md');
-            const summaries = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
-            const summaryBases = new Set(summaries.map(s => s.replace('-SUMMARY.md', '').replace('SUMMARY.md', '')));
+        const orphanDirs = (0, core_js_1.listSubDirs)(phasesDir);
+        for (const dirName of orphanDirs) {
+            const phaseFiles = node_fs_1.default.readdirSync(node_path_1.default.join(phasesDir, dirName));
+            const plans = phaseFiles.filter(f => (0, core_js_1.isPlanFile)(f));
+            const summaries = phaseFiles.filter(f => (0, core_js_1.isSummaryFile)(f));
+            const summaryBases = new Set(summaries.map(s => (0, core_js_1.summaryId)(s)));
             for (const plan of plans) {
-                const planBase = plan.replace('-PLAN.md', '').replace('PLAN.md', '');
+                const planBase = (0, core_js_1.planId)(plan);
                 if (!summaryBases.has(planBase)) {
-                    addIssue('info', 'I001', `${e.name}/${plan} has no SUMMARY.md`, 'May be in progress');
+                    addIssue('info', 'I001', `${dirName}/${plan} has no SUMMARY.md`, 'May be in progress');
                 }
             }
         }
     }
     catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG)
-            console.error(e);
+        (0, core_js_1.debugLog)(e);
     }
     // Check 8: Roadmap consistency
-    if (node_fs_1.default.existsSync(roadmapPath)) {
-        const roadmapContent = node_fs_1.default.readFileSync(roadmapPath, 'utf-8');
+    if (node_fs_1.default.existsSync(rmPath)) {
+        const roadmapContent = node_fs_1.default.readFileSync(rmPath, 'utf-8');
         const roadmapPhases = new Set();
         const phasePattern = (0, core_js_1.getPhasePattern)();
         let m;
@@ -679,19 +664,15 @@ function cmdValidateHealth(cwd, options, raw) {
         }
         const diskPhases = new Set();
         try {
-            const entries = node_fs_1.default.readdirSync(phasesDir, { withFileTypes: true });
-            for (const e of entries) {
-                if (e.isDirectory()) {
-                    const dm = e.name.match(/^(\d+[A-Z]?(?:\.\d+)?)/i);
-                    if (dm)
-                        diskPhases.add(dm[1]);
-                }
+            for (const dir of (0, core_js_1.listSubDirs)(phasesDir)) {
+                const dm = dir.match(/^(\d+[A-Z]?(?:\.\d+)?)/i);
+                if (dm)
+                    diskPhases.add(dm[1]);
             }
         }
         catch (e) {
             /* optional op, ignore */
-            if (process.env.MAXSIM_DEBUG)
-                console.error(e);
+            (0, core_js_1.debugLog)(e);
         }
         for (const p of roadmapPhases) {
             const padded = String(parseInt(p, 10)).padStart(2, '0');
@@ -724,15 +705,15 @@ function cmdValidateHealth(cwd, options, raw) {
                             verifier: true,
                             parallelization: true,
                         };
-                        node_fs_1.default.writeFileSync(configPath, JSON.stringify(defaults, null, 2), 'utf-8');
+                        node_fs_1.default.writeFileSync(cfgPath, JSON.stringify(defaults, null, 2), 'utf-8');
                         repairActions.push({ action: repair, success: true, path: 'config.json' });
                         break;
                     }
                     case 'regenerateState': {
-                        if (node_fs_1.default.existsSync(statePath)) {
+                        if (node_fs_1.default.existsSync(stPath)) {
                             const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-                            const backupPath = `${statePath}.bak-${timestamp}`;
-                            node_fs_1.default.copyFileSync(statePath, backupPath);
+                            const backupPath = `${stPath}.bak-${timestamp}`;
+                            node_fs_1.default.copyFileSync(stPath, backupPath);
                             repairActions.push({ action: 'backupState', success: true, path: backupPath });
                         }
                         const milestone = (0, core_js_1.getMilestoneInfo)(cwd);
@@ -744,8 +725,8 @@ function cmdValidateHealth(cwd, options, raw) {
                         stateContent += `**Current phase:** (determining...)\n`;
                         stateContent += `**Status:** Resuming\n\n`;
                         stateContent += `## Session Log\n\n`;
-                        stateContent += `- ${new Date().toISOString().split('T')[0]}: STATE.md regenerated by /maxsim:health --repair\n`;
-                        node_fs_1.default.writeFileSync(statePath, stateContent, 'utf-8');
+                        stateContent += `- ${(0, core_js_1.todayISO)()}: STATE.md regenerated by /maxsim:health --repair\n`;
+                        node_fs_1.default.writeFileSync(stPath, stateContent, 'utf-8');
                         repairActions.push({ action: repair, success: true, path: 'STATE.md' });
                         break;
                     }

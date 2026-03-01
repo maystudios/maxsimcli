@@ -20,6 +20,7 @@ export type Result<T> = {
 };
 export declare function ok<T>(data: T): Result<T>;
 export declare function err<T = never>(error: string): Result<T>;
+export type BranchingStrategy = 'none' | 'phase' | 'milestone';
 export type ModelTier = 'opus' | 'sonnet' | 'haiku';
 export type ModelProfileName = 'quality' | 'balanced' | 'budget' | 'tokenburner';
 export type ModelResolution = 'inherit' | ModelTier;
@@ -71,7 +72,7 @@ export interface AppConfig {
     model_profile: ModelProfileName;
     commit_docs: boolean;
     search_gitignored: boolean;
-    branching_strategy: string;
+    branching_strategy: BranchingStrategy;
     phase_branch_template: string;
     milestone_branch_template: string;
     research: boolean;
@@ -103,7 +104,7 @@ export interface PlanningConfig {
     model_profile: ModelProfileName;
     commit_docs: boolean;
     search_gitignored: boolean;
-    branching_strategy: string;
+    branching_strategy: BranchingStrategy;
     phase_branch_template: string;
     milestone_branch_template: string;
     workflow: WorkflowConfig;

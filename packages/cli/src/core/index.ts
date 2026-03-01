@@ -4,6 +4,7 @@
 
 // Type-only exports
 export type {
+  BranchingStrategy,
   PhaseNumber,
   PhasePath,
   PhaseSlug,

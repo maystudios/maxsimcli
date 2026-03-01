@@ -3,14 +3,14 @@
  *
  * Ported from maxsim/bin/lib/init.cjs
  */
-import type { ModelResolution } from './types.js';
+import type { BranchingStrategy, ModelResolution } from './types.js';
 export type WorkflowType = 'execute-phase' | 'plan-phase' | 'new-project' | 'new-milestone' | 'quick' | 'resume' | 'verify-work' | 'phase-op' | 'todos' | 'milestone-op' | 'map-codebase' | 'init-existing' | 'progress';
 export interface ExecutePhaseContext {
     executor_model: ModelResolution;
     verifier_model: ModelResolution;
     commit_docs: boolean;
     parallelization: boolean;
-    branching_strategy: string;
+    branching_strategy: BranchingStrategy;
     phase_branch_template: string;
     milestone_branch_template: string;
     verifier_enabled: boolean;

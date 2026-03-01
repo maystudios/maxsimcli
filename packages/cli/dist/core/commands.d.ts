@@ -4,6 +4,13 @@
  * Ported from maxsim/bin/lib/commands.cjs
  */
 import type { WebSearchOptions, ScaffoldOptions, TimestampFormat } from './types.js';
+export interface TodoFrontmatter {
+    created: string;
+    title: string;
+    area: string;
+    completed?: string;
+}
+export declare function parseTodoFrontmatter(content: string): TodoFrontmatter;
 export declare function cmdGenerateSlug(text: string | undefined, raw: boolean): void;
 export declare function cmdCurrentTimestamp(format: TimestampFormat, raw: boolean): void;
 export declare function cmdListTodos(cwd: string, area: string | undefined, raw: boolean): void;

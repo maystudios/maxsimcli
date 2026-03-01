@@ -19,7 +19,7 @@ MAXSIM evolves from a GSD-only workflow system into a GSD + Superpowers platform
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: MCP Core Server** - MAXSIM Core Server with MCP tools for phase ops, task management, and state updates
+- [x] **Phase 1: MCP Core Server** - MAXSIM Core Server with MCP tools for phase ops, task management, and state updates
 - [ ] **Phase 2: Quality Foundation** - Windows fix, testable core, install.ts refactor, dashboard launch consolidation
 - [ ] **Phase 3: Skills System** - using-maxsim entry skill, error memory, new skills (memory-management, code-review, simplify)
 - [ ] **Phase 4: Dashboard Evolution** - Core Server as backend, Simple Mode (4 panels), Advanced Mode (+ terminal), Q&A routing
@@ -41,10 +41,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 4 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- MCP server infrastructure + phase CRUD tools
-- [ ] 01-02-PLAN.md -- Todo + state management MCP tools
-- [ ] 01-03-PLAN.md -- Install integration + .mcp.json + fallback + end-to-end verification
-- [ ] 01-04-PLAN.md -- Gap closure: scaffold CONTEXT.md + RESEARCH.md in mcp_create_phase/mcp_insert_phase
+- [x] 01-01-PLAN.md -- MCP server infrastructure + phase CRUD tools
+- [x] 01-02-PLAN.md -- Todo + state management MCP tools
+- [x] 01-03-PLAN.md -- Install integration + .mcp.json + fallback + end-to-end verification
+- [x] 01-04-PLAN.md -- Gap closure: scaffold CONTEXT.md + RESEARCH.md in mcp_create_phase/mcp_insert_phase
 
 ### Phase 2: Quality Foundation
 **Goal**: Testable core architecture and cross-platform reliability -- clean foundation for Phase 3+4

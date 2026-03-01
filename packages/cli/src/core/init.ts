@@ -19,10 +19,18 @@ import {
   getMilestoneInfo,
   output,
   error,
+  debugLog,
+  planningPath,
+  phasesPath,
+  todayISO,
+  listSubDirs,
+  isSummaryFile,
+  isPlanFile,
 } from './core.js';
 
 import type {
   AgentType,
+  BranchingStrategy,
   ModelResolution,
   PhaseSearchResult,
   MilestoneInfo,
@@ -51,7 +59,7 @@ export interface ExecutePhaseContext {
   verifier_model: ModelResolution;
   commit_docs: boolean;
   parallelization: boolean;
-  branching_strategy: string;
+  branching_strategy: BranchingStrategy;
   phase_branch_template: string;
   milestone_branch_template: string;
   verifier_enabled: boolean;
@@ -369,7 +377,7 @@ function scanPhaseArtifacts(cwd: string, phaseDirectory: string): PhaseArtifacts
     }
   } catch (e) {
     /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
   return result;
 }
@@ -493,7 +501,7 @@ export function cmdInitNewProject(cwd: string, raw: boolean): void {
     hasCode = files.trim().length > 0;
   } catch (e) {
     /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   hasPackageFile = pathExistsInternal(cwd, 'package.json') ||
@@ -550,7 +558,7 @@ export function cmdInitQuick(cwd: string, description: string | undefined, raw: 
   const now = new Date();
   const slug = description ? generateSlugInternal(description)?.substring(0, 40) ?? null : null;
 
-  const quickDir = path.join(cwd, '.planning', 'quick');
+  const quickDir = planningPath(cwd, 'quick');
   let nextNum = 1;
   try {
     const existing = fs.readdirSync(quickDir)
@@ -562,7 +570,7 @@ export function cmdInitQuick(cwd: string, description: string | undefined, raw: 
     }
   } catch (e) {
     /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   const result: QuickContext = {
@@ -574,7 +582,7 @@ export function cmdInitQuick(cwd: string, description: string | undefined, raw: 
     next_num: nextNum,
     slug,
     description: description ?? null,
-    date: now.toISOString().split('T')[0],
+    date: todayISO(),
     timestamp: now.toISOString(),
     quick_dir: '.planning/quick',
     task_dir: slug ? `.planning/quick/${nextNum}-${slug}` : null,
@@ -590,10 +598,10 @@ export function cmdInitResume(cwd: string, raw: boolean): void {
 
   let interruptedAgentId: string | null = null;
   try {
-    interruptedAgentId = fs.readFileSync(path.join(cwd, '.planning', 'current-agent-id.txt'), 'utf-8').trim();
+    interruptedAgentId = fs.readFileSync(planningPath(cwd, 'current-agent-id.txt'), 'utf-8').trim();
   } catch (e) {
     /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   const result: ResumeContext = {
@@ -694,7 +702,7 @@ export function cmdInitTodos(cwd: string, area: string | undefined, raw: boolean
   const config = loadConfig(cwd);
   const now = new Date();
 
-  const pendingDir = path.join(cwd, '.planning', 'todos', 'pending');
+  const pendingDir = planningPath(cwd, 'todos', 'pending');
   let count = 0;
   const todos: Array<{ file: string; created: string; title: string; area: string; path: string }> = [];
 
@@ -720,17 +728,17 @@ export function cmdInitTodos(cwd: string, area: string | undefined, raw: boolean
         });
       } catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG) console.error(e);
+        debugLog(e);
       }
     }
   } catch (e) {
     /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   const result: TodosContext = {
     commit_docs: config.commit_docs,
-    date: now.toISOString().split('T')[0],
+    date: todayISO(),
     timestamp: now.toISOString(),
     todo_count: count,
     todos,
@@ -751,36 +759,33 @@ export function cmdInitMilestoneOp(cwd: string, raw: boolean): void {
 
   let phaseCount = 0;
   let completedPhases = 0;
-  const phasesDir = path.join(cwd, '.planning', 'phases');
+  const phasesDir = phasesPath(cwd);
   try {
-    const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+    const dirs = listSubDirs(phasesDir);
     phaseCount = dirs.length;
 
     for (const dir of dirs) {
       try {
         const phaseFiles = fs.readdirSync(path.join(phasesDir, dir));
-        const hasSummary = phaseFiles.some(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+        const hasSummary = phaseFiles.some(f => isSummaryFile(f));
         if (hasSummary) completedPhases++;
       } catch (e) {
         /* optional op, ignore */
-        if (process.env.MAXSIM_DEBUG) console.error(e);
+        debugLog(e);
       }
     }
   } catch (e) {
     /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
-  const archiveDir = path.join(cwd, '.planning', 'archive');
+  const archiveDir = planningPath(cwd, 'archive');
   let archivedMilestones: string[] = [];
   try {
-    archivedMilestones = fs.readdirSync(archiveDir, { withFileTypes: true })
-      .filter(e => e.isDirectory())
-      .map(e => e.name);
+    archivedMilestones = listSubDirs(archiveDir);
   } catch (e) {
     /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   const result: MilestoneOpContext = {
@@ -806,13 +811,13 @@ export function cmdInitMilestoneOp(cwd: string, raw: boolean): void {
 export function cmdInitMapCodebase(cwd: string, raw: boolean): void {
   const config = loadConfig(cwd);
 
-  const codebaseDir = path.join(cwd, '.planning', 'codebase');
+  const codebaseDir = planningPath(cwd, 'codebase');
   let existingMaps: string[] = [];
   try {
     existingMaps = fs.readdirSync(codebaseDir).filter(f => f.endsWith('.md'));
   } catch (e) {
     /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   const result: MapCodebaseContext = {
@@ -847,7 +852,7 @@ export function cmdInitExisting(cwd: string, raw: boolean): void {
     );
     hasCode = files.trim().length > 0;
   } catch (e) {
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   hasPackageFile =
@@ -860,7 +865,7 @@ export function cmdInitExisting(cwd: string, raw: boolean): void {
   // Detect existing .planning/ content for conflict dialog
   let planningFiles: string[] = [];
   try {
-    const planDir = path.join(cwd, '.planning');
+    const planDir = planningPath(cwd);
     if (fs.existsSync(planDir)) {
       planningFiles = fs
         .readdirSync(planDir, { recursive: true })
@@ -868,7 +873,7 @@ export function cmdInitExisting(cwd: string, raw: boolean): void {
         .filter((f) => !f.startsWith('.'));
     }
   } catch (e) {
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   const result: InitExistingContext = {
@@ -900,25 +905,24 @@ export function cmdInitProgress(cwd: string, raw: boolean): void {
   const config = loadConfig(cwd);
   const milestone = getMilestoneInfo(cwd);
 
-  const phasesDir = path.join(cwd, '.planning', 'phases');
+  const progressPhasesDir = phasesPath(cwd);
   const phases: ProgressPhaseInfo[] = [];
   let currentPhase: ProgressPhaseInfo | null = null;
   let nextPhase: ProgressPhaseInfo | null = null;
 
   try {
-    const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
+    const dirs = listSubDirs(progressPhasesDir, true);
 
     for (const dir of dirs) {
       const match = dir.match(/^(\d+(?:\.\d+)?)-?(.*)/);
       const phaseNumber = match ? match[1] : dir;
       const phaseName = match && match[2] ? match[2] : null;
 
-      const phasePath = path.join(phasesDir, dir);
-      const phaseFiles = fs.readdirSync(phasePath);
+      const phaseDirPath = path.join(progressPhasesDir, dir);
+      const phaseFiles = fs.readdirSync(phaseDirPath);
 
-      const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md');
-      const summaries = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+      const plans = phaseFiles.filter(f => isPlanFile(f));
+      const summaries = phaseFiles.filter(f => isSummaryFile(f));
       const hasResearch = phaseFiles.some(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
 
       const status = summaries.length >= plans.length && plans.length > 0 ? 'complete' :
@@ -946,17 +950,17 @@ export function cmdInitProgress(cwd: string, raw: boolean): void {
     }
   } catch (e) {
     /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   let pausedAt: string | null = null;
   try {
-    const state = fs.readFileSync(path.join(cwd, '.planning', 'STATE.md'), 'utf-8');
+    const state = fs.readFileSync(planningPath(cwd, 'STATE.md'), 'utf-8');
     const pauseMatch = state.match(/\*\*Paused At:\*\*\s*(.+)/);
     if (pauseMatch) pausedAt = pauseMatch[1].trim();
   } catch (e) {
     /* optional op, ignore */
-    if (process.env.MAXSIM_DEBUG) console.error(e);
+    debugLog(e);
   }
 
   const result: ProgressContext = {
