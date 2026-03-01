@@ -41,15 +41,45 @@ export const MODEL_PROFILES: ModelProfiles = {
 };
 
 // ─── Output helpers ──────────────────────────────────────────────────────────
-// DEPRECATION: output() and error() call process.exit() and belong in the CLI
-// layer. They are kept here for backward compatibility during the port. Future
-// plans should move these to @maxsim/cli.
+// These throw CliOutput / CliError instead of calling process.exit() directly.
+// The CLI entry point (cli.ts) catches these and calls process.exit() there.
+
+/** Thrown by output() to signal successful command completion. */
+export class CliOutput {
+  readonly result: unknown;
+  readonly raw: boolean;
+  readonly rawValue: unknown;
+  constructor(result: unknown, raw?: boolean, rawValue?: unknown) {
+    this.result = result;
+    this.raw = raw ?? false;
+    this.rawValue = rawValue;
+  }
+}
+
+/** Thrown by error() to signal a command error. */
+export class CliError {
+  readonly message: string;
+  constructor(message: string) {
+    this.message = message;
+  }
+}
 
 export function output(result: unknown, raw?: boolean, rawValue?: unknown): never {
-  if (raw && rawValue !== undefined) {
-    process.stdout.write(String(rawValue));
+  throw new CliOutput(result, raw, rawValue);
+}
+
+export function error(message: string): never {
+  throw new CliError(message);
+}
+
+/**
+ * Handle a CliOutput by writing to stdout. Extracted so cli.ts can use it.
+ */
+export function writeOutput(out: CliOutput): void {
+  if (out.raw && out.rawValue !== undefined) {
+    process.stdout.write(String(out.rawValue));
   } else {
-    const json = JSON.stringify(result, null, 2);
+    const json = JSON.stringify(out.result, null, 2);
     if (json.length > 50000) {
       const tmpPath = path.join(os.tmpdir(), `maxsim-${Date.now()}.json`);
       fs.writeFileSync(tmpPath, json, 'utf-8');
@@ -58,12 +88,6 @@ export function output(result: unknown, raw?: boolean, rawValue?: unknown): neve
       process.stdout.write(json);
     }
   }
-  process.exit(0);
-}
-
-export function error(message: string): never {
-  process.stderr.write('Error: ' + message + '\n');
-  process.exit(1);
 }
 
 // ─── Shared micro-utilities ─────────────────────────────────────────────────

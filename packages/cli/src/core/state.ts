@@ -111,8 +111,7 @@ export function cmdStateLoad(cwd: string, raw: boolean): void {
       `roadmap_exists=${roadmapExists}`,
       `state_exists=${stateExists}`,
     ];
-    process.stdout.write(lines.join('\n'));
-    process.exit(0);
+    output(result, true, lines.join('\n'));
   }
 
   output(result);
