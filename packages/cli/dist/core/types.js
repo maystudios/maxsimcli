@@ -43,9 +43,8 @@ exports.PLANNING_CONFIG_DEFAULTS = {
     milestone_branch_template: 'maxsim/{milestone}-{slug}',
     workflow: {
         research: true,
-        plan_check: true,
+        plan_checker: true,
         verifier: true,
-        nyquist_validation: false,
     },
     parallelization: true,
     brave_search: false,

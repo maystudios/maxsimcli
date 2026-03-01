@@ -1,3 +1,10 @@
+## [3.10.3](https://github.com/maystudios/maxsimcli/compare/v3.10.2...v3.10.3) (2026-02-28)
+
+
+### Bug Fixes
+
+* **dashboard:** add missing useEffect import causing black screen ([693537a](https://github.com/maystudios/maxsimcli/commit/693537a2850f97c8d6e0b45ba19f457cf79301f0))
+
 ## [3.10.2](https://github.com/maystudios/maxsimcli/compare/v3.10.1...v3.10.2) (2026-02-28)
 
 

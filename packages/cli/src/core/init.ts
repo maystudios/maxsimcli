@@ -92,7 +92,6 @@ export interface PlanPhaseContext {
   checker_model: ModelResolution;
   research_enabled: boolean;
   plan_checker_enabled: boolean;
-  nyquist_validation_enabled: boolean;
   commit_docs: boolean;
   phase_found: boolean;
   phase_dir: string | null;
@@ -452,7 +451,6 @@ export function cmdInitPlanPhase(cwd: string, phase: string | undefined, raw: bo
     checker_model: resolveModelInternal(cwd, 'maxsim-plan-checker'),
     research_enabled: config.research,
     plan_checker_enabled: config.plan_checker,
-    nyquist_validation_enabled: false, // config doesn't have nyquist_validation directly
     commit_docs: config.commit_docs,
     phase_found: !!phaseInfo,
     phase_dir: phaseInfo?.directory ?? null,

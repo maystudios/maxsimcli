@@ -141,10 +141,10 @@ If user selects "Cancel": exit gracefully.
 Before generating the test plan, discover the project's existing test structure:
 
 ```bash
-# Find existing test directories
-find . -type d -name "*test*" -o -name "*spec*" -o -name "*__tests__*" 2>/dev/null | head -20
+# Find existing test directories and files (cross-platform)
+git ls-files --others --cached --exclude-standard | grep -E "(test|spec|__tests__)" | head -20
 # Find existing test files for convention matching
-find . -type f \( -name "*.test.*" -o -name "*.spec.*" -o -name "*Tests.fs" -o -name "*Test.fs" \) 2>/dev/null | head -20
+git ls-files --others --cached --exclude-standard | grep -E "\.(test|spec)\.|Tests\.(fs|cs)|Test\.(fs|cs)" | head -20
 # Check for test runners
 ls package.json *.sln 2>/dev/null
 ```

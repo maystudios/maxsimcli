@@ -181,9 +181,8 @@ export interface PlanningConfig {
 
 export interface WorkflowConfig {
   research: boolean;
-  plan_check: boolean;
+  plan_checker: boolean;
   verifier: boolean;
-  nyquist_validation: boolean;
   [key: string]: boolean;
 }
 
@@ -196,9 +195,8 @@ export const PLANNING_CONFIG_DEFAULTS: PlanningConfig = {
   milestone_branch_template: 'maxsim/{milestone}-{slug}',
   workflow: {
     research: true,
-    plan_check: true,
+    plan_checker: true,
     verifier: true,
-    nyquist_validation: false,
   },
   parallelization: true,
   brave_search: false,

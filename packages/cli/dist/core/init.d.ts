@@ -42,7 +42,6 @@ export interface PlanPhaseContext {
     checker_model: ModelResolution;
     research_enabled: boolean;
     plan_checker_enabled: boolean;
-    nyquist_validation_enabled: boolean;
     commit_docs: boolean;
     phase_found: boolean;
     phase_dir: string | null;

@@ -33,9 +33,6 @@ let node_path = require("node:path");
 node_path = __toESM(node_path);
 let node_os = require("node:os");
 node_os = __toESM(node_os);
-let node_crypto = require("node:crypto");
-node_crypto = __toESM(node_crypto);
-let node_child_process = require("node:child_process");
 let node_process = require("node:process");
 node_process = __toESM(node_process);
 let node_tty = require("node:tty");
@@ -46,6 +43,9 @@ let node_util = require("node:util");
 let node_async_hooks = require("node:async_hooks");
 let node_readline = require("node:readline");
 node_readline = __toESM(node_readline);
+let node_crypto = require("node:crypto");
+node_crypto = __toESM(node_crypto);
+let node_child_process = require("node:child_process");
 
 //#region ../../node_modules/universalify/index.js
 var require_universalify = /* @__PURE__ */ __commonJSMin(((exports) => {
@@ -8284,103 +8284,9 @@ const codexAdapter = {
 };
 
 //#endregion
-//#region src/install.ts
+//#region src/install/shared.ts
 const pkg = JSON.parse(node_fs.readFileSync(node_path.resolve(__dirname, "..", "package.json"), "utf-8"));
 const templatesRoot = node_path.resolve(__dirname, "assets", "templates");
-const argv = (0, import_minimist.default)(process.argv.slice(2), {
-	boolean: [
-		"global",
-		"local",
-		"opencode",
-		"claude",
-		"gemini",
-		"codex",
-		"both",
-		"all",
-		"uninstall",
-		"help",
-		"version",
-		"force-statusline",
-		"network"
-	],
-	string: ["config-dir"],
-	alias: {
-		g: "global",
-		l: "local",
-		u: "uninstall",
-		h: "help",
-		c: "config-dir"
-	}
-});
-const hasGlobal = !!argv["global"];
-const hasLocal = !!argv["local"];
-const hasOpencode = !!argv["opencode"];
-const hasClaude = !!argv["claude"];
-const hasGemini = !!argv["gemini"];
-const hasCodex = !!argv["codex"];
-const hasBoth = !!argv["both"];
-const hasAll = !!argv["all"];
-const hasUninstall = !!argv["uninstall"];
-let selectedRuntimes = [];
-if (hasAll) selectedRuntimes = [
-	"claude",
-	"opencode",
-	"gemini",
-	"codex"
-];
-else if (hasBoth) selectedRuntimes = ["claude", "opencode"];
-else {
-	if (hasOpencode) selectedRuntimes.push("opencode");
-	if (hasClaude) selectedRuntimes.push("claude");
-	if (hasGemini) selectedRuntimes.push("gemini");
-	if (hasCodex) selectedRuntimes.push("codex");
-}
-/**
-* Add a firewall rule to allow inbound traffic on the given port.
-* Handles Windows (netsh), Linux (ufw / iptables), and macOS (no rule needed).
-*/
-/** Check whether the current process is running with admin/root privileges. */
-function isElevated() {
-	if (process.platform === "win32") try {
-		(0, node_child_process.execSync)("net session", { stdio: "pipe" });
-		return true;
-	} catch {
-		return false;
-	}
-	return process.getuid?.() === 0;
-}
-function applyFirewallRule(port) {
-	const platform = process.platform;
-	try {
-		if (platform === "win32") {
-			const cmd = `netsh advfirewall firewall add rule name="MAXSIM Dashboard" dir=in action=allow protocol=TCP localport=${port}`;
-			if (isElevated()) {
-				(0, node_child_process.execSync)(cmd, { stdio: "pipe" });
-				console.log(chalk.green("  ✓ Windows Firewall rule added for port " + port));
-			} else {
-				console.log(chalk.gray("  Requesting administrator privileges for firewall rule..."));
-				(0, node_child_process.execSync)(`powershell -NoProfile -Command "${`Start-Process cmd -ArgumentList '/c ${cmd}' -Verb RunAs -Wait`}"`, { stdio: "pipe" });
-				console.log(chalk.green("  ✓ Windows Firewall rule added for port " + port));
-			}
-		} else if (platform === "linux") {
-			const sudoPrefix = isElevated() ? "" : "sudo ";
-			try {
-				(0, node_child_process.execSync)(`${sudoPrefix}ufw allow ${port}/tcp`, { stdio: "pipe" });
-				console.log(chalk.green("  ✓ UFW rule added for port " + port));
-			} catch {
-				try {
-					(0, node_child_process.execSync)(`${sudoPrefix}iptables -A INPUT -p tcp --dport ${port} -j ACCEPT`, { stdio: "pipe" });
-					console.log(chalk.green("  ✓ iptables rule added for port " + port));
-				} catch {
-					console.log(chalk.yellow(`  ⚠ Could not add firewall rule automatically. Run: sudo ufw allow ${port}/tcp`));
-				}
-			}
-		} else if (platform === "darwin") console.log(chalk.gray("  macOS: No firewall rule needed (inbound connections are allowed by default)"));
-	} catch (err) {
-		console.warn(chalk.yellow(`  ⚠ Firewall rule failed: ${err.message}`));
-		console.warn(chalk.gray(`  You may need to manually allow port ${port} through your firewall.`));
-	}
-}
 /**
 * Adapter registry keyed by runtime name
 */
@@ -8434,26 +8340,44 @@ function copyDirRecursive(src, dest) {
 function getOpencodeGlobalDir() {
 	return opencodeAdapter.getGlobalDir();
 }
-const banner = "\n" + chalk.cyan(figlet.default.textSync("MAXSIM", { font: "ANSI Shadow" }).split("\n").map((line) => "  " + line).join("\n")) + "\n\n  MAXSIM " + chalk.dim("v" + pkg.version) + "\n  A meta-prompting, context engineering and spec-driven\n  development system for Claude Code, OpenCode, Gemini, and Codex.\n";
-const explicitConfigDir = argv["config-dir"] || null;
-const hasHelp = !!argv["help"];
-const hasVersion = !!argv["version"];
-const forceStatusline = !!argv["force-statusline"];
-if (hasVersion) {
-	console.log(pkg.version);
-	process.exit(0);
+/**
+* Verify a directory exists and contains files
+*/
+function verifyInstalled(dirPath, description) {
+	if (!node_fs.existsSync(dirPath)) {
+		console.error(`  \u2717 Failed to install ${description}: directory not created`);
+		return false;
+	}
+	try {
+		if (node_fs.readdirSync(dirPath).length === 0) {
+			console.error(`  \u2717 Failed to install ${description}: directory is empty`);
+			return false;
+		}
+	} catch (e) {
+		console.error(`  \u2717 Failed to install ${description}: ${e.message}`);
+		return false;
+	}
+	return true;
 }
-console.log(banner);
-if (hasHelp) {
-	console.log(`  ${chalk.yellow("Usage:")} npx maxsimcli [options]\n\n  ${chalk.yellow("Options:")}\n    ${chalk.cyan("-g, --global")}              Install globally (to config directory)\n    ${chalk.cyan("-l, --local")}               Install locally (to current directory)\n    ${chalk.cyan("--claude")}                  Install for Claude Code only\n    ${chalk.cyan("--opencode")}                Install for OpenCode only\n    ${chalk.cyan("--gemini")}                  Install for Gemini only\n    ${chalk.cyan("--codex")}                   Install for Codex only\n    ${chalk.cyan("--all")}                     Install for all runtimes\n    ${chalk.cyan("-u, --uninstall")}           Uninstall MAXSIM (remove all MAXSIM files)\n    ${chalk.cyan("-c, --config-dir <path>")}   Specify custom config directory\n    ${chalk.cyan("-h, --help")}                Show this help message\n    ${chalk.cyan("--force-statusline")}        Replace existing statusline config\n\n  ${chalk.yellow("Examples:")}\n    ${chalk.dim("# Interactive install (prompts for runtime and location)")}\n    npx maxsimcli\n\n    ${chalk.dim("# Install for Claude Code globally")}\n    npx maxsimcli --claude --global\n\n    ${chalk.dim("# Install for Gemini globally")}\n    npx maxsimcli --gemini --global\n\n    ${chalk.dim("# Install for Codex globally")}\n    npx maxsimcli --codex --global\n\n    ${chalk.dim("# Install for all runtimes globally")}\n    npx maxsimcli --all --global\n\n    ${chalk.dim("# Install to custom config directory")}\n    npx maxsimcli --codex --global --config-dir ~/.codex-work\n\n    ${chalk.dim("# Install to current project only")}\n    npx maxsimcli --claude --local\n\n    ${chalk.dim("# Uninstall MAXSIM from Codex globally")}\n    npx maxsimcli --codex --global --uninstall\n\n  ${chalk.yellow("Notes:")}\n    The --config-dir option is useful when you have multiple configurations.\n    It takes priority over CLAUDE_CONFIG_DIR / GEMINI_CONFIG_DIR / CODEX_HOME environment variables.\n`);
-	process.exit(0);
+/**
+* Verify a file exists
+*/
+function verifyFileInstalled(filePath, description) {
+	if (!node_fs.existsSync(filePath)) {
+		console.error(`  \u2717 Failed to install ${description}: file not created`);
+		return false;
+	}
+	return true;
 }
+
+//#endregion
+//#region src/install/adapters.ts
 const attributionCache = /* @__PURE__ */ new Map();
 /**
 * Get commit attribution setting for a runtime
 * @returns null = remove, undefined = keep default, string = custom
 */
-function getCommitAttribution(runtime) {
+function getCommitAttribution(runtime, explicitConfigDir) {
 	if (attributionCache.has(runtime)) return attributionCache.get(runtime);
 	let result;
 	if (runtime === "opencode") result = readSettings(node_path.join(getGlobalDir("opencode", null), "opencode.json")).disable_ai_attribution === true ? null : void 0;
@@ -8472,108 +8396,227 @@ function getCommitAttribution(runtime) {
 	return result;
 }
 /**
-* Copy commands to a flat structure for OpenCode
-* OpenCode expects: command/maxsim-help.md (invoked as /maxsim-help)
-* Source structure: commands/maxsim/help.md
+* Parse JSONC (JSON with Comments) by stripping comments and trailing commas.
 */
-function copyFlattenedCommands(srcDir, destDir, prefix, pathPrefix, runtime) {
-	if (!node_fs.existsSync(srcDir)) return;
-	if (node_fs.existsSync(destDir)) {
-		for (const file of node_fs.readdirSync(destDir)) if (file.startsWith(`${prefix}-`) && file.endsWith(".md")) node_fs.unlinkSync(node_path.join(destDir, file));
-	} else node_fs.mkdirSync(destDir, { recursive: true });
-	const entries = node_fs.readdirSync(srcDir, { withFileTypes: true });
-	for (const entry of entries) {
-		const srcPath = node_path.join(srcDir, entry.name);
-		if (entry.isDirectory()) copyFlattenedCommands(srcPath, destDir, `${prefix}-${entry.name}`, pathPrefix, runtime);
-		else if (entry.name.endsWith(".md")) {
-			const destName = `${prefix}-${entry.name.replace(".md", "")}.md`;
-			const destPath = node_path.join(destDir, destName);
-			let content = node_fs.readFileSync(srcPath, "utf8");
-			const globalClaudeRegex = /~\/\.claude\//g;
-			const localClaudeRegex = /\.\/\.claude\//g;
-			const opencodeDirRegex = /~\/\.opencode\//g;
-			content = content.replace(globalClaudeRegex, pathPrefix);
-			content = content.replace(localClaudeRegex, `./${getDirName(runtime)}/`);
-			content = content.replace(opencodeDirRegex, pathPrefix);
-			content = processAttribution(content, getCommitAttribution(runtime));
-			content = convertClaudeToOpencodeFrontmatter(content);
-			node_fs.writeFileSync(destPath, content);
-		}
-	}
-}
-function listCodexSkillNames(skillsDir, prefix = "maxsim-") {
-	if (!node_fs.existsSync(skillsDir)) return [];
-	return node_fs.readdirSync(skillsDir, { withFileTypes: true }).filter((entry) => entry.isDirectory() && entry.name.startsWith(prefix)).filter((entry) => node_fs.existsSync(node_path.join(skillsDir, entry.name, "SKILL.md"))).map((entry) => entry.name).sort();
-}
-function copyCommandsAsCodexSkills(srcDir, skillsDir, prefix, pathPrefix, runtime) {
-	if (!node_fs.existsSync(srcDir)) return;
-	node_fs.mkdirSync(skillsDir, { recursive: true });
-	const existing = node_fs.readdirSync(skillsDir, { withFileTypes: true });
-	for (const entry of existing) if (entry.isDirectory() && entry.name.startsWith(`${prefix}-`)) node_fs.rmSync(node_path.join(skillsDir, entry.name), { recursive: true });
-	function recurse(currentSrcDir, currentPrefix) {
-		const entries = node_fs.readdirSync(currentSrcDir, { withFileTypes: true });
-		for (const entry of entries) {
-			const srcPath = node_path.join(currentSrcDir, entry.name);
-			if (entry.isDirectory()) {
-				recurse(srcPath, `${currentPrefix}-${entry.name}`);
+function parseJsonc(content) {
+	if (content.charCodeAt(0) === 65279) content = content.slice(1);
+	let result = "";
+	let inString = false;
+	let i = 0;
+	while (i < content.length) {
+		const char = content[i];
+		const next = content[i + 1];
+		if (inString) {
+			result += char;
+			if (char === "\\" && i + 1 < content.length) {
+				result += next;
+				i += 2;
 				continue;
 			}
-			if (!entry.name.endsWith(".md")) continue;
-			const skillName = `${currentPrefix}-${entry.name.replace(".md", "")}`;
-			const skillDir = node_path.join(skillsDir, skillName);
-			node_fs.mkdirSync(skillDir, { recursive: true });
-			let content = node_fs.readFileSync(srcPath, "utf8");
-			const globalClaudeRegex = /~\/\.claude\//g;
-			const localClaudeRegex = /\.\/\.claude\//g;
-			const codexDirRegex = /~\/\.codex\//g;
-			content = content.replace(globalClaudeRegex, pathPrefix);
-			content = content.replace(localClaudeRegex, `./${getDirName(runtime)}/`);
-			content = content.replace(codexDirRegex, pathPrefix);
-			content = processAttribution(content, getCommitAttribution(runtime));
-			content = convertClaudeCommandToCodexSkill(content, skillName);
-			node_fs.writeFileSync(node_path.join(skillDir, "SKILL.md"), content);
+			if (char === "\"") inString = false;
+			i++;
+		} else if (char === "\"") {
+			inString = true;
+			result += char;
+			i++;
+		} else if (char === "/" && next === "/") while (i < content.length && content[i] !== "\n") i++;
+		else if (char === "/" && next === "*") {
+			i += 2;
+			while (i < content.length - 1 && !(content[i] === "*" && content[i + 1] === "/")) i++;
+			i += 2;
+		} else {
+			result += char;
+			i++;
 		}
 	}
-	recurse(srcDir, prefix);
+	result = result.replace(/,(\s*[}\]])/g, "$1");
+	return JSON.parse(result);
 }
 /**
-* Recursively copy directory, replacing paths in .md files
-* Deletes existing destDir first to remove orphaned files from previous versions
+* Configure OpenCode permissions to allow reading MAXSIM reference docs
 */
-function copyWithPathReplacement(srcDir, destDir, pathPrefix, runtime, isCommand = false) {
-	const isOpencode = runtime === "opencode";
-	const isCodex = runtime === "codex";
-	const dirName = getDirName(runtime);
-	if (node_fs.existsSync(destDir)) node_fs.rmSync(destDir, { recursive: true });
-	node_fs.mkdirSync(destDir, { recursive: true });
-	const entries = node_fs.readdirSync(srcDir, { withFileTypes: true });
-	for (const entry of entries) {
-		const srcPath = node_path.join(srcDir, entry.name);
-		const destPath = node_path.join(destDir, entry.name);
-		if (entry.isDirectory()) copyWithPathReplacement(srcPath, destPath, pathPrefix, runtime, isCommand);
-		else if (entry.name.endsWith(".md")) {
-			let content = node_fs.readFileSync(srcPath, "utf8");
-			const globalClaudeRegex = /~\/\.claude\//g;
-			const localClaudeRegex = /\.\/\.claude\//g;
-			content = content.replace(globalClaudeRegex, pathPrefix);
-			content = content.replace(localClaudeRegex, `./${dirName}/`);
-			content = processAttribution(content, getCommitAttribution(runtime));
-			if (isOpencode) {
-				content = convertClaudeToOpencodeFrontmatter(content);
-				node_fs.writeFileSync(destPath, content);
-			} else if (runtime === "gemini") if (isCommand) {
-				content = stripSubTags(content);
-				const tomlContent = convertClaudeToGeminiToml(content);
-				const tomlPath = destPath.replace(/\.md$/, ".toml");
-				node_fs.writeFileSync(tomlPath, tomlContent);
-			} else node_fs.writeFileSync(destPath, content);
-			else if (isCodex) {
-				content = convertClaudeToCodexMarkdown(content);
-				node_fs.writeFileSync(destPath, content);
-			} else node_fs.writeFileSync(destPath, content);
-		} else node_fs.copyFileSync(srcPath, destPath);
+function configureOpencodePermissions(isGlobal = true) {
+	const opencodeConfigDir = isGlobal ? getOpencodeGlobalDir() : node_path.join(process.cwd(), ".opencode");
+	const configPath = node_path.join(opencodeConfigDir, "opencode.json");
+	node_fs.mkdirSync(opencodeConfigDir, { recursive: true });
+	let config = {};
+	if (node_fs.existsSync(configPath)) try {
+		config = parseJsonc(node_fs.readFileSync(configPath, "utf8"));
+	} catch (e) {
+		console.log(`  ${chalk.yellow("⚠")} Could not parse opencode.json - skipping permission config`);
+		console.log(`    ${chalk.dim(`Reason: ${e.message}`)}`);
+		console.log(`    ${chalk.dim("Your config was NOT modified. Fix the syntax manually if needed.")}`);
+		return;
+	}
+	if (!config.permission) config.permission = {};
+	const permission = config.permission;
+	const maxsimPath = opencodeConfigDir === node_path.join(node_os.homedir(), ".config", "opencode") ? "~/.config/opencode/maxsim/*" : `${opencodeConfigDir.replace(/\\/g, "/")}/maxsim/*`;
+	let modified = false;
+	if (!permission.read || typeof permission.read !== "object") permission.read = {};
+	if (permission.read[maxsimPath] !== "allow") {
+		permission.read[maxsimPath] = "allow";
+		modified = true;
+	}
+	if (!permission.external_directory || typeof permission.external_directory !== "object") permission.external_directory = {};
+	if (permission.external_directory[maxsimPath] !== "allow") {
+		permission.external_directory[maxsimPath] = "allow";
+		modified = true;
+	}
+	if (!modified) return;
+	node_fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n");
+	console.log(`  ${chalk.green("✓")} Configured read permission for MAXSIM docs`);
+}
+
+//#endregion
+//#region src/install/dashboard.ts
+/** Check whether the current process is running with admin/root privileges. */
+function isElevated() {
+	if (process.platform === "win32") try {
+		(0, node_child_process.execSync)("net session", { stdio: "pipe" });
+		return true;
+	} catch {
+		return false;
+	}
+	return process.getuid?.() === 0;
+}
+/**
+* Add a firewall rule to allow inbound traffic on the given port.
+* Handles Windows (netsh), Linux (ufw / iptables), and macOS (no rule needed).
+*/
+function applyFirewallRule(port) {
+	const platform = process.platform;
+	try {
+		if (platform === "win32") {
+			const cmd = `netsh advfirewall firewall add rule name="MAXSIM Dashboard" dir=in action=allow protocol=TCP localport=${port}`;
+			if (isElevated()) {
+				(0, node_child_process.execSync)(cmd, { stdio: "pipe" });
+				console.log(chalk.green("  ✓ Windows Firewall rule added for port " + port));
+			} else {
+				console.log(chalk.gray("  Requesting administrator privileges for firewall rule..."));
+				(0, node_child_process.execSync)(`powershell -NoProfile -Command "${`Start-Process cmd -ArgumentList '/c ${cmd}' -Verb RunAs -Wait`}"`, { stdio: "pipe" });
+				console.log(chalk.green("  ✓ Windows Firewall rule added for port " + port));
+			}
+		} else if (platform === "linux") {
+			const sudoPrefix = isElevated() ? "" : "sudo ";
+			try {
+				(0, node_child_process.execSync)(`${sudoPrefix}ufw allow ${port}/tcp`, { stdio: "pipe" });
+				console.log(chalk.green("  ✓ UFW rule added for port " + port));
+			} catch {
+				try {
+					(0, node_child_process.execSync)(`${sudoPrefix}iptables -A INPUT -p tcp --dport ${port} -j ACCEPT`, { stdio: "pipe" });
+					console.log(chalk.green("  ✓ iptables rule added for port " + port));
+				} catch {
+					console.log(chalk.yellow(`  \u26a0 Could not add firewall rule automatically. Run: sudo ufw allow ${port}/tcp`));
+				}
+			}
+		} else if (platform === "darwin") console.log(chalk.gray("  macOS: No firewall rule needed (inbound connections are allowed by default)"));
+	} catch (err) {
+		console.warn(chalk.yellow(`  \u26a0 Firewall rule failed: ${err.message}`));
+		console.warn(chalk.gray(`  You may need to manually allow port ${port} through your firewall.`));
 	}
 }
+/**
+* Handle the `dashboard` subcommand — refresh assets, install node-pty, launch server
+*/
+async function runDashboardSubcommand(argv) {
+	const { spawn: spawnDash, execSync: execSyncDash } = await import("node:child_process");
+	const dashboardAssetSrc = node_path.resolve(__dirname, "assets", "dashboard");
+	const installDir = node_path.join(process.cwd(), ".claude");
+	const installDashDir = node_path.join(installDir, "dashboard");
+	if (node_fs.existsSync(dashboardAssetSrc)) {
+		const nodeModulesDir = node_path.join(installDashDir, "node_modules");
+		const nodeModulesTmp = node_path.join(installDir, "_dashboard_node_modules_tmp");
+		const hadNodeModules = node_fs.existsSync(nodeModulesDir);
+		if (hadNodeModules) node_fs.renameSync(nodeModulesDir, nodeModulesTmp);
+		safeRmDir(installDashDir);
+		node_fs.mkdirSync(installDashDir, { recursive: true });
+		copyDirRecursive(dashboardAssetSrc, installDashDir);
+		if (hadNodeModules && node_fs.existsSync(nodeModulesTmp)) node_fs.renameSync(nodeModulesTmp, nodeModulesDir);
+		const dashConfigPath = node_path.join(installDir, "dashboard.json");
+		if (!node_fs.existsSync(dashConfigPath)) node_fs.writeFileSync(dashConfigPath, JSON.stringify({ projectCwd: process.cwd() }, null, 2) + "\n");
+	}
+	const localDashboard = node_path.join(process.cwd(), ".claude", "dashboard", "server.js");
+	const globalDashboard = node_path.join(node_os.homedir(), ".claude", "dashboard", "server.js");
+	let serverPath = null;
+	if (node_fs.existsSync(localDashboard)) serverPath = localDashboard;
+	else if (node_fs.existsSync(globalDashboard)) serverPath = globalDashboard;
+	if (!serverPath) {
+		console.log(chalk.yellow("\n  Dashboard not available.\n"));
+		console.log("  Install MAXSIM first: " + chalk.cyan("npx maxsimcli@latest") + "\n");
+		process.exit(0);
+	}
+	const forceNetwork = !!argv["network"];
+	const dashboardDir = node_path.dirname(serverPath);
+	const dashboardConfigPath = node_path.join(node_path.dirname(dashboardDir), "dashboard.json");
+	let projectCwd = process.cwd();
+	let networkMode = forceNetwork;
+	if (node_fs.existsSync(dashboardConfigPath)) try {
+		const config = JSON.parse(node_fs.readFileSync(dashboardConfigPath, "utf8"));
+		if (config.projectCwd) projectCwd = config.projectCwd;
+		if (!forceNetwork) networkMode = config.networkMode ?? false;
+	} catch {}
+	const dashDirForPty = node_path.dirname(serverPath);
+	const ptyModulePath = node_path.join(dashDirForPty, "node_modules", "node-pty");
+	if (!node_fs.existsSync(ptyModulePath)) {
+		console.log(chalk.gray("  Installing node-pty for terminal support..."));
+		try {
+			const dashPkgPath = node_path.join(dashDirForPty, "package.json");
+			if (!node_fs.existsSync(dashPkgPath)) node_fs.writeFileSync(dashPkgPath, "{\"private\":true}\n");
+			execSyncDash("npm install node-pty --save-optional --no-audit --no-fund --loglevel=error", {
+				cwd: dashDirForPty,
+				stdio: "inherit",
+				timeout: 12e4
+			});
+		} catch {
+			console.warn(chalk.yellow("  node-pty installation failed — terminal will be unavailable."));
+		}
+	}
+	console.log(chalk.blue("Starting dashboard..."));
+	console.log(chalk.gray(`  Project: ${projectCwd}`));
+	console.log(chalk.gray(`  Server:  ${serverPath}`));
+	if (networkMode) console.log(chalk.gray("  Network: enabled (local network access + QR code)"));
+	console.log("");
+	spawnDash(process.execPath, [serverPath], {
+		cwd: dashboardDir,
+		detached: true,
+		stdio: "ignore",
+		env: {
+			...process.env,
+			MAXSIM_PROJECT_CWD: projectCwd,
+			MAXSIM_NETWORK_MODE: networkMode ? "1" : "0",
+			NODE_ENV: "production"
+		}
+	}).unref();
+	const POLL_INTERVAL_MS = 500;
+	const POLL_TIMEOUT_MS = 2e4;
+	const HEALTH_TIMEOUT_MS = 1e3;
+	const DEFAULT_PORT = 3333;
+	const PORT_RANGE_END = 3343;
+	let foundUrl = null;
+	const deadline = Date.now() + POLL_TIMEOUT_MS;
+	while (Date.now() < deadline) {
+		await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+		for (let p = DEFAULT_PORT; p <= PORT_RANGE_END; p++) try {
+			const controller = new AbortController();
+			const timer = setTimeout(() => controller.abort(), HEALTH_TIMEOUT_MS);
+			const res = await fetch(`http://localhost:${p}/api/health`, { signal: controller.signal });
+			clearTimeout(timer);
+			if (res.ok) {
+				if ((await res.json()).status === "ok") {
+					foundUrl = `http://localhost:${p}`;
+					break;
+				}
+			}
+		} catch {}
+		if (foundUrl) break;
+	}
+	if (foundUrl) console.log(chalk.green(`  Dashboard ready at ${foundUrl}`));
+	else console.log(chalk.yellow("\n  Dashboard did not respond after 20s. The server may still be starting — check http://localhost:3333"));
+	process.exit(0);
+}
+
+//#endregion
+//#region src/install/hooks.ts
 /**
 * Clean up orphaned files from previous MAXSIM versions
 */
@@ -8620,9 +8663,383 @@ function cleanupOrphanedHooks(settings) {
 	return settings;
 }
 /**
+* Install hook files and configure settings.json for a runtime
+*/
+function installHookFiles(targetDir, runtime, isGlobal, failures) {
+	getDirName(runtime);
+	if (runtime === "codex") return;
+	let hooksSrc = null;
+	const bundledHooksDir = node_path.resolve(__dirname, "assets", "hooks");
+	if (node_fs.existsSync(bundledHooksDir)) hooksSrc = bundledHooksDir;
+	else console.warn(`  ${chalk.yellow("!")} bundled hooks not found - hooks will not be installed`);
+	if (hooksSrc) {
+		const spinner = ora({
+			text: "Installing hooks...",
+			color: "cyan"
+		}).start();
+		const hooksDest = node_path.join(targetDir, "hooks");
+		node_fs.mkdirSync(hooksDest, { recursive: true });
+		const hookEntries = node_fs.readdirSync(hooksSrc);
+		const configDirReplacement = getConfigDirFromHome(runtime, isGlobal);
+		for (const entry of hookEntries) {
+			const srcFile = node_path.join(hooksSrc, entry);
+			if (node_fs.statSync(srcFile).isFile() && entry.endsWith(".cjs") && !entry.includes(".d.")) {
+				const destName = entry.replace(/\.cjs$/, ".js");
+				const destFile = node_path.join(hooksDest, destName);
+				let content = node_fs.readFileSync(srcFile, "utf8");
+				content = content.replace(/'\.claude'/g, configDirReplacement);
+				node_fs.writeFileSync(destFile, content);
+			}
+		}
+		if (verifyInstalled(hooksDest, "hooks")) spinner.succeed(chalk.green("✓") + " Installed hooks (bundled)");
+		else {
+			spinner.fail("Failed to install hooks");
+			failures.push("hooks");
+		}
+	}
+}
+/**
+* Configure hooks and statusline in settings.json
+*/
+function configureSettingsHooks(targetDir, runtime, isGlobal) {
+	const dirName = getDirName(runtime);
+	const isOpencode = runtime === "opencode";
+	const settingsPath = node_path.join(targetDir, "settings.json");
+	const settings = cleanupOrphanedHooks(readSettings(settingsPath));
+	const statuslineCommand = isGlobal ? buildHookCommand(targetDir, "maxsim-statusline.js") : "node " + dirName + "/hooks/maxsim-statusline.js";
+	const updateCheckCommand = isGlobal ? buildHookCommand(targetDir, "maxsim-check-update.js") : "node " + dirName + "/hooks/maxsim-check-update.js";
+	const contextMonitorCommand = isGlobal ? buildHookCommand(targetDir, "maxsim-context-monitor.js") : "node " + dirName + "/hooks/maxsim-context-monitor.js";
+	if (!isOpencode) {
+		if (!settings.hooks) settings.hooks = {};
+		const installHooks = settings.hooks;
+		if (!installHooks.SessionStart) installHooks.SessionStart = [];
+		if (!installHooks.SessionStart.some((entry) => entry.hooks && entry.hooks.some((h) => h.command && h.command.includes("maxsim-check-update")))) {
+			installHooks.SessionStart.push({ hooks: [{
+				type: "command",
+				command: updateCheckCommand
+			}] });
+			console.log(`  ${chalk.green("✓")} Configured update check hook`);
+		}
+		if (!installHooks.PostToolUse) installHooks.PostToolUse = [];
+		if (!installHooks.PostToolUse.some((entry) => entry.hooks && entry.hooks.some((h) => h.command && h.command.includes("maxsim-context-monitor")))) {
+			installHooks.PostToolUse.push({ hooks: [{
+				type: "command",
+				command: contextMonitorCommand
+			}] });
+			console.log(`  ${chalk.green("✓")} Configured context window monitor hook`);
+		}
+	}
+	return {
+		settingsPath,
+		settings,
+		statuslineCommand,
+		updateCheckCommand,
+		contextMonitorCommand
+	};
+}
+/**
+* Handle statusline configuration — returns true if MAXSIM statusline should be installed
+*/
+async function handleStatusline(settings, isInteractive, forceStatusline) {
+	if (!(settings.statusLine != null)) return true;
+	if (forceStatusline) return true;
+	if (!isInteractive) {
+		console.log(chalk.yellow("⚠") + " Skipping statusline (already configured)");
+		console.log("  Use " + chalk.cyan("--force-statusline") + " to replace\n");
+		return false;
+	}
+	const statusLine = settings.statusLine;
+	const existingCmd = statusLine.command || statusLine.url || "(custom)";
+	console.log();
+	console.log(chalk.yellow("⚠  Existing statusline detected"));
+	console.log();
+	console.log("  Your current statusline:");
+	console.log("    " + chalk.dim(`command: ${existingCmd}`));
+	console.log();
+	console.log("  MAXSIM includes a statusline showing:");
+	console.log("    • Model name");
+	console.log("    • Current task (from todo list)");
+	console.log("    • Context window usage (color-coded)");
+	console.log();
+	return await dist_default$1({
+		message: "Replace with MAXSIM statusline?",
+		default: false
+	});
+}
+/**
+* Apply statusline config, then print completion message
+*/
+function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline, runtime = "claude", isGlobal = true) {
+	const isOpencode = runtime === "opencode";
+	const isCodex = runtime === "codex";
+	if (shouldInstallStatusline && !isOpencode && !isCodex) {
+		settings.statusLine = {
+			type: "command",
+			command: statuslineCommand
+		};
+		console.log(`  ${chalk.green("✓")} Configured statusline`);
+	}
+	if (!isCodex && settingsPath && settings) writeSettings(settingsPath, settings);
+	if (isOpencode) configureOpencodePermissions(isGlobal);
+	let program = "Claude Code";
+	if (runtime === "opencode") program = "OpenCode";
+	if (runtime === "gemini") program = "Gemini";
+	if (runtime === "codex") program = "Codex";
+	let command = "/maxsim:help";
+	if (runtime === "opencode") command = "/maxsim-help";
+	if (runtime === "codex") command = "$maxsim-help";
+	console.log(`
+  ${chalk.green("Done!")} Launch ${program} and run ${chalk.cyan(command)}.
+
+  ${chalk.cyan("Join the community:")} https://discord.gg/5JJgD5svVS
+`);
+}
+
+//#endregion
+//#region src/install/copy.ts
+/**
+* Copy commands to a flat structure for OpenCode
+* OpenCode expects: command/maxsim-help.md (invoked as /maxsim-help)
+* Source structure: commands/maxsim/help.md
+*/
+function copyFlattenedCommands(srcDir, destDir, prefix, pathPrefix, runtime, explicitConfigDir) {
+	if (!node_fs.existsSync(srcDir)) return;
+	if (node_fs.existsSync(destDir)) {
+		for (const file of node_fs.readdirSync(destDir)) if (file.startsWith(`${prefix}-`) && file.endsWith(".md")) node_fs.unlinkSync(node_path.join(destDir, file));
+	} else node_fs.mkdirSync(destDir, { recursive: true });
+	const entries = node_fs.readdirSync(srcDir, { withFileTypes: true });
+	for (const entry of entries) {
+		const srcPath = node_path.join(srcDir, entry.name);
+		if (entry.isDirectory()) copyFlattenedCommands(srcPath, destDir, `${prefix}-${entry.name}`, pathPrefix, runtime, explicitConfigDir);
+		else if (entry.name.endsWith(".md")) {
+			const destName = `${prefix}-${entry.name.replace(".md", "")}.md`;
+			const destPath = node_path.join(destDir, destName);
+			let content = node_fs.readFileSync(srcPath, "utf8");
+			const globalClaudeRegex = /~\/\.claude\//g;
+			const localClaudeRegex = /\.\/\.claude\//g;
+			const opencodeDirRegex = /~\/\.opencode\//g;
+			content = content.replace(globalClaudeRegex, pathPrefix);
+			content = content.replace(localClaudeRegex, `./${getDirName(runtime)}/`);
+			content = content.replace(opencodeDirRegex, pathPrefix);
+			content = processAttribution(content, getCommitAttribution(runtime, explicitConfigDir));
+			content = convertClaudeToOpencodeFrontmatter(content);
+			node_fs.writeFileSync(destPath, content);
+		}
+	}
+}
+function listCodexSkillNames(skillsDir, prefix = "maxsim-") {
+	if (!node_fs.existsSync(skillsDir)) return [];
+	return node_fs.readdirSync(skillsDir, { withFileTypes: true }).filter((entry) => entry.isDirectory() && entry.name.startsWith(prefix)).filter((entry) => node_fs.existsSync(node_path.join(skillsDir, entry.name, "SKILL.md"))).map((entry) => entry.name).sort();
+}
+function copyCommandsAsCodexSkills(srcDir, skillsDir, prefix, pathPrefix, runtime, explicitConfigDir) {
+	if (!node_fs.existsSync(srcDir)) return;
+	node_fs.mkdirSync(skillsDir, { recursive: true });
+	const existing = node_fs.readdirSync(skillsDir, { withFileTypes: true });
+	for (const entry of existing) if (entry.isDirectory() && entry.name.startsWith(`${prefix}-`)) node_fs.rmSync(node_path.join(skillsDir, entry.name), { recursive: true });
+	function recurse(currentSrcDir, currentPrefix) {
+		const entries = node_fs.readdirSync(currentSrcDir, { withFileTypes: true });
+		for (const entry of entries) {
+			const srcPath = node_path.join(currentSrcDir, entry.name);
+			if (entry.isDirectory()) {
+				recurse(srcPath, `${currentPrefix}-${entry.name}`);
+				continue;
+			}
+			if (!entry.name.endsWith(".md")) continue;
+			const skillName = `${currentPrefix}-${entry.name.replace(".md", "")}`;
+			const skillDir = node_path.join(skillsDir, skillName);
+			node_fs.mkdirSync(skillDir, { recursive: true });
+			let content = node_fs.readFileSync(srcPath, "utf8");
+			const globalClaudeRegex = /~\/\.claude\//g;
+			const localClaudeRegex = /\.\/\.claude\//g;
+			const codexDirRegex = /~\/\.codex\//g;
+			content = content.replace(globalClaudeRegex, pathPrefix);
+			content = content.replace(localClaudeRegex, `./${getDirName(runtime)}/`);
+			content = content.replace(codexDirRegex, pathPrefix);
+			content = processAttribution(content, getCommitAttribution(runtime, explicitConfigDir));
+			content = convertClaudeCommandToCodexSkill(content, skillName);
+			node_fs.writeFileSync(node_path.join(skillDir, "SKILL.md"), content);
+		}
+	}
+	recurse(srcDir, prefix);
+}
+/**
+* Recursively copy directory, replacing paths in .md files
+* Deletes existing destDir first to remove orphaned files from previous versions
+*/
+function copyWithPathReplacement(srcDir, destDir, pathPrefix, runtime, explicitConfigDir, isCommand = false) {
+	const isOpencode = runtime === "opencode";
+	const isCodex = runtime === "codex";
+	const dirName = getDirName(runtime);
+	if (node_fs.existsSync(destDir)) node_fs.rmSync(destDir, { recursive: true });
+	node_fs.mkdirSync(destDir, { recursive: true });
+	const entries = node_fs.readdirSync(srcDir, { withFileTypes: true });
+	for (const entry of entries) {
+		const srcPath = node_path.join(srcDir, entry.name);
+		const destPath = node_path.join(destDir, entry.name);
+		if (entry.isDirectory()) copyWithPathReplacement(srcPath, destPath, pathPrefix, runtime, explicitConfigDir, isCommand);
+		else if (entry.name.endsWith(".md")) {
+			let content = node_fs.readFileSync(srcPath, "utf8");
+			const globalClaudeRegex = /~\/\.claude\//g;
+			const localClaudeRegex = /\.\/\.claude\//g;
+			content = content.replace(globalClaudeRegex, pathPrefix);
+			content = content.replace(localClaudeRegex, `./${dirName}/`);
+			content = processAttribution(content, getCommitAttribution(runtime, explicitConfigDir));
+			if (isOpencode) {
+				content = convertClaudeToOpencodeFrontmatter(content);
+				node_fs.writeFileSync(destPath, content);
+			} else if (runtime === "gemini") if (isCommand) {
+				content = stripSubTags(content);
+				const tomlContent = convertClaudeToGeminiToml(content);
+				const tomlPath = destPath.replace(/\.md$/, ".toml");
+				node_fs.writeFileSync(tomlPath, tomlContent);
+			} else node_fs.writeFileSync(destPath, content);
+			else if (isCodex) {
+				content = convertClaudeToCodexMarkdown(content);
+				node_fs.writeFileSync(destPath, content);
+			} else node_fs.writeFileSync(destPath, content);
+		} else node_fs.copyFileSync(srcPath, destPath);
+	}
+}
+
+//#endregion
+//#region src/install/manifest.ts
+const MANIFEST_NAME = "maxsim-file-manifest.json";
+/**
+* Compute SHA256 hash of file contents
+*/
+function fileHash(filePath) {
+	const content = node_fs.readFileSync(filePath);
+	return node_crypto.createHash("sha256").update(content).digest("hex");
+}
+/**
+* Recursively collect all files in dir with their hashes
+*/
+function generateManifest(dir, baseDir) {
+	if (!baseDir) baseDir = dir;
+	const manifest = {};
+	if (!node_fs.existsSync(dir)) return manifest;
+	const entries = node_fs.readdirSync(dir, { withFileTypes: true });
+	for (const entry of entries) {
+		const fullPath = node_path.join(dir, entry.name);
+		const relPath = node_path.relative(baseDir, fullPath).replace(/\\/g, "/");
+		if (entry.isDirectory()) Object.assign(manifest, generateManifest(fullPath, baseDir));
+		else manifest[relPath] = fileHash(fullPath);
+	}
+	return manifest;
+}
+/**
+* Write file manifest after installation for future modification detection
+*/
+function writeManifest(configDir, runtime = "claude") {
+	const isOpencode = runtime === "opencode";
+	const isCodex = runtime === "codex";
+	const maxsimDir = node_path.join(configDir, "maxsim");
+	const commandsDir = node_path.join(configDir, "commands", "maxsim");
+	const opencodeCommandDir = node_path.join(configDir, "command");
+	const codexSkillsDir = node_path.join(configDir, "skills");
+	const agentsDir = node_path.join(configDir, "agents");
+	const manifest = {
+		version: pkg.version,
+		timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+		files: {}
+	};
+	const maxsimHashes = generateManifest(maxsimDir);
+	for (const [rel, hash] of Object.entries(maxsimHashes)) manifest.files["maxsim/" + rel] = hash;
+	if (!isOpencode && !isCodex && node_fs.existsSync(commandsDir)) {
+		const cmdHashes = generateManifest(commandsDir);
+		for (const [rel, hash] of Object.entries(cmdHashes)) manifest.files["commands/maxsim/" + rel] = hash;
+	}
+	if (isOpencode && node_fs.existsSync(opencodeCommandDir)) {
+		for (const file of node_fs.readdirSync(opencodeCommandDir)) if (file.startsWith("maxsim-") && file.endsWith(".md")) manifest.files["command/" + file] = fileHash(node_path.join(opencodeCommandDir, file));
+	}
+	if (isCodex && node_fs.existsSync(codexSkillsDir)) for (const skillName of listCodexSkillNames(codexSkillsDir)) {
+		const skillHashes = generateManifest(node_path.join(codexSkillsDir, skillName));
+		for (const [rel, hash] of Object.entries(skillHashes)) manifest.files[`skills/${skillName}/${rel}`] = hash;
+	}
+	if (node_fs.existsSync(agentsDir)) {
+		for (const file of node_fs.readdirSync(agentsDir)) if (file.startsWith("maxsim-") && file.endsWith(".md")) manifest.files["agents/" + file] = fileHash(node_path.join(agentsDir, file));
+	}
+	const skillsManifestDir = node_path.join(agentsDir, "skills");
+	if (node_fs.existsSync(skillsManifestDir)) {
+		const skillHashes = generateManifest(skillsManifestDir);
+		for (const [rel, hash] of Object.entries(skillHashes)) manifest.files["agents/skills/" + rel] = hash;
+	}
+	node_fs.writeFileSync(node_path.join(configDir, MANIFEST_NAME), JSON.stringify(manifest, null, 2));
+	return manifest;
+}
+
+//#endregion
+//#region src/install/patches.ts
+const PATCHES_DIR_NAME = "maxsim-local-patches";
+/**
+* Detect user-modified MAXSIM files by comparing against install manifest.
+*/
+function saveLocalPatches(configDir) {
+	const manifestPath = node_path.join(configDir, MANIFEST_NAME);
+	if (!node_fs.existsSync(manifestPath)) return [];
+	let manifest;
+	try {
+		manifest = JSON.parse(node_fs.readFileSync(manifestPath, "utf8"));
+	} catch {
+		return [];
+	}
+	const patchesDir = node_path.join(configDir, PATCHES_DIR_NAME);
+	const modified = [];
+	for (const [relPath, originalHash] of Object.entries(manifest.files || {})) {
+		const fullPath = node_path.join(configDir, relPath);
+		if (!node_fs.existsSync(fullPath)) continue;
+		if (fileHash(fullPath) !== originalHash) {
+			const backupPath = node_path.join(patchesDir, relPath);
+			node_fs.mkdirSync(node_path.dirname(backupPath), { recursive: true });
+			node_fs.copyFileSync(fullPath, backupPath);
+			modified.push(relPath);
+		}
+	}
+	if (modified.length > 0) {
+		const meta = {
+			backed_up_at: (/* @__PURE__ */ new Date()).toISOString(),
+			from_version: manifest.version,
+			files: modified
+		};
+		node_fs.writeFileSync(node_path.join(patchesDir, "backup-meta.json"), JSON.stringify(meta, null, 2));
+		console.log("  " + chalk.yellow("i") + "  Found " + modified.length + " locally modified MAXSIM file(s) — backed up to maxsim-local-patches/");
+		for (const f of modified) console.log("     " + chalk.dim(f));
+	}
+	return modified;
+}
+/**
+* After install, report backed-up patches for user to reapply.
+*/
+function reportLocalPatches(configDir, runtime = "claude") {
+	const patchesDir = node_path.join(configDir, PATCHES_DIR_NAME);
+	const metaPath = node_path.join(patchesDir, "backup-meta.json");
+	if (!node_fs.existsSync(metaPath)) return [];
+	let meta;
+	try {
+		meta = JSON.parse(node_fs.readFileSync(metaPath, "utf8"));
+	} catch {
+		return [];
+	}
+	if (meta.files && meta.files.length > 0) {
+		const reapplyCommand = runtime === "opencode" ? "/maxsim-reapply-patches" : runtime === "codex" ? "$maxsim-reapply-patches" : "/maxsim:reapply-patches";
+		console.log("");
+		console.log("  " + chalk.yellow("Local patches detected") + " (from v" + meta.from_version + "):");
+		for (const f of meta.files) console.log("     " + chalk.cyan(f));
+		console.log("");
+		console.log("  Your modifications are saved in " + chalk.cyan(PATCHES_DIR_NAME + "/"));
+		console.log("  Run " + chalk.cyan(reapplyCommand) + " to merge them into the new version.");
+		console.log("  Or manually compare and merge the files.");
+		console.log("");
+	}
+	return meta.files || [];
+}
+
+//#endregion
+//#region src/install/uninstall.ts
+/**
 * Uninstall MAXSIM from the specified directory for a specific runtime
 */
-function uninstall(isGlobal, runtime = "claude") {
+function uninstall(isGlobal, runtime = "claude", explicitConfigDir = null) {
 	const isOpencode = runtime === "opencode";
 	const isCodex = runtime === "codex";
 	const dirName = getDirName(runtime);
@@ -8791,232 +9208,70 @@ function uninstall(isGlobal, runtime = "claude") {
   Your other files and settings have been preserved.
 `);
 }
-/**
-* Parse JSONC (JSON with Comments) by stripping comments and trailing commas.
-*/
-function parseJsonc(content) {
-	if (content.charCodeAt(0) === 65279) content = content.slice(1);
-	let result = "";
-	let inString = false;
-	let i = 0;
-	while (i < content.length) {
-		const char = content[i];
-		const next = content[i + 1];
-		if (inString) {
-			result += char;
-			if (char === "\\" && i + 1 < content.length) {
-				result += next;
-				i += 2;
-				continue;
-			}
-			if (char === "\"") inString = false;
-			i++;
-		} else if (char === "\"") {
-			inString = true;
-			result += char;
-			i++;
-		} else if (char === "/" && next === "/") while (i < content.length && content[i] !== "\n") i++;
-		else if (char === "/" && next === "*") {
-			i += 2;
-			while (i < content.length - 1 && !(content[i] === "*" && content[i + 1] === "/")) i++;
-			i += 2;
-		} else {
-			result += char;
-			i++;
-		}
+
+//#endregion
+//#region src/install/index.ts
+const argv = (0, import_minimist.default)(process.argv.slice(2), {
+	boolean: [
+		"global",
+		"local",
+		"opencode",
+		"claude",
+		"gemini",
+		"codex",
+		"both",
+		"all",
+		"uninstall",
+		"help",
+		"version",
+		"force-statusline",
+		"network"
+	],
+	string: ["config-dir"],
+	alias: {
+		g: "global",
+		l: "local",
+		u: "uninstall",
+		h: "help",
+		c: "config-dir"
 	}
-	result = result.replace(/,(\s*[}\]])/g, "$1");
-	return JSON.parse(result);
+});
+const hasGlobal = !!argv["global"];
+const hasLocal = !!argv["local"];
+const hasOpencode = !!argv["opencode"];
+const hasClaude = !!argv["claude"];
+const hasGemini = !!argv["gemini"];
+const hasCodex = !!argv["codex"];
+const hasBoth = !!argv["both"];
+const hasAll = !!argv["all"];
+const hasUninstall = !!argv["uninstall"];
+let selectedRuntimes = [];
+if (hasAll) selectedRuntimes = [
+	"claude",
+	"opencode",
+	"gemini",
+	"codex"
+];
+else if (hasBoth) selectedRuntimes = ["claude", "opencode"];
+else {
+	if (hasOpencode) selectedRuntimes.push("opencode");
+	if (hasClaude) selectedRuntimes.push("claude");
+	if (hasGemini) selectedRuntimes.push("gemini");
+	if (hasCodex) selectedRuntimes.push("codex");
 }
-/**
-* Configure OpenCode permissions to allow reading MAXSIM reference docs
-*/
-function configureOpencodePermissions(isGlobal = true) {
-	const opencodeConfigDir = isGlobal ? getOpencodeGlobalDir() : node_path.join(process.cwd(), ".opencode");
-	const configPath = node_path.join(opencodeConfigDir, "opencode.json");
-	node_fs.mkdirSync(opencodeConfigDir, { recursive: true });
-	let config = {};
-	if (node_fs.existsSync(configPath)) try {
-		config = parseJsonc(node_fs.readFileSync(configPath, "utf8"));
-	} catch (e) {
-		console.log(`  ${chalk.yellow("⚠")} Could not parse opencode.json - skipping permission config`);
-		console.log(`    ${chalk.dim(`Reason: ${e.message}`)}`);
-		console.log(`    ${chalk.dim("Your config was NOT modified. Fix the syntax manually if needed.")}`);
-		return;
-	}
-	if (!config.permission) config.permission = {};
-	const permission = config.permission;
-	const maxsimPath = opencodeConfigDir === node_path.join(node_os.homedir(), ".config", "opencode") ? "~/.config/opencode/maxsim/*" : `${opencodeConfigDir.replace(/\\/g, "/")}/maxsim/*`;
-	let modified = false;
-	if (!permission.read || typeof permission.read !== "object") permission.read = {};
-	if (permission.read[maxsimPath] !== "allow") {
-		permission.read[maxsimPath] = "allow";
-		modified = true;
-	}
-	if (!permission.external_directory || typeof permission.external_directory !== "object") permission.external_directory = {};
-	if (permission.external_directory[maxsimPath] !== "allow") {
-		permission.external_directory[maxsimPath] = "allow";
-		modified = true;
-	}
-	if (!modified) return;
-	node_fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n");
-	console.log(`  ${chalk.green("✓")} Configured read permission for MAXSIM docs`);
+const banner = "\n" + chalk.cyan(figlet.default.textSync("MAXSIM", { font: "ANSI Shadow" }).split("\n").map((line) => "  " + line).join("\n")) + "\n\n  MAXSIM " + chalk.dim("v" + pkg.version) + "\n  A meta-prompting, context engineering and spec-driven\n  development system for Claude Code, OpenCode, Gemini, and Codex.\n";
+const explicitConfigDir = argv["config-dir"] || null;
+const hasHelp = !!argv["help"];
+const hasVersion = !!argv["version"];
+const forceStatusline = !!argv["force-statusline"];
+if (hasVersion) {
+	console.log(pkg.version);
+	process.exit(0);
 }
-/**
-* Verify a directory exists and contains files
-*/
-function verifyInstalled(dirPath, description) {
-	if (!node_fs.existsSync(dirPath)) {
-		console.error(`  ${chalk.yellow("✗")} Failed to install ${description}: directory not created`);
-		return false;
-	}
-	try {
-		if (node_fs.readdirSync(dirPath).length === 0) {
-			console.error(`  ${chalk.yellow("✗")} Failed to install ${description}: directory is empty`);
-			return false;
-		}
-	} catch (e) {
-		console.error(`  ${chalk.yellow("✗")} Failed to install ${description}: ${e.message}`);
-		return false;
-	}
-	return true;
-}
-/**
-* Verify a file exists
-*/
-function verifyFileInstalled(filePath, description) {
-	if (!node_fs.existsSync(filePath)) {
-		console.error(`  ${chalk.yellow("✗")} Failed to install ${description}: file not created`);
-		return false;
-	}
-	return true;
-}
-const PATCHES_DIR_NAME = "maxsim-local-patches";
-const MANIFEST_NAME = "maxsim-file-manifest.json";
-/**
-* Compute SHA256 hash of file contents
-*/
-function fileHash(filePath) {
-	const content = node_fs.readFileSync(filePath);
-	return node_crypto.createHash("sha256").update(content).digest("hex");
-}
-/**
-* Recursively collect all files in dir with their hashes
-*/
-function generateManifest(dir, baseDir) {
-	if (!baseDir) baseDir = dir;
-	const manifest = {};
-	if (!node_fs.existsSync(dir)) return manifest;
-	const entries = node_fs.readdirSync(dir, { withFileTypes: true });
-	for (const entry of entries) {
-		const fullPath = node_path.join(dir, entry.name);
-		const relPath = node_path.relative(baseDir, fullPath).replace(/\\/g, "/");
-		if (entry.isDirectory()) Object.assign(manifest, generateManifest(fullPath, baseDir));
-		else manifest[relPath] = fileHash(fullPath);
-	}
-	return manifest;
-}
-/**
-* Write file manifest after installation for future modification detection
-*/
-function writeManifest(configDir, runtime = "claude") {
-	const isOpencode = runtime === "opencode";
-	const isCodex = runtime === "codex";
-	const maxsimDir = node_path.join(configDir, "maxsim");
-	const commandsDir = node_path.join(configDir, "commands", "maxsim");
-	const opencodeCommandDir = node_path.join(configDir, "command");
-	const codexSkillsDir = node_path.join(configDir, "skills");
-	const agentsDir = node_path.join(configDir, "agents");
-	const manifest = {
-		version: pkg.version,
-		timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-		files: {}
-	};
-	const maxsimHashes = generateManifest(maxsimDir);
-	for (const [rel, hash] of Object.entries(maxsimHashes)) manifest.files["maxsim/" + rel] = hash;
-	if (!isOpencode && !isCodex && node_fs.existsSync(commandsDir)) {
-		const cmdHashes = generateManifest(commandsDir);
-		for (const [rel, hash] of Object.entries(cmdHashes)) manifest.files["commands/maxsim/" + rel] = hash;
-	}
-	if (isOpencode && node_fs.existsSync(opencodeCommandDir)) {
-		for (const file of node_fs.readdirSync(opencodeCommandDir)) if (file.startsWith("maxsim-") && file.endsWith(".md")) manifest.files["command/" + file] = fileHash(node_path.join(opencodeCommandDir, file));
-	}
-	if (isCodex && node_fs.existsSync(codexSkillsDir)) for (const skillName of listCodexSkillNames(codexSkillsDir)) {
-		const skillHashes = generateManifest(node_path.join(codexSkillsDir, skillName));
-		for (const [rel, hash] of Object.entries(skillHashes)) manifest.files[`skills/${skillName}/${rel}`] = hash;
-	}
-	if (node_fs.existsSync(agentsDir)) {
-		for (const file of node_fs.readdirSync(agentsDir)) if (file.startsWith("maxsim-") && file.endsWith(".md")) manifest.files["agents/" + file] = fileHash(node_path.join(agentsDir, file));
-	}
-	const skillsManifestDir = node_path.join(agentsDir, "skills");
-	if (node_fs.existsSync(skillsManifestDir)) {
-		const skillHashes = generateManifest(skillsManifestDir);
-		for (const [rel, hash] of Object.entries(skillHashes)) manifest.files["agents/skills/" + rel] = hash;
-	}
-	node_fs.writeFileSync(node_path.join(configDir, MANIFEST_NAME), JSON.stringify(manifest, null, 2));
-	return manifest;
-}
-/**
-* Detect user-modified MAXSIM files by comparing against install manifest.
-*/
-function saveLocalPatches(configDir) {
-	const manifestPath = node_path.join(configDir, MANIFEST_NAME);
-	if (!node_fs.existsSync(manifestPath)) return [];
-	let manifest;
-	try {
-		manifest = JSON.parse(node_fs.readFileSync(manifestPath, "utf8"));
-	} catch {
-		return [];
-	}
-	const patchesDir = node_path.join(configDir, PATCHES_DIR_NAME);
-	const modified = [];
-	for (const [relPath, originalHash] of Object.entries(manifest.files || {})) {
-		const fullPath = node_path.join(configDir, relPath);
-		if (!node_fs.existsSync(fullPath)) continue;
-		if (fileHash(fullPath) !== originalHash) {
-			const backupPath = node_path.join(patchesDir, relPath);
-			node_fs.mkdirSync(node_path.dirname(backupPath), { recursive: true });
-			node_fs.copyFileSync(fullPath, backupPath);
-			modified.push(relPath);
-		}
-	}
-	if (modified.length > 0) {
-		const meta = {
-			backed_up_at: (/* @__PURE__ */ new Date()).toISOString(),
-			from_version: manifest.version,
-			files: modified
-		};
-		node_fs.writeFileSync(node_path.join(patchesDir, "backup-meta.json"), JSON.stringify(meta, null, 2));
-		console.log("  " + chalk.yellow("i") + "  Found " + modified.length + " locally modified MAXSIM file(s) — backed up to maxsim-local-patches/");
-		for (const f of modified) console.log("     " + chalk.dim(f));
-	}
-	return modified;
-}
-/**
-* After install, report backed-up patches for user to reapply.
-*/
-function reportLocalPatches(configDir, runtime = "claude") {
-	const patchesDir = node_path.join(configDir, PATCHES_DIR_NAME);
-	const metaPath = node_path.join(patchesDir, "backup-meta.json");
-	if (!node_fs.existsSync(metaPath)) return [];
-	let meta;
-	try {
-		meta = JSON.parse(node_fs.readFileSync(metaPath, "utf8"));
-	} catch {
-		return [];
-	}
-	if (meta.files && meta.files.length > 0) {
-		const reapplyCommand = runtime === "opencode" ? "/maxsim-reapply-patches" : runtime === "codex" ? "$maxsim-reapply-patches" : "/maxsim:reapply-patches";
-		console.log("");
-		console.log("  " + chalk.yellow("Local patches detected") + " (from v" + meta.from_version + "):");
-		for (const f of meta.files) console.log("     " + chalk.cyan(f));
-		console.log("");
-		console.log("  Your modifications are saved in " + chalk.cyan(PATCHES_DIR_NAME + "/"));
-		console.log("  Run " + chalk.cyan(reapplyCommand) + " to merge them into the new version.");
-		console.log("  Or manually compare and merge the files.");
-		console.log("");
-	}
-	return meta.files || [];
+console.log(banner);
+if (hasHelp) {
+	console.log(`  ${chalk.yellow("Usage:")} npx maxsimcli [options]\n\n  ${chalk.yellow("Options:")}\n    ${chalk.cyan("-g, --global")}              Install globally (to config directory)\n    ${chalk.cyan("-l, --local")}               Install locally (to current directory)\n    ${chalk.cyan("--claude")}                  Install for Claude Code only\n    ${chalk.cyan("--opencode")}                Install for OpenCode only\n    ${chalk.cyan("--gemini")}                  Install for Gemini only\n    ${chalk.cyan("--codex")}                   Install for Codex only\n    ${chalk.cyan("--all")}                     Install for all runtimes\n    ${chalk.cyan("-u, --uninstall")}           Uninstall MAXSIM (remove all MAXSIM files)\n    ${chalk.cyan("-c, --config-dir <path>")}   Specify custom config directory\n    ${chalk.cyan("-h, --help")}                Show this help message\n    ${chalk.cyan("--force-statusline")}        Replace existing statusline config\n\n  ${chalk.yellow("Examples:")}\n    ${chalk.dim("# Interactive install (prompts for runtime and location)")}\n    npx maxsimcli\n\n    ${chalk.dim("# Install for Claude Code globally")}\n    npx maxsimcli --claude --global\n\n    ${chalk.dim("# Install for Gemini globally")}\n    npx maxsimcli --gemini --global\n\n    ${chalk.dim("# Install for Codex globally")}\n    npx maxsimcli --codex --global\n\n    ${chalk.dim("# Install for all runtimes globally")}\n    npx maxsimcli --all --global\n\n    ${chalk.dim("# Install to custom config directory")}\n    npx maxsimcli --codex --global --config-dir ~/.codex-work\n\n    ${chalk.dim("# Install to current project only")}\n    npx maxsimcli --claude --local\n\n    ${chalk.dim("# Uninstall MAXSIM from Codex globally")}\n    npx maxsimcli --codex --global --uninstall\n\n  ${chalk.yellow("Notes:")}\n    The --config-dir option is useful when you have multiple configurations.\n    It takes priority over CLAUDE_CONFIG_DIR / GEMINI_CONFIG_DIR / CODEX_HOME environment variables.\n`);
+	process.exit(0);
 }
 async function install(isGlobal, runtime = "claude") {
 	const isOpencode = runtime === "opencode";
@@ -9042,7 +9297,7 @@ async function install(isGlobal, runtime = "claude") {
 	if (isOpencode) {
 		const commandDir = node_path.join(targetDir, "command");
 		node_fs.mkdirSync(commandDir, { recursive: true });
-		copyFlattenedCommands(node_path.join(src, "commands", "maxsim"), commandDir, "maxsim", pathPrefix, runtime);
+		copyFlattenedCommands(node_path.join(src, "commands", "maxsim"), commandDir, "maxsim", pathPrefix, runtime, explicitConfigDir);
 		if (verifyInstalled(commandDir, "command/maxsim-*")) {
 			const count = node_fs.readdirSync(commandDir).filter((f) => f.startsWith("maxsim-")).length;
 			spinner.succeed(chalk.green("✓") + ` Installed ${count} commands to command/`);
@@ -9052,7 +9307,7 @@ async function install(isGlobal, runtime = "claude") {
 		}
 	} else if (isCodex) {
 		const skillsDir = node_path.join(targetDir, "skills");
-		copyCommandsAsCodexSkills(node_path.join(src, "commands", "maxsim"), skillsDir, "maxsim", pathPrefix, runtime);
+		copyCommandsAsCodexSkills(node_path.join(src, "commands", "maxsim"), skillsDir, "maxsim", pathPrefix, runtime, explicitConfigDir);
 		const installedSkillNames = listCodexSkillNames(skillsDir);
 		if (installedSkillNames.length > 0) spinner.succeed(chalk.green("✓") + ` Installed ${installedSkillNames.length} skills to skills/`);
 		else {
@@ -9064,7 +9319,7 @@ async function install(isGlobal, runtime = "claude") {
 		node_fs.mkdirSync(commandsDir, { recursive: true });
 		const maxsimSrc = node_path.join(src, "commands", "maxsim");
 		const maxsimDest = node_path.join(commandsDir, "maxsim");
-		copyWithPathReplacement(maxsimSrc, maxsimDest, pathPrefix, runtime, true);
+		copyWithPathReplacement(maxsimSrc, maxsimDest, pathPrefix, runtime, explicitConfigDir, true);
 		if (verifyInstalled(maxsimDest, "commands/maxsim")) spinner.succeed(chalk.green("✓") + " Installed commands/maxsim");
 		else {
 			spinner.fail("Failed to install commands/maxsim");
@@ -9085,7 +9340,7 @@ async function install(isGlobal, runtime = "claude") {
 	node_fs.mkdirSync(skillDest, { recursive: true });
 	for (const subdir of maxsimSubdirs) {
 		const subdirSrc = node_path.join(src, subdir);
-		if (node_fs.existsSync(subdirSrc)) copyWithPathReplacement(subdirSrc, node_path.join(skillDest, subdir), pathPrefix, runtime);
+		if (node_fs.existsSync(subdirSrc)) copyWithPathReplacement(subdirSrc, node_path.join(skillDest, subdir), pathPrefix, runtime, explicitConfigDir);
 	}
 	if (verifyInstalled(skillDest, "maxsim")) spinner.succeed(chalk.green("✓") + " Installed maxsim");
 	else {
@@ -9107,7 +9362,7 @@ async function install(isGlobal, runtime = "claude") {
 		for (const entry of agentEntries) if (entry.isFile() && entry.name.endsWith(".md")) {
 			let content = node_fs.readFileSync(node_path.join(agentsSrc, entry.name), "utf8");
 			content = content.replace(/~\/\.claude\//g, pathPrefix);
-			content = processAttribution(content, getCommitAttribution(runtime));
+			content = processAttribution(content, getCommitAttribution(runtime, explicitConfigDir));
 			if (isOpencode) content = convertClaudeToOpencodeFrontmatter(content);
 			else if (isGemini) content = convertClaudeToGeminiAgent(content);
 			else if (isCodex) content = convertClaudeToCodexMarkdown(content);
@@ -9141,7 +9396,7 @@ async function install(isGlobal, runtime = "claude") {
 			if (node_fs.existsSync(skillMd)) {
 				let content = node_fs.readFileSync(skillMd, "utf8");
 				content = content.replace(/~\/\.claude\//g, pathPrefix);
-				content = processAttribution(content, getCommitAttribution(runtime));
+				content = processAttribution(content, getCommitAttribution(runtime, explicitConfigDir));
 				node_fs.writeFileSync(skillMd, content);
 			}
 		}
@@ -9206,35 +9461,7 @@ async function install(isGlobal, runtime = "claude") {
 			node_fs.copyFileSync(mcpSrc, mcpDest);
 			console.log(`  ${chalk.green("✓")} Installed mcp-server.cjs`);
 		} else console.warn(`  ${chalk.yellow("!")} mcp-server.cjs not found — MCP server not installed`);
-		let hooksSrc = null;
-		const bundledHooksDir = node_path.resolve(__dirname, "assets", "hooks");
-		if (node_fs.existsSync(bundledHooksDir)) hooksSrc = bundledHooksDir;
-		else console.warn(`  ${chalk.yellow("!")} bundled hooks not found - hooks will not be installed`);
-		if (hooksSrc) {
-			spinner = ora({
-				text: "Installing hooks...",
-				color: "cyan"
-			}).start();
-			const hooksDest = node_path.join(targetDir, "hooks");
-			node_fs.mkdirSync(hooksDest, { recursive: true });
-			const hookEntries = node_fs.readdirSync(hooksSrc);
-			const configDirReplacement = getConfigDirFromHome(runtime, isGlobal);
-			for (const entry of hookEntries) {
-				const srcFile = node_path.join(hooksSrc, entry);
-				if (node_fs.statSync(srcFile).isFile() && entry.endsWith(".cjs") && !entry.includes(".d.")) {
-					const destName = entry.replace(/\.cjs$/, ".js");
-					const destFile = node_path.join(hooksDest, destName);
-					let content = node_fs.readFileSync(srcFile, "utf8");
-					content = content.replace(/'\.claude'/g, configDirReplacement);
-					node_fs.writeFileSync(destFile, content);
-				}
-			}
-			if (verifyInstalled(hooksDest, "hooks")) spinner.succeed(chalk.green("✓") + " Installed hooks (bundled)");
-			else {
-				spinner.fail("Failed to install hooks");
-				failures.push("hooks");
-			}
-		}
+		installHookFiles(targetDir, runtime, isGlobal, failures);
 	}
 	const dashboardSrc = node_path.resolve(__dirname, "assets", "dashboard");
 	if (node_fs.existsSync(dashboardSrc)) {
@@ -9291,11 +9518,7 @@ async function install(isGlobal, runtime = "claude") {
 		statuslineCommand: null,
 		runtime
 	};
-	const settingsPath = node_path.join(targetDir, "settings.json");
-	const settings = cleanupOrphanedHooks(readSettings(settingsPath));
-	const statuslineCommand = isGlobal ? buildHookCommand(targetDir, "maxsim-statusline.js") : "node " + dirName + "/hooks/maxsim-statusline.js";
-	const updateCheckCommand = isGlobal ? buildHookCommand(targetDir, "maxsim-check-update.js") : "node " + dirName + "/hooks/maxsim-check-update.js";
-	const contextMonitorCommand = isGlobal ? buildHookCommand(targetDir, "maxsim-context-monitor.js") : "node " + dirName + "/hooks/maxsim-context-monitor.js";
+	const { settingsPath, settings, statuslineCommand } = configureSettingsHooks(targetDir, runtime, isGlobal);
 	if (isGemini) {
 		if (!settings.experimental) settings.experimental = {};
 		const experimental = settings.experimental;
@@ -9304,89 +9527,12 @@ async function install(isGlobal, runtime = "claude") {
 			console.log(`  ${chalk.green("✓")} Enabled experimental agents`);
 		}
 	}
-	if (!isOpencode) {
-		if (!settings.hooks) settings.hooks = {};
-		const installHooks = settings.hooks;
-		if (!installHooks.SessionStart) installHooks.SessionStart = [];
-		if (!installHooks.SessionStart.some((entry) => entry.hooks && entry.hooks.some((h) => h.command && h.command.includes("maxsim-check-update")))) {
-			installHooks.SessionStart.push({ hooks: [{
-				type: "command",
-				command: updateCheckCommand
-			}] });
-			console.log(`  ${chalk.green("✓")} Configured update check hook`);
-		}
-		if (!installHooks.PostToolUse) installHooks.PostToolUse = [];
-		if (!installHooks.PostToolUse.some((entry) => entry.hooks && entry.hooks.some((h) => h.command && h.command.includes("maxsim-context-monitor")))) {
-			installHooks.PostToolUse.push({ hooks: [{
-				type: "command",
-				command: contextMonitorCommand
-			}] });
-			console.log(`  ${chalk.green("✓")} Configured context window monitor hook`);
-		}
-	}
 	return {
 		settingsPath,
 		settings,
 		statuslineCommand,
 		runtime
 	};
-}
-/**
-* Apply statusline config, then print completion message
-*/
-function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline, runtime = "claude", isGlobal = true) {
-	const isOpencode = runtime === "opencode";
-	const isCodex = runtime === "codex";
-	if (shouldInstallStatusline && !isOpencode && !isCodex) {
-		settings.statusLine = {
-			type: "command",
-			command: statuslineCommand
-		};
-		console.log(`  ${chalk.green("✓")} Configured statusline`);
-	}
-	if (!isCodex && settingsPath && settings) writeSettings(settingsPath, settings);
-	if (isOpencode) configureOpencodePermissions(isGlobal);
-	let program = "Claude Code";
-	if (runtime === "opencode") program = "OpenCode";
-	if (runtime === "gemini") program = "Gemini";
-	if (runtime === "codex") program = "Codex";
-	let command = "/maxsim:help";
-	if (runtime === "opencode") command = "/maxsim-help";
-	if (runtime === "codex") command = "$maxsim-help";
-	console.log(`
-  ${chalk.green("Done!")} Launch ${program} and run ${chalk.cyan(command)}.
-
-  ${chalk.cyan("Join the community:")} https://discord.gg/5JJgD5svVS
-`);
-}
-/**
-* Handle statusline configuration — returns true if MAXSIM statusline should be installed
-*/
-async function handleStatusline(settings, isInteractive) {
-	if (!(settings.statusLine != null)) return true;
-	if (forceStatusline) return true;
-	if (!isInteractive) {
-		console.log(chalk.yellow("⚠") + " Skipping statusline (already configured)");
-		console.log("  Use " + chalk.cyan("--force-statusline") + " to replace\n");
-		return false;
-	}
-	const statusLine = settings.statusLine;
-	const existingCmd = statusLine.command || statusLine.url || "(custom)";
-	console.log();
-	console.log(chalk.yellow("⚠  Existing statusline detected"));
-	console.log();
-	console.log("  Your current statusline:");
-	console.log("    " + chalk.dim(`command: ${existingCmd}`));
-	console.log();
-	console.log("  MAXSIM includes a statusline showing:");
-	console.log("    • Model name");
-	console.log("    • Current task (from todo list)");
-	console.log("    • Context window usage (color-coded)");
-	console.log();
-	return await dist_default$1({
-		message: "Replace with MAXSIM statusline?",
-		default: false
-	});
 }
 /**
 * Prompt for runtime selection (multi-select)
@@ -9463,7 +9609,7 @@ async function installAllRuntimes(runtimes, isGlobal, isInteractive) {
 	const statuslineRuntimes = ["claude", "gemini"];
 	const primaryStatuslineResult = results.find((r) => statuslineRuntimes.includes(r.runtime));
 	let shouldInstallStatusline = false;
-	if (primaryStatuslineResult && primaryStatuslineResult.settings) shouldInstallStatusline = await handleStatusline(primaryStatuslineResult.settings, isInteractive);
+	if (primaryStatuslineResult && primaryStatuslineResult.settings) shouldInstallStatusline = await handleStatusline(primaryStatuslineResult.settings, isInteractive, forceStatusline);
 	let enableAgentTeams = false;
 	if (isInteractive && runtimes.includes("claude")) enableAgentTeams = await promptAgentTeams();
 	for (const result of results) {
@@ -9479,100 +9625,8 @@ async function installAllRuntimes(runtimes, isGlobal, isInteractive) {
 const subcommand = argv._[0];
 (async () => {
 	if (subcommand === "dashboard") {
-		const { spawn: spawnDash, execSync: execSyncDash } = await import("node:child_process");
-		const dashboardAssetSrc = node_path.resolve(__dirname, "assets", "dashboard");
-		const installDir = node_path.join(process.cwd(), ".claude");
-		const installDashDir = node_path.join(installDir, "dashboard");
-		if (node_fs.existsSync(dashboardAssetSrc)) {
-			const nodeModulesDir = node_path.join(installDashDir, "node_modules");
-			const nodeModulesTmp = node_path.join(installDir, "_dashboard_node_modules_tmp");
-			const hadNodeModules = node_fs.existsSync(nodeModulesDir);
-			if (hadNodeModules) node_fs.renameSync(nodeModulesDir, nodeModulesTmp);
-			safeRmDir(installDashDir);
-			node_fs.mkdirSync(installDashDir, { recursive: true });
-			copyDirRecursive(dashboardAssetSrc, installDashDir);
-			if (hadNodeModules && node_fs.existsSync(nodeModulesTmp)) node_fs.renameSync(nodeModulesTmp, nodeModulesDir);
-			const dashConfigPath = node_path.join(installDir, "dashboard.json");
-			if (!node_fs.existsSync(dashConfigPath)) node_fs.writeFileSync(dashConfigPath, JSON.stringify({ projectCwd: process.cwd() }, null, 2) + "\n");
-		}
-		const localDashboard = node_path.join(process.cwd(), ".claude", "dashboard", "server.js");
-		const globalDashboard = node_path.join(node_os.homedir(), ".claude", "dashboard", "server.js");
-		let serverPath = null;
-		if (node_fs.existsSync(localDashboard)) serverPath = localDashboard;
-		else if (node_fs.existsSync(globalDashboard)) serverPath = globalDashboard;
-		if (!serverPath) {
-			console.log(chalk.yellow("\n  Dashboard not available.\n"));
-			console.log("  Install MAXSIM first: " + chalk.cyan("npx maxsimcli@latest") + "\n");
-			process.exit(0);
-		}
-		const forceNetwork = !!argv["network"];
-		const dashboardDir = node_path.dirname(serverPath);
-		const dashboardConfigPath = node_path.join(node_path.dirname(dashboardDir), "dashboard.json");
-		let projectCwd = process.cwd();
-		let networkMode = forceNetwork;
-		if (node_fs.existsSync(dashboardConfigPath)) try {
-			const config = JSON.parse(node_fs.readFileSync(dashboardConfigPath, "utf8"));
-			if (config.projectCwd) projectCwd = config.projectCwd;
-			if (!forceNetwork) networkMode = config.networkMode ?? false;
-		} catch {}
-		const dashDirForPty = node_path.dirname(serverPath);
-		const ptyModulePath = node_path.join(dashDirForPty, "node_modules", "node-pty");
-		if (!node_fs.existsSync(ptyModulePath)) {
-			console.log(chalk.gray("  Installing node-pty for terminal support..."));
-			try {
-				const dashPkgPath = node_path.join(dashDirForPty, "package.json");
-				if (!node_fs.existsSync(dashPkgPath)) node_fs.writeFileSync(dashPkgPath, "{\"private\":true}\n");
-				execSyncDash("npm install node-pty --save-optional --no-audit --no-fund --loglevel=error", {
-					cwd: dashDirForPty,
-					stdio: "inherit",
-					timeout: 12e4
-				});
-			} catch {
-				console.warn(chalk.yellow("  node-pty installation failed — terminal will be unavailable."));
-			}
-		}
-		console.log(chalk.blue("Starting dashboard..."));
-		console.log(chalk.gray(`  Project: ${projectCwd}`));
-		console.log(chalk.gray(`  Server:  ${serverPath}`));
-		if (networkMode) console.log(chalk.gray("  Network: enabled (local network access + QR code)"));
-		console.log("");
-		spawnDash(process.execPath, [serverPath], {
-			cwd: dashboardDir,
-			detached: true,
-			stdio: "ignore",
-			env: {
-				...process.env,
-				MAXSIM_PROJECT_CWD: projectCwd,
-				MAXSIM_NETWORK_MODE: networkMode ? "1" : "0",
-				NODE_ENV: "production"
-			}
-		}).unref();
-		const POLL_INTERVAL_MS = 500;
-		const POLL_TIMEOUT_MS = 2e4;
-		const HEALTH_TIMEOUT_MS = 1e3;
-		const DEFAULT_PORT = 3333;
-		const PORT_RANGE_END = 3343;
-		let foundUrl = null;
-		const deadline = Date.now() + POLL_TIMEOUT_MS;
-		while (Date.now() < deadline) {
-			await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
-			for (let p = DEFAULT_PORT; p <= PORT_RANGE_END; p++) try {
-				const controller = new AbortController();
-				const timer = setTimeout(() => controller.abort(), HEALTH_TIMEOUT_MS);
-				const res = await fetch(`http://localhost:${p}/api/health`, { signal: controller.signal });
-				clearTimeout(timer);
-				if (res.ok) {
-					if ((await res.json()).status === "ok") {
-						foundUrl = `http://localhost:${p}`;
-						break;
-					}
-				}
-			} catch {}
-			if (foundUrl) break;
-		}
-		if (foundUrl) console.log(chalk.green(`  Dashboard ready at ${foundUrl}`));
-		else console.log(chalk.yellow("\n  Dashboard did not respond after 20s. The server may still be starting — check http://localhost:3333"));
-		process.exit(0);
+		await runDashboardSubcommand(argv);
+		return;
 	}
 	if (hasGlobal && hasLocal) {
 		console.error(chalk.yellow("Cannot specify both --global and --local"));
@@ -9586,7 +9640,7 @@ const subcommand = argv._[0];
 			process.exit(1);
 		}
 		const runtimes = selectedRuntimes.length > 0 ? selectedRuntimes : ["claude"];
-		for (const runtime of runtimes) uninstall(hasGlobal, runtime);
+		for (const runtime of runtimes) uninstall(hasGlobal, runtime, explicitConfigDir);
 	} else if (selectedRuntimes.length > 0) if (!hasGlobal && !hasLocal) {
 		const isGlobal = await promptLocation(selectedRuntimes);
 		await installAllRuntimes(selectedRuntimes, isGlobal, true);

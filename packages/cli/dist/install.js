@@ -1200,7 +1200,7 @@ async function install(isGlobal, runtime = 'claude') {
         const skillsDest = path.join(targetDir, 'agents', 'skills');
         // Remove old MAXSIM built-in skills before copying new ones (preserve user custom skills)
         if (fs.existsSync(skillsDest)) {
-            const builtInSkills = ['tdd', 'systematic-debugging', 'verification-before-completion'];
+            const builtInSkills = ['tdd', 'systematic-debugging', 'verification-before-completion', 'using-maxsim', 'memory-management', 'code-review', 'simplify'];
             for (const skill of builtInSkills) {
                 const skillDir = path.join(skillsDest, skill);
                 if (fs.existsSync(skillDir)) {
@@ -1641,7 +1641,7 @@ const subcommand = argv._[0];
 (async () => {
     // Dashboard subcommand
     if (subcommand === 'dashboard') {
-        const { spawn: spawnDash, execSync: execSyncDash } = await import('node:child_process');
+        const { resolveDashboardServer, readDashboardConfig, ensureNodePty, spawnDashboard, waitForDashboard, } = await import('./core/dashboard-launcher.js');
         // Always refresh dashboard from bundled assets before launching.
         // This ensures users get the latest version (fixes broken ESM builds, etc.)
         const dashboardAssetSrc = path.resolve(__dirname, 'assets', 'dashboard');
@@ -1658,8 +1658,6 @@ const subcommand = argv._[0];
             // Clean existing dashboard dir to prevent stale files from old installs
             safeRmDir(installDashDir);
             fs.mkdirSync(installDashDir, { recursive: true });
-            // Dashboard is now Vite+Express: server.js (self-contained) + client/ (static)
-            // No node_modules/ hoisting needed — all deps are bundled into server.js by tsdown.
             copyDirRecursive(dashboardAssetSrc, installDashDir);
             // Restore node_modules if it was preserved
             if (hadNodeModules && fs.existsSync(nodeModulesTmp)) {
@@ -1671,62 +1669,23 @@ const subcommand = argv._[0];
                 fs.writeFileSync(dashConfigPath, JSON.stringify({ projectCwd: process.cwd() }, null, 2) + '\n');
             }
         }
-        // Resolve server path: local project first, then global
-        const localDashboard = path.join(process.cwd(), '.claude', 'dashboard', 'server.js');
-        const globalDashboard = path.join(os.homedir(), '.claude', 'dashboard', 'server.js');
-        let serverPath = null;
-        if (fs.existsSync(localDashboard)) {
-            serverPath = localDashboard;
-        }
-        else if (fs.existsSync(globalDashboard)) {
-            serverPath = globalDashboard;
-        }
+        // Resolve server path
+        const serverPath = resolveDashboardServer();
         if (!serverPath) {
             console.log(chalk_1.default.yellow('\n  Dashboard not available.\n'));
             console.log('  Install MAXSIM first: ' + chalk_1.default.cyan('npx maxsimcli@latest') + '\n');
             process.exit(0);
         }
-        // --network flag overrides stored config (lets users enable network mode ad-hoc)
+        // --network flag overrides stored config
         const forceNetwork = !!argv['network'];
-        // Read projectCwd from dashboard.json (one level up from dashboard/ dir)
-        const dashboardDir = path.dirname(serverPath);
-        const dashboardConfigPath = path.join(path.dirname(dashboardDir), 'dashboard.json');
-        let projectCwd = process.cwd();
-        let networkMode = forceNetwork;
-        if (fs.existsSync(dashboardConfigPath)) {
-            try {
-                const config = JSON.parse(fs.readFileSync(dashboardConfigPath, 'utf8'));
-                if (config.projectCwd) {
-                    projectCwd = config.projectCwd;
-                }
-                if (!forceNetwork) {
-                    networkMode = config.networkMode ?? false;
-                }
-            }
-            catch {
-                // Use default cwd
-            }
-        }
-        // node-pty is a native addon that cannot be bundled — auto-install if missing
-        const dashDirForPty = path.dirname(serverPath);
-        const ptyModulePath = path.join(dashDirForPty, 'node_modules', 'node-pty');
-        if (!fs.existsSync(ptyModulePath)) {
-            console.log(chalk_1.default.gray('  Installing node-pty for terminal support...'));
-            try {
-                // Ensure a package.json exists so npm install works in the dashboard dir
-                const dashPkgPath = path.join(dashDirForPty, 'package.json');
-                if (!fs.existsSync(dashPkgPath)) {
-                    fs.writeFileSync(dashPkgPath, '{"private":true}\n');
-                }
-                execSyncDash('npm install node-pty --save-optional --no-audit --no-fund --loglevel=error', {
-                    cwd: dashDirForPty,
-                    stdio: 'inherit',
-                    timeout: 120_000,
-                });
-            }
-            catch {
-                console.warn(chalk_1.default.yellow('  node-pty installation failed — terminal will be unavailable.'));
-            }
+        const dashConfig = readDashboardConfig(serverPath);
+        const networkMode = forceNetwork || dashConfig.networkMode;
+        const projectCwd = dashConfig.projectCwd;
+        // Auto-install node-pty if missing
+        const serverDir = path.dirname(serverPath);
+        console.log(chalk_1.default.gray('  Installing node-pty for terminal support...'));
+        if (!ensureNodePty(serverDir)) {
+            console.warn(chalk_1.default.yellow('  node-pty installation failed — terminal will be unavailable.'));
         }
         console.log(chalk_1.default.blue('Starting dashboard...'));
         console.log(chalk_1.default.gray(`  Project: ${projectCwd}`));
@@ -1735,51 +1694,8 @@ const subcommand = argv._[0];
             console.log(chalk_1.default.gray('  Network: enabled (local network access + QR code)'));
         }
         console.log('');
-        // Use stdio: 'ignore' (fully detached) — a piped stderr causes the server to crash on
-        // Windows when the read-end is closed after the parent reads the ready message (EPIPE).
-        const child = spawnDash(process.execPath, [serverPath], {
-            cwd: dashboardDir,
-            detached: true,
-            stdio: 'ignore',
-            env: {
-                ...process.env,
-                MAXSIM_PROJECT_CWD: projectCwd,
-                MAXSIM_NETWORK_MODE: networkMode ? '1' : '0',
-                NODE_ENV: 'production',
-            },
-        });
-        child.unref();
-        // Poll /api/health until the server is ready (or 20s timeout).
-        // Health polling avoids any pipe between parent and child, so the server
-        // process stays alive after the parent exits.
-        const POLL_INTERVAL_MS = 500;
-        const POLL_TIMEOUT_MS = 20000;
-        const HEALTH_TIMEOUT_MS = 1000;
-        const DEFAULT_PORT = 3333;
-        const PORT_RANGE_END = 3343;
-        let foundUrl = null;
-        const deadline = Date.now() + POLL_TIMEOUT_MS;
-        while (Date.now() < deadline) {
-            await new Promise(r => setTimeout(r, POLL_INTERVAL_MS));
-            for (let p = DEFAULT_PORT; p <= PORT_RANGE_END; p++) {
-                try {
-                    const controller = new AbortController();
-                    const timer = setTimeout(() => controller.abort(), HEALTH_TIMEOUT_MS);
-                    const res = await fetch(`http://localhost:${p}/api/health`, { signal: controller.signal });
-                    clearTimeout(timer);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.status === 'ok') {
-                            foundUrl = `http://localhost:${p}`;
-                            break;
-                        }
-                    }
-                }
-                catch { /* not ready yet */ }
-            }
-            if (foundUrl)
-                break;
-        }
+        spawnDashboard({ serverPath, projectCwd, networkMode });
+        const foundUrl = await waitForDashboard();
         if (foundUrl) {
             console.log(chalk_1.default.green(`  Dashboard ready at ${foundUrl}`));
         }

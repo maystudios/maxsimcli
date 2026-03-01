@@ -1,11 +1,15 @@
 <purpose>
-Interactive configuration of MAXSIM workflow agents (research, plan_check, verifier) and model profile selection via multi-question prompt. Updates .planning/config.json with user preferences. Optionally saves settings as global defaults (~/.maxsim/defaults.json) for future projects.
+Interactive configuration of MAXSIM workflow agents (research, plan_checker, verifier) and model profile selection via multi-question prompt. Updates .planning/config.json with user preferences. Optionally saves settings as global defaults (~/.maxsim/defaults.json) for future projects.
 </purpose>
 
 <required_reading>
 Read all files referenced by the invoking prompt's execution_context before starting.
 @./references/dashboard-bridge.md
 </required_reading>
+
+<tool_mandate>
+**Question routing:** At workflow start, probe for the dashboard (see @dashboard-bridge). If `DASHBOARD_ACTIVE = true`, route ALL `AskUserQuestion` calls through `mcp__maxsim-dashboard__ask_question` using the schema translation rules from @dashboard-bridge. If `DASHBOARD_ACTIVE = false`, use `AskUserQuestion` as normal.
+</tool_mandate>
 
 <process>
 
@@ -27,7 +31,7 @@ cat .planning/config.json
 
 Parse current values (default to `true` if not present):
 - `workflow.research` — spawn researcher during plan-phase
-- `workflow.plan_check` — spawn plan checker during plan-phase
+- `workflow.plan_checker` — spawn plan checker during plan-phase
 - `workflow.verifier` — spawn verifier during execute-phase
 - `workflow.nyquist_validation` — validation architecture research during plan-phase
 - `model_profile` — which model each agent uses (default: `balanced`)
@@ -117,7 +121,7 @@ Merge new settings into existing config.json:
   "model_profile": "quality" | "balanced" | "budget",
   "workflow": {
     "research": true/false,
-    "plan_check": true/false,
+    "plan_checker": true/false,
     "verifier": true/false,
     "auto_advance": true/false,
     "nyquist_validation": true/false
@@ -165,7 +169,7 @@ Write `~/.maxsim/defaults.json` with:
   "branching_strategy": <current>,
   "workflow": {
     "research": <current>,
-    "plan_check": <current>,
+    "plan_checker": <current>,
     "verifier": <current>,
     "auto_advance": <current>,
     "nyquist_validation": <current>

@@ -105,8 +105,7 @@ function cmdStateLoad(cwd, raw) {
             `roadmap_exists=${roadmapExists}`,
             `state_exists=${stateExists}`,
         ];
-        process.stdout.write(lines.join('\n'));
-        process.exit(0);
+        (0, core_js_1.output)(result, true, lines.join('\n'));
     }
     (0, core_js_1.output)(result);
 }

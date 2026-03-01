@@ -5,8 +5,24 @@
  */
 import type { ModelProfiles, ModelResolution, AgentType, PhaseSearchResult, RoadmapPhaseInfo, ArchivedPhaseDir, GitResult, MilestoneInfo, AppConfig } from './types.js';
 export declare const MODEL_PROFILES: ModelProfiles;
+/** Thrown by output() to signal successful command completion. */
+export declare class CliOutput {
+    readonly result: unknown;
+    readonly raw: boolean;
+    readonly rawValue: unknown;
+    constructor(result: unknown, raw?: boolean, rawValue?: unknown);
+}
+/** Thrown by error() to signal a command error. */
+export declare class CliError {
+    readonly message: string;
+    constructor(message: string);
+}
 export declare function output(result: unknown, raw?: boolean, rawValue?: unknown): never;
 export declare function error(message: string): never;
+/**
+ * Handle a CliOutput by writing to stdout. Extracted so cli.ts can use it.
+ */
+export declare function writeOutput(out: CliOutput): void;
 /** Today's date as YYYY-MM-DD. */
 export declare function todayISO(): string;
 /** Canonical .planning/ sub-paths. */

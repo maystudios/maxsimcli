@@ -7,6 +7,10 @@ Read all files referenced by the invoking prompt's execution_context before star
 @./references/dashboard-bridge.md
 </required_reading>
 
+<tool_mandate>
+**Question routing:** At workflow start, probe for the dashboard (see @dashboard-bridge). If `DASHBOARD_ACTIVE = true`, route ALL `AskUserQuestion` calls through `mcp__maxsim-dashboard__ask_question` using the schema translation rules from @dashboard-bridge. If `DASHBOARD_ACTIVE = false`, use `AskUserQuestion` as normal.
+</tool_mandate>
+
 <auto_mode>
 ## Auto Mode Detection
 
@@ -176,7 +180,7 @@ Create `.planning/config.json` with mode set to "yolo":
   "model_profile": "quality|balanced|budget",
   "workflow": {
     "research": true|false,
-    "plan_check": true|false,
+    "plan_checker": true|false,
     "verifier": true|false,
     "auto_advance": true
   }
@@ -475,7 +479,7 @@ Create `.planning/config.json` with all settings:
   "model_profile": "quality|balanced|budget",
   "workflow": {
     "research": true|false,
-    "plan_check": true|false,
+    "plan_checker": true|false,
     "verifier": true|false
   }
 }

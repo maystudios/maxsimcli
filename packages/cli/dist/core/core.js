@@ -8,9 +8,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.summaryId = exports.planId = exports.isSummaryFile = exports.isPlanFile = exports.MODEL_PROFILES = void 0;
+exports.summaryId = exports.planId = exports.isSummaryFile = exports.isPlanFile = exports.CliError = exports.CliOutput = exports.MODEL_PROFILES = void 0;
 exports.output = output;
 exports.error = error;
+exports.writeOutput = writeOutput;
 exports.todayISO = todayISO;
 exports.planningPath = planningPath;
 exports.statePath = statePath;
@@ -54,15 +55,43 @@ exports.MODEL_PROFILES = {
     'maxsim-integration-checker': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', tokenburner: 'opus' },
 };
 // ─── Output helpers ──────────────────────────────────────────────────────────
-// DEPRECATION: output() and error() call process.exit() and belong in the CLI
-// layer. They are kept here for backward compatibility during the port. Future
-// plans should move these to @maxsim/cli.
+// These throw CliOutput / CliError instead of calling process.exit() directly.
+// The CLI entry point (cli.ts) catches these and calls process.exit() there.
+/** Thrown by output() to signal successful command completion. */
+class CliOutput {
+    result;
+    raw;
+    rawValue;
+    constructor(result, raw, rawValue) {
+        this.result = result;
+        this.raw = raw ?? false;
+        this.rawValue = rawValue;
+    }
+}
+exports.CliOutput = CliOutput;
+/** Thrown by error() to signal a command error. */
+class CliError {
+    message;
+    constructor(message) {
+        this.message = message;
+    }
+}
+exports.CliError = CliError;
 function output(result, raw, rawValue) {
-    if (raw && rawValue !== undefined) {
-        process.stdout.write(String(rawValue));
+    throw new CliOutput(result, raw, rawValue);
+}
+function error(message) {
+    throw new CliError(message);
+}
+/**
+ * Handle a CliOutput by writing to stdout. Extracted so cli.ts can use it.
+ */
+function writeOutput(out) {
+    if (out.raw && out.rawValue !== undefined) {
+        process.stdout.write(String(out.rawValue));
     }
     else {
-        const json = JSON.stringify(result, null, 2);
+        const json = JSON.stringify(out.result, null, 2);
         if (json.length > 50000) {
             const tmpPath = node_path_1.default.join(node_os_1.default.tmpdir(), `maxsim-${Date.now()}.json`);
             node_fs_1.default.writeFileSync(tmpPath, json, 'utf-8');
@@ -72,11 +101,6 @@ function output(result, raw, rawValue) {
             process.stdout.write(json);
         }
     }
-    process.exit(0);
-}
-function error(message) {
-    process.stderr.write('Error: ' + message + '\n');
-    process.exit(1);
 }
 // ─── Shared micro-utilities ─────────────────────────────────────────────────
 /** Today's date as YYYY-MM-DD. */
@@ -175,7 +199,7 @@ function loadConfig(cwd) {
             phase_branch_template: get('phase_branch_template', { section: 'git', field: 'phase_branch_template' }) ?? defaults.phase_branch_template,
             milestone_branch_template: get('milestone_branch_template', { section: 'git', field: 'milestone_branch_template' }) ?? defaults.milestone_branch_template,
             research: get('research', { section: 'workflow', field: 'research' }) ?? defaults.research,
-            plan_checker: get('plan_checker', { section: 'workflow', field: 'plan_check' }) ?? defaults.plan_checker,
+            plan_checker: (get('plan_checker', { section: 'workflow', field: 'plan_checker' }) ?? get('plan_checker', { section: 'workflow', field: 'plan_check' })) ?? defaults.plan_checker,
             verifier: get('verifier', { section: 'workflow', field: 'verifier' }) ?? defaults.verifier,
             parallelization,
             brave_search: get('brave_search') ?? defaults.brave_search,

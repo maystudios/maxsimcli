@@ -36,20 +36,8 @@ Parse JSON for: `executor_model`, `verifier_model`, `commit_docs`, `parallelizat
 When `parallelization` is false, plans within a wave execute sequentially.
 </step>
 
-<step name="launch_dashboard">
-Launch the live project dashboard (if not already running):
-
-```bash
-node ~/.claude/maxsim/bin/maxsim-tools.cjs dashboard 2>/dev/null || true
-```
-
-This is idempotent: if the dashboard is already running, it prints the URL. If not, it spawns a detached subprocess that survives the execute-phase session.
-
-The dashboard provides a real-time visual companion showing phase progress, plan tasks, and blockers as execution proceeds.
-
-**Best-effort:** If the dashboard fails to start (e.g., not installed, build missing), execution continues without it. Do NOT gate phase execution on dashboard availability.
-
-**Dashboard MCP probe:** After the dashboard launch attempt, probe for MCP availability (see @dashboard-bridge). If `DASHBOARD_ACTIVE`, emit:
+<step name="probe_dashboard">
+Probe for MCP dashboard availability (see @dashboard-bridge). If `DASHBOARD_ACTIVE`, emit:
 ```
 mcp__maxsim-dashboard__submit_lifecycle_event(
   event_type: "phase-started",
@@ -57,6 +45,8 @@ mcp__maxsim-dashboard__submit_lifecycle_event(
   phase_number: PHASE_NUMBER
 )
 ```
+
+**Note:** The dashboard is NOT auto-launched. Users start it explicitly via `maxsim dashboard`. This step only checks if a running dashboard is reachable via MCP.
 </step>
 
 <step name="handle_branching">

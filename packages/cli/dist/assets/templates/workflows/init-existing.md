@@ -9,6 +9,10 @@ Read all files referenced by the invoking prompt's execution_context before star
 @./references/dashboard-bridge.md
 </required_reading>
 
+<tool_mandate>
+**Question routing:** At workflow start, probe for the dashboard (see @dashboard-bridge). If `DASHBOARD_ACTIVE = true`, route ALL `AskUserQuestion` calls through `mcp__maxsim-dashboard__ask_question` using the schema translation rules from @dashboard-bridge. If `DASHBOARD_ACTIVE = false`, use `AskUserQuestion` as normal.
+</tool_mandate>
+
 <auto_mode>
 ## Auto Mode Detection
 
@@ -258,7 +262,7 @@ Print per-agent completion status:
 After all agents complete, also create a file tree overview:
 
 ```bash
-find . -type f | grep -v node_modules | grep -v .git | grep -v .planning | grep -v __pycache__ | grep -v .next | grep -v dist/ | grep -v build/ | head -200 > .planning/codebase/STRUCTURE.md
+git ls-files --others --cached --exclude-standard | grep -v node_modules | grep -v __pycache__ | grep -v .next | grep -v dist/ | grep -v build/ | head -200 > .planning/codebase/STRUCTURE.md
 ```
 
 Then wrap it with a header:
@@ -321,7 +325,7 @@ Store discrepancy notes in a variable for use in Steps 6 and 9.
   "model_profile": "balanced",
   "workflow": {
     "research": true,
-    "plan_check": true,
+    "plan_checker": true,
     "verifier": true
   }
 }
@@ -461,7 +465,7 @@ AskUserQuestion([
   "model_profile": "[quality|balanced|budget]",
   "workflow": {
     "research": [true|false],
-    "plan_check": [true|false],
+    "plan_checker": [true|false],
     "verifier": [true|false]
   }
 }

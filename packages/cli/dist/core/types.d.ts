@@ -114,9 +114,8 @@ export interface PlanningConfig {
 }
 export interface WorkflowConfig {
     research: boolean;
-    plan_check: boolean;
+    plan_checker: boolean;
     verifier: boolean;
-    nyquist_validation: boolean;
     [key: string]: boolean;
 }
 export declare const PLANNING_CONFIG_DEFAULTS: PlanningConfig;

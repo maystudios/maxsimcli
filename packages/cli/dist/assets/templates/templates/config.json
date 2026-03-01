@@ -3,7 +3,7 @@
   "depth": "standard",
   "workflow": {
     "research": true,
-    "plan_check": true,
+    "plan_checker": true,
     "verifier": true,
     "auto_advance": false,
     "nyquist_validation": false

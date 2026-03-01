@@ -25,7 +25,7 @@ Load all context in one call (paths only to minimize orchestrator context):
 INIT=$(node ~/.claude/maxsim/bin/maxsim-tools.cjs init plan-phase "$PHASE")
 ```
 
-Parse JSON for: `researcher_model`, `planner_model`, `checker_model`, `research_enabled`, `plan_checker_enabled`, `nyquist_validation_enabled`, `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_research`, `has_context`, `has_plans`, `plan_count`, `planning_exists`, `roadmap_exists`, `phase_req_ids`.
+Parse JSON for: `researcher_model`, `planner_model`, `checker_model`, `research_enabled`, `plan_checker_enabled`, `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_research`, `has_context`, `has_plans`, `plan_count`, `planning_exists`, `roadmap_exists`, `phase_req_ids`.
 
 **File paths (for <files_to_read> blocks):** `state_path`, `roadmap_path`, `requirements_path`, `context_path`, `research_path`, `verification_path`, `uat_path`. These are null if files don't exist.
 
@@ -136,7 +136,7 @@ Task(
 
 ## 5.5. Create Validation Strategy (if Nyquist enabled)
 
-**Skip if:** `nyquist_validation_enabled` is false from INIT JSON.
+**Skip if:** `workflow.nyquist_validation` is false in `.planning/config.json`.
 
 After researcher completes, check if RESEARCH.md contains a Validation Architecture section:
 

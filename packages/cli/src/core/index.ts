@@ -222,6 +222,26 @@ export {
   cmdTemplateFill,
 } from './template.js';
 
+// Dashboard launcher exports
+export {
+  checkHealth,
+  findRunningDashboard,
+  killProcessOnPort,
+  resolveDashboardServer,
+  readDashboardConfig,
+  ensureNodePty,
+  spawnDashboard,
+  waitForDashboard,
+  DEFAULT_PORT,
+  PORT_RANGE_END,
+  HEALTH_TIMEOUT_MS,
+} from './dashboard-launcher.js';
+
+export type {
+  DashboardConfig,
+  SpawnDashboardOptions,
+} from './dashboard-launcher.js';
+
 // Init exports
 export type {
   WorkflowType,

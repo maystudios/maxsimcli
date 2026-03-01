@@ -11,6 +11,10 @@ Read all files referenced by the invoking prompt's execution_context before star
 
 </required_reading>
 
+<tool_mandate>
+**Question routing:** At workflow start, probe for the dashboard (see @dashboard-bridge). If `DASHBOARD_ACTIVE = true`, route ALL `AskUserQuestion` calls through `mcp__maxsim-dashboard__ask_question` using the schema translation rules from @dashboard-bridge. If `DASHBOARD_ACTIVE = false`, use `AskUserQuestion` as normal.
+</tool_mandate>
+
 <process>
 
 ## 1. Load Context

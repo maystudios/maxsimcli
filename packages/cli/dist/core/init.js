@@ -126,7 +126,6 @@ function cmdInitPlanPhase(cwd, phase, raw) {
         checker_model: (0, core_js_1.resolveModelInternal)(cwd, 'maxsim-plan-checker'),
         research_enabled: config.research,
         plan_checker_enabled: config.plan_checker,
-        nyquist_validation_enabled: false, // config doesn't have nyquist_validation directly
         commit_docs: config.commit_docs,
         phase_found: !!phaseInfo,
         phase_dir: phaseInfo?.directory ?? null,

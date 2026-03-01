@@ -193,7 +193,7 @@ export function loadConfig(cwd: string): AppConfig {
       phase_branch_template: (get('phase_branch_template', { section: 'git', field: 'phase_branch_template' }) as string | undefined) ?? defaults.phase_branch_template,
       milestone_branch_template: (get('milestone_branch_template', { section: 'git', field: 'milestone_branch_template' }) as string | undefined) ?? defaults.milestone_branch_template,
       research: (get('research', { section: 'workflow', field: 'research' }) as boolean | undefined) ?? defaults.research,
-      plan_checker: (get('plan_checker', { section: 'workflow', field: 'plan_check' }) as boolean | undefined) ?? defaults.plan_checker,
+      plan_checker: ((get('plan_checker', { section: 'workflow', field: 'plan_checker' }) ?? get('plan_checker', { section: 'workflow', field: 'plan_check' })) as boolean | undefined) ?? defaults.plan_checker,
       verifier: (get('verifier', { section: 'workflow', field: 'verifier' }) as boolean | undefined) ?? defaults.verifier,
       parallelization,
       brave_search: (get('brave_search') as boolean | undefined) ?? defaults.brave_search,

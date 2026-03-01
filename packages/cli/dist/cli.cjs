@@ -31,10 +31,9 @@ let node_fs = require("node:fs");
 node_fs = __toESM(node_fs);
 let node_path = require("node:path");
 node_path = __toESM(node_path);
+let node_child_process = require("node:child_process");
 let node_os = require("node:os");
 node_os = __toESM(node_os);
-let node_child_process = require("node:child_process");
-let node_module = require("node:module");
 let node_buffer = require("node:buffer");
 let child_process = require("child_process");
 let node_events = require("node:events");
@@ -42,6 +41,7 @@ let node_process = require("node:process");
 node_process = __toESM(node_process);
 let node_tty = require("node:tty");
 node_tty = __toESM(node_tty);
+let node_module = require("node:module");
 
 //#region src/core/types.ts
 const PLANNING_CONFIG_DEFAULTS = {
@@ -53,9 +53,8 @@ const PLANNING_CONFIG_DEFAULTS = {
 	milestone_branch_template: "maxsim/{milestone}-{slug}",
 	workflow: {
 		research: true,
-		plan_check: true,
-		verifier: true,
-		nyquist_validation: false
+		plan_checker: true,
+		verifier: true
 	},
 	parallelization: true,
 	brave_search: false
@@ -594,7 +593,7 @@ var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 //#endregion
 //#region ../../node_modules/supports-color/index.js
 var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	const os$4 = require("os");
+	const os$5 = require("os");
 	const tty$2 = require("tty");
 	const hasFlag = require_has_flag();
 	const { env } = process;
@@ -621,7 +620,7 @@ var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 		const min = forceColor || 0;
 		if (env.TERM === "dumb") return min;
 		if (process.platform === "win32") {
-			const osRelease = os$4.release().split(".");
+			const osRelease = os$5.release().split(".");
 			if (Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) return Number(osRelease[2]) >= 14931 ? 3 : 2;
 			return 1;
 		}
@@ -4711,21 +4710,43 @@ const MODEL_PROFILES = {
 		tokenburner: "opus"
 	}
 };
+/** Thrown by output() to signal successful command completion. */
+var CliOutput = class {
+	result;
+	raw;
+	rawValue;
+	constructor(result, raw, rawValue) {
+		this.result = result;
+		this.raw = raw ?? false;
+		this.rawValue = rawValue;
+	}
+};
+/** Thrown by error() to signal a command error. */
+var CliError = class {
+	message;
+	constructor(message) {
+		this.message = message;
+	}
+};
 function output(result, raw, rawValue) {
-	if (raw && rawValue !== void 0) process.stdout.write(String(rawValue));
+	throw new CliOutput(result, raw, rawValue);
+}
+function error(message) {
+	throw new CliError(message);
+}
+/**
+* Handle a CliOutput by writing to stdout. Extracted so cli.ts can use it.
+*/
+function writeOutput(out) {
+	if (out.raw && out.rawValue !== void 0) process.stdout.write(String(out.rawValue));
 	else {
-		const json = JSON.stringify(result, null, 2);
+		const json = JSON.stringify(out.result, null, 2);
 		if (json.length > 5e4) {
 			const tmpPath = node_path.default.join(node_os.default.tmpdir(), `maxsim-${Date.now()}.json`);
 			node_fs.default.writeFileSync(tmpPath, json, "utf-8");
 			process.stdout.write("@file:" + tmpPath);
 		} else process.stdout.write(json);
 	}
-	process.exit(0);
-}
-function error(message) {
-	process.stderr.write("Error: " + message + "\n");
-	process.exit(1);
 }
 /** Today's date as YYYY-MM-DD. */
 function todayISO() {
@@ -4833,6 +4854,9 @@ function loadConfig(cwd) {
 				field: "research"
 			}) ?? defaults.research,
 			plan_checker: get("plan_checker", {
+				section: "workflow",
+				field: "plan_checker"
+			}) ?? get("plan_checker", {
 				section: "workflow",
 				field: "plan_check"
 			}) ?? defaults.plan_checker,
@@ -12079,7 +12103,7 @@ function cmdStateLoad(cwd, raw) {
 	};
 	if (raw) {
 		const c = config;
-		const lines = [
+		output(result, true, [
 			`model_profile=${c.model_profile}`,
 			`commit_docs=${c.commit_docs}`,
 			`branching_strategy=${c.branching_strategy}`,
@@ -12092,9 +12116,7 @@ function cmdStateLoad(cwd, raw) {
 			`config_exists=${configExists}`,
 			`roadmap_exists=${roadmapExists}`,
 			`state_exists=${stateExists}`
-		];
-		process.stdout.write(lines.join("\n"));
-		process.exit(0);
+		].join("\n"));
 	}
 	output(result);
 }
@@ -15180,6 +15202,155 @@ function cmdTemplateFill(cwd, templateType, options, raw) {
 }
 
 //#endregion
+//#region src/core/dashboard-launcher.ts
+/**
+* Dashboard Launcher — Shared dashboard lifecycle utilities
+*
+* Used by both cli.ts (tool-router) and install.ts (npx entry point).
+*/
+const DEFAULT_PORT = 3333;
+const PORT_RANGE_END = 3343;
+const HEALTH_TIMEOUT_MS = 1500;
+/**
+* Check if a dashboard health endpoint is responding on the given port.
+*/
+async function checkHealth(port, timeoutMs = HEALTH_TIMEOUT_MS) {
+	try {
+		const controller = new AbortController();
+		const timer = setTimeout(() => controller.abort(), timeoutMs);
+		const res = await fetch(`http://localhost:${port}/api/health`, { signal: controller.signal });
+		clearTimeout(timer);
+		if (res.ok) return (await res.json()).status === "ok";
+		return false;
+	} catch {
+		return false;
+	}
+}
+/**
+* Scan the port range for a running dashboard instance.
+* Returns the port number if found, null otherwise.
+*/
+async function findRunningDashboard(timeoutMs = HEALTH_TIMEOUT_MS) {
+	for (let port = DEFAULT_PORT; port <= PORT_RANGE_END; port++) if (await checkHealth(port, timeoutMs)) return port;
+	return null;
+}
+/**
+* Kill processes listening on the given port. Cross-platform.
+*/
+function killProcessOnPort(port) {
+	if (process.platform === "win32") try {
+		const lines = (0, node_child_process.execSync)(`netstat -ano | findstr :${port} | findstr LISTENING`, { encoding: "utf-8" }).trim().split("\n");
+		const pids = /* @__PURE__ */ new Set();
+		for (const line of lines) {
+			const parts = line.trim().split(/\s+/);
+			const pid = parts[parts.length - 1];
+			if (pid && pid !== "0") pids.add(pid);
+		}
+		for (const pid of pids) try {
+			(0, node_child_process.execSync)(`taskkill /PID ${pid} /F`, { stdio: "ignore" });
+		} catch {}
+	} catch {}
+	else try {
+		(0, node_child_process.execSync)(`lsof -i :${port} -t | xargs kill -SIGTERM 2>/dev/null`, { stdio: "ignore" });
+	} catch {}
+}
+/**
+* Resolve the dashboard server entry point path.
+* Tries: local project install, global install, @maxsim/dashboard package, monorepo walk.
+*/
+function resolveDashboardServer() {
+	const localDashboard = node_path.default.join(process.cwd(), ".claude", "dashboard", "server.js");
+	if (node_fs.default.existsSync(localDashboard)) return localDashboard;
+	const globalDashboard = node_path.default.join(node_os.default.homedir(), ".claude", "dashboard", "server.js");
+	if (node_fs.default.existsSync(globalDashboard)) return globalDashboard;
+	try {
+		const pkgPath = (0, node_module.createRequire)(require("url").pathToFileURL(__filename).href).resolve("@maxsim/dashboard/package.json");
+		const pkgDir = node_path.default.dirname(pkgPath);
+		const serverJs = node_path.default.join(pkgDir, "server.js");
+		if (node_fs.default.existsSync(serverJs)) return serverJs;
+		const serverTs = node_path.default.join(pkgDir, "server.ts");
+		if (node_fs.default.existsSync(serverTs)) return serverTs;
+	} catch {}
+	try {
+		let dir = node_path.default.dirname(new URL(require("url").pathToFileURL(__filename).href).pathname);
+		if (process.platform === "win32" && dir.startsWith("/")) dir = dir.slice(1);
+		for (let i = 0; i < 5; i++) {
+			const candidate = node_path.default.join(dir, "packages", "dashboard", "server.ts");
+			if (node_fs.default.existsSync(candidate)) return candidate;
+			const candidateJs = node_path.default.join(dir, "packages", "dashboard", "server.js");
+			if (node_fs.default.existsSync(candidateJs)) return candidateJs;
+			dir = node_path.default.dirname(dir);
+		}
+	} catch {}
+	return null;
+}
+/**
+* Ensure node-pty is installed in the dashboard directory.
+* Returns true if node-pty is available after this call.
+*/
+function ensureNodePty(serverDir) {
+	const ptyModulePath = node_path.default.join(serverDir, "node_modules", "node-pty");
+	if (node_fs.default.existsSync(ptyModulePath)) return true;
+	const dashPkgPath = node_path.default.join(serverDir, "package.json");
+	if (!node_fs.default.existsSync(dashPkgPath)) node_fs.default.writeFileSync(dashPkgPath, "{\"private\":true}\n");
+	try {
+		(0, node_child_process.execSync)("npm install node-pty --save-optional --no-audit --no-fund --loglevel=error", {
+			cwd: serverDir,
+			stdio: "inherit",
+			timeout: 12e4
+		});
+		return true;
+	} catch {
+		return false;
+	}
+}
+/**
+* Read dashboard.json config from the parent directory of the dashboard dir.
+*/
+function readDashboardConfig(serverPath) {
+	const dashboardDir = node_path.default.dirname(serverPath);
+	const dashboardConfigPath = node_path.default.join(node_path.default.dirname(dashboardDir), "dashboard.json");
+	let projectCwd = process.cwd();
+	let networkMode = false;
+	if (node_fs.default.existsSync(dashboardConfigPath)) try {
+		const config = JSON.parse(node_fs.default.readFileSync(dashboardConfigPath, "utf8"));
+		if (config.projectCwd) projectCwd = config.projectCwd;
+		networkMode = config.networkMode ?? false;
+	} catch {}
+	return {
+		projectCwd,
+		networkMode
+	};
+}
+/**
+* Spawn the dashboard server as a detached background process.
+* Returns the child process PID, or null if spawn failed.
+*/
+function spawnDashboard(options) {
+	const { serverPath, projectCwd, networkMode = false, nodeEnv = "production" } = options;
+	const serverDir = node_path.default.dirname(serverPath);
+	const isTsFile = serverPath.endsWith(".ts");
+	const child = (0, node_child_process.spawn)("node", isTsFile ? [
+		"--import",
+		"tsx",
+		serverPath
+	] : [serverPath], {
+		cwd: serverDir,
+		detached: true,
+		stdio: "ignore",
+		env: {
+			...process.env,
+			MAXSIM_PROJECT_CWD: projectCwd,
+			MAXSIM_NETWORK_MODE: networkMode ? "1" : "0",
+			NODE_ENV: isTsFile ? "development" : nodeEnv
+		},
+		...process.platform === "win32" ? { shell: true } : {}
+	});
+	child.unref();
+	return child.pid ?? null;
+}
+
+//#endregion
 //#region src/core/init.ts
 /**
 * Init — Compound init commands for workflow bootstrapping
@@ -15258,7 +15429,6 @@ function cmdInitPlanPhase(cwd, phase, raw) {
 		checker_model: resolveModelInternal(cwd, "maxsim-plan-checker"),
 		research_enabled: config.research,
 		plan_checker_enabled: config.plan_checker,
-		nyquist_validation_enabled: false,
 		commit_docs: config.commit_docs,
 		phase_found: !!phaseInfo,
 		phase_dir: phaseInfo?.directory ?? null,
@@ -15946,30 +16116,42 @@ const COMMANDS = {
 	}
 };
 async function main() {
-	const args = process.argv.slice(2);
-	let cwd = process.cwd();
-	const cwdEqArg = args.find((arg) => arg.startsWith("--cwd="));
-	const cwdIdx = args.indexOf("--cwd");
-	if (cwdEqArg) {
-		const value = cwdEqArg.slice(6).trim();
-		if (!value) error("Missing value for --cwd");
-		args.splice(args.indexOf(cwdEqArg), 1);
-		cwd = node_path.resolve(value);
-	} else if (cwdIdx !== -1) {
-		const value = args[cwdIdx + 1];
-		if (!value || value.startsWith("--")) error("Missing value for --cwd");
-		args.splice(cwdIdx, 2);
-		cwd = node_path.resolve(value);
+	try {
+		const args = process.argv.slice(2);
+		let cwd = process.cwd();
+		const cwdEqArg = args.find((arg) => arg.startsWith("--cwd="));
+		const cwdIdx = args.indexOf("--cwd");
+		if (cwdEqArg) {
+			const value = cwdEqArg.slice(6).trim();
+			if (!value) error("Missing value for --cwd");
+			args.splice(args.indexOf(cwdEqArg), 1);
+			cwd = node_path.resolve(value);
+		} else if (cwdIdx !== -1) {
+			const value = args[cwdIdx + 1];
+			if (!value || value.startsWith("--")) error("Missing value for --cwd");
+			args.splice(cwdIdx, 2);
+			cwd = node_path.resolve(value);
+		}
+		if (!node_fs.existsSync(cwd) || !node_fs.statSync(cwd).isDirectory()) error(`Invalid --cwd: ${cwd}`);
+		const rawIndex = args.indexOf("--raw");
+		const raw = rawIndex !== -1;
+		if (rawIndex !== -1) args.splice(rawIndex, 1);
+		const command = args[0];
+		if (!command) error(`Usage: maxsim-tools <command> [args] [--raw] [--cwd <path>]\nCommands: ${Object.keys(COMMANDS).join(", ")}`);
+		const handler = COMMANDS[command];
+		if (!handler) error(`Unknown command: ${command}`);
+		await handler(args, cwd, raw);
+	} catch (thrown) {
+		if (thrown instanceof CliOutput) {
+			writeOutput(thrown);
+			process.exit(0);
+		}
+		if (thrown instanceof CliError) {
+			process.stderr.write("Error: " + thrown.message + "\n");
+			process.exit(1);
+		}
+		throw thrown;
 	}
-	if (!node_fs.existsSync(cwd) || !node_fs.statSync(cwd).isDirectory()) error(`Invalid --cwd: ${cwd}`);
-	const rawIndex = args.indexOf("--raw");
-	const raw = rawIndex !== -1;
-	if (rawIndex !== -1) args.splice(rawIndex, 1);
-	const command = args[0];
-	if (!command) error(`Usage: maxsim-tools <command> [args] [--raw] [--cwd <path>]\nCommands: ${Object.keys(COMMANDS).join(", ")}`);
-	const handler = COMMANDS[command];
-	if (!handler) error(`Unknown command: ${command}`);
-	await handler(args, cwd, raw);
 }
 /**
 * Dashboard launch command.
@@ -15979,40 +16161,20 @@ async function main() {
 * Supports --stop to kill a running instance.
 */
 async function handleDashboard(args) {
-	const DEFAULT_PORT = 3333;
-	const PORT_RANGE_END = 3343;
-	const HEALTH_TIMEOUT_MS = 1500;
 	const networkMode = args.includes("--network");
 	if (args.includes("--stop")) {
-		for (let port = DEFAULT_PORT; port <= PORT_RANGE_END; port++) if (await checkHealth(port, HEALTH_TIMEOUT_MS)) {
-			console.log(`Dashboard found on port ${port} — sending shutdown...`);
-			console.log(`Dashboard at http://localhost:${port} is running.`);
-			console.log(`To stop it, close the browser tab or kill the process on port ${port}.`);
-			try {
-				if (process.platform === "win32") {
-					const lines = (0, node_child_process.execSync)(`netstat -ano | findstr :${port} | findstr LISTENING`, { encoding: "utf-8" }).trim().split("\n");
-					const pids = /* @__PURE__ */ new Set();
-					for (const line of lines) {
-						const parts = line.trim().split(/\s+/);
-						const pid = parts[parts.length - 1];
-						if (pid && pid !== "0") pids.add(pid);
-					}
-					for (const pid of pids) try {
-						(0, node_child_process.execSync)(`taskkill /PID ${pid} /F`, { stdio: "ignore" });
-						console.log(`Killed process ${pid}`);
-					} catch {}
-				} else (0, node_child_process.execSync)(`lsof -i :${port} -t | xargs kill -SIGTERM 2>/dev/null`, { stdio: "ignore" });
-				console.log("Dashboard stopped.");
-			} catch {
-				console.log("Could not automatically stop the dashboard. Kill the process manually.");
-			}
+		for (let port = DEFAULT_PORT; port <= PORT_RANGE_END; port++) if (await checkHealth(port)) {
+			console.log(`Dashboard found on port ${port} — stopping...`);
+			killProcessOnPort(port);
+			console.log("Dashboard stopped.");
 			return;
 		}
 		console.log("No running dashboard found.");
 		return;
 	}
-	for (let port = DEFAULT_PORT; port <= PORT_RANGE_END; port++) if (await checkHealth(port, HEALTH_TIMEOUT_MS)) {
-		console.log(`Dashboard already running at http://localhost:${port}`);
+	const runningPort = await findRunningDashboard();
+	if (runningPort) {
+		console.log(`Dashboard already running at http://localhost:${runningPort}`);
 		return;
 	}
 	const serverPath = resolveDashboardServer();
@@ -16021,99 +16183,24 @@ async function handleDashboard(args) {
 		console.error("Ensure @maxsim/dashboard is installed and built.");
 		process.exit(1);
 	}
-	const isTsFile = serverPath.endsWith(".ts");
-	const runner = "node";
-	const runnerArgs = isTsFile ? [
-		"--import",
-		"tsx",
-		serverPath
-	] : [serverPath];
 	const serverDir = node_path.dirname(serverPath);
-	let projectCwd = process.cwd();
-	const dashboardConfigPath = node_path.join(node_path.dirname(serverDir), "dashboard.json");
-	if (node_fs.existsSync(dashboardConfigPath)) try {
-		const config = JSON.parse(node_fs.readFileSync(dashboardConfigPath, "utf8"));
-		if (config.projectCwd) projectCwd = config.projectCwd;
-	} catch {}
-	const ptyModulePath = node_path.join(serverDir, "node_modules", "node-pty");
-	if (!node_fs.existsSync(ptyModulePath)) {
-		console.log("Installing node-pty for terminal support...");
-		try {
-			(0, node_child_process.execSync)("npm install node-pty --save-optional --no-audit --no-fund --loglevel=error", {
-				cwd: serverDir,
-				stdio: "inherit",
-				timeout: 12e4
-			});
-		} catch {
-			console.warn("node-pty installation failed — terminal will be unavailable.");
-		}
-	}
+	const dashConfig = readDashboardConfig(serverPath);
+	console.log("Installing node-pty for terminal support...");
+	if (!ensureNodePty(serverDir)) console.warn("node-pty installation failed — terminal will be unavailable.");
 	console.log("Dashboard starting...");
-	const child = (0, node_child_process.spawn)(runner, runnerArgs, {
-		cwd: serverDir,
-		detached: true,
-		stdio: "ignore",
-		env: {
-			...process.env,
-			MAXSIM_PROJECT_CWD: projectCwd,
-			NODE_ENV: isTsFile ? "development" : "production",
-			...networkMode ? { MAXSIM_NETWORK_MODE: "1" } : {}
-		},
-		...process.platform === "win32" ? { shell: true } : {}
+	const pid = spawnDashboard({
+		serverPath,
+		projectCwd: dashConfig.projectCwd,
+		networkMode
 	});
-	child.unref();
 	await new Promise((resolve) => setTimeout(resolve, 3e3));
-	for (let port = DEFAULT_PORT; port <= PORT_RANGE_END; port++) if (await checkHealth(port, HEALTH_TIMEOUT_MS)) {
-		console.log(`Dashboard ready at http://localhost:${port}`);
+	const readyPort = await findRunningDashboard();
+	if (readyPort) {
+		console.log(`Dashboard ready at http://localhost:${readyPort}`);
 		return;
 	}
-	console.log(`Dashboard spawned (PID ${child.pid}). It may take a moment to start.`);
+	console.log(`Dashboard spawned (PID ${pid}). It may take a moment to start.`);
 	console.log(`Check http://localhost:${DEFAULT_PORT} once ready.`);
-}
-/**
-* Check if a dashboard health endpoint is responding on the given port.
-*/
-async function checkHealth(port, timeoutMs) {
-	try {
-		const controller = new AbortController();
-		const timer = setTimeout(() => controller.abort(), timeoutMs);
-		const res = await fetch(`http://localhost:${port}/api/health`, { signal: controller.signal });
-		clearTimeout(timer);
-		if (res.ok) return (await res.json()).status === "ok";
-		return false;
-	} catch {
-		return false;
-	}
-}
-/**
-* Resolve the dashboard server entry point path.
-* Tries: built server.js first, then source server.ts for dev mode.
-*/
-function resolveDashboardServer() {
-	const localDashboard = node_path.join(process.cwd(), ".claude", "dashboard", "server.js");
-	if (node_fs.existsSync(localDashboard)) return localDashboard;
-	const globalDashboard = node_path.join(node_os.homedir(), ".claude", "dashboard", "server.js");
-	if (node_fs.existsSync(globalDashboard)) return globalDashboard;
-	try {
-		const pkgPath = (0, node_module.createRequire)(require("url").pathToFileURL(__filename).href).resolve("@maxsim/dashboard/package.json");
-		const pkgDir = node_path.dirname(pkgPath);
-		const serverJs = node_path.join(pkgDir, "server.js");
-		if (node_fs.existsSync(serverJs)) return serverJs;
-		const serverTs = node_path.join(pkgDir, "server.ts");
-		if (node_fs.existsSync(serverTs)) return serverTs;
-	} catch {}
-	try {
-		let dir = node_path.dirname(new URL(require("url").pathToFileURL(__filename).href).pathname);
-		if (process.platform === "win32" && dir.startsWith("/")) dir = dir.slice(1);
-		for (let i = 0; i < 5; i++) {
-			const candidate = node_path.join(dir, "packages", "dashboard", "server.ts");
-			if (node_fs.existsSync(candidate)) return candidate;
-			const candidateJs = node_path.join(dir, "packages", "dashboard", "server.js");
-			if (node_fs.existsSync(candidateJs)) return candidateJs;
-			dir = node_path.dirname(dir);
-		}
-	} catch {}
-	return null;
 }
 main();
 
