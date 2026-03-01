@@ -162,6 +162,17 @@ export function registerPhaseTools(server: McpServer): void {
         fs.mkdirSync(dirPath, { recursive: true });
         fs.writeFileSync(path.join(dirPath, '.gitkeep'), '');
 
+        // Scaffold template stub files
+        const today = new Date().toISOString().split('T')[0];
+        fs.writeFileSync(
+          path.join(dirPath, `${paddedNum}-CONTEXT.md`),
+          `# Phase ${newPhaseNum} Context: ${name}\n\n**Created:** ${today}\n**Phase goal:** [To be defined during /maxsim:discuss-phase]\n\n---\n\n_Context will be populated by /maxsim:discuss-phase_\n`,
+        );
+        fs.writeFileSync(
+          path.join(dirPath, `${paddedNum}-RESEARCH.md`),
+          `# Phase ${newPhaseNum}: ${name} - Research\n\n**Researched:** Not yet\n**Domain:** TBD\n**Confidence:** TBD\n\n---\n\n_Research will be populated by /maxsim:research-phase_\n`,
+        );
+
         const phaseEntry = `\n### Phase ${newPhaseNum}: ${name}\n\n**Goal:** [To be planned]\n**Requirements**: TBD\n**Depends on:** Phase ${maxPhase}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /maxsim:plan-phase ${newPhaseNum} to break down)\n`;
 
         let updatedContent: string;
@@ -264,6 +275,17 @@ export function registerPhaseTools(server: McpServer): void {
 
         fs.mkdirSync(dirPath, { recursive: true });
         fs.writeFileSync(path.join(dirPath, '.gitkeep'), '');
+
+        // Scaffold template stub files
+        const today = new Date().toISOString().split('T')[0];
+        fs.writeFileSync(
+          path.join(dirPath, `${decimalPhase}-CONTEXT.md`),
+          `# Phase ${decimalPhase} Context: ${name}\n\n**Created:** ${today}\n**Phase goal:** [To be defined during /maxsim:discuss-phase]\n\n---\n\n_Context will be populated by /maxsim:discuss-phase_\n`,
+        );
+        fs.writeFileSync(
+          path.join(dirPath, `${decimalPhase}-RESEARCH.md`),
+          `# Phase ${decimalPhase}: ${name} - Research\n\n**Researched:** Not yet\n**Domain:** TBD\n**Confidence:** TBD\n\n---\n\n_Research will be populated by /maxsim:research-phase_\n`,
+        );
 
         const phaseEntry = `\n### Phase ${decimalPhase}: ${name} (INSERTED)\n\n**Goal:** [Urgent work - to be planned]\n**Requirements**: TBD\n**Depends on:** Phase ${after}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /maxsim:plan-phase ${decimalPhase} to break down)\n`;
 
