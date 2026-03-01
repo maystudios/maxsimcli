@@ -16,6 +16,7 @@ import { TerminalToggle, useTerminalLayout } from "@/components/terminal/Termina
 import { ModeToggleButton } from "@/components/simple-mode/mode-toggle-button";
 import { FirstRunCard } from "@/components/simple-mode/first-run-card";
 import { SimpleModeView } from "@/components/simple-mode/simple-mode-view";
+import { ConnectionBanner } from "@/components/dashboard/connection-banner";
 import type { DashboardPhase } from "@/lib/types";
 
 export type ActiveView = "overview" | "phase" | "todos" | "blockers" | "terminal";
@@ -251,6 +252,9 @@ function DashboardApp() {
         </div>
       }
     >
+      {/* Connection status banner — shows when server is unreachable */}
+      <ConnectionBanner />
+
       {/* First-run card — shown above everything when mode is not yet chosen */}
       {initialized && mode === null && <FirstRunCard onChoose={setMode} />}
 

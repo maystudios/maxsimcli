@@ -2,6 +2,9 @@ import { useDiscussion } from "@/components/providers/discussion-provider";
 import { useWebSocket } from "@/components/providers/websocket-provider";
 import { RecommendationCard } from "./recommendation-card";
 import { ActionGrid } from "./action-grid";
+import { PhaseProgressPanel } from "./phase-progress-panel";
+import { TodoSummaryPanel } from "./todo-summary-panel";
+import { RoadmapOverviewPanel } from "./roadmap-overview-panel";
 import { DiscussionView } from "./discussion/discussion-view";
 
 function StatusBar() {
@@ -89,7 +92,12 @@ export function SimpleModeView({ onExecute }: SimpleModeViewProps) {
       <StatusBar />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="mx-auto max-w-3xl flex flex-col gap-4">
+          <PhaseProgressPanel />
           <RecommendationCard />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <TodoSummaryPanel />
+            <RoadmapOverviewPanel />
+          </div>
           <ActionGrid onExecute={handleExecute} />
         </div>
       </div>
