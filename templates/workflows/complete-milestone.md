@@ -128,7 +128,7 @@ Calculate milestone statistics:
 ```bash
 git log --oneline --grep="feat(" | head -20
 git diff --stat FIRST_COMMIT..LAST_COMMIT | tail -1
-find . -name "*.swift" -o -name "*.ts" -o -name "*.py" | xargs wc -l 2>/dev/null
+git ls-files --cached --exclude-standard -- "*.swift" "*.ts" "*.py" | xargs wc -l 2>/dev/null
 git log --format="%ai" FIRST_COMMIT | tail -1
 git log --format="%ai" LAST_COMMIT | head -1
 ```

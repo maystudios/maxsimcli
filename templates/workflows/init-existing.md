@@ -258,7 +258,7 @@ Print per-agent completion status:
 After all agents complete, also create a file tree overview:
 
 ```bash
-find . -type f | grep -v node_modules | grep -v .git | grep -v .planning | grep -v __pycache__ | grep -v .next | grep -v dist/ | grep -v build/ | head -200 > .planning/codebase/STRUCTURE.md
+git ls-files --others --cached --exclude-standard | grep -v node_modules | grep -v __pycache__ | grep -v .next | grep -v dist/ | grep -v build/ | head -200 > .planning/codebase/STRUCTURE.md
 ```
 
 Then wrap it with a header:
