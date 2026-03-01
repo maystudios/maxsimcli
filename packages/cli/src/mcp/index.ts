@@ -8,6 +8,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { registerPhaseTools } from './phase-tools.js';
 import { registerTodoTools } from './todo-tools.js';
+import { registerStateTools } from './state-tools.js';
 
 /**
  * Register all MCP tools on the given server instance.
@@ -15,4 +16,5 @@ import { registerTodoTools } from './todo-tools.js';
 export function registerAllTools(server: McpServer): void {
   registerPhaseTools(server);
   registerTodoTools(server);
+  registerStateTools(server);
 }
