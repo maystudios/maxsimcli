@@ -33,6 +33,10 @@ export default defineConfig([
     ...shared,
     entry: { cli: 'src/cli.ts' },
   },
+  {
+    ...shared,
+    entry: { 'mcp-server': 'src/mcp-server.ts' },
+  },
   // Hooks — compiled as standalone bundles into dist/assets/hooks/
   {
     ...hookShared,
