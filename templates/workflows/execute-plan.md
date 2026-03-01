@@ -10,6 +10,16 @@ Read config.json for planning behavior settings.
 @./references/dashboard-bridge.md
 </required_reading>
 
+## MCP Server Fallback
+
+MAXSIM provides MCP tools (mcp_create_phase, mcp_list_phases, etc.) for structured operations.
+If MCP tools are available in your tool list, prefer them for phase, todo, and state operations.
+
+**If MCP tools are NOT available** (server not running, .mcp.json not configured, or non-Claude runtime):
+- Log a warning: "MCP server not available -- using Bash tools router fallback"
+- Fall back to the Bash tools router: `node .claude/maxsim/bin/maxsim-tools.cjs <command>`
+- All operations work identically via either path -- MCP is preferred but not required
+
 <process>
 
 <step name="init_context" priority="first">
