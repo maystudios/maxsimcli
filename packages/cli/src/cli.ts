@@ -361,6 +361,11 @@ const COMMANDS: Record<string, Handler> = {
     }, raw);
   },
   'dashboard': (args) => handleDashboard(args.slice(1)),
+  'start-server': async () => {
+    const serverPath = path.join(__dirname, 'mcp-server.cjs');
+    const child = spawn(process.execPath, [serverPath], { stdio: 'inherit' });
+    child.on('exit', (code) => process.exit(code ?? 0));
+  },
 };
 
 // ─── Main ────────────────────────────────────────────────────────────────────
