@@ -1540,6 +1540,18 @@ async function install(
       failures.push('maxsim-tools.cjs');
     }
 
+    // Install mcp-server.cjs — MCP server binary for Claude Code integration
+    const mcpSrc = path.resolve(__dirname, 'mcp-server.cjs');
+    const mcpDest = path.join(binDir, 'mcp-server.cjs');
+    if (fs.existsSync(mcpSrc)) {
+      fs.mkdirSync(binDir, { recursive: true });
+      fs.copyFileSync(mcpSrc, mcpDest);
+      console.log(`  ${chalk.green('\u2713')} Installed mcp-server.cjs`);
+    } else {
+      console.warn(`  ${chalk.yellow('!')} mcp-server.cjs not found — MCP server not installed`);
+      // Don't add to failures — MCP is optional, install should not fail
+    }
+
     // Copy hooks from bundled assets directory (copied from @maxsim/hooks/dist at build time)
     let hooksSrc: string | null = null;
     const bundledHooksDir = path.resolve(__dirname, 'assets', 'hooks');
@@ -1610,6 +1622,34 @@ async function install(
     if (networkMode) {
       applyFirewallRule(3333);
     }
+  }
+
+  // Write .mcp.json for Claude Code MCP server auto-discovery
+  if (!isOpencode && !isCodex && !isGemini) {
+    const mcpJsonPath = isGlobal
+      ? path.join(targetDir, '..', '.mcp.json')
+      : path.join(process.cwd(), '.mcp.json');
+    let mcpConfig: Record<string, unknown> = {};
+
+    // Preserve existing .mcp.json if it exists (user may have other MCP servers)
+    if (fs.existsSync(mcpJsonPath)) {
+      try {
+        mcpConfig = JSON.parse(fs.readFileSync(mcpJsonPath, 'utf-8'));
+      } catch {
+        // Corrupted file — start fresh
+      }
+    }
+
+    const mcpServers = (mcpConfig.mcpServers as Record<string, unknown>) ?? {};
+    mcpServers['maxsim'] = {
+      command: 'node',
+      args: ['.claude/maxsim/bin/mcp-server.cjs'],
+      env: {},
+    };
+    mcpConfig.mcpServers = mcpServers;
+
+    fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + '\n', 'utf-8');
+    console.log(`  ${chalk.green('\u2713')} Configured .mcp.json for MCP server auto-discovery`);
   }
 
   if (failures.length > 0) {

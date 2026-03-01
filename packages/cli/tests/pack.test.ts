@@ -18,6 +18,10 @@ describe('npm pack validation', () => {
     expect(existsSync(path.join(distDir, 'cli.cjs'))).toBe(true);
   });
 
+  it('mcp-server.cjs exists in dist/ — required for MCP server install', () => {
+    expect(existsSync(path.join(distDir, 'mcp-server.cjs'))).toBe(true);
+  });
+
   it('npm pack --dry-run includes core CLI dist files and bundled hooks assets', () => {
     const output = execSync('npm pack --dry-run 2>&1', {
       cwd: cliDir,
@@ -27,6 +31,7 @@ describe('npm pack validation', () => {
     // Core CLI files
     expect(output).toContain('dist/cli.cjs');
     expect(output).toContain('dist/install.cjs');
+    expect(output).toContain('dist/mcp-server.cjs');
     // Hooks bundled in assets (no longer a bundledDependency)
     expect(output).toContain('dist/assets/hooks/maxsim-statusline.cjs');
   }, 30_000);
