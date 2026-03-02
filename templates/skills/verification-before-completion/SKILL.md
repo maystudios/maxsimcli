@@ -1,6 +1,7 @@
 ---
 name: verification-before-completion
 description: Use before claiming any work is complete, fixed, or passing — requires running verification commands and reading output before making success claims
+context: fork
 ---
 
 # Verification Before Completion
@@ -91,12 +92,43 @@ Before marking any work as complete:
 - [ ] No "should", "probably", or "seems to" in your completion statement
 - [ ] Evidence block produced for the task completion claim
 
-## In MAXSIM Plan Execution
+## Integration with MAXSIM
 
-The executor's task commit protocol requires verification BEFORE committing:
-1. Run the task's `<verify>` block (automated checks)
-2. Confirm the `<done>` criteria are met with evidence
-3. Produce an evidence block for the task completion
+### Context Loading
+
+When verifying within a MAXSIM project, load project context:
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs skill-context verification-before-completion
+```
+
+This returns the current phase, active plan path, and artifact locations. Use this to:
+- Load the current plan's `<verify>` and `<done>` blocks as the verification checklist
+- Check if a VERIFICATION.md already exists for the phase (prior verification results)
+- Reference the plan's success criteria for the current task
+
+### Plan Verify/Done Block Loading
+
+Each task in a MAXSIM plan has `<verify>` and `<done>` blocks:
+- `<verify>` — automated commands to run (test suites, build commands, lint)
+- `<done>` — human-readable criteria that must be TRUE
+
+The verification process:
+1. Run every command in the `<verify>` block — capture full output
+2. Check every criterion in the `<done>` block — produce evidence for each
+3. Produce the Evidence Block (see format above) for task completion
 4. Only then: stage files and commit
 
-The verifier agent independently re-checks all claims — do not assume the verifier will catch what you missed.
+### STATE.md Hooks
+
+Track verification results:
+- Record verification pass/fail for each task completion
+- If verification fails, record the failure as a blocker with the failing command and output
+- Verification metrics (pass rate, common failures) feed into performance tracking
+
+### Artifact References
+
+- Load `.planning/phases/{current}/PLAN.md` for task `<verify>` blocks
+- Surface `.planning/phases/{current}/VERIFICATION.md` if it exists — check prior verification results
+- Verification evidence feeds into SUMMARY.md task completion records
+- The verifier agent (`maxsim-verifier`) independently re-checks all claims — do not assume it will catch what you missed
