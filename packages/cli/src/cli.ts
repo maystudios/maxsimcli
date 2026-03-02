@@ -8,9 +8,10 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { spawn } from 'node:child_process';
 
-import type { TimestampFormat } from './core/index.js';
+import type { TimestampFormat, CmdResult } from './core/index.js';
 
 import {
+  output,
   error,
   CliOutput,
   CliError,
@@ -114,6 +115,14 @@ function hasFlag(args: string[], flag: string): boolean {
   return args.includes(`--${flag}`);
 }
 
+// ─── Result dispatcher ───────────────────────────────────────────────────────
+
+/** Convert a CmdResult into the appropriate output()/error() call. */
+function handleResult(r: CmdResult, raw: boolean): never {
+  if (r.ok) output(r.result, raw, r.rawValue);
+  else error(r.error);
+}
+
 // ─── Command handler type ────────────────────────────────────────────────────
 
 type Handler = (args: string[], cwd: string, raw: boolean) => void | Promise<void>;
@@ -122,7 +131,7 @@ type Handler = (args: string[], cwd: string, raw: boolean) => void | Promise<voi
 
 const handleState: Handler = async (args, cwd, raw) => {
   const sub = args[1];
-  const handlers: Record<string, () => void | Promise<void>> = {
+  const handlers: Record<string, () => CmdResult | Promise<CmdResult>> = {
     'update': () => cmdStateUpdate(cwd, args[2], args[3]),
     'get': () => cmdStateGet(cwd, args[2], raw),
     'patch': () => {
@@ -132,12 +141,12 @@ const handleState: Handler = async (args, cwd, raw) => {
         const value = args[i + 1];
         if (key && value !== undefined) patches[key] = value;
       }
-      cmdStatePatch(cwd, patches, raw);
+      return cmdStatePatch(cwd, patches, raw);
     },
     'advance-plan': () => cmdStateAdvancePlan(cwd, raw),
     'record-metric': () => {
       const f = getFlags(args, 'phase', 'plan', 'duration', 'tasks', 'files');
-      cmdStateRecordMetric(cwd, {
+      return cmdStateRecordMetric(cwd, {
         phase: f.phase ?? '', plan: f.plan ?? '', duration: f.duration ?? '',
         tasks: f.tasks ?? undefined, files: f.files ?? undefined,
       }, raw);
@@ -145,7 +154,7 @@ const handleState: Handler = async (args, cwd, raw) => {
     'update-progress': () => cmdStateUpdateProgress(cwd, raw),
     'add-decision': () => {
       const f = getFlags(args, 'phase', 'summary', 'summary-file', 'rationale', 'rationale-file');
-      cmdStateAddDecision(cwd, {
+      return cmdStateAddDecision(cwd, {
         phase: f.phase ?? undefined, summary: f.summary ?? undefined,
         summary_file: f['summary-file'] ?? undefined,
         rationale: f.rationale ?? '', rationale_file: f['rationale-file'] ?? undefined,
@@ -153,12 +162,12 @@ const handleState: Handler = async (args, cwd, raw) => {
     },
     'add-blocker': () => {
       const f = getFlags(args, 'text', 'text-file');
-      cmdStateAddBlocker(cwd, { text: f.text ?? undefined, text_file: f['text-file'] ?? undefined }, raw);
+      return cmdStateAddBlocker(cwd, { text: f.text ?? undefined, text_file: f['text-file'] ?? undefined }, raw);
     },
     'resolve-blocker': () => cmdStateResolveBlocker(cwd, getFlag(args, '--text'), raw),
     'record-session': () => {
       const f = getFlags(args, 'stopped-at', 'resume-file');
-      cmdStateRecordSession(cwd, {
+      return cmdStateRecordSession(cwd, {
         stopped_at: f['stopped-at'] ?? undefined,
         resume_file: f['resume-file'] ?? 'None',
       }, raw);
@@ -166,8 +175,8 @@ const handleState: Handler = async (args, cwd, raw) => {
   };
 
   const handler = sub ? handlers[sub] : undefined;
-  if (handler) return handler();
-  return cmdStateLoad(cwd, raw);
+  if (handler) return handleResult(await handler(), raw);
+  return handleResult(await cmdStateLoad(cwd, raw), raw);
 };
 
 const handleTemplate: Handler = (args, cwd, raw) => {
@@ -316,13 +325,13 @@ const handleInit: Handler = (args, cwd, raw) => {
 
 const COMMANDS: Record<string, Handler> = {
   'state': handleState,
-  'resolve-model': (args, cwd, raw) => cmdResolveModel(cwd, args[1], raw),
+  'resolve-model': (args, cwd, raw) => handleResult(cmdResolveModel(cwd, args[1], raw), raw),
   'find-phase': (args, cwd, raw) => cmdFindPhase(cwd, args[1], raw),
   'commit': async (args, cwd, raw) => {
     const files = args.indexOf('--files') !== -1
       ? args.slice(args.indexOf('--files') + 1).filter(a => !a.startsWith('--'))
       : [];
-    await cmdCommit(cwd, args[1], files, raw, hasFlag(args, 'amend'));
+    handleResult(await cmdCommit(cwd, args[1], files, raw, hasFlag(args, 'amend')), raw);
   },
   'verify-summary': async (args, cwd, raw) => {
     const countIndex = args.indexOf('--check-count');
@@ -332,14 +341,14 @@ const COMMANDS: Record<string, Handler> = {
   'template': handleTemplate,
   'frontmatter': handleFrontmatter,
   'verify': handleVerify,
-  'generate-slug': (args, _cwd, raw) => cmdGenerateSlug(args[1], raw),
-  'current-timestamp': (args, _cwd, raw) => cmdCurrentTimestamp((args[1] || 'full') as TimestampFormat, raw),
-  'list-todos': (args, cwd, raw) => cmdListTodos(cwd, args[1], raw),
-  'verify-path-exists': (args, cwd, raw) => cmdVerifyPathExists(cwd, args[1], raw),
-  'config-ensure-section': (_args, cwd, raw) => cmdConfigEnsureSection(cwd, raw),
-  'config-set': (args, cwd, raw) => cmdConfigSet(cwd, args[1], args[2], raw),
-  'config-get': (args, cwd, raw) => cmdConfigGet(cwd, args[1], raw),
-  'history-digest': (_args, cwd, raw) => cmdHistoryDigest(cwd, raw),
+  'generate-slug': (args, _cwd, raw) => handleResult(cmdGenerateSlug(args[1], raw), raw),
+  'current-timestamp': (args, _cwd, raw) => handleResult(cmdCurrentTimestamp((args[1] || 'full') as TimestampFormat, raw), raw),
+  'list-todos': (args, cwd, raw) => handleResult(cmdListTodos(cwd, args[1], raw), raw),
+  'verify-path-exists': (args, cwd, raw) => handleResult(cmdVerifyPathExists(cwd, args[1], raw), raw),
+  'config-ensure-section': (_args, cwd, raw) => handleResult(cmdConfigEnsureSection(cwd, raw), raw),
+  'config-set': (args, cwd, raw) => handleResult(cmdConfigSet(cwd, args[1], args[2], raw), raw),
+  'config-get': (args, cwd, raw) => handleResult(cmdConfigGet(cwd, args[1], raw), raw),
+  'history-digest': (_args, cwd, raw) => handleResult(cmdHistoryDigest(cwd, raw), raw),
   'phases': handlePhases,
   'roadmap': handleRoadmap,
   'requirements': (args, cwd, raw) => {
@@ -349,34 +358,34 @@ const COMMANDS: Record<string, Handler> = {
   'phase': handlePhase,
   'milestone': handleMilestone,
   'validate': handleValidate,
-  'progress': (args, cwd, raw) => cmdProgressRender(cwd, args[1] || 'json', raw),
+  'progress': (args, cwd, raw) => handleResult(cmdProgressRender(cwd, args[1] || 'json', raw), raw),
   'todo': (args, cwd, raw) => {
-    if (args[1] === 'complete') cmdTodoComplete(cwd, args[2], raw);
+    if (args[1] === 'complete') handleResult(cmdTodoComplete(cwd, args[2], raw), raw);
     else error('Unknown todo subcommand. Available: complete');
   },
   'scaffold': (args, cwd, raw) => {
     const f = getFlags(args, 'phase', 'name');
-    cmdScaffold(cwd, args[1], { phase: f.phase, name: f.name ? args.slice(args.indexOf('--name') + 1).join(' ') : null }, raw);
+    handleResult(cmdScaffold(cwd, args[1], { phase: f.phase, name: f.name ? args.slice(args.indexOf('--name') + 1).join(' ') : null }, raw), raw);
   },
   'init': handleInit,
   'phase-plan-index': (args, cwd, raw) => cmdPhasePlanIndex(cwd, args[1], raw),
-  'state-snapshot': (_args, cwd, raw) => cmdStateSnapshot(cwd, raw),
+  'state-snapshot': (_args, cwd, raw) => handleResult(cmdStateSnapshot(cwd, raw), raw),
   'summary-extract': (args, cwd, raw) => {
     const fieldsIndex = args.indexOf('--fields');
     const fields = fieldsIndex !== -1 ? args[fieldsIndex + 1].split(',') : null;
-    cmdSummaryExtract(cwd, args[1], fields, raw);
+    handleResult(cmdSummaryExtract(cwd, args[1], fields, raw), raw);
   },
   'websearch': async (args, _cwd, raw) => {
     const f = getFlags(args, 'limit', 'freshness');
-    await cmdWebsearch(args[1], {
+    handleResult(await cmdWebsearch(args[1], {
       limit: f.limit ? parseInt(f.limit, 10) : 10,
       freshness: f.freshness ?? undefined,
-    }, raw);
+    }, raw), raw);
   },
-  'artefakte-read': (args, cwd, raw) => cmdArtefakteRead(cwd, args[1], getFlag(args, '--phase') ?? undefined, raw),
-  'artefakte-write': (args, cwd, raw) => cmdArtefakteWrite(cwd, args[1], getFlag(args, '--content') ?? undefined, getFlag(args, '--phase') ?? undefined, raw),
-  'artefakte-append': (args, cwd, raw) => cmdArtefakteAppend(cwd, args[1], getFlag(args, '--entry') ?? undefined, getFlag(args, '--phase') ?? undefined, raw),
-  'artefakte-list': (args, cwd, raw) => cmdArtefakteList(cwd, getFlag(args, '--phase') ?? undefined, raw),
+  'artefakte-read': (args, cwd, raw) => handleResult(cmdArtefakteRead(cwd, args[1], getFlag(args, '--phase') ?? undefined, raw), raw),
+  'artefakte-write': (args, cwd, raw) => handleResult(cmdArtefakteWrite(cwd, args[1], getFlag(args, '--content') ?? undefined, getFlag(args, '--phase') ?? undefined, raw), raw),
+  'artefakte-append': (args, cwd, raw) => handleResult(cmdArtefakteAppend(cwd, args[1], getFlag(args, '--entry') ?? undefined, getFlag(args, '--phase') ?? undefined, raw), raw),
+  'artefakte-list': (args, cwd, raw) => handleResult(cmdArtefakteList(cwd, getFlag(args, '--phase') ?? undefined, raw), raw),
   'context-load': (args, cwd, raw) => cmdContextLoad(cwd, getFlag(args, '--phase') ?? undefined, getFlag(args, '--topic') ?? undefined, hasFlag(args, 'include-history'), raw),
   'start': async (args, cwd, raw) => cmdStart(cwd, { noBrowser: hasFlag(args, 'no-browser'), networkMode: hasFlag(args, 'network') }, raw),
   'dashboard': (args) => handleDashboard(args.slice(1)),

@@ -8,13 +8,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 
-import { output, error } from './core.js';
-import type { PlanningConfig, WorkflowConfig } from './types.js';
-import { PLANNING_CONFIG_DEFAULTS } from './types.js';
+import type { PlanningConfig, WorkflowConfig, CmdResult } from './types.js';
+import { PLANNING_CONFIG_DEFAULTS, cmdOk, cmdErr } from './types.js';
 
 // ─── Config CRUD commands ───────────────────────────────────────────────────
 
-export function cmdConfigEnsureSection(cwd: string, raw: boolean): void {
+export function cmdConfigEnsureSection(cwd: string, raw: boolean): CmdResult {
   const configPath = path.join(cwd, '.planning', 'config.json');
   const planningDir = path.join(cwd, '.planning');
 
@@ -23,13 +22,12 @@ export function cmdConfigEnsureSection(cwd: string, raw: boolean): void {
       fs.mkdirSync(planningDir, { recursive: true });
     }
   } catch (err: unknown) {
-    error('Failed to create .planning directory: ' + (err as Error).message);
+    return cmdErr('Failed to create .planning directory: ' + (err as Error).message);
   }
 
   if (fs.existsSync(configPath)) {
     const result = { created: false, reason: 'already_exists' };
-    output(result, raw, 'exists');
-    return;
+    return cmdOk(result, raw ? 'exists' : undefined);
   }
 
   // Detect Brave Search API key availability
@@ -65,17 +63,17 @@ export function cmdConfigEnsureSection(cwd: string, raw: boolean): void {
   try {
     fs.writeFileSync(configPath, JSON.stringify(defaults, null, 2), 'utf-8');
     const result = { created: true, path: '.planning/config.json' };
-    output(result, raw, 'created');
+    return cmdOk(result, raw ? 'created' : undefined);
   } catch (err: unknown) {
-    error('Failed to create config.json: ' + (err as Error).message);
+    return cmdErr('Failed to create config.json: ' + (err as Error).message);
   }
 }
 
-export function cmdConfigSet(cwd: string, keyPath: string | undefined, value: string | undefined, raw: boolean): void {
+export function cmdConfigSet(cwd: string, keyPath: string | undefined, value: string | undefined, raw: boolean): CmdResult {
   const configPath = path.join(cwd, '.planning', 'config.json');
 
   if (!keyPath) {
-    error('Usage: config-set <key.path> <value>');
+    return cmdErr('Usage: config-set <key.path> <value>');
   }
 
   // Parse value (handle booleans and numbers)
@@ -91,7 +89,7 @@ export function cmdConfigSet(cwd: string, keyPath: string | undefined, value: st
       config = JSON.parse(fs.readFileSync(configPath, 'utf-8')) as Record<string, unknown>;
     }
   } catch (err: unknown) {
-    error('Failed to read config.json: ' + (err as Error).message);
+    return cmdErr('Failed to read config.json: ' + (err as Error).message);
   }
 
   // Set nested value using dot notation
@@ -109,17 +107,17 @@ export function cmdConfigSet(cwd: string, keyPath: string | undefined, value: st
   try {
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
     const result = { updated: true, key: keyPath, value: parsedValue };
-    output(result, raw, `${keyPath}=${parsedValue}`);
+    return cmdOk(result, raw ? `${keyPath}=${parsedValue}` : undefined);
   } catch (err: unknown) {
-    error('Failed to write config.json: ' + (err as Error).message);
+    return cmdErr('Failed to write config.json: ' + (err as Error).message);
   }
 }
 
-export function cmdConfigGet(cwd: string, keyPath: string | undefined, raw: boolean): void {
+export function cmdConfigGet(cwd: string, keyPath: string | undefined, raw: boolean): CmdResult {
   const configPath = path.join(cwd, '.planning', 'config.json');
 
   if (!keyPath) {
-    error('Usage: config-get <key.path>');
+    return cmdErr('Usage: config-get <key.path>');
   }
 
   let config: Record<string, unknown> = {};
@@ -127,25 +125,24 @@ export function cmdConfigGet(cwd: string, keyPath: string | undefined, raw: bool
     if (fs.existsSync(configPath)) {
       config = JSON.parse(fs.readFileSync(configPath, 'utf-8')) as Record<string, unknown>;
     } else {
-      error('No config.json found at ' + configPath);
+      return cmdErr('No config.json found at ' + configPath);
     }
   } catch (err: unknown) {
-    if ((err as Error).message.startsWith('No config.json')) throw err;
-    error('Failed to read config.json: ' + (err as Error).message);
+    return cmdErr('Failed to read config.json: ' + (err as Error).message);
   }
 
   const keys = keyPath!.split('.');
   let current: unknown = config;
   for (const key of keys) {
     if (current === undefined || current === null || typeof current !== 'object') {
-      error(`Key not found: ${keyPath}`);
+      return cmdErr(`Key not found: ${keyPath}`);
     }
     current = (current as Record<string, unknown>)[key];
   }
 
   if (current === undefined) {
-    error(`Key not found: ${keyPath}`);
+    return cmdErr(`Key not found: ${keyPath}`);
   }
 
-  output(current, raw, String(current));
+  return cmdOk(current, raw ? String(current) : undefined);
 }

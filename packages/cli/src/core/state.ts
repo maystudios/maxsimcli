@@ -9,7 +9,7 @@ import path from 'node:path';
 
 import escapeStringRegexp from 'escape-string-regexp';
 
-import { loadConfig, output, error, rethrowCliSignals, safeReadFile, safeReadFileAsync, planningPath, statePath as statePathUtil, configPath, roadmapPath, phasesPath, debugLog, todayISO, isPlanFile, isSummaryFile } from './core.js';
+import { loadConfig, rethrowCliSignals, safeReadFile, safeReadFileAsync, planningPath, statePath as statePathUtil, configPath, roadmapPath, phasesPath, debugLog, todayISO, isPlanFile, isSummaryFile } from './core.js';
 import type {
   AppConfig,
   StatePatchResult,
@@ -19,7 +19,9 @@ import type {
   StateSessionOptions,
   StateSnapshot,
   Decision,
+  CmdResult,
 } from './types.js';
+import { cmdOk, cmdErr } from './types.js';
 
 // ─── Internal helpers ────────────────────────────────────────────────────────
 
@@ -93,7 +95,7 @@ export function appendToStateSection(
 
 // ─── State commands ──────────────────────────────────────────────────────────
 
-export async function cmdStateLoad(cwd: string, raw: boolean): Promise<void> {
+export async function cmdStateLoad(cwd: string, raw: boolean): Promise<CmdResult> {
   const config: AppConfig = loadConfig(cwd);
 
   const [stateContent, configExists, roadmapExists] = await Promise.all([
@@ -129,27 +131,25 @@ export async function cmdStateLoad(cwd: string, raw: boolean): Promise<void> {
       `roadmap_exists=${roadmapExists}`,
       `state_exists=${stateExists}`,
     ];
-    output(result, true, lines.join('\n'));
+    return cmdOk(result, lines.join('\n'));
   }
 
-  output(result);
+  return cmdOk(result);
 }
 
-export function cmdStateGet(cwd: string, section: string | null, raw: boolean): void {
+export function cmdStateGet(cwd: string, section: string | null, raw: boolean): CmdResult {
   const statePath = statePathUtil(cwd);
   try {
     const content = fs.readFileSync(statePath, 'utf-8');
 
     if (!section) {
-      output({ content }, raw, content);
-      return;
+      return cmdOk({ content }, raw ? content : undefined);
     }
 
     // Check for **field:** value (reuse stateExtractField for format tolerance)
     const fieldValue = stateExtractField(content, section);
     if (fieldValue !== null) {
-      output({ [section]: fieldValue }, raw, fieldValue);
-      return;
+      return cmdOk({ [section]: fieldValue }, raw ? fieldValue : undefined);
     }
 
     // Check for ## or ### Section, tolerating extra blank lines after header
@@ -157,18 +157,17 @@ export function cmdStateGet(cwd: string, section: string | null, raw: boolean): 
     const sectionPattern = new RegExp(`#{2,3}\\s*${fieldEscaped}\\s*\\n\\s*\\n?([\\s\\S]*?)(?=\\n#{2,3}\\s|$)`, 'i');
     const sectionMatch = content.match(sectionPattern);
     if (sectionMatch) {
-      output({ [section]: sectionMatch[1].trim() }, raw, sectionMatch[1].trim());
-      return;
+      return cmdOk({ [section]: sectionMatch[1].trim() }, raw ? sectionMatch[1].trim() : undefined);
     }
 
-    output({ error: `Section or field "${section}" not found` }, raw, '');
+    return cmdOk({ error: `Section or field "${section}" not found` }, raw ? '' : undefined);
   } catch (e: unknown) {
     rethrowCliSignals(e);
-    error('STATE.md not found');
+    return cmdErr('STATE.md not found');
   }
 }
 
-export function cmdStatePatch(cwd: string, patches: Record<string, string>, raw: boolean): void {
+export function cmdStatePatch(cwd: string, patches: Record<string, string>, raw: boolean): CmdResult {
   const statePath = statePathUtil(cwd);
   try {
     let content = fs.readFileSync(statePath, 'utf-8');
@@ -188,16 +187,16 @@ export function cmdStatePatch(cwd: string, patches: Record<string, string>, raw:
       fs.writeFileSync(statePath, content, 'utf-8');
     }
 
-    output(results, raw, results.updated.length > 0 ? 'true' : 'false');
+    return cmdOk(results, raw ? (results.updated.length > 0 ? 'true' : 'false') : undefined);
   } catch (e: unknown) {
     rethrowCliSignals(e);
-    error('STATE.md not found');
+    return cmdErr('STATE.md not found');
   }
 }
 
-export function cmdStateUpdate(cwd: string, field: string | undefined, value: string | undefined): void {
+export function cmdStateUpdate(cwd: string, field: string | undefined, value: string | undefined): CmdResult {
   if (!field || value === undefined) {
-    error('field and value required for state update');
+    return cmdErr('field and value required for state update');
   }
 
   const statePath = statePathUtil(cwd);
@@ -206,21 +205,21 @@ export function cmdStateUpdate(cwd: string, field: string | undefined, value: st
     const result = stateReplaceField(content, field, value);
     if (result) {
       fs.writeFileSync(statePath, result, 'utf-8');
-      output({ updated: true });
+      return cmdOk({ updated: true });
     } else {
-      output({ updated: false, reason: `Field "${field}" not found in STATE.md` });
+      return cmdOk({ updated: false, reason: `Field "${field}" not found in STATE.md` });
     }
   } catch (e: unknown) {
     rethrowCliSignals(e);
-    output({ updated: false, reason: 'STATE.md not found' });
+    return cmdOk({ updated: false, reason: 'STATE.md not found' });
   }
 }
 
 // ─── State Progression Engine ────────────────────────────────────────────────
 
-export function cmdStateAdvancePlan(cwd: string, raw: boolean): void {
+export function cmdStateAdvancePlan(cwd: string, raw: boolean): CmdResult {
   const statePath = statePathUtil(cwd);
-  if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
+  if (!fs.existsSync(statePath)) { return cmdOk({ error: 'STATE.md not found' }); }
 
   let content = fs.readFileSync(statePath, 'utf-8');
   const currentPlan = parseInt(stateExtractField(content, 'Current Plan') ?? '', 10);
@@ -228,35 +227,33 @@ export function cmdStateAdvancePlan(cwd: string, raw: boolean): void {
   const today = todayISO();
 
   if (isNaN(currentPlan) || isNaN(totalPlans)) {
-    output({ error: 'Cannot parse Current Plan or Total Plans in Phase from STATE.md' }, raw);
-    return;
+    return cmdOk({ error: 'Cannot parse Current Plan or Total Plans in Phase from STATE.md' });
   }
 
   if (currentPlan >= totalPlans) {
     content = stateReplaceField(content, 'Status', 'Phase complete — ready for verification') || content;
     content = stateReplaceField(content, 'Last Activity', today) || content;
     fs.writeFileSync(statePath, content, 'utf-8');
-    output({ advanced: false, reason: 'last_plan', current_plan: currentPlan, total_plans: totalPlans, status: 'ready_for_verification' }, raw, 'false');
+    return cmdOk({ advanced: false, reason: 'last_plan', current_plan: currentPlan, total_plans: totalPlans, status: 'ready_for_verification' }, raw ? 'false' : undefined);
   } else {
     const newPlan = currentPlan + 1;
     content = stateReplaceField(content, 'Current Plan', String(newPlan)) || content;
     content = stateReplaceField(content, 'Status', 'Ready to execute') || content;
     content = stateReplaceField(content, 'Last Activity', today) || content;
     fs.writeFileSync(statePath, content, 'utf-8');
-    output({ advanced: true, previous_plan: currentPlan, current_plan: newPlan, total_plans: totalPlans }, raw, 'true');
+    return cmdOk({ advanced: true, previous_plan: currentPlan, current_plan: newPlan, total_plans: totalPlans }, raw ? 'true' : undefined);
   }
 }
 
-export function cmdStateRecordMetric(cwd: string, options: StateMetricOptions, raw: boolean): void {
+export function cmdStateRecordMetric(cwd: string, options: StateMetricOptions, raw: boolean): CmdResult {
   const statePath = statePathUtil(cwd);
-  if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
+  if (!fs.existsSync(statePath)) { return cmdOk({ error: 'STATE.md not found' }); }
 
   let content = fs.readFileSync(statePath, 'utf-8');
   const { phase, plan, duration, tasks, files } = options;
 
   if (!phase || !plan || !duration) {
-    output({ error: 'phase, plan, and duration required' }, raw);
-    return;
+    return cmdOk({ error: 'phase, plan, and duration required' });
   }
 
   // Flexible: tolerate varying heading levels (##/###), flexible separator lines (|---|, | --- |, |:---|)
@@ -275,15 +272,15 @@ export function cmdStateRecordMetric(cwd: string, options: StateMetricOptions, r
 
     content = content.replace(metricsPattern, (_match, header: string) => `${header}${tableBody}\n`);
     fs.writeFileSync(statePath, content, 'utf-8');
-    output({ recorded: true, phase, plan, duration }, raw, 'true');
+    return cmdOk({ recorded: true, phase, plan, duration }, raw ? 'true' : undefined);
   } else {
-    output({ recorded: false, reason: 'Performance Metrics section not found in STATE.md' }, raw, 'false');
+    return cmdOk({ recorded: false, reason: 'Performance Metrics section not found in STATE.md' }, raw ? 'false' : undefined);
   }
 }
 
-export function cmdStateUpdateProgress(cwd: string, raw: boolean): void {
+export function cmdStateUpdateProgress(cwd: string, raw: boolean): CmdResult {
   const statePath = statePathUtil(cwd);
-  if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
+  if (!fs.existsSync(statePath)) { return cmdOk({ error: 'STATE.md not found' }); }
 
   let content = fs.readFileSync(statePath, 'utf-8');
 
@@ -310,15 +307,15 @@ export function cmdStateUpdateProgress(cwd: string, raw: boolean): void {
   const result = stateReplaceField(content, 'Progress', progressStr);
   if (result) {
     fs.writeFileSync(statePath, result, 'utf-8');
-    output({ updated: true, percent, completed: totalSummaries, total: totalPlans, bar: progressStr }, raw, progressStr);
+    return cmdOk({ updated: true, percent, completed: totalSummaries, total: totalPlans, bar: progressStr }, raw ? progressStr : undefined);
   } else {
-    output({ updated: false, reason: 'Progress field not found in STATE.md' }, raw, 'false');
+    return cmdOk({ updated: false, reason: 'Progress field not found in STATE.md' }, raw ? 'false' : undefined);
   }
 }
 
-export function cmdStateAddDecision(cwd: string, options: StateDecisionOptions, raw: boolean): void {
+export function cmdStateAddDecision(cwd: string, options: StateDecisionOptions, raw: boolean): CmdResult {
   const statePath = statePathUtil(cwd);
-  if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
+  if (!fs.existsSync(statePath)) { return cmdOk({ error: 'STATE.md not found' }); }
 
   const { phase, summary, summary_file, rationale, rationale_file } = options;
   let summaryText: string | undefined;
@@ -329,11 +326,10 @@ export function cmdStateAddDecision(cwd: string, options: StateDecisionOptions, 
     rationaleText = readTextArgOrFile(cwd, rationale || '', rationale_file, 'rationale') || '';
   } catch (thrown: unknown) {
     const e = thrown as Error;
-    output({ added: false, reason: e.message }, raw, 'false');
-    return;
+    return cmdOk({ added: false, reason: e.message }, raw ? 'false' : undefined);
   }
 
-  if (!summaryText) { output({ error: 'summary required' }, raw); return; }
+  if (!summaryText) { return cmdOk({ error: 'summary required' }); }
 
   const content = fs.readFileSync(statePath, 'utf-8');
   const entry = `- [Phase ${phase || '?'}]: ${summaryText}${rationaleText ? ` — ${rationaleText}` : ''}`;
@@ -343,15 +339,15 @@ export function cmdStateAddDecision(cwd: string, options: StateDecisionOptions, 
 
   if (updated) {
     fs.writeFileSync(statePath, updated, 'utf-8');
-    output({ added: true, decision: entry }, raw, 'true');
+    return cmdOk({ added: true, decision: entry }, raw ? 'true' : undefined);
   } else {
-    output({ added: false, reason: 'Decisions section not found in STATE.md' }, raw, 'false');
+    return cmdOk({ added: false, reason: 'Decisions section not found in STATE.md' }, raw ? 'false' : undefined);
   }
 }
 
-export function cmdStateAddBlocker(cwd: string, text: string | StateBlockerOptions, raw: boolean): void {
+export function cmdStateAddBlocker(cwd: string, text: string | StateBlockerOptions, raw: boolean): CmdResult {
   const statePath = statePathUtil(cwd);
-  if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
+  if (!fs.existsSync(statePath)) { return cmdOk({ error: 'STATE.md not found' }); }
   const blockerOptions: StateBlockerOptions = typeof text === 'object' && text !== null ? text : { text: text as string };
   let blockerText: string | undefined;
 
@@ -359,11 +355,10 @@ export function cmdStateAddBlocker(cwd: string, text: string | StateBlockerOptio
     blockerText = readTextArgOrFile(cwd, blockerOptions.text, blockerOptions.text_file, 'blocker');
   } catch (thrown: unknown) {
     const e = thrown as Error;
-    output({ added: false, reason: e.message }, raw, 'false');
-    return;
+    return cmdOk({ added: false, reason: e.message }, raw ? 'false' : undefined);
   }
 
-  if (!blockerText) { output({ error: 'text required' }, raw); return; }
+  if (!blockerText) { return cmdOk({ error: 'text required' }); }
 
   const content = fs.readFileSync(statePath, 'utf-8');
   const entry = `- ${blockerText}`;
@@ -373,16 +368,16 @@ export function cmdStateAddBlocker(cwd: string, text: string | StateBlockerOptio
 
   if (updated) {
     fs.writeFileSync(statePath, updated, 'utf-8');
-    output({ added: true, blocker: blockerText }, raw, 'true');
+    return cmdOk({ added: true, blocker: blockerText }, raw ? 'true' : undefined);
   } else {
-    output({ added: false, reason: 'Blockers section not found in STATE.md' }, raw, 'false');
+    return cmdOk({ added: false, reason: 'Blockers section not found in STATE.md' }, raw ? 'false' : undefined);
   }
 }
 
-export function cmdStateResolveBlocker(cwd: string, text: string | null, raw: boolean): void {
+export function cmdStateResolveBlocker(cwd: string, text: string | null, raw: boolean): CmdResult {
   const statePath = statePathUtil(cwd);
-  if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
-  if (!text) { output({ error: 'text required' }, raw); return; }
+  if (!fs.existsSync(statePath)) { return cmdOk({ error: 'STATE.md not found' }); }
+  if (!text) { return cmdOk({ error: 'text required' }); }
 
   let content = fs.readFileSync(statePath, 'utf-8');
 
@@ -405,15 +400,15 @@ export function cmdStateResolveBlocker(cwd: string, text: string | null, raw: bo
 
     content = content.replace(sectionPattern, (_match, header: string) => `${header}${newBody}`);
     fs.writeFileSync(statePath, content, 'utf-8');
-    output({ resolved: true, blocker: text }, raw, 'true');
+    return cmdOk({ resolved: true, blocker: text }, raw ? 'true' : undefined);
   } else {
-    output({ resolved: false, reason: 'Blockers section not found in STATE.md' }, raw, 'false');
+    return cmdOk({ resolved: false, reason: 'Blockers section not found in STATE.md' }, raw ? 'false' : undefined);
   }
 }
 
-export function cmdStateRecordSession(cwd: string, options: StateSessionOptions, raw: boolean): void {
+export function cmdStateRecordSession(cwd: string, options: StateSessionOptions, raw: boolean): CmdResult {
   const statePath = statePathUtil(cwd);
-  if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
+  if (!fs.existsSync(statePath)) { return cmdOk({ error: 'STATE.md not found' }); }
 
   let content = fs.readFileSync(statePath, 'utf-8');
   const now = new Date().toISOString();
@@ -437,18 +432,17 @@ export function cmdStateRecordSession(cwd: string, options: StateSessionOptions,
 
   if (updated.length > 0) {
     fs.writeFileSync(statePath, content, 'utf-8');
-    output({ recorded: true, updated }, raw, 'true');
+    return cmdOk({ recorded: true, updated }, raw ? 'true' : undefined);
   } else {
-    output({ recorded: false, reason: 'No session fields found in STATE.md' }, raw, 'false');
+    return cmdOk({ recorded: false, reason: 'No session fields found in STATE.md' }, raw ? 'false' : undefined);
   }
 }
 
-export function cmdStateSnapshot(cwd: string, raw: boolean): void {
+export function cmdStateSnapshot(cwd: string, raw: boolean): CmdResult {
   const statePath = statePathUtil(cwd);
 
   if (!fs.existsSync(statePath)) {
-    output({ error: 'STATE.md not found' }, raw);
-    return;
+    return cmdOk({ error: 'STATE.md not found' });
   }
 
   const content = fs.readFileSync(statePath, 'utf-8');
@@ -532,5 +526,5 @@ export function cmdStateSnapshot(cwd: string, raw: boolean): void {
     session,
   };
 
-  output(snapshot, raw);
+  return cmdOk(snapshot);
 }

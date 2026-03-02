@@ -49,6 +49,22 @@ export function err<T = never>(error: string): Result<T> {
   return { success: false, error };
 }
 
+// ─── Command result type ─────────────────────────────────────────────────────
+// Typed return for cmd* functions that previously called output()/error() directly.
+// `result` and `rawValue` mirror the arguments to `output(result, raw, rawValue)`.
+
+export type CmdResult =
+  | { ok: true; result: unknown; rawValue?: unknown }
+  | { ok: false; error: string };
+
+export function cmdOk(result: unknown, rawValue?: unknown): CmdResult {
+  return { ok: true, result, rawValue };
+}
+
+export function cmdErr(error: string): CmdResult {
+  return { ok: false, error };
+}
+
 // ─── Core interfaces ─────────────────────────────────────────────────────────
 
 export type BranchingStrategy = 'none' | 'phase' | 'milestone';
