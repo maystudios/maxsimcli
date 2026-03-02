@@ -83,6 +83,9 @@ import {
   cmdInitMapCodebase,
   cmdInitExisting,
   cmdInitProgress,
+  cmdSkillList,
+  cmdSkillInstall,
+  cmdSkillUpdate,
 } from './core/index.js';
 
 // ─── Arg parsing utilities ───────────────────────────────────────────────────
@@ -278,6 +281,18 @@ const handleValidate: Handler = (args, cwd, raw) => {
   error('Unknown validate subcommand. Available: consistency, health');
 };
 
+const handleSkill: Handler = (args, cwd, raw) => {
+  const sub = args[1];
+  const handlers: Record<string, () => void> = {
+    'list': () => cmdSkillList(cwd, raw),
+    'install': () => cmdSkillInstall(cwd, args[2], raw),
+    'update': () => cmdSkillUpdate(cwd, raw),
+  };
+  const handler = sub ? handlers[sub] : undefined;
+  if (handler) return handler();
+  error('Unknown skill subcommand. Available: list, install, update');
+};
+
 const handleInit: Handler = (args, cwd, raw) => {
   const workflow = args[1];
   const handlers: Record<string, () => void> = {
@@ -346,6 +361,7 @@ const COMMANDS: Record<string, Handler> = {
     const f = getFlags(args, 'phase', 'name');
     cmdScaffold(cwd, args[1], { phase: f.phase, name: f.name ? args.slice(args.indexOf('--name') + 1).join(' ') : null }, raw);
   },
+  'skill': handleSkill,
   'init': handleInit,
   'phase-plan-index': (args, cwd, raw) => cmdPhasePlanIndex(cwd, args[1], raw),
   'state-snapshot': (_args, cwd, raw) => cmdStateSnapshot(cwd, raw),
