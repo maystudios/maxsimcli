@@ -127,9 +127,19 @@ export function listSubDirs(dir: string, sortByPhase = false): string[] {
   return sortByPhase ? dirs.sort((a, b) => comparePhaseNum(a, b)) : dirs;
 }
 
-/** Log only when MAXSIM_DEBUG is set. */
-export function debugLog(e: unknown): void {
-  if (process.env.MAXSIM_DEBUG) console.error(e);
+/** Extract a human-readable message from an unknown thrown value. */
+export function errorMsg(e: unknown): string {
+  return errorMsg(e);
+}
+
+/** Log only when MAXSIM_DEBUG is set. Accepts an optional context label. */
+export function debugLog(contextOrError: unknown, error?: unknown): void {
+  if (!process.env.MAXSIM_DEBUG) return;
+  if (error !== undefined) {
+    console.error(`[maxsim:${contextOrError}]`, error);
+  } else {
+    console.error(contextOrError);
+  }
 }
 
 /** Escape a phase number for use in regex. */
@@ -206,7 +216,12 @@ export function loadConfig(cwd: string): AppConfig {
     };
     _configCache = { cwd, config: result };
     return result;
-  } catch {
+  } catch (e) {
+    // If the file exists but is unparseable, warn the user
+    if (fs.existsSync(cfgPath)) {
+      console.warn(`[maxsim] Warning: config.json exists but could not be parsed — using defaults.`);
+      debugLog('config-load-failed', e);
+    }
     _configCache = { cwd, config: defaults };
     return defaults;
   }
@@ -230,9 +245,9 @@ export async function execGit(cwd: string, args: string[]): Promise<GitResult> {
     const stdout = await git.raw(args);
     return { exitCode: 0, stdout: (stdout ?? '').trim(), stderr: '' };
   } catch (thrown: unknown) {
-    const err = thrown as { message?: string };
     // simple-git throws on non-zero exit — extract what we can
-    const message = err.message ?? '';
+    const message = thrown instanceof Error ? thrown.message : String(thrown);
+    debugLog('exec-git-failed', { args, error: message });
     return {
       exitCode: 1,
       stdout: '',
@@ -334,7 +349,8 @@ function searchPhaseInDir(baseDir: string, relBase: string, normalized: string):
       has_context: hasContext,
       has_verification: hasVerification,
     };
-  } catch {
+  } catch (e) {
+    debugLog('search-phase-in-dir-failed', { dir: baseDir, phase: normalized, error: errorMsg(e) });
     return null;
   }
 }
@@ -377,7 +393,7 @@ export function findPhaseInternal(cwd: string, phase: string): PhaseSearchResult
       }
     }
   } catch (e) {
-    debugLog(e);
+    debugLog('find-phase-milestone-search-failed', e);
   }
 
   return null;
@@ -412,7 +428,7 @@ export function getArchivedPhaseDirs(cwd: string): ArchivedPhaseDir[] {
       }
     }
   } catch (e) {
-    debugLog(e);
+    debugLog('get-archived-phase-dirs-failed', e);
   }
 
   return results;
@@ -448,7 +464,8 @@ export function getRoadmapPhaseInternal(cwd: string, phaseNum: string | number):
       goal,
       section,
     };
-  } catch {
+  } catch (e) {
+    debugLog('get-roadmap-phase-failed', { phase: phaseNum, error: errorMsg(e) });
     return null;
   }
 }

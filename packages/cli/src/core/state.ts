@@ -79,8 +79,7 @@ export function cmdStateLoad(cwd: string, raw: boolean): void {
   try {
     stateRaw = fs.readFileSync(statePathUtil(cwd), 'utf-8');
   } catch (e) {
-    /* optional op, ignore */
-    debugLog(e);
+    debugLog('state-load-failed', e);
   }
 
   const configExists = fs.existsSync(configPath(cwd));

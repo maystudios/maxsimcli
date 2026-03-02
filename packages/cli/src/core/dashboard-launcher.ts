@@ -9,6 +9,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { spawn, execSync } from 'node:child_process';
 import { createRequire } from 'node:module';
+import { debugLog, errorMsg } from './core.js';
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -34,7 +35,8 @@ export async function checkHealth(port: number, timeoutMs: number = HEALTH_TIMEO
       return data.status === 'ok';
     }
     return false;
-  } catch {
+  } catch (e) {
+    debugLog('health-check-failed', { port, error: errorMsg(e) });
     return false;
   }
 }
@@ -72,18 +74,18 @@ export function killProcessOnPort(port: number): void {
       for (const pid of pids) {
         try {
           execSync(`taskkill /PID ${pid} /F`, { stdio: 'ignore' });
-        } catch {
-          // Process may have already exited
+        } catch (e) {
+          debugLog('kill-process-on-port-taskkill-failed', { port, pid, error: errorMsg(e) });
         }
       }
-    } catch {
-      // No process found on port or command failed
+    } catch (e) {
+      debugLog('kill-process-on-port-netstat-failed', { port, platform: 'win32', error: errorMsg(e) });
     }
   } else {
     try {
       execSync(`lsof -i :${port} -t | xargs kill -SIGTERM 2>/dev/null`, { stdio: 'ignore' });
-    } catch {
-      // No process found on port or command failed
+    } catch (e) {
+      debugLog('kill-process-on-port-lsof-failed', { port, platform: process.platform, error: errorMsg(e) });
     }
   }
 }
@@ -112,8 +114,8 @@ export function resolveDashboardServer(): string | null {
 
     const serverTs = path.join(pkgDir, 'server.ts');
     if (fs.existsSync(serverTs)) return serverTs;
-  } catch {
-    // @maxsim/dashboard not resolvable
+  } catch (e) {
+    debugLog('resolve-dashboard-strategy1-failed', { strategy: '@maxsim/dashboard package', error: errorMsg(e) });
   }
 
   // Strategy 2: Walk up from this file to find the monorepo root
@@ -130,8 +132,8 @@ export function resolveDashboardServer(): string | null {
       if (fs.existsSync(candidateJs)) return candidateJs;
       dir = path.dirname(dir);
     }
-  } catch {
-    // Fallback walk failed
+  } catch (e) {
+    debugLog('resolve-dashboard-strategy2-failed', { strategy: 'monorepo walk', error: errorMsg(e) });
   }
 
   return null;
@@ -160,7 +162,8 @@ export function ensureNodePty(serverDir: string): boolean {
       timeout: 120_000,
     });
     return true;
-  } catch {
+  } catch (e) {
+    debugLog('ensure-node-pty-install-failed', { serverDir, error: errorMsg(e) });
     return false;
   }
 }
@@ -189,8 +192,8 @@ export function readDashboardConfig(serverPath: string): DashboardConfig {
       };
       if (config.projectCwd) projectCwd = config.projectCwd;
       networkMode = config.networkMode ?? false;
-    } catch {
-      // Use defaults
+    } catch (e) {
+      debugLog('read-dashboard-config-failed', { path: dashboardConfigPath, error: errorMsg(e) });
     }
   }
 
