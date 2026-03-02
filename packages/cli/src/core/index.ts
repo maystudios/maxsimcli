@@ -243,6 +243,13 @@ export type {
   SpawnDashboardOptions,
 } from './dashboard-launcher.js';
 
+// Skills exports
+export {
+  cmdSkillList,
+  cmdSkillInstall,
+  cmdSkillUpdate,
+} from './skills.js';
+
 // Init exports
 export type {
   WorkflowType,
