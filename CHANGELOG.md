@@ -1,3 +1,10 @@
+## [4.2.1](https://github.com/maystudios/maxsimcli/compare/v4.2.0...v4.2.1) (2026-03-02)
+
+
+### Bug Fixes
+
+* **dashboard:** execute commands on button click instead of just copying ([ab10ff9](https://github.com/maystudios/maxsimcli/commit/ab10ff9bcb6d74695d52cb1430e5f99485484652))
+
 # [4.2.0](https://github.com/maystudios/maxsimcli/compare/v4.1.0...v4.2.0) (2026-03-02)
 
 
