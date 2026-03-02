@@ -222,11 +222,11 @@
 | CS-02 | Phase 5 | Complete |
 | CS-03 | Phase 5 | Complete |
 | CS-04 | Phase 5 | Complete |
-| ES-01 | Phase 6, 13 | Partial |
-| ES-02 | Phase 6, 13 | Partial |
-| ES-03 | Phase 6, 13 | Partial |
+| ES-01 | Phase 6 | Complete |
+| ES-02 | Phase 6 | Complete |
+| ES-03 | Phase 6 | Complete |
 | ES-04 | Phase 6 | Complete |
-| EXEC-01 | Phase 6, 13 | Partial |
+| EXEC-01 | Phase 6 | Complete |
 | EXEC-02 | Phase 6 | Complete |
 | EXEC-03 | Phase 6 | Complete |
 | DISC-01 | Phase 7 | Complete |
@@ -274,7 +274,7 @@
 | GUARD-04 | All phases | Active |
 
 **Coverage:**
-- v1 requirements: 62 total (49 complete, 6 partial, 7 pending)
+- v1 requirements: 62 total (53 complete, 2 partial, 7 pending)
 - Guards: 4 total (active)
 - Mapped to phases: 62
 - Unmapped: 0
