@@ -17,7 +17,6 @@ import {
   phaseCompleteCore,
   cmdPhaseRemove,
 } from '../../src/core/phase.js';
-import { CliOutput, CliError } from '../../src/core/core.js';
 
 // Track temp dirs for cleanup
 const tempDirs: string[] = [];
@@ -58,20 +57,6 @@ function scaffoldPlanning(
         fs.writeFileSync(path.join(phaseDir, file), '');
       }
     }
-  }
-}
-
-/**
- * Call a function that uses output() (throws CliOutput) and return the result.
- * Throws if the function throws something other than CliOutput.
- */
-function catchCliOutput(fn: () => void): unknown {
-  try {
-    fn();
-    return undefined;
-  } catch (e) {
-    if (e instanceof CliOutput) return e.result;
-    throw e;
   }
 }
 
@@ -137,9 +122,6 @@ describe('phaseInsertCore', () => {
 
   it('succeeds when inserting after an existing phase', () => {
     const cwd = makeTempDir();
-    // Phase header must be at start of a line. getPhasePattern uses ^ without m flag,
-    // so the header must be findable by the regex. The targetPattern.test() call
-    // uses 'i' flag only. Put the phase header at start of string for the match.
     scaffoldPlanning(cwd, {
       roadmap: '### Phase 1: Foundation\n\n**Goal:** Build core\n',
       phases: { '01-Foundation': ['.gitkeep'] },
@@ -167,8 +149,6 @@ describe('phaseCompleteCore', () => {
       roadmap: '# Roadmap\n\n### Phase 1: Foundation\n\n**Goal:** Build core\n',
       phases: { '05-Missing': ['05-01-PLAN.md'] },
     });
-    // Phase 05 exists on disk but not in roadmap. phaseCompleteCore proceeds
-    // because findPhaseInternal only checks the filesystem.
     const result = phaseCompleteCore(cwd, '05');
     expect(result.completed_phase).toBe('05');
     expect(result.roadmap_updated).toBe(true);
@@ -226,10 +206,12 @@ describe('phaseCompleteCore', () => {
 // ─── cmdPhaseRemove ─────────────────────────────────────────────────────────
 
 describe('cmdPhaseRemove', () => {
-  it('throws CliError when ROADMAP.md does not exist', () => {
+  it('returns error CmdResult when ROADMAP.md does not exist', () => {
     const cwd = makeTempDir();
     scaffoldPlanning(cwd); // no roadmap
-    expect(() => cmdPhaseRemove(cwd, '01', { force: false }, true)).toThrow(CliError);
+    const result = cmdPhaseRemove(cwd, '01', { force: false });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('ROADMAP.md not found');
   });
 
   it('succeeds when target phase directory does not exist (removes from roadmap only)', () => {
@@ -238,11 +220,13 @@ describe('cmdPhaseRemove', () => {
       roadmap: '### Phase 1: Foundation\n\n**Goal:** Build core\n\n### Phase 2: Integration\n\n**Goal:** Wire up\n',
       phases: { '01-Foundation': ['.gitkeep'] },
     });
-    // cmdPhaseRemove calls output() which throws CliOutput -- catch it
-    const result = catchCliOutput(() => cmdPhaseRemove(cwd, '2', { force: false }, true));
-    expect(result).toBeDefined();
-    expect((result as Record<string, unknown>).removed).toBe('2');
-    expect((result as Record<string, unknown>).directory_deleted).toBeNull();
+    const result = cmdPhaseRemove(cwd, '2', { force: false });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      const data = result.result as Record<string, unknown>;
+      expect(data.removed).toBe('2');
+      expect(data.directory_deleted).toBeNull();
+    }
   });
 
   it('removes a phase with its directory when force is true', () => {
@@ -251,20 +235,21 @@ describe('cmdPhaseRemove', () => {
       roadmap: '### Phase 1: Foundation\n\n**Goal:** Build core\n',
       phases: { '01-Foundation': ['.gitkeep', '01-01-PLAN.md', '01-01-SUMMARY.md'] },
     });
-    const result = catchCliOutput(() => cmdPhaseRemove(cwd, '1', { force: true }, true));
-    expect(result).toBeDefined();
-    expect((result as Record<string, unknown>).removed).toBe('1');
+    const result = cmdPhaseRemove(cwd, '1', { force: true });
+    expect(result.ok).toBe(true);
     expect(
       fs.existsSync(path.join(cwd, '.planning', 'phases', '01-Foundation')),
     ).toBe(false);
   });
 
-  it('throws CliError when phase has summaries and force is false', () => {
+  it('returns error CmdResult when phase has summaries and force is false', () => {
     const cwd = makeTempDir();
     scaffoldPlanning(cwd, {
       roadmap: '### Phase 1: Foundation\n\n**Goal:** Build core\n',
       phases: { '01-Foundation': ['.gitkeep', '01-01-PLAN.md', '01-01-SUMMARY.md'] },
     });
-    expect(() => cmdPhaseRemove(cwd, '1', { force: false }, true)).toThrow(CliError);
+    const result = cmdPhaseRemove(cwd, '1', { force: false });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('executed plan(s)');
   });
 });
