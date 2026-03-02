@@ -4,21 +4,21 @@
  * Ported from maxsim/bin/lib/roadmap.cjs
  */
 
-import fs from 'node:fs';
+import { promises as fsp } from 'node:fs';
 import path from 'node:path';
 
-import { normalizePhaseName, getPhasePattern, findPhaseInternal, roadmapPath, phasesPath, listSubDirsAsync, isPlanFile, isSummaryFile, debugLog, todayISO, safeReadFileAsync } from './core.js';
+import { normalizePhaseName, getPhasePattern, findPhaseInternalAsync, roadmapPath, phasesPath, listSubDirsAsync, isPlanFile, isSummaryFile, debugLog, todayISO, safeReadFileAsync } from './core.js';
 import { cmdOk, cmdErr } from './types.js';
 import type { PhaseStatus, RoadmapPhase, RoadmapMilestone, RoadmapAnalysis, CmdResult } from './types.js';
 
 // ─── Roadmap commands ────────────────────────────────────────────────────────
 
-export function cmdRoadmapGetPhase(cwd: string, phaseNum: string): CmdResult {
+export async function cmdRoadmapGetPhase(cwd: string, phaseNum: string): Promise<CmdResult> {
   const rmPath = roadmapPath(cwd);
-  if (!fs.existsSync(rmPath)) return cmdOk({ found: false, error: 'ROADMAP.md not found' }, '');
+  const content = await safeReadFileAsync(rmPath);
+  if (!content) return cmdOk({ found: false, error: 'ROADMAP.md not found' }, '');
 
   try {
-    const content = fs.readFileSync(rmPath, 'utf-8');
     const escapedPhase = phaseNum.replace(/\./g, '\\.');
     const phasePattern = getPhasePattern(escapedPhase, 'i');
     const headerMatch = content.match(phasePattern);
@@ -88,7 +88,7 @@ export async function cmdRoadmapAnalyze(cwd: string): Promise<CmdResult> {
       try {
         const dirMatch = allDirs.find(d => d.startsWith(p.normalized + '-') || d === p.normalized);
         if (dirMatch) {
-          const phaseFiles = await fs.promises.readdir(path.join(phasesDir, dirMatch));
+          const phaseFiles = await fsp.readdir(path.join(phasesDir, dirMatch));
           planCount = phaseFiles.filter(f => isPlanFile(f)).length;
           summaryCount = phaseFiles.filter(f => isSummaryFile(f)).length;
           hasContext = phaseFiles.some(f => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
@@ -129,10 +129,10 @@ export async function cmdRoadmapAnalyze(cwd: string): Promise<CmdResult> {
   return cmdOk(result);
 }
 
-export function cmdRoadmapUpdatePlanProgress(cwd: string, phaseNum: string): CmdResult {
+export async function cmdRoadmapUpdatePlanProgress(cwd: string, phaseNum: string): Promise<CmdResult> {
   if (!phaseNum) return cmdErr('phase number required for roadmap update-plan-progress');
   const rmPath = roadmapPath(cwd);
-  const phaseInfo = findPhaseInternal(cwd, phaseNum);
+  const phaseInfo = await findPhaseInternalAsync(cwd, phaseNum);
   if (!phaseInfo) return cmdErr(`Phase ${phaseNum} not found`);
 
   const planCount = phaseInfo.plans.length;
@@ -143,16 +143,17 @@ export function cmdRoadmapUpdatePlanProgress(cwd: string, phaseNum: string): Cmd
   const status = isComplete ? 'Complete' : summaryCount > 0 ? 'In Progress' : 'Planned';
   const today = todayISO();
 
-  if (!fs.existsSync(rmPath)) return cmdOk({ updated: false, reason: 'ROADMAP.md not found', plan_count: planCount, summary_count: summaryCount }, 'no roadmap');
+  const rawContent = await safeReadFileAsync(rmPath);
+  if (!rawContent) return cmdOk({ updated: false, reason: 'ROADMAP.md not found', plan_count: planCount, summary_count: summaryCount }, 'no roadmap');
 
-  let roadmapContent = fs.readFileSync(rmPath, 'utf-8');
+  let roadmapContent = rawContent;
   const phaseEscaped = phaseNum.replace('.', '\\.');
   const dateField = isComplete ? ` ${today} ` : '  ';
   roadmapContent = roadmapContent.replace(new RegExp(`(\\|\\s*${phaseEscaped}\\.?\\s[^|]*\\|)[^|]*(\\|)\\s*[^|]*(\\|)\\s*[^|]*(\\|)`, 'i'), `$1 ${summaryCount}/${planCount} $2 ${status.padEnd(11)}$3${dateField}$4`);
   const planCountText = isComplete ? `${summaryCount}/${planCount} plans complete` : `${summaryCount}/${planCount} plans executed`;
   roadmapContent = roadmapContent.replace(new RegExp(`(#{2,4}\\s*Phase\\s+${phaseEscaped}[\\s\\S]*?\\*\\*Plans:\\*\\*\\s*)[^\\n]+`, 'i'), `$1${planCountText}`);
   if (isComplete) { roadmapContent = roadmapContent.replace(new RegExp(`(-\\s*\\[)[ ](\\]\\s*.*Phase\\s+${phaseEscaped}[:\\s][^\\n]*)`, 'i'), `$1x$2 (completed ${today})`); }
-  fs.writeFileSync(rmPath, roadmapContent, 'utf-8');
+  await fsp.writeFile(rmPath, roadmapContent, 'utf-8');
 
   return cmdOk({ updated: true, phase: phaseNum, plan_count: planCount, summary_count: summaryCount, status, complete: isComplete }, `${summaryCount}/${planCount} ${status}`);
 }
