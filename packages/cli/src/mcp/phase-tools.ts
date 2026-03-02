@@ -140,7 +140,7 @@ export function registerPhaseTools(server: McpServer): void {
           return mcpError('Phase name must not be empty', 'Validation failed');
         }
 
-        const result = phaseAddCore(cwd, name, { includeStubs: true });
+        const result = await phaseAddCore(cwd, name, { includeStubs: true });
 
         return mcpSuccess(
           {
@@ -178,7 +178,7 @@ export function registerPhaseTools(server: McpServer): void {
           return mcpError('Phase name must not be empty', 'Validation failed');
         }
 
-        const result = phaseInsertCore(cwd, after, name, { includeStubs: true });
+        const result = await phaseInsertCore(cwd, after, name, { includeStubs: true });
 
         return mcpSuccess(
           {
@@ -211,7 +211,7 @@ export function registerPhaseTools(server: McpServer): void {
           return mcpError('No .planning/ directory found', 'Project not detected');
         }
 
-        const result = phaseCompleteCore(cwd, phase);
+        const result = await phaseCompleteCore(cwd, phase);
 
         return mcpSuccess(
           {

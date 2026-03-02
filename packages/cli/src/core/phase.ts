@@ -4,15 +4,16 @@
  * Ported from maxsim/bin/lib/phase.cjs
  */
 
-import fs from 'node:fs';
+import { promises as fsp } from 'node:fs';
 import path from 'node:path';
 
 import {
   normalizePhaseName,
   comparePhaseNum,
   getPhasePattern,
-  findPhaseInternal,
-  getArchivedPhaseDirs,
+  findPhaseInternalAsync,
+  getArchivedPhaseDirsAsync,
+  pathExistsAsync,
   generateSlugInternal,
   phasesPath,
   roadmapPath,
@@ -22,7 +23,6 @@ import {
   isSummaryFile,
   planId,
   summaryId,
-  listSubDirs,
   listSubDirsAsync,
   debugLog,
   errorMsg,
@@ -73,27 +73,30 @@ export interface PhaseCompleteResult {
 
 // ─── Stub scaffolding ───────────────────────────────────────────────────────
 
-export function scaffoldPhaseStubs(dirPath: string, phaseId: string, name: string): void {
+export async function scaffoldPhaseStubs(dirPath: string, phaseId: string, name: string): Promise<void> {
   const today = todayISO();
-  fs.writeFileSync(
-    path.join(dirPath, `${phaseId}-CONTEXT.md`),
-    `# Phase ${phaseId} Context: ${name}\n\n**Created:** ${today}\n**Phase goal:** [To be defined during /maxsim:discuss-phase]\n\n---\n\n_Context will be populated by /maxsim:discuss-phase_\n`,
-  );
-  fs.writeFileSync(
-    path.join(dirPath, `${phaseId}-RESEARCH.md`),
-    `# Phase ${phaseId}: ${name} - Research\n\n**Researched:** Not yet\n**Domain:** TBD\n**Confidence:** TBD\n\n---\n\n_Research will be populated by /maxsim:research-phase_\n`,
-  );
+  await Promise.all([
+    fsp.writeFile(
+      path.join(dirPath, `${phaseId}-CONTEXT.md`),
+      `# Phase ${phaseId} Context: ${name}\n\n**Created:** ${today}\n**Phase goal:** [To be defined during /maxsim:discuss-phase]\n\n---\n\n_Context will be populated by /maxsim:discuss-phase_\n`,
+    ),
+    fsp.writeFile(
+      path.join(dirPath, `${phaseId}-RESEARCH.md`),
+      `# Phase ${phaseId}: ${name} - Research\n\n**Researched:** Not yet\n**Domain:** TBD\n**Confidence:** TBD\n\n---\n\n_Research will be populated by /maxsim:research-phase_\n`,
+    ),
+  ]);
 }
 
 // ─── Core functions ─────────────────────────────────────────────────────────
 
-export function phaseAddCore(cwd: string, description: string, options?: PhaseCreateOptions): PhaseAddResult {
+export async function phaseAddCore(cwd: string, description: string, options?: PhaseCreateOptions): Promise<PhaseAddResult> {
   const rmPath = roadmapPath(cwd);
-  if (!fs.existsSync(rmPath)) {
+  let content: string;
+  try {
+    content = await fsp.readFile(rmPath, 'utf-8');
+  } catch {
     throw new Error('ROADMAP.md not found');
   }
-
-  const content = fs.readFileSync(rmPath, 'utf-8');
   const slug = generateSlugInternal(description);
 
   const phasePattern = getPhasePattern();
@@ -109,11 +112,11 @@ export function phaseAddCore(cwd: string, description: string, options?: PhaseCr
   const dirName = `${paddedNum}-${slug}`;
   const dirPath = planningPath(cwd, 'phases', dirName);
 
-  fs.mkdirSync(dirPath, { recursive: true });
-  fs.writeFileSync(path.join(dirPath, '.gitkeep'), '');
+  await fsp.mkdir(dirPath, { recursive: true });
+  await fsp.writeFile(path.join(dirPath, '.gitkeep'), '');
 
   if (options?.includeStubs) {
-    scaffoldPhaseStubs(dirPath, paddedNum, description);
+    await scaffoldPhaseStubs(dirPath, paddedNum, description);
   }
 
   const phaseEntry = `\n### Phase ${newPhaseNum}: ${description}\n\n**Goal:** [To be planned]\n**Requirements**: TBD\n**Depends on:** Phase ${maxPhase}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /maxsim:plan-phase ${newPhaseNum} to break down)\n`;
@@ -126,7 +129,7 @@ export function phaseAddCore(cwd: string, description: string, options?: PhaseCr
     updatedContent = content + phaseEntry;
   }
 
-  fs.writeFileSync(rmPath, updatedContent, 'utf-8');
+  await fsp.writeFile(rmPath, updatedContent, 'utf-8');
 
   return {
     phase_number: newPhaseNum,
@@ -137,13 +140,14 @@ export function phaseAddCore(cwd: string, description: string, options?: PhaseCr
   };
 }
 
-export function phaseInsertCore(cwd: string, afterPhase: string, description: string, options?: PhaseCreateOptions): PhaseInsertResult {
+export async function phaseInsertCore(cwd: string, afterPhase: string, description: string, options?: PhaseCreateOptions): Promise<PhaseInsertResult> {
   const rmPath = roadmapPath(cwd);
-  if (!fs.existsSync(rmPath)) {
+  let content: string;
+  try {
+    content = await fsp.readFile(rmPath, 'utf-8');
+  } catch {
     throw new Error('ROADMAP.md not found');
   }
-
-  const content = fs.readFileSync(rmPath, 'utf-8');
   const slug = generateSlugInternal(description);
 
   const normalizedAfter = normalizePhaseName(afterPhase);
@@ -159,7 +163,7 @@ export function phaseInsertCore(cwd: string, afterPhase: string, description: st
   const existingDecimals: number[] = [];
 
   try {
-    const dirs = listSubDirs(phasesDirPath);
+    const dirs = await listSubDirsAsync(phasesDirPath);
     const decimalPattern = new RegExp(`^${normalizedBase}\\.(\\d+)`);
     for (const dir of dirs) {
       const dm = dir.match(decimalPattern);
@@ -174,11 +178,11 @@ export function phaseInsertCore(cwd: string, afterPhase: string, description: st
   const dirName = `${decimalPhase}-${slug}`;
   const dirPath = planningPath(cwd, 'phases', dirName);
 
-  fs.mkdirSync(dirPath, { recursive: true });
-  fs.writeFileSync(path.join(dirPath, '.gitkeep'), '');
+  await fsp.mkdir(dirPath, { recursive: true });
+  await fsp.writeFile(path.join(dirPath, '.gitkeep'), '');
 
   if (options?.includeStubs) {
-    scaffoldPhaseStubs(dirPath, decimalPhase, description);
+    await scaffoldPhaseStubs(dirPath, decimalPhase, description);
   }
 
   const phaseEntry = `\n### Phase ${decimalPhase}: ${description} (INSERTED)\n\n**Goal:** [Urgent work - to be planned]\n**Requirements**: TBD\n**Depends on:** Phase ${afterPhase}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /maxsim:plan-phase ${decimalPhase} to break down)\n`;
@@ -201,7 +205,7 @@ export function phaseInsertCore(cwd: string, afterPhase: string, description: st
   }
 
   const updatedContent = content.slice(0, insertIdx) + phaseEntry + content.slice(insertIdx);
-  fs.writeFileSync(rmPath, updatedContent, 'utf-8');
+  await fsp.writeFile(rmPath, updatedContent, 'utf-8');
 
   return {
     phase_number: decimalPhase,
@@ -212,13 +216,13 @@ export function phaseInsertCore(cwd: string, afterPhase: string, description: st
   };
 }
 
-export function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteResult {
+export async function phaseCompleteCore(cwd: string, phaseNum: string): Promise<PhaseCompleteResult> {
   const rmPath = roadmapPath(cwd);
   const stPath = statePath(cwd);
   const phasesDirPath = phasesPath(cwd);
   const today = todayISO();
 
-  const phaseInfo = findPhaseInternal(cwd, phaseNum);
+  const phaseInfo = await findPhaseInternalAsync(cwd, phaseNum);
   if (!phaseInfo) {
     throw new Error(`Phase ${phaseNum} not found`);
   }
@@ -227,8 +231,9 @@ export function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteR
   const summaryCount = phaseInfo.summaries.length;
   let requirementsUpdated = false;
 
-  if (fs.existsSync(rmPath)) {
-    let roadmapContent = fs.readFileSync(rmPath, 'utf-8');
+  const rmExists = await pathExistsAsync(rmPath);
+  if (rmExists) {
+    let roadmapContent = await fsp.readFile(rmPath, 'utf-8');
 
     const checkboxPattern = new RegExp(
       `(-\\s*\\[)[ ](\\]\\s*.*Phase\\s+${escapePhaseNum(phaseNum)}[:\\s][^\\n]*)`,
@@ -256,19 +261,19 @@ export function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteR
     );
 
     debugLog('phase-complete-write', `writing ROADMAP.md for phase ${phaseNum}`);
-    fs.writeFileSync(rmPath, roadmapContent, 'utf-8');
+    await fsp.writeFile(rmPath, roadmapContent, 'utf-8');
     debugLog('phase-complete-write', `ROADMAP.md updated for phase ${phaseNum}`);
 
     // Update REQUIREMENTS.md
     const reqPath = planningPath(cwd, 'REQUIREMENTS.md');
-    if (fs.existsSync(reqPath)) {
+    if (await pathExistsAsync(reqPath)) {
       const reqMatch = roadmapContent.match(
         new RegExp(`Phase\\s+${escapePhaseNum(phaseNum)}[\\s\\S]*?\\*\\*Requirements:\\*\\*\\s*([^\\n]+)`, 'i'),
       );
 
       if (reqMatch) {
         const reqIds = reqMatch[1].replace(/[\[\]]/g, '').split(/[,\s]+/).map(r => r.trim()).filter(Boolean);
-        let reqContent = fs.readFileSync(reqPath, 'utf-8');
+        let reqContent = await fsp.readFile(reqPath, 'utf-8');
 
         for (const reqId of reqIds) {
           reqContent = reqContent.replace(
@@ -282,7 +287,7 @@ export function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteR
         }
 
         debugLog('phase-complete-write', `writing REQUIREMENTS.md for phase ${phaseNum}`);
-        fs.writeFileSync(reqPath, reqContent, 'utf-8');
+        await fsp.writeFile(reqPath, reqContent, 'utf-8');
         debugLog('phase-complete-write', `REQUIREMENTS.md updated for phase ${phaseNum}`);
         requirementsUpdated = true;
       }
@@ -295,7 +300,7 @@ export function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteR
   let isLastPhase = true;
 
   try {
-    const dirs = listSubDirs(phasesDirPath, true);
+    const dirs = await listSubDirsAsync(phasesDirPath, true);
 
     for (const dir of dirs) {
       const dm = dir.match(/^(\d+[A-Z]?(?:\.\d+)?)-?(.*)/i);
@@ -313,8 +318,9 @@ export function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteR
   }
 
   // Update STATE.md
-  if (fs.existsSync(stPath)) {
-    let stateContent = fs.readFileSync(stPath, 'utf-8');
+  const stExists = await pathExistsAsync(stPath);
+  if (stExists) {
+    let stateContent = await fsp.readFile(stPath, 'utf-8');
 
     stateContent = stateContent.replace(
       /(\*\*Current Phase:\*\*\s*).*/,
@@ -349,7 +355,7 @@ export function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteR
     );
 
     debugLog('phase-complete-write', `writing STATE.md for phase ${phaseNum}`);
-    fs.writeFileSync(stPath, stateContent, 'utf-8');
+    await fsp.writeFile(stPath, stateContent, 'utf-8');
     debugLog('phase-complete-write', `STATE.md updated for phase ${phaseNum}`);
   }
 
@@ -361,8 +367,8 @@ export function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteR
     next_phase_name: nextPhaseName,
     is_last_phase: isLastPhase,
     date: today,
-    roadmap_updated: fs.existsSync(rmPath),
-    state_updated: fs.existsSync(stPath),
+    roadmap_updated: rmExists,
+    state_updated: stExists,
     requirements_updated: requirementsUpdated,
   };
 }
@@ -373,7 +379,7 @@ export async function cmdPhasesList(cwd: string, options: PhasesListOptions): Pr
   const phasesDirPath = phasesPath(cwd);
   const { type, phase, includeArchived, offset, limit } = options;
 
-  if (!fs.existsSync(phasesDirPath)) {
+  if (!(await pathExistsAsync(phasesDirPath))) {
     if (type) {
       return cmdOk({ files: [], count: 0, total: 0 }, '');
     } else {
@@ -385,7 +391,7 @@ export async function cmdPhasesList(cwd: string, options: PhasesListOptions): Pr
     let dirs = await listSubDirsAsync(phasesDirPath);
 
     if (includeArchived) {
-      const archived = getArchivedPhaseDirs(cwd);
+      const archived = await getArchivedPhaseDirsAsync(cwd);
       for (const a of archived) {
         dirs.push(`${a.name} [${a.milestone}]`);
       }
@@ -406,7 +412,7 @@ export async function cmdPhasesList(cwd: string, options: PhasesListOptions): Pr
       const fileResults = await Promise.all(
         dirs.map(async (dir) => {
           const dirPath = path.join(phasesDirPath, dir);
-          const dirFiles = await fs.promises.readdir(dirPath);
+          const dirFiles = await fsp.readdir(dirPath);
 
           let filtered: string[];
           if (type === 'plans') {
@@ -444,11 +450,11 @@ export async function cmdPhasesList(cwd: string, options: PhasesListOptions): Pr
 
 // ─── Next decimal ───────────────────────────────────────────────────────────
 
-export function cmdPhaseNextDecimal(cwd: string, basePhase: string): CmdResult {
+export async function cmdPhaseNextDecimal(cwd: string, basePhase: string): Promise<CmdResult> {
   const phasesDirPath = phasesPath(cwd);
   const normalized = normalizePhaseName(basePhase);
 
-  if (!fs.existsSync(phasesDirPath)) {
+  if (!(await pathExistsAsync(phasesDirPath))) {
     return cmdOk(
       { found: false, base_phase: normalized, next: `${normalized}.1`, existing: [] },
       `${normalized}.1`,
@@ -456,7 +462,7 @@ export function cmdPhaseNextDecimal(cwd: string, basePhase: string): CmdResult {
   }
 
   try {
-    const dirs = listSubDirs(phasesDirPath);
+    const dirs = await listSubDirsAsync(phasesDirPath);
 
     const baseExists = dirs.some(d => d.startsWith(normalized + '-') || d === normalized);
 
@@ -496,7 +502,7 @@ export function cmdPhaseNextDecimal(cwd: string, basePhase: string): CmdResult {
 
 // ─── Find phase ─────────────────────────────────────────────────────────────
 
-export function cmdFindPhase(cwd: string, phase: string | undefined): CmdResult {
+export async function cmdFindPhase(cwd: string, phase: string | undefined): Promise<CmdResult> {
   if (!phase) {
     return cmdErr('phase identifier required');
   }
@@ -507,7 +513,7 @@ export function cmdFindPhase(cwd: string, phase: string | undefined): CmdResult 
   const notFound = { found: false, directory: null, phase_number: null, phase_name: null, plans: [] as string[], summaries: [] as string[] };
 
   try {
-    const dirs = listSubDirs(phasesDirPath, true);
+    const dirs = await listSubDirsAsync(phasesDirPath, true);
 
     const match = dirs.find(d => d.startsWith(normalized));
     if (!match) {
@@ -519,7 +525,7 @@ export function cmdFindPhase(cwd: string, phase: string | undefined): CmdResult 
     const phaseName = dirMatch && dirMatch[2] ? dirMatch[2] : null;
 
     const phaseDir = path.join(phasesDirPath, match);
-    const phaseFiles = fs.readdirSync(phaseDir);
+    const phaseFiles = await fsp.readdir(phaseDir);
     const plans = phaseFiles.filter(isPlanFile).sort();
     const summaries = phaseFiles.filter(isSummaryFile).sort();
 
@@ -540,7 +546,7 @@ export function cmdFindPhase(cwd: string, phase: string | undefined): CmdResult 
 
 // ─── Phase plan index ───────────────────────────────────────────────────────
 
-export function cmdPhasePlanIndex(cwd: string, phase: string | undefined): CmdResult {
+export async function cmdPhasePlanIndex(cwd: string, phase: string | undefined): Promise<CmdResult> {
   if (!phase) {
     return cmdErr('phase required for phase-plan-index');
   }
@@ -551,7 +557,7 @@ export function cmdPhasePlanIndex(cwd: string, phase: string | undefined): CmdRe
   let phaseDir: string | null = null;
   let phaseDirName: string | null = null;
   try {
-    const dirs = listSubDirs(phasesDirPath, true);
+    const dirs = await listSubDirsAsync(phasesDirPath, true);
     const match = dirs.find(d => d.startsWith(normalized));
     if (match) {
       phaseDir = path.join(phasesDirPath, match);
@@ -565,7 +571,7 @@ export function cmdPhasePlanIndex(cwd: string, phase: string | undefined): CmdRe
     return cmdOk({ phase: normalized, error: 'Phase not found', plans: [], waves: {}, incomplete: [], has_checkpoints: false });
   }
 
-  const phaseFiles = fs.readdirSync(phaseDir);
+  const phaseFiles = await fsp.readdir(phaseDir);
   const planFiles = phaseFiles.filter(isPlanFile).sort();
   const summaryFiles = phaseFiles.filter(isSummaryFile);
 
@@ -586,10 +592,15 @@ export function cmdPhasePlanIndex(cwd: string, phase: string | undefined): CmdRe
   const incomplete: string[] = [];
   let hasCheckpoints = false;
 
-  for (const planFile of planFiles) {
+  // Read all plan files in parallel since each read is independent
+  const planContents = await Promise.all(
+    planFiles.map(planFile => fsp.readFile(path.join(phaseDir!, planFile), 'utf-8')),
+  );
+
+  for (let i = 0; i < planFiles.length; i++) {
+    const planFile = planFiles[i];
     const id = planId(planFile);
-    const planPath = path.join(phaseDir, planFile);
-    const content = fs.readFileSync(planPath, 'utf-8');
+    const content = planContents[i];
     const fm = extractFrontmatter(content);
 
     const taskMatches = content.match(/##\s*Task\s*\d+/gi) || [];
@@ -640,13 +651,13 @@ export function cmdPhasePlanIndex(cwd: string, phase: string | undefined): CmdRe
 
 // ─── Phase add ──────────────────────────────────────────────────────────────
 
-export function cmdPhaseAdd(cwd: string, description: string | undefined): CmdResult {
+export async function cmdPhaseAdd(cwd: string, description: string | undefined): Promise<CmdResult> {
   if (!description) {
     return cmdErr('description required for phase add');
   }
 
   try {
-    const result = phaseAddCore(cwd, description, { includeStubs: false });
+    const result = await phaseAddCore(cwd, description, { includeStubs: false });
     return cmdOk(
       { phase_number: result.phase_number, padded: result.padded, name: result.description, slug: result.slug, directory: result.directory },
       result.padded,
@@ -658,13 +669,13 @@ export function cmdPhaseAdd(cwd: string, description: string | undefined): CmdRe
 
 // ─── Phase insert ───────────────────────────────────────────────────────────
 
-export function cmdPhaseInsert(cwd: string, afterPhase: string | undefined, description: string | undefined): CmdResult {
+export async function cmdPhaseInsert(cwd: string, afterPhase: string | undefined, description: string | undefined): Promise<CmdResult> {
   if (!afterPhase || !description) {
     return cmdErr('after-phase and description required for phase insert');
   }
 
   try {
-    const result = phaseInsertCore(cwd, afterPhase, description, { includeStubs: false });
+    const result = await phaseInsertCore(cwd, afterPhase, description, { includeStubs: false });
     return cmdOk(
       { phase_number: result.phase_number, after_phase: result.after_phase, name: result.description, slug: result.slug, directory: result.directory },
       result.phase_number,
@@ -676,11 +687,11 @@ export function cmdPhaseInsert(cwd: string, afterPhase: string | undefined, desc
 
 // ─── Phase remove ───────────────────────────────────────────────────────────
 
-export function cmdPhaseRemove(
+export async function cmdPhaseRemove(
   cwd: string,
   targetPhase: string | undefined,
   options: { force: boolean },
-): CmdResult {
+): Promise<CmdResult> {
   if (!targetPhase) {
     return cmdErr('phase number required for phase remove');
   }
@@ -689,7 +700,7 @@ export function cmdPhaseRemove(
   const phasesDirPath = phasesPath(cwd);
   const force = options.force || false;
 
-  if (!fs.existsSync(rmPath)) {
+  if (!(await pathExistsAsync(rmPath))) {
     return cmdErr('ROADMAP.md not found');
   }
 
@@ -698,7 +709,7 @@ export function cmdPhaseRemove(
 
   let targetDir: string | null = null;
   try {
-    const dirs = listSubDirs(phasesDirPath, true);
+    const dirs = await listSubDirsAsync(phasesDirPath, true);
     targetDir = dirs.find(d => d.startsWith(normalized + '-') || d === normalized) || null;
   } catch (e) {
     debugLog('phase-remove-find-target-failed', e);
@@ -706,7 +717,7 @@ export function cmdPhaseRemove(
 
   if (targetDir && !force) {
     const targetPath = path.join(phasesDirPath, targetDir);
-    const files = fs.readdirSync(targetPath);
+    const files = await fsp.readdir(targetPath);
     const summaries = files.filter(isSummaryFile);
     if (summaries.length > 0) {
       return cmdErr(`Phase ${targetPhase} has ${summaries.length} executed plan(s). Use --force to remove anyway.`);
@@ -714,7 +725,7 @@ export function cmdPhaseRemove(
   }
 
   if (targetDir) {
-    fs.rmSync(path.join(phasesDirPath, targetDir), { recursive: true, force: true });
+    await fsp.rm(path.join(phasesDirPath, targetDir), { recursive: true, force: true });
   }
 
   const renamedDirs: Array<{ from: string; to: string }> = [];
@@ -726,7 +737,7 @@ export function cmdPhaseRemove(
     const removedDecimal = parseInt(baseParts[1], 10);
 
     try {
-      const dirs = listSubDirs(phasesDirPath, true);
+      const dirs = await listSubDirsAsync(phasesDirPath, true);
 
       const decPattern = new RegExp(`^${baseInt}\\.(\\d+)-(.+)$`);
       const toRename: Array<{ dir: string; oldDecimal: number; slug: string }> = [];
@@ -739,20 +750,21 @@ export function cmdPhaseRemove(
 
       toRename.sort((a, b) => b.oldDecimal - a.oldDecimal);
 
+      // Sequential renames — order matters
       for (const item of toRename) {
         const newDecimal = item.oldDecimal - 1;
         const oldPhaseId = `${baseInt}.${item.oldDecimal}`;
         const newPhaseId = `${baseInt}.${newDecimal}`;
         const newDirName = `${baseInt}.${newDecimal}-${item.slug}`;
 
-        fs.renameSync(path.join(phasesDirPath, item.dir), path.join(phasesDirPath, newDirName));
+        await fsp.rename(path.join(phasesDirPath, item.dir), path.join(phasesDirPath, newDirName));
         renamedDirs.push({ from: item.dir, to: newDirName });
 
-        const dirFiles = fs.readdirSync(path.join(phasesDirPath, newDirName));
+        const dirFiles = await fsp.readdir(path.join(phasesDirPath, newDirName));
         for (const f of dirFiles) {
           if (f.includes(oldPhaseId)) {
             const newFileName = f.replace(oldPhaseId, newPhaseId);
-            fs.renameSync(
+            await fsp.rename(
               path.join(phasesDirPath, newDirName, f),
               path.join(phasesDirPath, newDirName, newFileName),
             );
@@ -767,7 +779,7 @@ export function cmdPhaseRemove(
     const removedInt = parseInt(normalized, 10);
 
     try {
-      const dirs = listSubDirs(phasesDirPath, true);
+      const dirs = await listSubDirsAsync(phasesDirPath, true);
 
       const toRename: Array<{ dir: string; oldInt: number; letter: string; decimal: number | null; slug: string }> = [];
       for (const dir of dirs) {
@@ -790,6 +802,7 @@ export function cmdPhaseRemove(
         return (b.decimal || 0) - (a.decimal || 0);
       });
 
+      // Sequential renames — order matters
       for (const item of toRename) {
         const newInt = item.oldInt - 1;
         const newPadded = String(newInt).padStart(2, '0');
@@ -800,14 +813,14 @@ export function cmdPhaseRemove(
         const newPrefix = `${newPadded}${letterSuffix}${decimalSuffix}`;
         const newDirName = `${newPrefix}-${item.slug}`;
 
-        fs.renameSync(path.join(phasesDirPath, item.dir), path.join(phasesDirPath, newDirName));
+        await fsp.rename(path.join(phasesDirPath, item.dir), path.join(phasesDirPath, newDirName));
         renamedDirs.push({ from: item.dir, to: newDirName });
 
-        const dirFiles = fs.readdirSync(path.join(phasesDirPath, newDirName));
+        const dirFiles = await fsp.readdir(path.join(phasesDirPath, newDirName));
         for (const f of dirFiles) {
           if (f.startsWith(oldPrefix)) {
             const newFileName = newPrefix + f.slice(oldPrefix.length);
-            fs.renameSync(
+            await fsp.rename(
               path.join(phasesDirPath, newDirName, f),
               path.join(phasesDirPath, newDirName, newFileName),
             );
@@ -821,7 +834,7 @@ export function cmdPhaseRemove(
   }
 
   // Update ROADMAP.md
-  let roadmapContent = fs.readFileSync(rmPath, 'utf-8');
+  let roadmapContent = await fsp.readFile(rmPath, 'utf-8');
 
   const targetEscaped = escapePhaseNum(targetPhase);
   const sectionPattern = new RegExp(
@@ -869,12 +882,13 @@ export function cmdPhaseRemove(
     }
   }
 
-  fs.writeFileSync(rmPath, roadmapContent, 'utf-8');
+  await fsp.writeFile(rmPath, roadmapContent, 'utf-8');
 
   // Update STATE.md phase count
   const stPath = statePath(cwd);
-  if (fs.existsSync(stPath)) {
-    let stateContent = fs.readFileSync(stPath, 'utf-8');
+  const stExists = await pathExistsAsync(stPath);
+  if (stExists) {
+    let stateContent = await fsp.readFile(stPath, 'utf-8');
     const totalPattern = /(\*\*Total Phases:\*\*\s*)(\d+)/;
     const totalMatch = stateContent.match(totalPattern);
     if (totalMatch) {
@@ -887,7 +901,7 @@ export function cmdPhaseRemove(
       const oldTotal = parseInt(ofMatch[2], 10);
       stateContent = stateContent.replace(ofPattern, `$1${oldTotal - 1}$3`);
     }
-    fs.writeFileSync(stPath, stateContent, 'utf-8');
+    await fsp.writeFile(stPath, stateContent, 'utf-8');
   }
 
   return cmdOk({
@@ -896,19 +910,19 @@ export function cmdPhaseRemove(
     renamed_directories: renamedDirs,
     renamed_files: renamedFiles,
     roadmap_updated: true,
-    state_updated: fs.existsSync(stPath),
+    state_updated: stExists,
   });
 }
 
 // ─── Phase complete ─────────────────────────────────────────────────────────
 
-export function cmdPhaseComplete(cwd: string, phaseNum: string | undefined): CmdResult {
+export async function cmdPhaseComplete(cwd: string, phaseNum: string | undefined): Promise<CmdResult> {
   if (!phaseNum) {
     return cmdErr('phase number required for phase complete');
   }
 
   try {
-    const result = phaseCompleteCore(cwd, phaseNum);
+    const result = await phaseCompleteCore(cwd, phaseNum);
     return cmdOk({
       completed_phase: result.completed_phase,
       phase_name: result.phase_name,

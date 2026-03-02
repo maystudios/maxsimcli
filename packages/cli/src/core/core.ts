@@ -144,6 +144,16 @@ export async function safeReadFileAsync(filePath: string): Promise<string | null
   }
 }
 
+/** Async check whether a path exists. */
+export async function pathExistsAsync(p: string): Promise<boolean> {
+  try {
+    await fsp.access(p);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** Extract a human-readable message from an unknown thrown value. */
 export function errorMsg(e: unknown): string {
   return e instanceof Error ? e.message : String(e);
@@ -446,6 +456,122 @@ export function getArchivedPhaseDirs(cwd: string): ArchivedPhaseDir[] {
     }
   } catch (e) {
     debugLog('get-archived-phase-dirs-failed', e);
+  }
+
+  return results;
+}
+
+/** Async version of searchPhaseInDir. */
+async function searchPhaseInDirAsync(baseDir: string, relBase: string, normalized: string): Promise<PhaseSearchResult | null> {
+  try {
+    const dirs = await listSubDirsAsync(baseDir, true);
+    const match = dirs.find(d => d.startsWith(normalized));
+    if (!match) return null;
+
+    const dirMatch = match.match(/^(\d+[A-Z]?(?:\.\d+)?)-?(.*)/i);
+    const phaseNumber = dirMatch ? dirMatch[1] : normalized;
+    const phaseName = dirMatch && dirMatch[2] ? dirMatch[2] : null;
+    const phaseDir = path.join(baseDir, match);
+    const phaseFiles = await fsp.readdir(phaseDir);
+
+    const plans = phaseFiles.filter(isPlanFile).sort();
+    const summaries = phaseFiles.filter(isSummaryFile).sort();
+    const hasResearch = phaseFiles.some(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
+    const hasContext = phaseFiles.some(f => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
+    const hasVerification = phaseFiles.some(f => f.endsWith('-VERIFICATION.md') || f === 'VERIFICATION.md');
+
+    const completedPlanIds = new Set(summaries.map(summaryId));
+    const incompletePlans = plans.filter(p => !completedPlanIds.has(planId(p)));
+
+    return {
+      found: true,
+      directory: path.join(relBase, match),
+      phase_number: phaseNumber,
+      phase_name: phaseName,
+      phase_slug: phaseName ? phaseName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : null,
+      plans,
+      summaries,
+      incomplete_plans: incompletePlans,
+      has_research: hasResearch,
+      has_context: hasContext,
+      has_verification: hasVerification,
+    };
+  } catch (e) {
+    debugLog('search-phase-in-dir-async-failed', { dir: baseDir, phase: normalized, error: errorMsg(e) });
+    return null;
+  }
+}
+
+/** Async version of findPhaseInternal. */
+export async function findPhaseInternalAsync(cwd: string, phase: string): Promise<PhaseSearchResult | null> {
+  if (!phase) return null;
+
+  const pd = phasesPath(cwd);
+  const normalized = normalizePhaseName(phase);
+
+  const current = await searchPhaseInDirAsync(pd, path.join('.planning', 'phases'), normalized);
+  if (current) return current;
+
+  const milestonesDir = planningPath(cwd, 'milestones');
+
+  try {
+    const milestoneEntries = await fsp.readdir(milestonesDir, { withFileTypes: true });
+    const archiveDirs = milestoneEntries
+      .filter(e => e.isDirectory() && /^v[\d.]+-phases$/.test(e.name))
+      .map(e => e.name)
+      .sort()
+      .reverse();
+
+    for (const archiveName of archiveDirs) {
+      const versionMatch = archiveName.match(/^(v[\d.]+)-phases$/);
+      if (!versionMatch) continue;
+      const version = versionMatch[1];
+      const archivePath = path.join(milestonesDir, archiveName);
+      const relBase = path.join('.planning', 'milestones', archiveName);
+      const result = await searchPhaseInDirAsync(archivePath, relBase, normalized);
+      if (result) {
+        result.archived = version;
+        return result;
+      }
+    }
+  } catch (e) {
+    debugLog('find-phase-internal-async-milestone-search-failed', e);
+  }
+
+  return null;
+}
+
+/** Async version of getArchivedPhaseDirs. */
+export async function getArchivedPhaseDirsAsync(cwd: string): Promise<ArchivedPhaseDir[]> {
+  const milestonesDir = planningPath(cwd, 'milestones');
+  const results: ArchivedPhaseDir[] = [];
+
+  try {
+    const milestoneEntries = await fsp.readdir(milestonesDir, { withFileTypes: true });
+    const phaseDirs = milestoneEntries
+      .filter(e => e.isDirectory() && /^v[\d.]+-phases$/.test(e.name))
+      .map(e => e.name)
+      .sort()
+      .reverse();
+
+    for (const archiveName of phaseDirs) {
+      const versionMatch = archiveName.match(/^(v[\d.]+)-phases$/);
+      if (!versionMatch) continue;
+      const version = versionMatch[1];
+      const archivePath = path.join(milestonesDir, archiveName);
+      const dirs = await listSubDirsAsync(archivePath, true);
+
+      for (const dir of dirs) {
+        results.push({
+          name: dir,
+          milestone: version,
+          basePath: path.join('.planning', 'milestones', archiveName),
+          fullPath: path.join(archivePath, dir),
+        });
+      }
+    }
+  } catch (e) {
+    debugLog('get-archived-phase-dirs-async-failed', e);
   }
 
   return results;
