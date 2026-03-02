@@ -1,3 +1,56 @@
+# [4.0.0](https://github.com/maystudios/maxsimcli/compare/v3.12.0...v4.0.0) (2026-03-02)
+
+
+* feat!: remove non-Claude adapters and simplify install to Claude-only ([e640107](https://github.com/maystudios/maxsimcli/commit/e640107bc7d66fd6b6a22778fc3f5aa2f720f1ae))
+
+
+### Bug Fixes
+
+* **core:** add actionable context to catch blocks across core modules ([3bda2eb](https://github.com/maystudios/maxsimcli/commit/3bda2eb3767500a2500cd4ce394af90a79ef1c8a))
+* **core:** replace Unix find with cross-platform fs walk ([#22](https://github.com/maystudios/maxsimcli/issues/22)) ([8dddae4](https://github.com/maystudios/maxsimcli/commit/8dddae4f2af7fa2c0e398025779c4fcc85389244))
+* **core:** replace Unix find with cross-platform fs walk for Windows compatibility ([b121ae6](https://github.com/maystudios/maxsimcli/commit/b121ae68d5d38733960e9ff72c2f7a982f54d739))
+* **dashboard:** increase health check timeout to 10s and verify multi-project isolation ([bee185c](https://github.com/maystudios/maxsimcli/commit/bee185c91e730896040afef63eaac5d782cefc28))
+* **install:** add .mcp.json backup and install recovery safety ([77eb4fe](https://github.com/maystudios/maxsimcli/commit/77eb4feeafd141eca94349f19615fcee97bb6718))
+* **install:** move skills install path from agents/skills/ to skills/ ([436712a](https://github.com/maystudios/maxsimcli/commit/436712a4adee7c86ae9480a6aa93e52ff017338a))
+* **install:** remove dead isCodex reference and reject deprecated runtime flags ([#21](https://github.com/maystudios/maxsimcli/issues/21)) ([9a4af80](https://github.com/maystudios/maxsimcli/commit/9a4af80c5543fcd69970fbac4f9c71c9f5821388))
+* resolve duplicate CmdResult and update tests for CmdResult pattern ([1e02d4b](https://github.com/maystudios/maxsimcli/commit/1e02d4b7df95d3833fd92f3413870a18ff1be3d4))
+* **state:** harden STATE.md parsing for format drift resilience ([9881d1c](https://github.com/maystudios/maxsimcli/commit/9881d1c9f6b1810aa5838f651aa16f9bd87cdf5d))
+
+
+### Features
+
+* add artefakte system, context loader, and start command (Units 1, 9, 10) ([dbbc2b4](https://github.com/maystudios/maxsimcli/commit/dbbc2b4d35412f9b51e100a9aa2bd027dcd4e398))
+* add brainstorming and roadmap-writing skills (Units 7, 8) ([1b8c64c](https://github.com/maystudios/maxsimcli/commit/1b8c64c2c5dec6f2873df1cc79a5002b176f7e96))
+* async I/O for hot-path commands and phase-list pagination (Phase 10) ([19e7741](https://github.com/maystudios/maxsimcli/commit/19e7741c8df1567a08f59282235b217855d4cd85))
+* **execution:** wire Execute-Review-Simplify-Review cycle into execution pipeline ([7a6a998](https://github.com/maystudios/maxsimcli/commit/7a6a998aeb707288930d99e36c06ba0cac23dfae))
+* **mcp:** complete E2E Q&A routing between Claude Code and dashboard ([ac3115a](https://github.com/maystudios/maxsimcli/commit/ac3115a7e120ae9b1e597ae6f9afe664449640a2))
+* rewrite workflows with thinking-partner behavior and artefakte integration (Units 2-6) ([f44b4f4](https://github.com/maystudios/maxsimcli/commit/f44b4f4589df9f94fc3b927a88e5683c2b5bbf2d))
+* **skills:** add batch-worktree and sdd skill templates ([84997be](https://github.com/maystudios/maxsimcli/commit/84997be21443de3213636f862c480ca32caed254))
+* **skills:** add skill-list, skill-install, skill-update CLI commands ([d848acd](https://github.com/maystudios/maxsimcli/commit/d848acd678e19a4eb1bf947e15a972786a801ef0))
+* **skills:** register using-maxsim skill for auto-trigger at conversation start ([d5f0a50](https://github.com/maystudios/maxsimcli/commit/d5f0a50ab625655cf1d3e53eebbb86661b011bf3))
+* unified dashboard mode with enhanced MCP Q&A and multi-project support (Units 11-14) ([b26205e](https://github.com/maystudios/maxsimcli/commit/b26205ebffb1770daa6f2bbb82ced801af8800eb))
+
+
+### BREAKING CHANGES
+
+* Remove OpenCode, Gemini, and Codex runtime support.
+MAXSIM v2.0 is Claude Code-only.
+
+- Delete adapter files: opencode.ts, gemini.ts, codex.ts
+- Delete transforms/: tool-maps.ts, frontmatter.ts, content.ts
+- Simplify adapter registry to export only claudeAdapter
+- Narrow RuntimeName type to 'claude' literal
+- Narrow AdapterConfig.commandStructure to 'nested' only
+- Remove --opencode, --gemini, --codex, --both, --all CLI flags
+- Remove promptRuntime() multi-runtime selector
+- Remove copyFlattenedCommands() and copyCommandsAsCodexSkills()
+- Remove configureOpencodePermissions() and parseJsonc()
+- Remove non-Claude branches from install, uninstall, hooks, manifest
+- Simplify shared.ts to use claudeAdapter directly (no adapter map)
+- Update help text and banner for Claude-only messaging
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+
 # [3.12.0](https://github.com/maystudios/maxsimcli/compare/v3.11.0...v3.12.0) (2026-03-01)
 
 
