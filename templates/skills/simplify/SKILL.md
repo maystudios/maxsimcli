@@ -1,6 +1,7 @@
 ---
 name: simplify
 description: Use after implementation and before commit — requires reviewing changed code for reuse opportunities, quality issues, and unnecessary complexity
+context: fork
 ---
 
 # Simplify
@@ -17,6 +18,47 @@ If you have not checked for duplication, dead code, and unnecessary complexity, 
 "It works" is the starting point, not the finish line.
 Violating this rule is a violation — not a preference.
 </HARD-GATE>
+
+## Three-Reviewer Protocol
+
+For significant changes (10+ files or 200+ lines changed), run three parallel review passes. For smaller changes, a single sequential pass through the gate function steps below is sufficient.
+
+### Parallel Review Passes
+
+**Reviewer A — Duplication & Dead Code:**
+Focus exclusively on steps 2 (DUPLICATION) and 3 (DEAD CODE) of the gate function.
+- Scan the entire diff for copy-paste patterns
+- Cross-reference new code against the existing codebase for existing utilities
+- Flag all unused imports, variables, unreachable branches, commented code
+
+**Reviewer B — Complexity & Abstraction:**
+Focus exclusively on step 4 (COMPLEXITY) of the gate function.
+- Challenge every new abstraction, wrapper, and indirection layer
+- Flag generic solutions where specific ones suffice
+- Identify premature configuration and extension points
+
+**Reviewer C — Clarity & Efficiency:**
+Focus exclusively on steps 5 (CLARITY) and 6 (EFFICIENCY) of the gate function.
+- Review naming for self-evidence
+- Flatten nested conditions, simplify control flow
+- Flag obvious O(n²) operations and repeated computations
+
+### Aggregation
+
+After all three reviewers complete:
+1. Merge findings — deduplicate overlapping issues
+2. Resolve conflicts — if reviewers disagree, prefer the simpler option
+3. Apply changes — make all simplifications in a single pass
+4. Re-run tests — verify nothing broke
+5. Re-diff — confirm the simplification actually reduced complexity
+
+### When to Use Sequential vs Parallel
+
+| Change Size | Approach |
+|------------|----------|
+| < 5 files, < 100 lines | Sequential (single pass through gate function) |
+| 5-10 files, 100-200 lines | Sequential with extra attention to duplication |
+| 10+ files or 200+ lines | Three-reviewer parallel protocol |
 
 ## The Gate Function
 
@@ -128,10 +170,40 @@ Before committing, confirm:
 - [ ] No obvious efficiency issues (unnecessary O(n^2), repeated computations)
 - [ ] Tests still pass after simplification changes
 
-## In MAXSIM Plan Execution
+## Integration with MAXSIM
 
-Simplification applies at the task level, after implementation and before commit:
+### Context Loading
+
+When simplifying within a MAXSIM project, load project context:
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs skill-context simplify
+```
+
+This returns the current phase and codebase conventions. Use this to:
+- Reference `.planning/codebase/CONVENTIONS.md` for project naming and style rules
+- Reference `.planning/codebase/STRUCTURE.md` for where shared utilities live
+- Know which phase's code you are simplifying
+
+### Task-Level Simplification
+
+In MAXSIM plan execution, simplification applies at the task level:
 - After task implementation is complete and tests pass, run this review
 - Make simplification changes as part of the same commit (not a separate task)
 - If simplification reveals a larger refactoring opportunity, file a todo — do not scope-creep
-- Track significant simplifications in the task's commit message (e.g., "extracted shared helper for X")
+- Track significant simplifications in the task's commit message
+
+### Metrics Tracking
+
+Record simplification metrics for phase documentation:
+- Lines removed vs added (net reduction is the goal)
+- Helpers extracted (shared utilities created)
+- Dead code removed (imports, functions, branches)
+- These feed into SUMMARY.md performance section
+
+### STATE.md Hooks
+
+Track significant simplification decisions:
+- If a simplification changes a public interface, record as a decision
+- If a simplification removes a feature, verify it was unused before recording
+- Track cumulative code reduction across the phase
