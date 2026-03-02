@@ -1,108 +1,158 @@
 # Roadmap: MAXSIM
-## Milestone: MCP Foundation + Superpowers Skills
 
 ## Overview
 
-MAXSIM evolves from a GSD-only workflow system into a GSD + Superpowers platform with an MCP-first architecture. This milestone delivers:
-1. A **MAXSIM Core Server** (MCP tools + logic, always-on background server) -- Claude Code calls tools instead of reading Bash output
-2. A **Quality Foundation** -- testable core, Windows fixes, consolidated codebase
-3. A **Superpowers Skills System** -- auto-triggering skills, error memory, code review
-4. A **Dashboard Evolution** -- Simple Mode (task overview + Q&A) + Advanced Mode (terminal), running on top of Core Server
+MAXSIM v2.0 is built on three pillars: deep collaborative planning, context engineering, and superior execution. The roadmap: clean up multi-runtime code, harden reliability, build the skills infrastructure, ship 10 native skills (core, execution, planning), redesign the discussion system, overhaul the dashboard, and optimize performance. Big bang release — all phases complete before v2.0 tag.
 
-**Architecture direction:** Core Server is the new backbone. Dashboard is an optional UI layer on top. Bash tools router stays for backwards compatibility and quick agent calls.
+## Milestones
+
+- 🚧 **v2.0 Claude Code Edition** — Phases 1-10 (in progress)
 
 ## Phases
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
-
-Decimal phases appear between their surrounding integers in numeric order.
-
-- [x] **Phase 1: MCP Core Server** - MAXSIM Core Server with MCP tools for phase ops, task management, and state updates
-- [ ] **Phase 2: Quality Foundation** - Windows fix, testable core, install.ts refactor, dashboard launch consolidation
-- [ ] **Phase 3: Skills System** - using-maxsim entry skill, error memory, new skills (memory-management, code-review, simplify)
-- [ ] **Phase 4: Dashboard Evolution** - Core Server as backend, Simple Mode (4 panels), Advanced Mode (+ terminal), Q&A routing
+- [x] **Phase 1: Runtime Cleanup** - Remove all non-Claude adapters and document architecture (completed 2026-03-02)
+- [x] **Phase 2: Install Simplification** - Strip to clean Claude-only install flow (completed 2026-03-02)
+- [x] **Phase 3: Reliability Hardening** - STATE.md parsing, error handling, install recovery (completed 2026-03-02)
+- [x] **Phase 4: Skills Infrastructure** - Build native .claude/skills/ system with install pipeline
+- [x] **Phase 5: Core Skills** - TDD, Systematic Debugging, Verification-Before-Completion, Code Review (2-stage)
+- [x] **Phase 6: Execution Skills & Pipeline** - Simplify, Batch/Worktree, SDD, Writing Plans + Execute→Review→Simplify cycle
+- [ ] **Phase 7: Deep Discussion System** - 4 collaborative flows + expanded artefakte (DECISIONS.md, ACCEPTANCE-CRITERIA.md, NO-GOS.md)
+- [ ] **Phase 8: Planning Skills** - Brainstorming, Roadmap-Writing + task-based context loading
+- [ ] **Phase 9: Dashboard Overhaul** - Unified mode, MCP Q&A, maxsimcli start, multi-project
+- [ ] **Phase 10: Performance** - Async hot-path I/O, paginated phase listings
 
 ## Phase Details
 
-### Phase 1: MCP Core Server
-**Goal**: A persistent MAXSIM Core Server that Claude Code can call via MCP tools for all structured operations -- phase creation, task management, state updates
+### Phase 1: Runtime Cleanup
+**Goal**: All non-Claude runtime code removed; architecture documented for future reference
 **Depends on**: Nothing (first phase)
-**Requirements**: MCP-01, MCP-02, MCP-03, MCP-04
+**Requirements**: SIMP-01, SIMP-03
 **Success Criteria** (what must be TRUE):
-  1. Running `maxsim-tools.cjs start-server` spawns a persistent MCP server; `.mcp.json` at project root enables Claude Code to auto-discover and connect to it at session start
-  2. `mcp_create_phase` creates a correctly structured `.planning/phases/NN-Name/` directory with all required files -- identical result every time, no variance
-  3. `mcp_add_todo`, `mcp_complete_todo`, `mcp_list_todos` persist task state correctly; `mcp_update_state`, `mcp_add_decision`, `mcp_add_blocker` write to STATE.md correctly
-  4. Existing `/maxsim:*` commands and Bash tools router continue to work without any changes
-  5. `.mcp.json` written during install configures the MCP server for auto-start; Claude Code natively spawns stdio servers from `.mcp.json` at session start
-  6. When MCP server is unavailable, workflows warn the user and fall back to Bash tools router
+  1. `packages/cli/src/adapters/` contains only `claude.ts`, `base.ts`, `index.ts`
+  2. `docs/multi-runtime-architecture.md` documents adapter interface and per-runtime logic
+  3. `npm run build` succeeds and `npm test` passes after removal
+  4. No references to OpenCode, Gemini, or Codex remain in source code
+**Plans**: TBD
 
-**Plans:** 4 plans
-
-Plans:
-- [x] 01-01-PLAN.md -- MCP server infrastructure + phase CRUD tools
-- [x] 01-02-PLAN.md -- Todo + state management MCP tools
-- [x] 01-03-PLAN.md -- Install integration + .mcp.json + fallback + end-to-end verification
-- [x] 01-04-PLAN.md -- Gap closure: scaffold CONTEXT.md + RESEARCH.md in mcp_create_phase/mcp_insert_phase
-
-### Phase 2: Quality Foundation
-**Goal**: Testable core architecture and cross-platform reliability -- clean foundation for Phase 3+4
-**Depends on**: Phase 1 (dashboard launch consolidation targets Core Server architecture)
-**Requirements**: QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05
+### Phase 2: Install Simplification
+**Goal**: Install is a clean single-path Claude Code flow with no runtime selection
+**Depends on**: Phase 1
+**Requirements**: SIMP-02, SIMP-04, SIMP-05
 **Success Criteria** (what must be TRUE):
-  1. `init-existing` and `new-project` correctly detect existing code on Windows (no Unix `find` dependency)
-  2. Core module functions return typed results instead of calling `process.exit()` -- unit tests run without mocking process.exit
-  3. `install.ts` split into focused modules (`install/adapters.ts`, `install/dashboard.ts`, `install/hooks.ts`) with unit tests covering runtime selection and file copying
-  4. Dashboard launch logic exists in exactly one place; `--stop` works correctly from both `cli.ts` and `install.ts`
-  5. Dead code removed, duplicated logic consolidated (YAGNI/DRY pass); hand-rolled code replaced by proven libraries where applicable; `nyquist_validation` stub removed; Brave search key detection consolidated into one helper
+  1. `maxsimcli` install runs without runtime selection prompts
+  2. CLI flags `--opencode`, `--gemini`, `--codex`, `--both`, `--all` produce error if used
+  3. Skills folder installed at `.claude/skills/` (not `.claude/agents/skills/`)
+  4. Install code reduced by 30%+ in line count
+**Plans**: TBD
 
-Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
-- [ ] 02-03: TBD
-
-### Phase 3: Skills System
-**Goal**: Agents automatically invoke relevant skills before acting; new skills for memory, code review, and simplification; error patterns are remembered
-**Depends on**: Phase 1 (skills may use MCP for state persistence)
-**Requirements**: SKILL-01, SKILL-02, SKILL-03, SKILL-04, SKILL-05, SKILL-06
+### Phase 3: Reliability Hardening
+**Goal**: Core CLI is robust — no silent failures, no format-drift crashes, recoverable installs
+**Depends on**: Phase 2
+**Requirements**: REL-01, REL-02, REL-03
 **Success Criteria** (what must be TRUE):
-  1. `using-maxsim` skill is registered in AGENTS.md and triggers before any agent action in a MAXSIM project
-  2. After 2-3 occurrences of the same error pattern, it is auto-saved to `.claude/memory/` and visible in subsequent agent context
-  3. `memory-management`, `code-review`, and `simplify` skills exist in `templates/skills/` and are included in MAXSIM install
-  4. Existing skills (`systematic-debugging`, `tdd`, `verification-before-completion`) trigger automatically via AGENTS.md without user prompting
-  5. `code-review` skill triggers after each phase completion; critical issues block phase sign-off
+  1. STATE.md parsing handles extra blank lines, reordered sections, missing sections without breaking
+  2. Every CLI command returns actionable error messages — zero unhandled stack traces in user-facing output
+  3. Partial install failure is recoverable by re-running install
+  4. Error paths have test coverage
+**Plans**: TBD
 
-Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-
-### Phase 4: Dashboard Evolution
-**Goal**: Dashboard as optional UI on top of Core Server -- Simple Mode (4 panels: phase, todos, roadmap, Q&A) + Advanced Mode (+ terminal)
-**Depends on**: Phase 1 (Core Server required), Phase 2 (consolidated launch code)
-**Requirements**: DASH-01, DASH-02, DASH-03, DASH-04, MCP-05
+### Phase 4: Skills Infrastructure
+**Goal**: Native skills system built — install, update, list skills in `.claude/skills/` format
+**Depends on**: Phase 2
+**Requirements**: SINF-01, SINF-02, SINF-03, SINF-04
 **Success Criteria** (what must be TRUE):
-  1. Dashboard only starts via explicit `maxsim dashboard` command -- no workflow command auto-launches it
-  2. Simple Mode renders: current phase + progress bar, todo list (done/not-done), phase roadmap overview, Q&A panel for pending questions
-  3. Advanced Mode has all Simple Mode panels plus embedded xterm.js terminal showing a live Claude Code session
-  4. Switching between Simple and Advanced modes preserves all state (Advanced = Simple + terminal pane, not a different layout)
-  5. When dashboard is running, AskUserQuestion calls route via MCP to the Q&A panel; user answers feed back to the agent
-  6. Dashboard connects to a running Core Server; starting dashboard also ensures Core Server is running
+  1. `maxsimcli` installs skills to `.claude/skills/maxsim-*/SKILL.md` with valid frontmatter
+  2. Skills follow Claude Code native format (frontmatter with description, context: fork, etc.)
+  3. CLI supports `skill-list`, `skill-install`, `skill-update` operations
+  4. Skills have access to MAXSIM context (STATE.md, current phase, artefakte) via integration layer
+**Plans**: TBD
 
-Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
-- [ ] 04-03: TBD
+### Phase 5: Core Skills
+**Goal**: Four discipline-enforcing skills shipped — TDD, debugging, verification, code review
+**Depends on**: Phase 4
+**Requirements**: CS-01, CS-02, CS-03, CS-04
+**Success Criteria** (what must be TRUE):
+  1. TDD skill enforces RED→GREEN→REFACTOR — blocks production code without failing test
+  2. Systematic Debugging skill enforces root-cause investigation before any fix attempt (4 phases)
+  3. Verification skill blocks success claims without fresh verification evidence
+  4. Code Review skill runs 2-stage review (spec compliance → code quality) with actionable feedback
+  5. All skills integrated with MAXSIM STATE.md and phase tracking
+**Plans**: TBD
+
+### Phase 6: Execution Skills & Pipeline
+**Goal**: Execution pipeline redesigned with Simplify, Batch, SDD skills and Execute→Review→Simplify cycle
+**Depends on**: Phase 5
+**Requirements**: ES-01, ES-02, ES-03, ES-04, EXEC-01, EXEC-02, EXEC-03
+**Success Criteria** (what must be TRUE):
+  1. Simplify skill spawns 3 parallel reviewers (code reuse, quality, efficiency) and fixes findings
+  2. Batch/Worktree skill spawns 5-30 agents, each in isolated git worktree with own PR
+  3. SDD skill dispatches fresh subagent per task with 2-stage review between tasks
+  4. Writing Plans skill produces standardized plans with TDD-style task definitions
+  5. Execute → Review → Simplify → Review cycle runs for every executed feature
+  6. Orchestrator tracks progress via status table
+  7. Task-based context loading ensures agents receive only relevant files
+**Plans**: TBD
+
+### Phase 7: Deep Discussion System
+**Goal**: All four planning modes rewritten for deep collaborative discussion with user
+**Depends on**: Phase 4
+**Requirements**: DISC-01, DISC-02, DISC-03, DISC-04, DISC-05, DISC-06, ART-01, ART-02, ART-03, ART-04
+**Success Criteria** (what must be TRUE):
+  1. New Project flow takes user through vision → requirements → acceptance criteria → no-gos → architecture → roadmap via free-flowing conversation
+  2. Init Existing flow scans, presents findings, asks user to verify/correct, captures vision — without forcing a roadmap
+  3. Feature/Phase flow deeply discusses what's needed before generating any plan — probing questions, challenging vagueness
+  4. Todo/Bug flow runs a shorter but still collaborative discussion (20-30 min)
+  5. DECISIONS.md, ACCEPTANCE-CRITERIA.md, NO-GOS.md created as project-level documents with phase-specific extensions
+  6. Claude acts as thinking partner — suggests directions, challenges vague answers, surfaces unstated assumptions
+**Plans**: TBD
+
+### Phase 8: Planning Skills
+**Goal**: Brainstorming and Roadmap-Writing skills shipped with intelligent context loading
+**Depends on**: Phase 7
+**Requirements**: PS-01, PS-02, PS-03
+**Success Criteria** (what must be TRUE):
+  1. Brainstorming skill enforces hard-gate design approval — explores context, proposes 2-3 approaches with trade-offs, documents decisions
+  2. Roadmap-Writing skill produces standardized roadmap format with phases, dependencies, success criteria
+  3. Planning agents intelligently select relevant files based on discussion topic (task-based context loading)
+**Plans**: TBD
+
+### Phase 9: Dashboard Overhaul
+**Goal**: Dashboard is unified discussion + execution UI with `maxsimcli start` and multi-project support
+**Depends on**: Phase 7
+**Requirements**: DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06, DASH-07, DISC-07
+**Success Criteria** (what must be TRUE):
+  1. `maxsimcli start` launches Dashboard + MCP-Server + Terminal in one command
+  2. Single unified mode — discussion/Q&A UI is primary, terminal is toggle-able panel
+  3. MCP-powered Q&A interface handles discussion questions from Claude Code
+  4. Multiple projects can run independent dashboards simultaneously
+  5. Health check handles up to 10s startup; file watcher debounced for bulk edits
+  6. Discussion works equally in terminal and dashboard UI
+**Plans**: TBD
+
+### Phase 10: Performance
+**Goal**: Hot-path I/O is non-blocking, large projects don't hang
+**Depends on**: Phase 6
+**Requirements**: PERF-01, PERF-02
+**Success Criteria** (what must be TRUE):
+  1. `state-read`, `phase-list`, `roadmap-parse` complete without blocking on 50+ phase projects
+  2. `phase-list` on 100+ directories returns paginated output
+  3. Async migration passes all existing tests
+**Plans**: TBD
 
 ## Progress
 
 **Execution Order:**
-Phases execute in order: 1 -> 2 -> 3 -> 4
-(Phase 2 and Phase 3 can partially overlap after Phase 1 completes)
+Phase 1 → Phase 2 → Phase 3 ∥ Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8 → Phase 9 → Phase 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. MCP Core Server | 1/3 | In progress | - |
-| 2. Quality Foundation | 0/3 | Not started | - |
-| 3. Skills System | 0/2 | Not started | - |
-| 4. Dashboard Evolution | 0/3 | Not started | - |
+| 1. Runtime Cleanup | 1/1 | Complete | 2026-03-02 |
+| 2. Install Simplification | 1/1 | Complete | 2026-03-02 |
+| 3. Reliability Hardening | 1/1 | Complete | 2026-03-02 |
+| 4. Skills Infrastructure | 1/1 | Complete | 2026-03-02 |
+| 5. Core Skills | 1/1 | Complete | 2026-03-02 |
+| 6. Execution Skills & Pipeline | 1/1 | Complete | 2026-03-02 |
+| 7. Deep Discussion System | 0/? | Not started | - |
+| 8. Planning Skills | 0/? | Not started | - |
+| 9. Dashboard Overhaul | 0/? | Not started | - |
+| 10. Performance | 0/? | Not started | - |

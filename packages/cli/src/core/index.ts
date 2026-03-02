@@ -223,6 +223,29 @@ export {
   cmdTemplateFill,
 } from './template.js';
 
+// Artefakte exports
+export {
+  cmdArtefakteRead,
+  cmdArtefakteWrite,
+  cmdArtefakteAppend,
+  cmdArtefakteList,
+} from './artefakte.js';
+
+// Context loader exports
+export type {
+  ContextFile,
+  ContextLoadResult,
+} from './context-loader.js';
+
+export {
+  cmdContextLoad,
+} from './context-loader.js';
+
+// Start command exports
+export {
+  cmdStart,
+} from './start.js';
+
 // Dashboard launcher exports
 export {
   checkHealth,
