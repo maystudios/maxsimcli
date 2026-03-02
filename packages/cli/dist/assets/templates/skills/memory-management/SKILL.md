@@ -1,28 +1,19 @@
 ---
 name: memory-management
-description: Use when encountering recurring patterns, errors, or decisions that should persist across sessions — defines when and how to save to project memory
+description: "Persists recurring patterns, error solutions, and architectural decisions to project memory files for cross-session continuity. Use when encountering the same error twice, making significant decisions, or discovering non-obvious conventions."
 ---
 
 # Memory Management
 
 Context dies with each session. Patterns discovered but not saved are patterns lost.
 
-**If you encountered it twice, save it. You will encounter it again.**
+**HARD GATE** -- If you encountered it twice, save it. You will encounter it again. "I'll remember" is a lie -- your context resets. Write it down. Violating this rule guarantees repeated mistakes across sessions.
 
-## The Iron Law
+## Process
 
-<HARD-GATE>
-RECURRING PATTERNS MUST BE PERSISTED.
-If you have seen the same error, pattern, or decision twice in this session or across sessions, you MUST save it.
-"I'll remember" is a lie — your context resets. Write it down.
-Violating this rule guarantees repeated mistakes across sessions.
-</HARD-GATE>
+### 1. Detect -- Recognize Save Triggers
 
-## When to Save
-
-### Auto-Save Triggers (MUST save)
-
-These situations require immediate memory persistence:
+Save immediately when any of these occur:
 
 | Trigger | Threshold | What to Save |
 |---------|-----------|-------------|
@@ -33,36 +24,17 @@ These situations require immediate memory persistence:
 | Workaround for tooling/framework quirk | Once | The quirk and the workaround |
 | Project-specific pattern confirmed | 2+ uses | The pattern and when to apply it |
 
-### Do NOT Save
+Do NOT save: session-specific context, information already in CLAUDE.md, speculative conclusions, temporary workarounds, or obvious patterns.
 
-- Session-specific context (current task details, in-progress work)
-- Information already in CLAUDE.md or project documentation
-- Speculative conclusions from reading a single file
-- Temporary workarounds that will be removed
-- Obvious patterns that any developer would know
+### 2. Check -- Avoid Duplicates
 
-## Where to Save
+- Read existing memory files before writing
+- If the pattern is already documented, update it (do not duplicate)
+- If it contradicts existing memory, investigate which is correct
 
-Memory files live in `.claude/memory/` (for Claude Code) or the equivalent runtime memory directory.
+### 3. Write -- Persist the Memory
 
-### File Organization
-
-```
-.claude/memory/
-  MEMORY.md          # Index file — always loaded into context
-  patterns.md        # Code patterns and conventions
-  errors.md          # Error patterns and solutions
-  architecture.md    # Architectural decisions and rationale
-  tooling.md         # Tool quirks and workarounds
-```
-
-- **MEMORY.md** is the index: keep it under 200 lines, link to topic files for details
-- Topic files hold detailed notes organized by subject
-- Use headers and bullet points for scannability
-
-### Memory Entry Format
-
-Each entry should follow this structure:
+Add to the appropriate topic file using this entry format:
 
 ```markdown
 ## [Short descriptive title]
@@ -73,83 +45,47 @@ Each entry should follow this structure:
 **Evidence:** How this was confirmed (dates, occurrences, test results)
 ```
 
-## The Gate Function
-
-When you encounter something worth remembering:
-
-### 1. DETECT — Recognize the Pattern
-
-- Is this the same error/pattern you saw before?
-- Is this a decision that will affect future work?
-- Is this a non-obvious convention or quirk?
-
-### 2. CHECK — Avoid Duplicates
-
-- Read the existing memory files first
-- If the pattern is already documented, update it (don't duplicate)
-- If it contradicts existing memory, investigate which is correct
-
-### 3. WRITE — Persist the Memory
-
-- Add to the appropriate topic file
-- Update MEMORY.md index if adding a new topic
-- Keep entries concise — future you needs the answer, not the journey
-
-### 4. VERIFY — Confirm the Save
+### 4. Verify -- Confirm the Save
 
 - Re-read the file to confirm the entry was written correctly
-- Ensure the entry is actionable (someone reading it can act on it)
+- Ensure the entry is actionable (someone reading it can act on it immediately)
 
-## Error Pattern Detection
+## File Organization
 
-When debugging, track errors in a mental tally:
+Memory files live in `.claude/memory/` (or the equivalent runtime memory directory).
 
 ```
-Error seen once → Note it, move on
-Error seen twice → Save to errors.md with pattern and fix
-Error seen 3+ times → Save AND add to MEMORY.md index for immediate visibility
+.claude/memory/
+  MEMORY.md          # Index file -- always loaded into context
+  patterns.md        # Code patterns and conventions
+  errors.md          # Error patterns and solutions
+  architecture.md    # Architectural decisions and rationale
+  tooling.md         # Tool quirks and workarounds
 ```
 
-### What Makes a Good Error Memory
+- **MEMORY.md** is the index: keep it under 200 lines, link to topic files for details
+- Topic files hold detailed notes organized by subject
+- Use headers and bullet points for scannability
 
-Good:
-```markdown
-## Vitest "cannot find module" for path aliases
+## Error Escalation
 
-**Context:** When running tests that import from `@maxsim/core`
-**Error:** `Cannot find module '@maxsim/core/types'`
-**Fix:** Add `resolve.alias` to `vitest.config.ts` matching tsconfig paths
-**Evidence:** Hit 3 times across phases 01-03 (Feb 2026)
+```
+Error seen once     -- Note it, move on
+Error seen twice    -- Save to errors.md with pattern and fix
+Error seen 3+ times -- Save AND add to MEMORY.md index for immediate visibility
 ```
 
-Bad:
-```markdown
-## Test error
-There was an error with tests. Fixed it by changing config.
-```
+## Common Pitfalls
 
-## Common Rationalizations — REJECT THESE
-
-| Excuse | Why It Violates the Rule |
-|--------|--------------------------|
-| "I'll remember this" | No you won't. Context resets. Write it down. |
-| "It's too specific to save" | Specific is good. Generic memories are useless. |
-| "Memory files are messy" | Organize them. Messy files > lost knowledge. |
-| "This only applies to this project" | Project memory IS project-scoped. Save it. |
-| "Someone else documented this" | If it's not in your memory files, you won't find it next session. |
-| "I'll save it later" | You'll forget to. Save it now. |
-
-## Red Flags — STOP If You Catch Yourself:
-
-- Encountering the same error for the second time without saving it
+- Encountering the same error a second time without saving it
 - Making the same architectural decision you made in a previous session
 - Debugging a problem you already solved before
 - Saying "I think we fixed this before" without finding the memory entry
 - Leaving a session without updating memory for patterns discovered
 
-**If any red flag triggers: STOP. Write the memory entry NOW, before continuing.**
+If any of these occur: stop, write the memory entry now, then continue.
 
-## Verification Checklist
+## Verification
 
 Before ending a work session:
 
@@ -160,12 +96,12 @@ Before ending a work session:
 - [ ] No duplicate entries were created
 - [ ] All entries follow the format (Context, Pattern, Solution, Evidence)
 
-## Integration with MAXSIM
+## MAXSIM Integration
 
-During plan execution, the executor and researcher agents load memory files at startup:
+During plan execution, agents load memory files at startup:
 - **Executor:** Reads MEMORY.md to avoid known pitfalls before implementing
 - **Researcher:** Saves findings to memory for future phases
-- **Debugger:** Checks error memories before starting investigation — the fix may already be known
+- **Debugger:** Checks error memories before starting investigation -- the fix may already be known
 
 Memory persistence happens at natural breakpoints:
 - After resolving a bug (save to errors.md)

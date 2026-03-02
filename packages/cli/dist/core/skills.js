@@ -16,6 +16,7 @@ const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
 const core_js_1 = require("./core.js");
 const frontmatter_js_1 = require("./frontmatter.js");
+const types_js_1 = require("./types.js");
 // ─── Internal helpers ────────────────────────────────────────────────────────
 /**
  * Resolve the installed skills directory for the current project.
@@ -50,10 +51,10 @@ function readSkillInfo(skillDir, dirName) {
 /**
  * List all installed skills from `.claude/skills/`.
  */
-function cmdSkillList(cwd, raw) {
+function cmdSkillList(cwd) {
     const dir = skillsDir(cwd);
     if (!node_fs_1.default.existsSync(dir)) {
-        (0, core_js_1.output)({ skills: [], count: 0 }, raw, 'No skills installed.');
+        return (0, types_js_1.cmdOk)({ skills: [], count: 0 }, 'No skills installed.');
     }
     const entries = node_fs_1.default.readdirSync(dir, { withFileTypes: true });
     const skills = [];
@@ -64,52 +65,50 @@ function cmdSkillList(cwd, raw) {
         if (info)
             skills.push(info);
     }
-    (0, core_js_1.output)({ skills, count: skills.length }, raw, skills.map(s => `${s.name}: ${s.description}`).join('\n'));
+    return (0, types_js_1.cmdOk)({ skills, count: skills.length }, skills.map(s => `${s.name}: ${s.description}`).join('\n'));
 }
 /**
  * Install a specific skill from the templates directory.
  */
-function cmdSkillInstall(cwd, skillName, raw) {
+function cmdSkillInstall(cwd, skillName) {
     if (!skillName) {
-        (0, core_js_1.error)('skill name required. Usage: skill-install <name>');
+        return (0, types_js_1.cmdErr)('skill name required. Usage: skill-install <name>');
     }
     const srcFile = node_path_1.default.join(skillsTemplateDir(), skillName, 'SKILL.md');
     if (!node_fs_1.default.existsSync(srcFile)) {
         // List available skills for a helpful error
         const available = listAvailableTemplates();
-        (0, core_js_1.error)(`Skill "${skillName}" not found in templates. Available: ${available.join(', ')}`);
+        return (0, types_js_1.cmdErr)(`Skill "${skillName}" not found in templates. Available: ${available.join(', ')}`);
     }
     const destDir = node_path_1.default.join(skillsDir(cwd), skillName);
     const destFile = node_path_1.default.join(destDir, 'SKILL.md');
     node_fs_1.default.mkdirSync(destDir, { recursive: true });
     node_fs_1.default.copyFileSync(srcFile, destFile);
-    (0, core_js_1.output)({ installed: true, skill: skillName, path: node_path_1.default.relative(cwd, destFile) }, raw, `Installed skill: ${skillName}`);
+    return (0, types_js_1.cmdOk)({ installed: true, skill: skillName, path: node_path_1.default.relative(cwd, destFile) }, `Installed skill: ${skillName}`);
 }
 /**
  * Update one or all installed skills from the templates source.
  */
-function cmdSkillUpdate(cwd, skillName, raw) {
+function cmdSkillUpdate(cwd, skillName) {
     const dir = skillsDir(cwd);
     const templateDir = skillsTemplateDir();
     if (skillName) {
         // Update a single skill
         const srcFile = node_path_1.default.join(templateDir, skillName, 'SKILL.md');
         if (!node_fs_1.default.existsSync(srcFile)) {
-            (0, core_js_1.error)(`Skill template "${skillName}" not found.`);
+            return (0, types_js_1.cmdErr)(`Skill template "${skillName}" not found.`);
         }
         const destDir = node_path_1.default.join(dir, skillName);
         if (!node_fs_1.default.existsSync(destDir)) {
-            (0, core_js_1.error)(`Skill "${skillName}" is not installed. Use skill-install first.`);
+            return (0, types_js_1.cmdErr)(`Skill "${skillName}" is not installed. Use skill-install first.`);
         }
         const destFile = node_path_1.default.join(destDir, 'SKILL.md');
         node_fs_1.default.copyFileSync(srcFile, destFile);
-        (0, core_js_1.output)({ updated: [skillName], skipped: [], not_found: [] }, raw, `Updated skill: ${skillName}`);
-        return;
+        return (0, types_js_1.cmdOk)({ updated: [skillName], skipped: [], not_found: [] }, `Updated skill: ${skillName}`);
     }
     // Update all installed skills
     if (!node_fs_1.default.existsSync(dir)) {
-        (0, core_js_1.output)({ updated: [], skipped: [], not_found: [] }, raw, 'No skills installed.');
-        return;
+        return (0, types_js_1.cmdOk)({ updated: [], skipped: [], not_found: [] }, 'No skills installed.');
     }
     const entries = node_fs_1.default.readdirSync(dir, { withFileTypes: true });
     const updated = [];
@@ -131,7 +130,7 @@ function cmdSkillUpdate(cwd, skillName, raw) {
     const summary = updated.length > 0
         ? `Updated ${updated.length} skill(s): ${updated.join(', ')}`
         : 'No skills updated.';
-    (0, core_js_1.output)({ updated, skipped }, raw, summary);
+    return (0, types_js_1.cmdOk)({ updated, skipped }, summary);
 }
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function listAvailableTemplates() {

@@ -8705,8 +8705,8 @@ const subcommand = argv._[0];
 		return;
 	}
 	if (subcommand === "skill-list" || subcommand === "skill-install" || subcommand === "skill-update") {
-		const { cmdSkillList, cmdSkillInstall, cmdSkillUpdate } = await Promise.resolve().then(() => require("./skills-BOSxYUzf.cjs"));
-		const { CliOutput, writeOutput, CliError } = await Promise.resolve().then(() => require("./core-TFSlUjV1.cjs"));
+		const { cmdSkillList, cmdSkillInstall, cmdSkillUpdate } = await Promise.resolve().then(() => require("./skills-DYictYGI.cjs"));
+		const { CliOutput, writeOutput, CliError } = await Promise.resolve().then(() => require("./core-Cqn3M3eD.cjs"));
 		const cwd = process.cwd();
 		try {
 			if (subcommand === "skill-list") cmdSkillList(cwd, false);

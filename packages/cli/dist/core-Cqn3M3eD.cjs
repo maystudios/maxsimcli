@@ -529,7 +529,7 @@ var require_browser = /* @__PURE__ */ require_install.__commonJSMin(((exports, m
 }));
 
 //#endregion
-//#region ../../node_modules/has-flag/index.js
+//#region ../../../../../node_modules/has-flag/index.js
 var require_has_flag = /* @__PURE__ */ require_install.__commonJSMin(((exports, module) => {
 	module.exports = (flag, argv = process.argv) => {
 		const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
@@ -540,7 +540,7 @@ var require_has_flag = /* @__PURE__ */ require_install.__commonJSMin(((exports, 
 }));
 
 //#endregion
-//#region ../../node_modules/supports-color/index.js
+//#region ../../../../../node_modules/supports-color/index.js
 var require_supports_color = /* @__PURE__ */ require_install.__commonJSMin(((exports, module) => {
 	const os$1 = require("os");
 	const tty$1 = require("tty");
@@ -4274,12 +4274,6 @@ var CliError = class {
 		this.message = message;
 	}
 };
-function output(result, raw, rawValue) {
-	throw new CliOutput(result, raw, rawValue);
-}
-function error(message) {
-	throw new CliError(message);
-}
 /**
 * Handle a CliOutput by writing to stdout. Extracted so cli.ts can use it.
 */
@@ -4305,8 +4299,6 @@ function safeReadFile(filePath) {
 //#endregion
 exports.CliError = CliError;
 exports.CliOutput = CliOutput;
-exports.error = error;
-exports.output = output;
 exports.safeReadFile = safeReadFile;
 exports.writeOutput = writeOutput;
-//# sourceMappingURL=core-TFSlUjV1.cjs.map
+//# sourceMappingURL=core-Cqn3M3eD.cjs.map

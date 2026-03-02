@@ -333,15 +333,35 @@ const COMMANDS = {
     'artefakte-append': (args, cwd, raw) => handleResult((0, index_js_1.cmdArtefakteAppend)(cwd, args[1], getFlag(args, '--entry') ?? undefined, getFlag(args, '--phase') ?? undefined, raw), raw),
     'artefakte-list': (args, cwd, raw) => handleResult((0, index_js_1.cmdArtefakteList)(cwd, getFlag(args, '--phase') ?? undefined, raw), raw),
     'context-load': (args, cwd, raw) => handleResult((0, index_js_1.cmdContextLoad)(cwd, getFlag(args, '--phase') ?? undefined, getFlag(args, '--topic') ?? undefined, hasFlag(args, 'include-history')), raw),
-    'skill-list': (_args, cwd, raw) => (0, index_js_1.cmdSkillList)(cwd, raw),
-    'skill-install': (args, cwd, raw) => (0, index_js_1.cmdSkillInstall)(cwd, args[1], raw),
-    'skill-update': (args, cwd, raw) => (0, index_js_1.cmdSkillUpdate)(cwd, args[1], raw),
+    'skill-list': (_args, cwd, raw) => handleResult((0, index_js_1.cmdSkillList)(cwd), raw),
+    'skill-install': (args, cwd, raw) => handleResult((0, index_js_1.cmdSkillInstall)(cwd, args[1]), raw),
+    'skill-update': (args, cwd, raw) => handleResult((0, index_js_1.cmdSkillUpdate)(cwd, args[1]), raw),
     'start': async (args, cwd, raw) => handleResult(await (0, index_js_1.cmdStart)(cwd, { noBrowser: hasFlag(args, 'no-browser'), networkMode: hasFlag(args, 'network') }), raw),
     'dashboard': (args) => handleDashboard(args.slice(1)),
     'start-server': async () => {
         const serverPath = path.join(__dirname, 'mcp-server.cjs');
         const child = (0, node_child_process_1.spawn)(process.execPath, [serverPath], { stdio: 'inherit' });
         child.on('exit', (code) => process.exit(code ?? 0));
+    },
+    'backend-start': async (args, cwd, raw) => {
+        const { startBackend } = await import('./backend/lifecycle.js');
+        const portFlag = args.find(a => a.startsWith('--port='))?.split('=')[1];
+        const background = !args.includes('--foreground');
+        const result = await startBackend(cwd, {
+            port: portFlag ? parseInt(portFlag, 10) : undefined,
+            background,
+        });
+        (0, index_js_1.output)(result, raw);
+    },
+    'backend-stop': async (_args, cwd, raw) => {
+        const { stopBackend } = await import('./backend/lifecycle.js');
+        const stopped = await stopBackend(cwd);
+        (0, index_js_1.output)({ stopped }, raw);
+    },
+    'backend-status': async (_args, cwd, raw) => {
+        const { getBackendStatus } = await import('./backend/lifecycle.js');
+        const status = await getBackendStatus(cwd);
+        (0, index_js_1.output)(status || { running: false }, raw);
     },
 };
 // ─── Main ────────────────────────────────────────────────────────────────────
