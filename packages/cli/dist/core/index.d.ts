@@ -17,6 +17,8 @@ export type { TemplateSelectResult, TemplateFillOptions, TemplateFillResult, } f
 export { cmdTemplateSelect, cmdTemplateFill, } from './template.js';
 export { checkHealth, findRunningDashboard, killProcessOnPort, resolveDashboardServer, readDashboardConfig, ensureNodePty, spawnDashboard, waitForDashboard, DEFAULT_PORT, PORT_RANGE_END, HEALTH_TIMEOUT_MS, } from './dashboard-launcher.js';
 export type { DashboardConfig, SpawnDashboardOptions, } from './dashboard-launcher.js';
+export type { SkillContextResult } from './skill-context.js';
+export { cmdSkillContext } from './skill-context.js';
 export type { WorkflowType, InitContext, ExecutePhaseContext, PlanPhaseContext, NewProjectContext, NewMilestoneContext, QuickContext, ResumeContext, VerifyWorkContext, PhaseOpContext, TodosContext, MilestoneOpContext, MapCodebaseContext, InitExistingContext, ProgressContext, } from './init.js';
 export { cmdInitExecutePhase, cmdInitPlanPhase, cmdInitNewProject, cmdInitNewMilestone, cmdInitQuick, cmdInitResume, cmdInitVerifyWork, cmdInitPhaseOp, cmdInitTodos, cmdInitMilestoneOp, cmdInitMapCodebase, cmdInitExisting, cmdInitProgress, } from './init.js';
 //# sourceMappingURL=index.d.ts.map

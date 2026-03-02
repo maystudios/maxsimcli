@@ -1,3 +1,20 @@
+# [3.12.0](https://github.com/maystudios/maxsimcli/compare/v3.11.0...v3.12.0) (2026-03-01)
+
+
+### Bug Fixes
+
+* **core:** add rethrowCliSignals guard to catch blocks intercepting CliOutput ([1480a1d](https://github.com/maystudios/maxsimcli/commit/1480a1da0d0d38da9db729f0fa67566ff84a62de))
+* **install:** add new skills to builtInSkills cleanup list ([f51c1b4](https://github.com/maystudios/maxsimcli/commit/f51c1b44c7e77f414238974c04cc86b8fe5391b3))
+* **workflows:** replace Unix find with cross-platform alternatives and remove dashboard auto-launch ([ea8ca60](https://github.com/maystudios/maxsimcli/commit/ea8ca60ff1883a2c835d44d39844317f632d7466))
+
+
+### Features
+
+* **dashboard:** add Simple Mode panels and connection status banner ([80a6de2](https://github.com/maystudios/maxsimcli/commit/80a6de2aaff4adfa32f99237095c4501696b80a9))
+* **skills:** add code-review and simplify skills ([9d54e3a](https://github.com/maystudios/maxsimcli/commit/9d54e3aa5140a6d9b0d647eae488b7e37a919398))
+* **skills:** add using-maxsim, memory-management skills and AGENTS.md registry ([60375c9](https://github.com/maystudios/maxsimcli/commit/60375c945eeb3a4e9f05afd5a7a7623409dc313e))
+* **workflows:** add explicit Q&A routing bridge directives to high-interaction workflows ([d82e932](https://github.com/maystudios/maxsimcli/commit/d82e93289628f35250a1b00ac202b064071422f2)), closes [hi#interaction](https://github.com/hi/issues/interaction)
+
 # [3.11.0](https://github.com/maystudios/maxsimcli/compare/v3.10.3...v3.11.0) (2026-03-01)
 
 
