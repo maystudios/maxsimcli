@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { normalizePhaseName, getPhasePattern, output, error, rethrowCliSignals, findPhaseInternal, roadmapPath, phasesPath, listSubDirs, isPlanFile, isSummaryFile, debugLog, todayISO } from './core.js';
+import { normalizePhaseName, getPhasePattern, output, error, rethrowCliSignals, findPhaseInternal, roadmapPath, phasesPath, listSubDirs, listSubDirsAsync, isPlanFile, isSummaryFile, debugLog, todayISO, safeReadFileAsync } from './core.js';
 import type {
   PhaseStatus,
   RoadmapPhase,
@@ -93,19 +93,28 @@ export function cmdRoadmapGetPhase(cwd: string, phaseNum: string, raw: boolean):
   }
 }
 
-export function cmdRoadmapAnalyze(cwd: string, raw: boolean): void {
+export async function cmdRoadmapAnalyze(cwd: string, raw: boolean): Promise<void> {
   const rmPath = roadmapPath(cwd);
 
-  if (!fs.existsSync(rmPath)) {
+  const content = await safeReadFileAsync(rmPath);
+  if (!content) {
     output({ error: 'ROADMAP.md not found', milestones: [], phases: [], current_phase: null }, raw);
     return;
   }
 
-  const content = fs.readFileSync(rmPath, 'utf-8');
   const phasesDir = phasesPath(cwd);
 
+  // Parse all phase headers from roadmap
   const phasePattern = getPhasePattern();
-  const phases: RoadmapPhase[] = [];
+  interface ParsedPhase {
+    phaseNum: string;
+    phaseName: string;
+    goal: string | null;
+    depends_on: string | null;
+    normalized: string;
+    checkboxPattern: RegExp;
+  }
+  const parsedPhases: ParsedPhase[] = [];
   let match: RegExpExecArray | null;
 
   while ((match = phasePattern.exec(content)) !== null) {
@@ -124,53 +133,71 @@ export function cmdRoadmapAnalyze(cwd: string, raw: boolean): void {
     const dependsMatch = section.match(/\*\*Depends on:\*\*\s*([^\n]+)/i);
     const depends_on = dependsMatch ? dependsMatch[1].trim() : null;
 
-    const normalized = normalizePhaseName(phaseNum);
-    let diskStatus: PhaseStatus = 'no_directory';
-    let planCount = 0;
-    let summaryCount = 0;
-    let hasContext = false;
-    let hasResearch = false;
-
-    try {
-      const dirs = listSubDirs(phasesDir);
-      const dirMatch = dirs.find(d => d.startsWith(normalized + '-') || d === normalized);
-
-      if (dirMatch) {
-        const phaseFiles = fs.readdirSync(path.join(phasesDir, dirMatch));
-        planCount = phaseFiles.filter(f => isPlanFile(f)).length;
-        summaryCount = phaseFiles.filter(f => isSummaryFile(f)).length;
-        hasContext = phaseFiles.some(f => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
-        hasResearch = phaseFiles.some(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
-
-        if (summaryCount >= planCount && planCount > 0) diskStatus = 'complete';
-        else if (summaryCount > 0) diskStatus = 'partial';
-        else if (planCount > 0) diskStatus = 'planned';
-        else if (hasResearch) diskStatus = 'researched';
-        else if (hasContext) diskStatus = 'discussed';
-        else diskStatus = 'empty';
-      }
-    } catch (e) {
-      /* optional op, ignore */
-      debugLog(e);
-    }
-
-    const checkboxPattern = new RegExp(`-\\s*\\[(x| )\\]\\s*.*Phase\\s+${phaseNum.replace('.', '\\.')}`, 'i');
-    const checkboxMatch = content.match(checkboxPattern);
-    const roadmapComplete = checkboxMatch ? checkboxMatch[1] === 'x' : false;
-
-    phases.push({
-      number: phaseNum,
-      name: phaseName,
+    parsedPhases.push({
+      phaseNum,
+      phaseName,
       goal,
       depends_on,
-      plan_count: planCount,
-      summary_count: summaryCount,
-      has_context: hasContext,
-      has_research: hasResearch,
-      disk_status: diskStatus,
-      roadmap_complete: roadmapComplete,
+      normalized: normalizePhaseName(phaseNum),
+      checkboxPattern: new RegExp(`-\\s*\\[(x| )\\]\\s*.*Phase\\s+${phaseNum.replace('.', '\\.')}`, 'i'),
     });
   }
+
+  // Read all phase directories in parallel
+  let allDirs: string[] = [];
+  try {
+    allDirs = await listSubDirsAsync(phasesDir);
+  } catch {
+    // phases dir may not exist
+  }
+
+  // Scan each phase's disk status in parallel
+  const phases: RoadmapPhase[] = await Promise.all(
+    parsedPhases.map(async (p) => {
+      let diskStatus: PhaseStatus = 'no_directory';
+      let planCount = 0;
+      let summaryCount = 0;
+      let hasContext = false;
+      let hasResearch = false;
+
+      try {
+        const dirMatch = allDirs.find(d => d.startsWith(p.normalized + '-') || d === p.normalized);
+
+        if (dirMatch) {
+          const phaseFiles = await fs.promises.readdir(path.join(phasesDir, dirMatch));
+          planCount = phaseFiles.filter(f => isPlanFile(f)).length;
+          summaryCount = phaseFiles.filter(f => isSummaryFile(f)).length;
+          hasContext = phaseFiles.some(f => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
+          hasResearch = phaseFiles.some(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
+
+          if (summaryCount >= planCount && planCount > 0) diskStatus = 'complete';
+          else if (summaryCount > 0) diskStatus = 'partial';
+          else if (planCount > 0) diskStatus = 'planned';
+          else if (hasResearch) diskStatus = 'researched';
+          else if (hasContext) diskStatus = 'discussed';
+          else diskStatus = 'empty';
+        }
+      } catch (e) {
+        debugLog(e);
+      }
+
+      const checkboxMatch = content.match(p.checkboxPattern);
+      const roadmapComplete = checkboxMatch ? checkboxMatch[1] === 'x' : false;
+
+      return {
+        number: p.phaseNum,
+        name: p.phaseName,
+        goal: p.goal,
+        depends_on: p.depends_on,
+        plan_count: planCount,
+        summary_count: summaryCount,
+        has_context: hasContext,
+        has_research: hasResearch,
+        disk_status: diskStatus,
+        roadmap_complete: roadmapComplete,
+      };
+    }),
+  );
 
   const milestones: RoadmapMilestone[] = [];
   const milestonePattern = /##\s*(.*v(\d+\.\d+)[^(\n]*)/gi;

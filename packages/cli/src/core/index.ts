@@ -100,6 +100,8 @@ export {
   pathExistsInternal,
   generateSlugInternal,
   getMilestoneInfo,
+  listSubDirsAsync,
+  safeReadFileAsync,
 } from './core.js';
 
 // Frontmatter exports

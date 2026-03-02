@@ -46,6 +46,20 @@ describe('TOOL-01: phase commands', () => {
     const result = runTool('phase complete 01', mock.dir);
     expect(result.exitCode).toBe(0);
   });
+
+  it('phases list with --offset and --limit returns paginated subset', () => {
+    // Mock project has 4 phase dirs
+    const full = runTool('phases list', mock.dir);
+    const fullData = JSON.parse(full.stdout);
+    expect(fullData.total).toBeGreaterThanOrEqual(4);
+
+    const paginated = runTool('phases list --offset 1 --limit 2', mock.dir);
+    expect(paginated.exitCode).toBe(0);
+    const data = JSON.parse(paginated.stdout);
+    expect(data.count).toBe(2);
+    expect(data.total).toBe(fullData.total);
+    expect(data.directories).toEqual(fullData.directories.slice(1, 3));
+  });
 });
 
 describe('TOOL-02: state commands', () => {

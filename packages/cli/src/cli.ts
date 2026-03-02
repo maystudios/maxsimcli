@@ -120,7 +120,7 @@ type Handler = (args: string[], cwd: string, raw: boolean) => void | Promise<voi
 
 // ─── Subcommand handlers ─────────────────────────────────────────────────────
 
-const handleState: Handler = (args, cwd, raw) => {
+const handleState: Handler = async (args, cwd, raw) => {
   const sub = args[1];
   const handlers: Record<string, () => void | Promise<void>> = {
     'update': () => cmdStateUpdate(cwd, args[2], args[3]),
@@ -167,7 +167,7 @@ const handleState: Handler = (args, cwd, raw) => {
 
   const handler = sub ? handlers[sub] : undefined;
   if (handler) return handler();
-  cmdStateLoad(cwd, raw);
+  return cmdStateLoad(cwd, raw);
 };
 
 const handleTemplate: Handler = (args, cwd, raw) => {
@@ -215,19 +215,25 @@ const handleVerify: Handler = async (args, cwd, raw) => {
   error('Unknown verify subcommand. Available: plan-structure, phase-completeness, references, commits, artifacts, key-links');
 };
 
-const handlePhases: Handler = (args, cwd, raw) => {
+const handlePhases: Handler = async (args, cwd, raw) => {
   const sub = args[1];
   if (sub === 'list') {
-    const f = getFlags(args, 'type', 'phase');
-    cmdPhasesList(cwd, { type: f.type, phase: f.phase, includeArchived: hasFlag(args, 'include-archived') }, raw);
+    const f = getFlags(args, 'type', 'phase', 'offset', 'limit');
+    await cmdPhasesList(cwd, {
+      type: f.type,
+      phase: f.phase,
+      includeArchived: hasFlag(args, 'include-archived'),
+      offset: f.offset !== null ? parseInt(f.offset, 10) : undefined,
+      limit: f.limit !== null ? parseInt(f.limit, 10) : undefined,
+    }, raw);
   } else {
     error('Unknown phases subcommand. Available: list');
   }
 };
 
-const handleRoadmap: Handler = (args, cwd, raw) => {
+const handleRoadmap: Handler = async (args, cwd, raw) => {
   const sub = args[1];
-  const handlers: Record<string, () => void> = {
+  const handlers: Record<string, () => void | Promise<void>> = {
     'get-phase': () => cmdRoadmapGetPhase(cwd, args[2], raw),
     'analyze': () => cmdRoadmapAnalyze(cwd, raw),
     'update-plan-progress': () => cmdRoadmapUpdatePlanProgress(cwd, args[2], raw),

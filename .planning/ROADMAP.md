@@ -16,10 +16,10 @@ MAXSIM v2.0 is built on three pillars: deep collaborative planning, context engi
 - [x] **Phase 4: Skills Infrastructure** - Build native .claude/skills/ system with install pipeline
 - [x] **Phase 5: Core Skills** - TDD, Systematic Debugging, Verification-Before-Completion, Code Review (2-stage)
 - [x] **Phase 6: Execution Skills & Pipeline** - Simplify, Batch/Worktree, SDD, Writing Plans + Execute→Review→Simplify cycle
-- [ ] **Phase 7: Deep Discussion System** - 4 collaborative flows + expanded artefakte (DECISIONS.md, ACCEPTANCE-CRITERIA.md, NO-GOS.md)
-- [ ] **Phase 8: Planning Skills** - Brainstorming, Roadmap-Writing + task-based context loading
-- [ ] **Phase 9: Dashboard Overhaul** - Unified mode, MCP Q&A, maxsimcli start, multi-project
-- [ ] **Phase 10: Performance** - Async hot-path I/O, paginated phase listings
+- [x] **Phase 7: Deep Discussion System** - 4 collaborative flows + expanded artefakte (DECISIONS.md, ACCEPTANCE-CRITERIA.md, NO-GOS.md) (completed 2026-03-02)
+- [x] **Phase 8: Planning Skills** - Brainstorming, Roadmap-Writing + task-based context loading (completed 2026-03-02)
+- [x] **Phase 9: Dashboard Overhaul** - Unified mode, MCP Q&A, maxsimcli start, multi-project (completed 2026-03-02)
+- [x] **Phase 10: Performance** - Async hot-path I/O, paginated phase listings (completed 2026-03-02)
 
 ## Phase Details
 
@@ -152,7 +152,7 @@ Phase 1 → Phase 2 → Phase 3 ∥ Phase 4 → Phase 5 → Phase 6 → Phase 7 
 | 4. Skills Infrastructure | 1/1 | Complete | 2026-03-02 |
 | 5. Core Skills | 1/1 | Complete | 2026-03-02 |
 | 6. Execution Skills & Pipeline | 1/1 | Complete | 2026-03-02 |
-| 7. Deep Discussion System | 0/? | Not started | - |
-| 8. Planning Skills | 0/? | Not started | - |
-| 9. Dashboard Overhaul | 0/? | Not started | - |
-| 10. Performance | 0/? | Not started | - |
+| 7. Deep Discussion System | 1/1 | Complete | 2026-03-02 |
+| 8. Planning Skills | 1/1 | Complete | 2026-03-02 |
+| 9. Dashboard Overhaul | 1/1 | Complete | 2026-03-02 |
+| 10. Performance | 1/1 | Complete | 2026-03-02 |

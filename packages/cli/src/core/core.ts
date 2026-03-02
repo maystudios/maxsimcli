@@ -5,6 +5,7 @@
  */
 
 import fs from 'node:fs';
+import { promises as fsp } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { simpleGit } from 'simple-git';
@@ -125,6 +126,22 @@ export function listSubDirs(dir: string, sortByPhase = false): string[] {
     .filter(e => e.isDirectory())
     .map(e => e.name);
   return sortByPhase ? dirs.sort((a, b) => comparePhaseNum(a, b)) : dirs;
+}
+
+/** Async version of listSubDirs using fs.promises. */
+export async function listSubDirsAsync(dir: string, sortByPhase = false): Promise<string[]> {
+  const entries = await fsp.readdir(dir, { withFileTypes: true });
+  const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+  return sortByPhase ? dirs.sort((a, b) => comparePhaseNum(a, b)) : dirs;
+}
+
+/** Async version of safeReadFile using fs.promises. */
+export async function safeReadFileAsync(filePath: string): Promise<string | null> {
+  try {
+    return await fsp.readFile(filePath, 'utf-8');
+  } catch {
+    return null;
+  }
 }
 
 /** Extract a human-readable message from an unknown thrown value. */

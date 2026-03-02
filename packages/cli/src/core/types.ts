@@ -478,6 +478,8 @@ export interface PhasesListOptions {
   type: string | null;
   phase: string | null;
   includeArchived: boolean;
+  offset?: number;
+  limit?: number;
 }
 
 // ─── Adapter interfaces ─────────────────────────────────────────────────────

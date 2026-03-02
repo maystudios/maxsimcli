@@ -9,7 +9,7 @@ import path from 'node:path';
 
 import escapeStringRegexp from 'escape-string-regexp';
 
-import { loadConfig, output, error, rethrowCliSignals, safeReadFile, planningPath, statePath as statePathUtil, configPath, roadmapPath, phasesPath, debugLog, todayISO, isPlanFile, isSummaryFile } from './core.js';
+import { loadConfig, output, error, rethrowCliSignals, safeReadFile, safeReadFileAsync, planningPath, statePath as statePathUtil, configPath, roadmapPath, phasesPath, debugLog, todayISO, isPlanFile, isSummaryFile } from './core.js';
 import type {
   AppConfig,
   StatePatchResult,
@@ -93,17 +93,16 @@ export function appendToStateSection(
 
 // ─── State commands ──────────────────────────────────────────────────────────
 
-export function cmdStateLoad(cwd: string, raw: boolean): void {
+export async function cmdStateLoad(cwd: string, raw: boolean): Promise<void> {
   const config: AppConfig = loadConfig(cwd);
-  let stateRaw = '';
-  try {
-    stateRaw = fs.readFileSync(statePathUtil(cwd), 'utf-8');
-  } catch (e) {
-    debugLog('state-load-failed', e);
-  }
 
-  const configExists = fs.existsSync(configPath(cwd));
-  const roadmapExists = fs.existsSync(roadmapPath(cwd));
+  const [stateContent, configExists, roadmapExists] = await Promise.all([
+    safeReadFileAsync(statePathUtil(cwd)),
+    fs.promises.access(configPath(cwd)).then(() => true, () => false),
+    fs.promises.access(roadmapPath(cwd)).then(() => true, () => false),
+  ]);
+
+  const stateRaw = stateContent ?? '';
   const stateExists = stateRaw.length > 0;
 
   const result = {

@@ -26,6 +26,7 @@ import {
   planId,
   summaryId,
   listSubDirs,
+  listSubDirsAsync,
   debugLog,
   errorMsg,
   todayISO,
@@ -371,21 +372,21 @@ export function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteR
 
 // ─── Phase list ─────────────────────────────────────────────────────────────
 
-export function cmdPhasesList(cwd: string, options: PhasesListOptions, raw: boolean): void {
+export async function cmdPhasesList(cwd: string, options: PhasesListOptions, raw: boolean): Promise<void> {
   const phasesDirPath = phasesPath(cwd);
-  const { type, phase, includeArchived } = options;
+  const { type, phase, includeArchived, offset, limit } = options;
 
   if (!fs.existsSync(phasesDirPath)) {
     if (type) {
-      output({ files: [], count: 0 }, raw, '');
+      output({ files: [], count: 0, total: 0 }, raw, '');
     } else {
-      output({ directories: [], count: 0 }, raw, '');
+      output({ directories: [], count: 0, total: 0 }, raw, '');
     }
     return;
   }
 
   try {
-    let dirs = listSubDirs(phasesDirPath);
+    let dirs = await listSubDirsAsync(phasesDirPath);
 
     if (includeArchived) {
       const archived = getArchivedPhaseDirs(cwd);
@@ -400,40 +401,48 @@ export function cmdPhasesList(cwd: string, options: PhasesListOptions, raw: bool
       const normalized = normalizePhaseName(phase);
       const match = dirs.find(d => d.startsWith(normalized));
       if (!match) {
-        output({ files: [], count: 0, phase_dir: null, error: 'Phase not found' }, raw, '');
+        output({ files: [], count: 0, total: 0, phase_dir: null, error: 'Phase not found' }, raw, '');
         return;
       }
       dirs = [match];
     }
 
     if (type) {
-      const files: string[] = [];
-      for (const dir of dirs) {
-        const dirPath = path.join(phasesDirPath, dir);
-        const dirFiles = fs.readdirSync(dirPath);
+      const fileResults = await Promise.all(
+        dirs.map(async (dir) => {
+          const dirPath = path.join(phasesDirPath, dir);
+          const dirFiles = await fs.promises.readdir(dirPath);
 
-        let filtered: string[];
-        if (type === 'plans') {
-          filtered = dirFiles.filter(isPlanFile);
-        } else if (type === 'summaries') {
-          filtered = dirFiles.filter(isSummaryFile);
-        } else {
-          filtered = dirFiles;
-        }
+          let filtered: string[];
+          if (type === 'plans') {
+            filtered = dirFiles.filter(isPlanFile);
+          } else if (type === 'summaries') {
+            filtered = dirFiles.filter(isSummaryFile);
+          } else {
+            filtered = dirFiles;
+          }
 
-        files.push(...filtered.sort());
-      }
+          return filtered.sort();
+        }),
+      );
+      const files = fileResults.flat();
 
       const result = {
         files,
         count: files.length,
+        total: files.length,
         phase_dir: phase ? dirs[0].replace(/^\d+(?:\.\d+)?-?/, '') : null,
       };
       output(result, raw, files.join('\n'));
       return;
     }
 
-    output({ directories: dirs, count: dirs.length }, raw, dirs.join('\n'));
+    // Apply pagination
+    const total = dirs.length;
+    const start = offset ?? 0;
+    const paginated = limit !== undefined ? dirs.slice(start, start + limit) : dirs.slice(start);
+
+    output({ directories: paginated, count: paginated.length, total }, raw, paginated.join('\n'));
   } catch (e: unknown) {
     rethrowCliSignals(e);
     error('Failed to list phases: ' + (e as Error).message);
