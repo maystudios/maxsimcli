@@ -27,6 +27,7 @@ import {
   summaryId,
   listSubDirs,
   debugLog,
+  errorMsg,
   todayISO,
   escapePhaseNum,
 } from './core.js';
@@ -167,7 +168,7 @@ export function phaseInsertCore(cwd: string, afterPhase: string, description: st
       if (dm) existingDecimals.push(parseInt(dm[1], 10));
     }
   } catch (e) {
-    debugLog(e);
+    debugLog('phase-insert-decimal-scan-failed', e);
   }
 
   const nextDecimal = existingDecimals.length === 0 ? 1 : Math.max(...existingDecimals) + 1;
@@ -256,7 +257,9 @@ export function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteR
       `$1${summaryCount}/${planCount} plans complete`,
     );
 
+    debugLog('phase-complete-write', `writing ROADMAP.md for phase ${phaseNum}`);
     fs.writeFileSync(rmPath, roadmapContent, 'utf-8');
+    debugLog('phase-complete-write', `ROADMAP.md updated for phase ${phaseNum}`);
 
     // Update REQUIREMENTS.md
     const reqPath = planningPath(cwd, 'REQUIREMENTS.md');
@@ -280,7 +283,9 @@ export function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteR
           );
         }
 
+        debugLog('phase-complete-write', `writing REQUIREMENTS.md for phase ${phaseNum}`);
         fs.writeFileSync(reqPath, reqContent, 'utf-8');
+        debugLog('phase-complete-write', `REQUIREMENTS.md updated for phase ${phaseNum}`);
         requirementsUpdated = true;
       }
     }
@@ -306,7 +311,7 @@ export function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteR
       }
     }
   } catch (e) {
-    debugLog(e);
+    debugLog('phase-complete-next-phase-scan-failed', e);
   }
 
   // Update STATE.md
@@ -345,7 +350,9 @@ export function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteR
       `$1Phase ${phaseNum} complete${nextPhaseNum ? `, transitioned to Phase ${nextPhaseNum}` : ''}`,
     );
 
+    debugLog('phase-complete-write', `writing STATE.md for phase ${phaseNum}`);
     fs.writeFileSync(stPath, stateContent, 'utf-8');
+    debugLog('phase-complete-write', `STATE.md updated for phase ${phaseNum}`);
   }
 
   return {
@@ -555,8 +562,7 @@ export function cmdPhasePlanIndex(cwd: string, phase: string | undefined, raw: b
       phaseDirName = match;
     }
   } catch (e) {
-    /* optional op, ignore */
-    debugLog(e);
+    debugLog('phase-plan-index-failed', e);
   }
 
   if (!phaseDir) {
@@ -705,8 +711,7 @@ export function cmdPhaseRemove(
     const dirs = listSubDirs(phasesDirPath, true);
     targetDir = dirs.find(d => d.startsWith(normalized + '-') || d === normalized) || null;
   } catch (e) {
-    /* optional op, ignore */
-    debugLog(e);
+    debugLog('phase-remove-find-target-failed', e);
   }
 
   if (targetDir && !force) {
@@ -766,8 +771,7 @@ export function cmdPhaseRemove(
         }
       }
     } catch (e) {
-      /* optional op, ignore */
-      debugLog(e);
+      debugLog('phase-remove-decimal-rename-failed', { phase: targetPhase, error: errorMsg(e) });
     }
   } else {
     const removedInt = parseInt(normalized, 10);
@@ -822,8 +826,7 @@ export function cmdPhaseRemove(
         }
       }
     } catch (e) {
-      /* optional op, ignore */
-      debugLog(e);
+      debugLog('phase-remove-int-rename-failed', { phase: targetPhase, error: errorMsg(e) });
     }
   }
 
