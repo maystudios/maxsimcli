@@ -22,6 +22,7 @@ const node_path_1 = __importDefault(require("node:path"));
 const node_os_1 = __importDefault(require("node:os"));
 const node_child_process_1 = require("node:child_process");
 const node_module_1 = require("node:module");
+const core_js_1 = require("./core.js");
 // ─── Constants ──────────────────────────────────────────────────────────────
 exports.DEFAULT_PORT = 3333;
 exports.PORT_RANGE_END = 3343;
@@ -44,7 +45,8 @@ async function checkHealth(port, timeoutMs = exports.HEALTH_TIMEOUT_MS) {
         }
         return false;
     }
-    catch {
+    catch (e) {
+        (0, core_js_1.debugLog)('health-check-failed', { port, error: (0, core_js_1.errorMsg)(e) });
         return false;
     }
 }
@@ -82,21 +84,21 @@ function killProcessOnPort(port) {
                 try {
                     (0, node_child_process_1.execSync)(`taskkill /PID ${pid} /F`, { stdio: 'ignore' });
                 }
-                catch {
-                    // Process may have already exited
+                catch (e) {
+                    (0, core_js_1.debugLog)('kill-process-on-port-taskkill-failed', { port, pid, error: (0, core_js_1.errorMsg)(e) });
                 }
             }
         }
-        catch {
-            // No process found on port or command failed
+        catch (e) {
+            (0, core_js_1.debugLog)('kill-process-on-port-netstat-failed', { port, platform: 'win32', error: (0, core_js_1.errorMsg)(e) });
         }
     }
     else {
         try {
             (0, node_child_process_1.execSync)(`lsof -i :${port} -t | xargs kill -SIGTERM 2>/dev/null`, { stdio: 'ignore' });
         }
-        catch {
-            // No process found on port or command failed
+        catch (e) {
+            (0, core_js_1.debugLog)('kill-process-on-port-lsof-failed', { port, platform: process.platform, error: (0, core_js_1.errorMsg)(e) });
         }
     }
 }
@@ -125,8 +127,8 @@ function resolveDashboardServer() {
         if (node_fs_1.default.existsSync(serverTs))
             return serverTs;
     }
-    catch {
-        // @maxsim/dashboard not resolvable
+    catch (e) {
+        (0, core_js_1.debugLog)('resolve-dashboard-strategy1-failed', { strategy: '@maxsim/dashboard package', error: (0, core_js_1.errorMsg)(e) });
     }
     // Strategy 2: Walk up from this file to find the monorepo root
     try {
@@ -145,8 +147,8 @@ function resolveDashboardServer() {
             dir = node_path_1.default.dirname(dir);
         }
     }
-    catch {
-        // Fallback walk failed
+    catch (e) {
+        (0, core_js_1.debugLog)('resolve-dashboard-strategy2-failed', { strategy: 'monorepo walk', error: (0, core_js_1.errorMsg)(e) });
     }
     return null;
 }
@@ -172,7 +174,8 @@ function ensureNodePty(serverDir) {
         });
         return true;
     }
-    catch {
+    catch (e) {
+        (0, core_js_1.debugLog)('ensure-node-pty-install-failed', { serverDir, error: (0, core_js_1.errorMsg)(e) });
         return false;
     }
 }
@@ -191,8 +194,8 @@ function readDashboardConfig(serverPath) {
                 projectCwd = config.projectCwd;
             networkMode = config.networkMode ?? false;
         }
-        catch {
-            // Use defaults
+        catch (e) {
+            (0, core_js_1.debugLog)('read-dashboard-config-failed', { path: dashboardConfigPath, error: (0, core_js_1.errorMsg)(e) });
         }
     }
     return { projectCwd, networkMode };

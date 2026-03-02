@@ -15,13 +15,9 @@ export interface Manifest {
 /**
  * Write file manifest after installation for future modification detection
  */
-<<<<<<< HEAD
 export declare function writeManifest(configDir: string): Manifest;
-=======
-export declare function writeManifest(configDir: string, runtime?: RuntimeName): Manifest;
 /**
  * Read an existing manifest from the config directory, or return null if none exists / is invalid
  */
 export declare function readManifest(configDir: string): Manifest | null;
->>>>>>> origin/worktree-agent-a59d4079
 //# sourceMappingURL=manifest.d.ts.map

@@ -20,6 +20,7 @@ exports.roadmapPath = roadmapPath;
 exports.configPath = configPath;
 exports.phasesPath = phasesPath;
 exports.listSubDirs = listSubDirs;
+exports.errorMsg = errorMsg;
 exports.debugLog = debugLog;
 exports.escapePhaseNum = escapePhaseNum;
 exports.safeReadFile = safeReadFile;
@@ -138,10 +139,20 @@ function listSubDirs(dir, sortByPhase = false) {
         .map(e => e.name);
     return sortByPhase ? dirs.sort((a, b) => comparePhaseNum(a, b)) : dirs;
 }
-/** Log only when MAXSIM_DEBUG is set. */
-function debugLog(e) {
-    if (process.env.MAXSIM_DEBUG)
-        console.error(e);
+/** Extract a human-readable message from an unknown thrown value. */
+function errorMsg(e) {
+    return errorMsg(e);
+}
+/** Log only when MAXSIM_DEBUG is set. Accepts an optional context label. */
+function debugLog(contextOrError, error) {
+    if (!process.env.MAXSIM_DEBUG)
+        return;
+    if (error !== undefined) {
+        console.error(`[maxsim:${contextOrError}]`, error);
+    }
+    else {
+        console.error(contextOrError);
+    }
 }
 /** Escape a phase number for use in regex. */
 function escapePhaseNum(phase) {
@@ -214,7 +225,12 @@ function loadConfig(cwd) {
         _configCache = { cwd, config: result };
         return result;
     }
-    catch {
+    catch (e) {
+        // If the file exists but is unparseable, warn the user
+        if (node_fs_1.default.existsSync(cfgPath)) {
+            console.warn(`[maxsim] Warning: config.json exists but could not be parsed — using defaults.`);
+            debugLog('config-load-failed', e);
+        }
         _configCache = { cwd, config: defaults };
         return defaults;
     }
@@ -237,9 +253,9 @@ async function execGit(cwd, args) {
         return { exitCode: 0, stdout: (stdout ?? '').trim(), stderr: '' };
     }
     catch (thrown) {
-        const err = thrown;
         // simple-git throws on non-zero exit — extract what we can
-        const message = err.message ?? '';
+        const message = thrown instanceof Error ? thrown.message : String(thrown);
+        debugLog('exec-git-failed', { args, error: message });
         return {
             exitCode: 1,
             stdout: '',
@@ -332,7 +348,8 @@ function searchPhaseInDir(baseDir, relBase, normalized) {
             has_verification: hasVerification,
         };
     }
-    catch {
+    catch (e) {
+        debugLog('search-phase-in-dir-failed', { dir: baseDir, phase: normalized, error: errorMsg(e) });
         return null;
     }
 }
@@ -373,7 +390,7 @@ function findPhaseInternal(cwd, phase) {
         }
     }
     catch (e) {
-        debugLog(e);
+        debugLog('find-phase-milestone-search-failed', e);
     }
     return null;
 }
@@ -405,7 +422,7 @@ function getArchivedPhaseDirs(cwd) {
         }
     }
     catch (e) {
-        debugLog(e);
+        debugLog('get-archived-phase-dirs-failed', e);
     }
     return results;
 }
@@ -437,7 +454,8 @@ function getRoadmapPhaseInternal(cwd, phaseNum) {
             section,
         };
     }
-    catch {
+    catch (e) {
+        debugLog('get-roadmap-phase-failed', { phase: phaseNum, error: errorMsg(e) });
         return null;
     }
 }

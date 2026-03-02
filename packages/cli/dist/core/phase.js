@@ -100,7 +100,7 @@ function phaseInsertCore(cwd, afterPhase, description, options) {
         }
     }
     catch (e) {
-        (0, core_js_1.debugLog)(e);
+        (0, core_js_1.debugLog)('phase-insert-decimal-scan-failed', e);
     }
     const nextDecimal = existingDecimals.length === 0 ? 1 : Math.max(...existingDecimals) + 1;
     const decimalPhase = `${normalizedBase}.${nextDecimal}`;
@@ -158,7 +158,9 @@ function phaseCompleteCore(cwd, phaseNum) {
         roadmapContent = roadmapContent.replace(tablePattern, `$1 Complete    $2 ${today} $3`);
         const planCountPattern = new RegExp(`(#{2,4}\\s*Phase\\s+${phaseEscaped}[\\s\\S]*?\\*\\*Plans:\\*\\*\\s*)[^\\n]+`, 'i');
         roadmapContent = roadmapContent.replace(planCountPattern, `$1${summaryCount}/${planCount} plans complete`);
+        (0, core_js_1.debugLog)('phase-complete-write', `writing ROADMAP.md for phase ${phaseNum}`);
         node_fs_1.default.writeFileSync(rmPath, roadmapContent, 'utf-8');
+        (0, core_js_1.debugLog)('phase-complete-write', `ROADMAP.md updated for phase ${phaseNum}`);
         // Update REQUIREMENTS.md
         const reqPath = (0, core_js_1.planningPath)(cwd, 'REQUIREMENTS.md');
         if (node_fs_1.default.existsSync(reqPath)) {
@@ -170,7 +172,9 @@ function phaseCompleteCore(cwd, phaseNum) {
                     reqContent = reqContent.replace(new RegExp(`(-\\s*\\[)[ ](\\]\\s*\\*\\*${reqId}\\*\\*)`, 'gi'), '$1x$2');
                     reqContent = reqContent.replace(new RegExp(`(\\|\\s*${reqId}\\s*\\|[^|]+\\|)\\s*Pending\\s*(\\|)`, 'gi'), '$1 Complete $2');
                 }
+                (0, core_js_1.debugLog)('phase-complete-write', `writing REQUIREMENTS.md for phase ${phaseNum}`);
                 node_fs_1.default.writeFileSync(reqPath, reqContent, 'utf-8');
+                (0, core_js_1.debugLog)('phase-complete-write', `REQUIREMENTS.md updated for phase ${phaseNum}`);
                 requirementsUpdated = true;
             }
         }
@@ -194,7 +198,7 @@ function phaseCompleteCore(cwd, phaseNum) {
         }
     }
     catch (e) {
-        (0, core_js_1.debugLog)(e);
+        (0, core_js_1.debugLog)('phase-complete-next-phase-scan-failed', e);
     }
     // Update STATE.md
     if (node_fs_1.default.existsSync(stPath)) {
@@ -207,7 +211,9 @@ function phaseCompleteCore(cwd, phaseNum) {
         stateContent = stateContent.replace(/(\*\*Current Plan:\*\*\s*).*/, `$1Not started`);
         stateContent = stateContent.replace(/(\*\*Last Activity:\*\*\s*).*/, `$1${today}`);
         stateContent = stateContent.replace(/(\*\*Last Activity Description:\*\*\s*).*/, `$1Phase ${phaseNum} complete${nextPhaseNum ? `, transitioned to Phase ${nextPhaseNum}` : ''}`);
+        (0, core_js_1.debugLog)('phase-complete-write', `writing STATE.md for phase ${phaseNum}`);
         node_fs_1.default.writeFileSync(stPath, stateContent, 'utf-8');
+        (0, core_js_1.debugLog)('phase-complete-write', `STATE.md updated for phase ${phaseNum}`);
     }
     return {
         completed_phase: phaseNum,
@@ -380,8 +386,7 @@ function cmdPhasePlanIndex(cwd, phase, raw) {
         }
     }
     catch (e) {
-        /* optional op, ignore */
-        (0, core_js_1.debugLog)(e);
+        (0, core_js_1.debugLog)('phase-plan-index-failed', e);
     }
     if (!phaseDir) {
         (0, core_js_1.output)({ phase: normalized, error: 'Phase not found', plans: [], waves: {}, incomplete: [], has_checkpoints: false }, raw);
@@ -483,8 +488,7 @@ function cmdPhaseRemove(cwd, targetPhase, options, raw) {
         targetDir = dirs.find(d => d.startsWith(normalized + '-') || d === normalized) || null;
     }
     catch (e) {
-        /* optional op, ignore */
-        (0, core_js_1.debugLog)(e);
+        (0, core_js_1.debugLog)('phase-remove-find-target-failed', e);
     }
     if (targetDir && !force) {
         const targetPath = node_path_1.default.join(phasesDirPath, targetDir);
@@ -532,8 +536,7 @@ function cmdPhaseRemove(cwd, targetPhase, options, raw) {
             }
         }
         catch (e) {
-            /* optional op, ignore */
-            (0, core_js_1.debugLog)(e);
+            (0, core_js_1.debugLog)('phase-remove-decimal-rename-failed', { phase: targetPhase, error: (0, core_js_1.errorMsg)(e) });
         }
     }
     else {
@@ -583,8 +586,7 @@ function cmdPhaseRemove(cwd, targetPhase, options, raw) {
             }
         }
         catch (e) {
-            /* optional op, ignore */
-            (0, core_js_1.debugLog)(e);
+            (0, core_js_1.debugLog)('phase-remove-int-rename-failed', { phase: targetPhase, error: (0, core_js_1.errorMsg)(e) });
         }
     }
     // Update ROADMAP.md

@@ -47,11 +47,7 @@ let node_crypto = require("node:crypto");
 node_crypto = __toESM(node_crypto);
 let node_child_process = require("node:child_process");
 
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/universalify/index.js
-=======
-//#region ../../../../../node_modules/universalify/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/universalify/index.js
 var require_universalify = /* @__PURE__ */ __commonJSMin(((exports) => {
 	exports.fromCallback = function(fn) {
 		return Object.defineProperty(function(...args) {
@@ -75,11 +71,7 @@ var require_universalify = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/graceful-fs/polyfills.js
-=======
-//#region ../../../../../node_modules/graceful-fs/polyfills.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/graceful-fs/polyfills.js
 var require_polyfills = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var constants = require("constants");
 	var origCwd = process.cwd;
@@ -332,11 +324,7 @@ var require_polyfills = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/graceful-fs/legacy-streams.js
-=======
-//#region ../../../../../node_modules/graceful-fs/legacy-streams.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/graceful-fs/legacy-streams.js
 var require_legacy_streams = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var Stream$1 = require("stream").Stream;
 	module.exports = legacy;
@@ -426,11 +414,7 @@ var require_legacy_streams = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/graceful-fs/clone.js
-=======
-//#region ../../../../../node_modules/graceful-fs/clone.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/graceful-fs/clone.js
 var require_clone = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = clone;
 	var getPrototypeOf = Object.getPrototypeOf || function(obj) {
@@ -448,11 +432,7 @@ var require_clone = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/graceful-fs/graceful-fs.js
-=======
-//#region ../../../../../node_modules/graceful-fs/graceful-fs.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/graceful-fs/graceful-fs.js
 var require_graceful_fs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var fs = require("fs");
 	var polyfills = require_polyfills();
@@ -809,11 +789,7 @@ var require_graceful_fs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/fs/index.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/fs/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/fs/index.js
 var require_fs = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const u = require_universalify().fromCallback;
 	const fs = require_graceful_fs();
@@ -922,11 +898,7 @@ var require_fs = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/mkdirs/utils.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/mkdirs/utils.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/mkdirs/utils.js
 var require_utils$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const path$11 = require("path");
 	module.exports.checkPath = function checkPath(pth) {
@@ -941,11 +913,7 @@ var require_utils$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/mkdirs/make-dir.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/mkdirs/make-dir.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/mkdirs/make-dir.js
 var require_make_dir = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_fs();
 	const { checkPath } = require_utils$1();
@@ -974,11 +942,7 @@ var require_make_dir = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/mkdirs/index.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/mkdirs/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/mkdirs/index.js
 var require_mkdirs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const { makeDir: _makeDir, makeDirSync } = require_make_dir();
@@ -994,11 +958,7 @@ var require_mkdirs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/path-exists/index.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/path-exists/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/path-exists/index.js
 var require_path_exists = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const fs = require_fs();
@@ -1012,11 +972,7 @@ var require_path_exists = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/util/utimes.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/util/utimes.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/util/utimes.js
 var require_utimes = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_fs();
 	const u = require_universalify().fromPromise;
@@ -1046,11 +1002,7 @@ var require_utimes = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/util/stat.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/util/stat.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/util/stat.js
 var require_stat = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_fs();
 	const path$10 = require("path");
@@ -1177,11 +1129,7 @@ var require_stat = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/util/async.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/util/async.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/util/async.js
 var require_async = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	async function asyncIteratorConcurrentProcess(iterator, fn) {
 		const promises = [];
@@ -1194,11 +1142,7 @@ var require_async = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/copy/copy.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/copy/copy.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/copy/copy.js
 var require_copy$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_fs();
 	const path$9 = require("path");
@@ -1290,11 +1234,7 @@ var require_copy$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/copy/copy-sync.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/copy/copy-sync.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/copy/copy-sync.js
 var require_copy_sync = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_graceful_fs();
 	const path$8 = require("path");
@@ -1408,11 +1348,7 @@ var require_copy_sync = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/copy/index.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/copy/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/copy/index.js
 var require_copy = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	module.exports = {
@@ -1422,11 +1358,7 @@ var require_copy = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/remove/index.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/remove/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/remove/index.js
 var require_remove = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_graceful_fs();
 	const u = require_universalify().fromCallback;
@@ -1449,11 +1381,7 @@ var require_remove = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/empty/index.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/empty/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/empty/index.js
 var require_empty = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const fs = require_fs();
@@ -1490,11 +1418,7 @@ var require_empty = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/ensure/file.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/ensure/file.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/ensure/file.js
 var require_file = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const path$6 = require("path");
@@ -1542,11 +1466,7 @@ var require_file = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/ensure/link.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/ensure/link.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/ensure/link.js
 var require_link = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const path$5 = require("path");
@@ -1595,11 +1515,7 @@ var require_link = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/ensure/symlink-paths.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/ensure/symlink-paths.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/ensure/symlink-paths.js
 var require_symlink_paths = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const path$4 = require("path");
 	const fs = require_fs();
@@ -1683,11 +1599,7 @@ var require_symlink_paths = /* @__PURE__ */ __commonJSMin(((exports, module) => 
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/ensure/symlink-type.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/ensure/symlink-type.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/ensure/symlink-type.js
 var require_symlink_type = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_fs();
 	const u = require_universalify().fromPromise;
@@ -1718,11 +1630,7 @@ var require_symlink_type = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/ensure/symlink.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/ensure/symlink.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/ensure/symlink.js
 var require_symlink = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const path$3 = require("path");
@@ -1771,11 +1679,7 @@ var require_symlink = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/ensure/index.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/ensure/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/ensure/index.js
 var require_ensure = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { createFile, createFileSync } = require_file();
 	const { createLink, createLinkSync } = require_link();
@@ -1797,11 +1701,7 @@ var require_ensure = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/jsonfile/utils.js
-=======
-//#region ../../../../../node_modules/jsonfile/utils.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/jsonfile/utils.js
 var require_utils = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	function stringify(obj, { EOL = "\n", finalEOL = true, replacer = null, spaces } = {}) {
 		const EOF = finalEOL ? EOL : "";
@@ -1818,11 +1718,7 @@ var require_utils = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/jsonfile/index.js
-=======
-//#region ../../../../../node_modules/jsonfile/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/jsonfile/index.js
 var require_jsonfile$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	let _fs;
 	try {
@@ -1885,11 +1781,7 @@ var require_jsonfile$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/json/jsonfile.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/json/jsonfile.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/json/jsonfile.js
 var require_jsonfile = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const jsonFile = require_jsonfile$1();
 	module.exports = {
@@ -1901,11 +1793,7 @@ var require_jsonfile = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/output-file/index.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/output-file/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/output-file/index.js
 var require_output_file = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const fs = require_fs();
@@ -1929,11 +1817,7 @@ var require_output_file = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/json/output-json.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/json/output-json.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/json/output-json.js
 var require_output_json = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { stringify } = require_utils();
 	const { outputFile } = require_output_file();
@@ -1944,11 +1828,7 @@ var require_output_json = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/json/output-json-sync.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/json/output-json-sync.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/json/output-json-sync.js
 var require_output_json_sync = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { stringify } = require_utils();
 	const { outputFileSync } = require_output_file();
@@ -1959,11 +1839,7 @@ var require_output_json_sync = /* @__PURE__ */ __commonJSMin(((exports, module) 
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/json/index.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/json/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/json/index.js
 var require_json = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const jsonFile = require_jsonfile();
@@ -1979,11 +1855,7 @@ var require_json = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/move/move.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/move/move.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/move/move.js
 var require_move$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_fs();
 	const path$1 = require("path");
@@ -2024,11 +1896,7 @@ var require_move$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/move/move-sync.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/move/move-sync.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/move/move-sync.js
 var require_move_sync = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_graceful_fs();
 	const path = require("path");
@@ -2077,11 +1945,7 @@ var require_move_sync = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/move/index.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/move/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/move/index.js
 var require_move = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	module.exports = {
@@ -2091,11 +1955,7 @@ var require_move = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fs-extra/lib/index.js
-=======
-//#region ../../../../../node_modules/fs-extra/lib/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fs-extra/lib/index.js
 var require_lib$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		...require_fs(),
@@ -2112,11 +1972,7 @@ var require_lib$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/chalk/source/vendor/ansi-styles/index.js
-=======
-//#region ../../../../../node_modules/chalk/source/vendor/ansi-styles/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/chalk/source/vendor/ansi-styles/index.js
 var import_lib = /* @__PURE__ */ __toESM(require_lib$1());
 const ANSI_BACKGROUND_OFFSET = 10;
 const wrapAnsi16 = (offset = 0) => (code) => `\u001B[${code + offset}m`;
@@ -2282,11 +2138,7 @@ function assembleStyles() {
 const ansiStyles = assembleStyles();
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/chalk/source/vendor/supports-color/index.js
-=======
-//#region ../../../../../node_modules/chalk/source/vendor/supports-color/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/chalk/source/vendor/supports-color/index.js
 function hasFlag(flag, argv = globalThis.Deno ? globalThis.Deno.args : node_process.default.argv) {
 	const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
 	const position = argv.indexOf(prefix + flag);
@@ -2375,11 +2227,7 @@ const supportsColor = {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/chalk/source/utilities.js
-=======
-//#region ../../../../../node_modules/chalk/source/utilities.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/chalk/source/utilities.js
 function stringReplaceAll(string, substring, replacer) {
 	let index = string.indexOf(substring);
 	if (index === -1) return string;
@@ -2408,11 +2256,7 @@ function stringEncaseCRLFWithFirstIndex(string, prefix, postfix, index) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/chalk/source/index.js
-=======
-//#region ../../../../../node_modules/chalk/source/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/chalk/source/index.js
 const { stdout: stdoutColor, stderr: stderrColor } = supportsColor;
 const GENERATOR = Symbol("GENERATOR");
 const STYLER = Symbol("STYLER");
@@ -2535,11 +2379,7 @@ const chalk = createChalk();
 const chalkStderr = createChalk({ level: stderrColor ? stderrColor.level : 0 });
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/mimic-function/index.js
-=======
-//#region ../../../../../node_modules/mimic-function/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/mimic-function/index.js
 const copyProperty = (to, from, property, ignoreNonConfigurable) => {
 	if (property === "length" || property === "prototype") return;
 	if (property === "arguments" || property === "caller") return;
@@ -2580,11 +2420,7 @@ function mimicFunction(to, from, { ignoreNonConfigurable = false } = {}) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/restore-cursor/node_modules/onetime/index.js
-=======
-//#region ../../../../../node_modules/restore-cursor/node_modules/onetime/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/restore-cursor/node_modules/onetime/index.js
 const calledFunctions = /* @__PURE__ */ new WeakMap();
 const onetime = (function_, options = {}) => {
 	if (typeof function_ !== "function") throw new TypeError("Expected a function");
@@ -2609,11 +2445,7 @@ onetime.callCount = (function_) => {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/restore-cursor/node_modules/signal-exit/dist/mjs/signals.js
-=======
-//#region ../../../../../node_modules/restore-cursor/node_modules/signal-exit/dist/mjs/signals.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/restore-cursor/node_modules/signal-exit/dist/mjs/signals.js
 /**
 * This is not the set of all possible signals.
 *
@@ -2646,11 +2478,7 @@ if (process.platform !== "win32") signals$1.push("SIGALRM", "SIGABRT", "SIGVTALR
 if (process.platform === "linux") signals$1.push("SIGIO", "SIGPOLL", "SIGPWR", "SIGSTKFLT");
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/restore-cursor/node_modules/signal-exit/dist/mjs/index.js
-=======
-//#region ../../../../../node_modules/restore-cursor/node_modules/signal-exit/dist/mjs/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/restore-cursor/node_modules/signal-exit/dist/mjs/index.js
 const processOk$1 = (process) => !!process && typeof process === "object" && typeof process.removeListener === "function" && typeof process.emit === "function" && typeof process.reallyExit === "function" && typeof process.listeners === "function" && typeof process.kill === "function" && typeof process.pid === "number" && typeof process.on === "function";
 const kExitEmitter$1 = Symbol.for("signal-exit emitter");
 const global$2 = globalThis;
@@ -2818,11 +2646,7 @@ const process$8 = globalThis.process;
 const { onExit: onExit$1, load: load$1, unload: unload$1 } = signalExitWrap$1(processOk$1(process$8) ? new SignalExit$1(process$8) : new SignalExitFallback$1());
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/restore-cursor/index.js
-=======
-//#region ../../../../../node_modules/restore-cursor/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/restore-cursor/index.js
 const terminal = node_process.default.stderr.isTTY ? node_process.default.stderr : node_process.default.stdout.isTTY ? node_process.default.stdout : void 0;
 const restoreCursor = terminal ? onetime(() => {
 	onExit$1(() => {
@@ -2831,11 +2655,7 @@ const restoreCursor = terminal ? onetime(() => {
 }) : () => {};
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/cli-cursor/index.js
-=======
-//#region ../../../../../node_modules/cli-cursor/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/cli-cursor/index.js
 let isHidden = false;
 const cliCursor = {};
 cliCursor.show = (writableStream = node_process.default.stderr) => {
@@ -2856,11 +2676,7 @@ cliCursor.toggle = (force, writableStream) => {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/cli-spinners/spinners.json
-=======
-//#region ../../../../../node_modules/cli-spinners/spinners.json
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/cli-spinners/spinners.json
 var spinners_default = {
 	dots: {
 		"interval": 80,
@@ -4518,20 +4334,12 @@ var spinners_default = {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/cli-spinners/index.js
-=======
-//#region ../../../../../node_modules/cli-spinners/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/cli-spinners/index.js
 var cli_spinners_default = spinners_default;
 const spinnersList = Object.keys(spinners_default);
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/yoctocolors/base.js
-=======
-//#region ../../../../../node_modules/yoctocolors/base.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/yoctocolors/base.js
 const hasColors = node_tty.default?.WriteStream?.prototype?.hasColors?.() ?? false;
 const format = (open, close) => {
 	if (!hasColors) return (input) => input;
@@ -4596,11 +4404,7 @@ const bgCyanBright = format(106, 49);
 const bgWhiteBright = format(107, 49);
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/is-unicode-supported/index.js
-=======
-//#region ../../../../../node_modules/is-unicode-supported/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/is-unicode-supported/index.js
 function isUnicodeSupported$1() {
 	const { env } = node_process.default;
 	const { TERM, TERM_PROGRAM } = env;
@@ -4609,11 +4413,7 @@ function isUnicodeSupported$1() {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/log-symbols/symbols.js
-=======
-//#region ../../../../../node_modules/log-symbols/symbols.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/log-symbols/symbols.js
 const _isUnicodeSupported = isUnicodeSupported$1();
 const info = blue(_isUnicodeSupported ? "ℹ" : "i");
 const success = green(_isUnicodeSupported ? "✔" : "√");
@@ -4621,21 +4421,13 @@ const warning = yellow(_isUnicodeSupported ? "⚠" : "‼");
 const error = red(_isUnicodeSupported ? "✖" : "×");
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/ansi-regex/index.js
-=======
-//#region ../../../../../node_modules/ansi-regex/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/ansi-regex/index.js
 function ansiRegex({ onlyFirst = false } = {}) {
 	return new RegExp(`(?:\\u001B\\][\\s\\S]*?(?:\\u0007|\\u001B\\u005C|\\u009C))|[\\u001B\\u009B][[\\]()#;?]*(?:\\d{1,4}(?:[;:]\\d{0,4})*)?[\\dA-PR-TZcf-nq-uy=><~]`, onlyFirst ? void 0 : "g");
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/ora/node_modules/strip-ansi/index.js
-=======
-//#region ../../../../../node_modules/ora/node_modules/strip-ansi/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/ora/node_modules/strip-ansi/index.js
 const regex = ansiRegex();
 function stripAnsi(string) {
 	if (typeof string !== "string") throw new TypeError(`Expected a \`string\`, got \`${typeof string}\``);
@@ -4643,11 +4435,7 @@ function stripAnsi(string) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/get-east-asian-width/lookup-data.js
-=======
-//#region ../../../../../node_modules/get-east-asian-width/lookup-data.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/get-east-asian-width/lookup-data.js
 const ambiguousRanges = [
 	161,
 	161,
@@ -5296,11 +5084,7 @@ const wideRanges = [
 ];
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/get-east-asian-width/utilities.js
-=======
-//#region ../../../../../node_modules/get-east-asian-width/utilities.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/get-east-asian-width/utilities.js
 /**
 Binary search on a sorted flat array of [start, end] pairs.
 
@@ -5322,11 +5106,7 @@ const isInRange = (ranges, codePoint) => {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/get-east-asian-width/lookup.js
-=======
-//#region ../../../../../node_modules/get-east-asian-width/lookup.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/get-east-asian-width/lookup.js
 const minimumAmbiguousCodePoint = ambiguousRanges[0];
 const maximumAmbiguousCodePoint = ambiguousRanges.at(-1);
 const minimumFullWidthCodePoint = fullwidthRanges[0];
@@ -5368,11 +5148,7 @@ const isWide = (codePoint) => {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/get-east-asian-width/index.js
-=======
-//#region ../../../../../node_modules/get-east-asian-width/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/get-east-asian-width/index.js
 function validate(codePoint) {
 	if (!Number.isSafeInteger(codePoint)) throw new TypeError(`Expected a code point, got \`${typeof codePoint}\`.`);
 }
@@ -5383,11 +5159,7 @@ function eastAsianWidth(codePoint, { ambiguousAsWide = false } = {}) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/ora/node_modules/string-width/index.js
-=======
-//#region ../../../../../node_modules/ora/node_modules/string-width/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/ora/node_modules/string-width/index.js
 /**
 Logic:
 - Segment graphemes to match how terminals render clusters.
@@ -5448,21 +5220,13 @@ function stringWidth(input, options = {}) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/is-interactive/index.js
-=======
-//#region ../../../../../node_modules/is-interactive/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/is-interactive/index.js
 function isInteractive({ stream = process.stdout } = {}) {
 	return Boolean(stream && stream.isTTY && process.env.TERM !== "dumb" && !("CI" in process.env));
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/stdin-discarder/index.js
-=======
-//#region ../../../../../node_modules/stdin-discarder/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/stdin-discarder/index.js
 const ASCII_ETX_CODE = 3;
 var StdinDiscarder = class {
 	#activeCount = 0;
@@ -5510,11 +5274,7 @@ const stdinDiscarder = new StdinDiscarder();
 var stdin_discarder_default = Object.freeze(stdinDiscarder);
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/ora/index.js
-=======
-//#region ../../../../../node_modules/ora/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/ora/index.js
 const RENDER_DEFERRAL_TIMEOUT = 200;
 const SYNCHRONIZED_OUTPUT_ENABLE = "\x1B[?2026h";
 const SYNCHRONIZED_OUTPUT_DISABLE = "\x1B[?2026l";
@@ -5883,11 +5643,7 @@ function ora(options) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/key.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/key.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/key.js
 const isUpKey = (key, keybindings = []) => key.name === "up" || keybindings.includes("vim") && key.name === "k" || keybindings.includes("emacs") && key.ctrl && key.name === "p";
 const isDownKey = (key, keybindings = []) => key.name === "down" || keybindings.includes("vim") && key.name === "j" || keybindings.includes("emacs") && key.ctrl && key.name === "n";
 const isBackspaceKey = (key) => key.name === "backspace";
@@ -5896,11 +5652,7 @@ const isNumberKey = (key) => "1234567890".includes(key.name);
 const isEnterKey = (key) => key.name === "enter" || key.name === "return";
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/errors.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/errors.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/errors.js
 var AbortPromptError = class extends Error {
 	name = "AbortPromptError";
 	message = "Prompt was aborted";
@@ -5924,11 +5676,7 @@ var ValidationError = class extends Error {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/hook-engine.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/hook-engine.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/hook-engine.js
 const hookStorage = new node_async_hooks.AsyncLocalStorage();
 function createStore(rl) {
 	return {
@@ -6025,11 +5773,7 @@ const effectScheduler = {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/use-state.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/use-state.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/use-state.js
 function useState(defaultValue) {
 	return withPointer((pointer) => {
 		const setState = node_async_hooks.AsyncResource.bind(function setState(newValue) {
@@ -6046,11 +5790,7 @@ function useState(defaultValue) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/use-effect.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/use-effect.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/use-effect.js
 function useEffect(cb, depArray) {
 	withPointer((pointer) => {
 		const oldDeps = pointer.get();
@@ -6060,11 +5800,7 @@ function useEffect(cb, depArray) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/figures/dist/index.js
-=======
-//#region ../../../../../node_modules/@inquirer/figures/dist/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/figures/dist/index.js
 function isUnicodeSupported() {
 	if (node_process.default.platform !== "win32") return node_process.default.env["TERM"] !== "linux";
 	return Boolean(node_process.default.env["WT_SESSION"]) || Boolean(node_process.default.env["TERMINUS_SUBLIME"]) || node_process.default.env["ConEmuTask"] === "{cmd::Cmder}" || node_process.default.env["TERM_PROGRAM"] === "Terminus-Sublime" || node_process.default.env["TERM_PROGRAM"] === "vscode" || node_process.default.env["TERM"] === "xterm-256color" || node_process.default.env["TERM"] === "alacritty" || node_process.default.env["TERMINAL_EMULATOR"] === "JetBrains-JediTerm";
@@ -6350,11 +6086,7 @@ const figures = shouldUseMain ? mainSymbols : fallbackSymbols;
 const replacements = Object.entries(specialMainSymbols);
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/theme.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/theme.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/theme.js
 const defaultTheme = {
 	prefix: {
 		idle: (0, node_util.styleText)("blue", "?"),
@@ -6387,11 +6119,7 @@ const defaultTheme = {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/make-theme.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/make-theme.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/make-theme.js
 function isPlainObject(value) {
 	if (typeof value !== "object" || value === null) return false;
 	let proto = value;
@@ -6411,11 +6139,7 @@ function makeTheme(...themes) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/use-prefix.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/use-prefix.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/use-prefix.js
 function usePrefix({ status = "idle", theme }) {
 	const [showLoader, setShowLoader] = useState(false);
 	const [tick, setTick] = useState(0);
@@ -6442,11 +6166,7 @@ function usePrefix({ status = "idle", theme }) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/use-memo.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/use-memo.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/use-memo.js
 function useMemo(fn, dependencies) {
 	return withPointer((pointer) => {
 		const prev = pointer.get();
@@ -6463,21 +6183,13 @@ function useMemo(fn, dependencies) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/use-ref.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/use-ref.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/use-ref.js
 function useRef(val) {
 	return useState({ current: val })[0];
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/use-keypress.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/use-keypress.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/use-keypress.js
 function useKeypress(userHandler) {
 	const signal = useRef(userHandler);
 	signal.current = userHandler;
@@ -6496,11 +6208,7 @@ function useKeypress(userHandler) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/cli-width/index.js
-=======
-//#region ../../../../../node_modules/cli-width/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/cli-width/index.js
 var require_cli_width = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = cliWidth;
 	function normalizeOpts(options) {
@@ -6529,11 +6237,7 @@ var require_cli_width = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fast-string-truncated-width/dist/utils.js
-=======
-//#region ../../../../../node_modules/fast-string-truncated-width/dist/utils.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fast-string-truncated-width/dist/utils.js
 const getCodePointsLength = (() => {
 	const SURROGATE_PAIR_RE = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
 	return (input) => {
@@ -6551,11 +6255,7 @@ const isWideNotCJKTNotEmoji = (x) => {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fast-string-truncated-width/dist/index.js
-=======
-//#region ../../../../../node_modules/fast-string-truncated-width/dist/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fast-string-truncated-width/dist/index.js
 const ANSI_RE = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]|\u001b\]8;[^;]*;.*?(?:\u0007|\u001b\u005c)/y;
 const CONTROL_RE = /[\x00-\x08\x0A-\x1F\x7F-\x9F]{1,1000}/y;
 const CJKT_WIDE_RE = /(?:(?![\uFF61-\uFF9F\uFF00-\uFFEF])[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Script=Tangut}]){1,1000}/uy;
@@ -6646,11 +6346,7 @@ const getStringTruncatedWidth = (input, truncationOptions = {}, widthOptions = {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fast-string-width/dist/index.js
-=======
-//#region ../../../../../node_modules/fast-string-width/dist/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fast-string-width/dist/index.js
 const NO_TRUNCATION = {
 	limit: Infinity,
 	ellipsis: "",
@@ -6661,11 +6357,7 @@ const fastStringWidth = (input, options = {}) => {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/fast-wrap-ansi/lib/main.js
-=======
-//#region ../../../../../node_modules/fast-wrap-ansi/lib/main.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/fast-wrap-ansi/lib/main.js
 const ESC$1 = "\x1B";
 const CSI = "";
 const END_CODE = 39;
@@ -6831,11 +6523,7 @@ function wrapAnsi(string, columns, options) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/utils.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/utils.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/utils.js
 var import_cli_width = /* @__PURE__ */ __toESM(require_cli_width(), 1);
 /**
 * Force line returns at specific width. This function is ANSI code friendly and it'll
@@ -6862,11 +6550,7 @@ function readlineWidth() {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/pagination/use-pagination.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/pagination/use-pagination.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/pagination/use-pagination.js
 function usePointerPosition({ active, renderedItems, pageSize, loop }) {
 	const state = useRef({
 		lastPointer: active,
@@ -6950,11 +6634,7 @@ function usePagination({ items, active, renderItem, pageSize, loop = true }) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/mute-stream/lib/index.js
-=======
-//#region ../../../../../node_modules/mute-stream/lib/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/mute-stream/lib/index.js
 var require_lib = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const Stream = require("stream");
 	var MuteStream = class extends Stream {
@@ -7051,11 +6731,7 @@ var require_lib = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/node_modules/signal-exit/dist/mjs/signals.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/node_modules/signal-exit/dist/mjs/signals.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/node_modules/signal-exit/dist/mjs/signals.js
 /**
 * This is not the set of all possible signals.
 *
@@ -7088,11 +6764,7 @@ if (process.platform !== "win32") signals.push("SIGALRM", "SIGABRT", "SIGVTALRM"
 if (process.platform === "linux") signals.push("SIGIO", "SIGPOLL", "SIGPWR", "SIGSTKFLT");
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/node_modules/signal-exit/dist/mjs/index.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/node_modules/signal-exit/dist/mjs/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/node_modules/signal-exit/dist/mjs/index.js
 const processOk = (process) => !!process && typeof process === "object" && typeof process.removeListener === "function" && typeof process.emit === "function" && typeof process.reallyExit === "function" && typeof process.listeners === "function" && typeof process.kill === "function" && typeof process.pid === "number" && typeof process.on === "function";
 const kExitEmitter = Symbol.for("signal-exit emitter");
 const global$1 = globalThis;
@@ -7260,11 +6932,7 @@ const process$1 = globalThis.process;
 const { onExit, load, unload } = signalExitWrap(processOk(process$1) ? new SignalExit(process$1) : new SignalExitFallback());
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/ansi/dist/index.js
-=======
-//#region ../../../../../node_modules/@inquirer/ansi/dist/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/ansi/dist/index.js
 const ESC = "\x1B[";
 /** Move cursor to first column */
 const cursorLeft = ESC + "G";
@@ -7286,11 +6954,7 @@ const eraseLine = ESC + "2K";
 const eraseLines = (lines) => lines > 0 ? (eraseLine + cursorUp(1)).repeat(lines - 1) + eraseLine + cursorLeft : "";
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/screen-manager.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/screen-manager.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/screen-manager.js
 const height = (content) => content.split("\n").length;
 const lastLine = (content) => content.split("\n").pop() ?? "";
 var ScreenManager = class {
@@ -7346,11 +7010,7 @@ var ScreenManager = class {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/promise-polyfill.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/promise-polyfill.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/promise-polyfill.js
 var PromisePolyfill = class extends Promise {
 	static withResolver() {
 		let resolve;
@@ -7367,11 +7027,7 @@ var PromisePolyfill = class extends Promise {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/create-prompt.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/create-prompt.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/create-prompt.js
 var import_lib$1 = /* @__PURE__ */ __toESM(require_lib(), 1);
 const nativeSetImmediate = globalThis.setImmediate;
 function getCallSites() {
@@ -7465,11 +7121,7 @@ function createPrompt(view) {
 }
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/Separator.js
-=======
-//#region ../../../../../node_modules/@inquirer/core/dist/lib/Separator.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/core/dist/lib/Separator.js
 /**
 * Separator object
 * Used to space/separate choices group
@@ -7486,192 +7138,7 @@ var Separator = class {
 };
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/confirm/dist/index.js
-=======
-//#region ../../../../../node_modules/@inquirer/checkbox/dist/index.js
-const checkboxTheme = {
-	icon: {
-		checked: (0, node_util.styleText)("green", figures.circleFilled),
-		unchecked: figures.circle,
-		cursor: figures.pointer,
-		disabledChecked: (0, node_util.styleText)("green", figures.circleDouble),
-		disabledUnchecked: "-"
-	},
-	style: {
-		disabled: (text) => (0, node_util.styleText)("dim", text),
-		renderSelectedChoices: (selectedChoices) => selectedChoices.map((choice) => choice.short).join(", "),
-		description: (text) => (0, node_util.styleText)("cyan", text),
-		keysHelpTip: (keys) => keys.map(([key, action]) => `${(0, node_util.styleText)("bold", key)} ${(0, node_util.styleText)("dim", action)}`).join((0, node_util.styleText)("dim", " • "))
-	},
-	i18n: { disabledError: "This option is disabled and cannot be toggled." },
-	keybindings: []
-};
-function isSelectable$1(item) {
-	return !Separator.isSeparator(item) && !item.disabled;
-}
-function isNavigable$1(item) {
-	return !Separator.isSeparator(item);
-}
-function isChecked(item) {
-	return !Separator.isSeparator(item) && item.checked;
-}
-function toggle(item) {
-	return isSelectable$1(item) ? {
-		...item,
-		checked: !item.checked
-	} : item;
-}
-function check(checked) {
-	return function(item) {
-		return isSelectable$1(item) ? {
-			...item,
-			checked
-		} : item;
-	};
-}
-function normalizeChoices$1(choices) {
-	return choices.map((choice) => {
-		if (Separator.isSeparator(choice)) return choice;
-		if (typeof choice === "string") return {
-			value: choice,
-			name: choice,
-			short: choice,
-			checkedName: choice,
-			disabled: false,
-			checked: false
-		};
-		const name = choice.name ?? String(choice.value);
-		const normalizedChoice = {
-			value: choice.value,
-			name,
-			short: choice.short ?? name,
-			checkedName: choice.checkedName ?? name,
-			disabled: choice.disabled ?? false,
-			checked: choice.checked ?? false
-		};
-		if (choice.description) normalizedChoice.description = choice.description;
-		return normalizedChoice;
-	});
-}
-var dist_default$2 = createPrompt((config, done) => {
-	const { pageSize = 7, loop = true, required, validate = () => true } = config;
-	const shortcuts = {
-		all: "a",
-		invert: "i",
-		...config.shortcuts
-	};
-	const theme = makeTheme(checkboxTheme, config.theme);
-	const { keybindings } = theme;
-	const [status, setStatus] = useState("idle");
-	const prefix = usePrefix({
-		status,
-		theme
-	});
-	const [items, setItems] = useState(normalizeChoices$1(config.choices));
-	const bounds = useMemo(() => {
-		const first = items.findIndex(isNavigable$1);
-		const last = items.findLastIndex(isNavigable$1);
-		if (first === -1) throw new ValidationError("[checkbox prompt] No selectable choices. All choices are disabled.");
-		return {
-			first,
-			last
-		};
-	}, [items]);
-	const [active, setActive] = useState(bounds.first);
-	const [errorMsg, setError] = useState();
-	useKeypress(async (key) => {
-		if (isEnterKey(key)) {
-			const selection = items.filter(isChecked);
-			const isValid = await validate([...selection]);
-			if (required && !selection.length) setError("At least one choice must be selected");
-			else if (isValid === true) {
-				setStatus("done");
-				done(selection.map((choice) => choice.value));
-			} else setError(isValid || "You must select a valid value");
-		} else if (isUpKey(key, keybindings) || isDownKey(key, keybindings)) {
-			if (errorMsg) setError(void 0);
-			if (loop || isUpKey(key, keybindings) && active !== bounds.first || isDownKey(key, keybindings) && active !== bounds.last) {
-				const offset = isUpKey(key, keybindings) ? -1 : 1;
-				let next = active;
-				do
-					next = (next + offset + items.length) % items.length;
-				while (!isNavigable$1(items[next]));
-				setActive(next);
-			}
-		} else if (isSpaceKey(key)) {
-			const activeItem = items[active];
-			if (activeItem && !Separator.isSeparator(activeItem)) if (activeItem.disabled) setError(theme.i18n.disabledError);
-			else {
-				setError(void 0);
-				setItems(items.map((choice, i) => i === active ? toggle(choice) : choice));
-			}
-		} else if (key.name === shortcuts.all) {
-			const selectAll = items.some((choice) => isSelectable$1(choice) && !choice.checked);
-			setItems(items.map(check(selectAll)));
-		} else if (key.name === shortcuts.invert) setItems(items.map(toggle));
-		else if (isNumberKey(key)) {
-			const selectedIndex = Number(key.name) - 1;
-			let selectableIndex = -1;
-			const position = items.findIndex((item) => {
-				if (Separator.isSeparator(item)) return false;
-				selectableIndex++;
-				return selectableIndex === selectedIndex;
-			});
-			const selectedItem = items[position];
-			if (selectedItem && isSelectable$1(selectedItem)) {
-				setActive(position);
-				setItems(items.map((choice, i) => i === position ? toggle(choice) : choice));
-			}
-		}
-	});
-	const message = theme.style.message(config.message, status);
-	let description;
-	const page = usePagination({
-		items,
-		active,
-		renderItem({ item, isActive }) {
-			if (Separator.isSeparator(item)) return ` ${item.separator}`;
-			const cursor = isActive ? theme.icon.cursor : " ";
-			if (item.disabled) {
-				const disabledLabel = typeof item.disabled === "string" ? item.disabled : "(disabled)";
-				const checkbox = item.checked ? theme.icon.disabledChecked : theme.icon.disabledUnchecked;
-				return theme.style.disabled(`${cursor}${checkbox} ${item.name} ${disabledLabel}`);
-			}
-			if (isActive) description = item.description;
-			const checkbox = item.checked ? theme.icon.checked : theme.icon.unchecked;
-			const name = item.checked ? item.checkedName : item.name;
-			return (isActive ? theme.style.highlight : (x) => x)(`${cursor}${checkbox} ${name}`);
-		},
-		pageSize,
-		loop
-	});
-	if (status === "done") {
-		const selection = items.filter(isChecked);
-		return [
-			prefix,
-			message,
-			theme.style.answer(theme.style.renderSelectedChoices(selection, items))
-		].filter(Boolean).join(" ");
-	}
-	const keys = [["↑↓", "navigate"], ["space", "select"]];
-	if (shortcuts.all) keys.push([shortcuts.all, "all"]);
-	if (shortcuts.invert) keys.push([shortcuts.invert, "invert"]);
-	keys.push(["⏎", "submit"]);
-	const helpLine = theme.style.keysHelpTip(keys);
-	return `${[
-		[prefix, message].filter(Boolean).join(" "),
-		page,
-		" ",
-		description ? theme.style.description(description) : "",
-		errorMsg ? theme.style.error(errorMsg) : "",
-		helpLine
-	].filter(Boolean).join("\n").trimEnd()}${cursorHide}`;
-});
-
-//#endregion
-//#region ../../../../../node_modules/@inquirer/confirm/dist/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/confirm/dist/index.js
 function getBooleanValue(value, defaultValue) {
 	let answer = defaultValue !== false;
 	if (/^(y|yes)/i.test(value)) answer = true;
@@ -7712,11 +7179,7 @@ var dist_default$1 = createPrompt((config, done) => {
 });
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/@inquirer/select/dist/index.js
-=======
-//#region ../../../../../node_modules/@inquirer/select/dist/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/@inquirer/select/dist/index.js
 const selectTheme = {
 	icon: { cursor: figures.pointer },
 	style: {
@@ -7872,11 +7335,7 @@ var dist_default = createPrompt((config, done) => {
 });
 
 //#endregion
-<<<<<<< HEAD
-//#region ../../../../../../../../node_modules/minimist/index.js
-=======
-//#region ../../../../../node_modules/minimist/index.js
->>>>>>> origin/worktree-agent-a59d4079
+//#region ../../node_modules/minimist/index.js
 var require_minimist = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	function hasKey(obj, keys) {
 		var o = obj;
@@ -8150,6 +7609,15 @@ const claudeAdapter = {
 //#region src/install/shared.ts
 const pkg = JSON.parse(node_fs.readFileSync(node_path.resolve(__dirname, "..", "package.json"), "utf-8"));
 const templatesRoot = node_path.resolve(__dirname, "assets", "templates");
+const builtInSkills = [
+	"tdd",
+	"systematic-debugging",
+	"verification-before-completion",
+	"simplify",
+	"code-review",
+	"memory-management",
+	"using-maxsim"
+];
 /**
 * Get the global config directory, using the Claude adapter
 */
@@ -8182,19 +7650,8 @@ function copyDirRecursive(src, dest) {
 	import_lib.default.copySync(src, dest, { dereference: true });
 }
 /**
-<<<<<<< HEAD
-* Verify a directory exists and contains files
-=======
-* Get the global config directory for OpenCode (for JSONC permissions)
-* OpenCode follows XDG Base Directory spec
-*/
-function getOpencodeGlobalDir() {
-	return opencodeAdapter.getGlobalDir();
-}
-/**
 * Verify a directory exists and contains files.
 * If expectedFiles is provided, also checks that those specific files exist inside the directory.
->>>>>>> origin/worktree-agent-a59d4079
 */
 function verifyInstalled(dirPath, description, expectedFiles) {
 	if (!node_fs.existsSync(dirPath)) {
@@ -8237,9 +7694,7 @@ function verifyFileInstalled(filePath, description) {
 * Returns an object with `complete` (boolean) and `missing` (list of
 * component names that are absent or incomplete).
 */
-function verifyInstallComplete(configDir, runtime, manifest = null) {
-	const isOpencode = runtime === "opencode";
-	const isCodex = runtime === "codex";
+function verifyInstallComplete(configDir, _runtime, manifest = null) {
 	const missing = [];
 	if (manifest && manifest.files) {
 		for (const relPath of Object.keys(manifest.files)) if (!node_fs.existsSync(node_path.join(configDir, relPath))) missing.push(relPath);
@@ -8248,29 +7703,24 @@ function verifyInstallComplete(configDir, runtime, manifest = null) {
 			missing
 		};
 	}
-	const components = [{
-		dir: node_path.join(configDir, "maxsim"),
-		label: "maxsim (workflows/templates)"
-	}, {
-		dir: node_path.join(configDir, "agents"),
-		label: "agents"
-	}];
-	if (isOpencode) components.push({
-		dir: node_path.join(configDir, "command"),
-		label: "commands"
-	});
-	else if (isCodex) components.push({
-		dir: node_path.join(configDir, "skills"),
-		label: "skills"
-	});
-	else components.push({
-		dir: node_path.join(configDir, "commands", "maxsim"),
-		label: "commands"
-	});
-	if (!isCodex) components.push({
-		dir: node_path.join(configDir, "hooks"),
-		label: "hooks"
-	});
+	const components = [
+		{
+			dir: node_path.join(configDir, "maxsim"),
+			label: "maxsim (workflows/templates)"
+		},
+		{
+			dir: node_path.join(configDir, "agents"),
+			label: "agents"
+		},
+		{
+			dir: node_path.join(configDir, "commands", "maxsim"),
+			label: "commands"
+		},
+		{
+			dir: node_path.join(configDir, "hooks"),
+			label: "hooks"
+		}
+	];
 	for (const { dir, label } of components) if (!node_fs.existsSync(dir)) missing.push(label);
 	else try {
 		if (node_fs.readdirSync(dir).length === 0) missing.push(label);
@@ -8661,10 +8111,10 @@ function writeManifest(configDir) {
 	if (node_fs.existsSync(agentsDir)) {
 		for (const file of node_fs.readdirSync(agentsDir)) if (file.startsWith("maxsim-") && file.endsWith(".md")) manifest.files["agents/" + file] = fileHash(node_path.join(agentsDir, file));
 	}
-	const skillsManifestDir = node_path.join(agentsDir, "skills");
-	if (node_fs.existsSync(skillsManifestDir)) {
+	const skillsManifestDir = node_path.join(configDir, "skills");
+	if (!isCodex && node_fs.existsSync(skillsManifestDir)) {
 		const skillHashes = generateManifest(skillsManifestDir);
-		for (const [rel, hash] of Object.entries(skillHashes)) manifest.files["agents/skills/" + rel] = hash;
+		for (const [rel, hash] of Object.entries(skillHashes)) manifest.files["skills/" + rel] = hash;
 	}
 	node_fs.writeFileSync(node_path.join(configDir, MANIFEST_NAME), JSON.stringify(manifest, null, 2));
 	return manifest;
@@ -8788,6 +8238,28 @@ function uninstall(isGlobal, explicitConfigDir = null) {
 		node_fs.rmSync(maxsimCommandsDir, { recursive: true });
 		removedCount++;
 		console.log(`  ${chalk.green("✓")} Removed commands/maxsim/`);
+	}
+	{
+		const skillsDir = node_path.join(targetDir, "skills");
+		if (node_fs.existsSync(skillsDir)) {
+			let skillCount = 0;
+			for (const skill of builtInSkills) {
+				const skillDir = node_path.join(skillsDir, skill);
+				if (node_fs.existsSync(skillDir)) {
+					node_fs.rmSync(skillDir, { recursive: true });
+					skillCount++;
+				}
+			}
+			if (skillCount > 0) {
+				removedCount++;
+				console.log(`  ${chalk.green("✓")} Removed ${skillCount} MAXSIM skills`);
+			}
+		}
+		const legacySkillsDir = node_path.join(targetDir, "agents", "skills");
+		if (node_fs.existsSync(legacySkillsDir)) {
+			node_fs.rmSync(legacySkillsDir, { recursive: true });
+			console.log(`  ${chalk.green("✓")} Removed legacy agents/skills/ directory`);
+		}
 	}
 	const maxsimDir = node_path.join(targetDir, "maxsim");
 	if (node_fs.existsSync(maxsimDir)) {
@@ -9001,18 +8473,19 @@ async function install(isGlobal) {
 			failures.push("agents");
 		}
 	}
+	const legacySkillsDir = node_path.join(targetDir, "agents", "skills");
+	if (node_fs.existsSync(legacySkillsDir)) {
+		node_fs.rmSync(legacySkillsDir, { recursive: true });
+		console.log(`  ${chalk.green("✓")} Removed legacy agents/skills/ directory`);
+	}
 	const skillsSrc = node_path.join(src, "skills");
 	if (node_fs.existsSync(skillsSrc)) {
 		spinner = ora({
 			text: "Installing skills...",
 			color: "cyan"
 		}).start();
-		const skillsDest = node_path.join(targetDir, "agents", "skills");
-		if (node_fs.existsSync(skillsDest)) for (const skill of [
-			"tdd",
-			"systematic-debugging",
-			"verification-before-completion"
-		]) {
+		const skillsDest = node_path.join(targetDir, "skills");
+		if (node_fs.existsSync(skillsDest)) for (const skill of builtInSkills) {
 			const skillDir = node_path.join(skillsDest, skill);
 			if (node_fs.existsSync(skillDir)) node_fs.rmSync(skillDir, { recursive: true });
 		}
@@ -9028,10 +8501,10 @@ async function install(isGlobal) {
 			}
 		}
 		const installedSkillDirs = node_fs.readdirSync(skillsDest, { withFileTypes: true }).filter((e) => e.isDirectory()).length;
-		if (installedSkillDirs > 0) spinner.succeed(chalk.green("✓") + ` Installed ${installedSkillDirs} skills to agents/skills/`);
+		if (installedSkillDirs > 0) spinner.succeed(chalk.green("✓") + ` Installed ${installedSkillDirs} skills to skills/`);
 		else {
 			spinner.fail("Failed to install skills");
-			failures.push("agents/skills");
+			failures.push("skills");
 		}
 	}
 	const changelogSrc = node_path.join(src, "..", "CHANGELOG.md");
@@ -9114,58 +8587,39 @@ async function install(isGlobal) {
 		else spinner.succeed(chalk.green("✓") + " Installed dashboard (server.js not found in bundle)");
 		if (networkMode) applyFirewallRule(3333);
 	}
-<<<<<<< HEAD
 	const mcpJsonPath = isGlobal ? node_path.join(targetDir, "..", ".mcp.json") : node_path.join(process.cwd(), ".mcp.json");
 	let mcpConfig = {};
-	if (node_fs.existsSync(mcpJsonPath)) try {
-		mcpConfig = JSON.parse(node_fs.readFileSync(mcpJsonPath, "utf-8"));
-	} catch {}
-	const mcpServers = mcpConfig.mcpServers ?? {};
-	mcpServers["maxsim"] = {
-		command: "node",
-		args: [".claude/maxsim/bin/mcp-server.cjs"],
-		env: {}
-	};
-	mcpConfig.mcpServers = mcpServers;
-	node_fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + "\n", "utf-8");
-	console.log(`  ${chalk.green("✓")} Configured .mcp.json for MCP server auto-discovery`);
-=======
-	if (!isOpencode && !isCodex && !isGemini) {
-		const mcpJsonPath = isGlobal ? node_path.join(targetDir, "..", ".mcp.json") : node_path.join(process.cwd(), ".mcp.json");
-		let mcpConfig = {};
-		let skipMcpConfig = false;
-		if (node_fs.existsSync(mcpJsonPath)) {
-			node_fs.copyFileSync(mcpJsonPath, mcpJsonPath + ".bak");
+	let skipMcpConfig = false;
+	if (node_fs.existsSync(mcpJsonPath)) {
+		node_fs.copyFileSync(mcpJsonPath, mcpJsonPath + ".bak");
+		try {
+			mcpConfig = JSON.parse(node_fs.readFileSync(mcpJsonPath, "utf-8"));
+		} catch {
+			console.warn(`  ${chalk.yellow("!")} .mcp.json is corrupted (invalid JSON). Backup saved to .mcp.json.bak`);
+			let startFresh = true;
 			try {
-				mcpConfig = JSON.parse(node_fs.readFileSync(mcpJsonPath, "utf-8"));
-			} catch {
-				console.warn(`  ${chalk.yellow("!")} .mcp.json is corrupted (invalid JSON). Backup saved to .mcp.json.bak`);
-				let startFresh = true;
-				try {
-					startFresh = await dist_default$1({
-						message: ".mcp.json is corrupted. Start with a fresh config? (No = abort MCP setup)",
-						default: true
-					});
-				} catch {}
-				if (!startFresh) {
-					console.log(`  ${chalk.yellow("!")} Skipping .mcp.json configuration`);
-					skipMcpConfig = true;
-				}
+				startFresh = await dist_default$1({
+					message: ".mcp.json is corrupted. Start with a fresh config? (No = abort MCP setup)",
+					default: true
+				});
+			} catch {}
+			if (!startFresh) {
+				console.log(`  ${chalk.yellow("!")} Skipping .mcp.json configuration`);
+				skipMcpConfig = true;
 			}
 		}
-		if (!skipMcpConfig) {
-			const mcpServers = mcpConfig.mcpServers ?? {};
-			mcpServers["maxsim"] = {
-				command: "node",
-				args: [".claude/maxsim/bin/mcp-server.cjs"],
-				env: {}
-			};
-			mcpConfig.mcpServers = mcpServers;
-			node_fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + "\n", "utf-8");
-			console.log(`  ${chalk.green("✓")} Configured .mcp.json for MCP server auto-discovery`);
-		}
 	}
->>>>>>> origin/worktree-agent-a59d4079
+	if (!skipMcpConfig) {
+		const mcpServers = mcpConfig.mcpServers ?? {};
+		mcpServers["maxsim"] = {
+			command: "node",
+			args: [".claude/maxsim/bin/mcp-server.cjs"],
+			env: {}
+		};
+		mcpConfig.mcpServers = mcpServers;
+		node_fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + "\n", "utf-8");
+		console.log(`  ${chalk.green("✓")} Configured .mcp.json for MCP server auto-discovery`);
+	}
 	if (failures.length > 0) {
 		console.error(`\n  ${chalk.yellow("Installation incomplete!")} Failed: ${failures.join(", ")}`);
 		process.exit(1);

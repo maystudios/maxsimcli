@@ -68,8 +68,8 @@ function uninstall(isGlobal, explicitConfigDir = null) {
         removedCount++;
         console.log(`  ${chalk_1.default.green('\u2713')} Removed commands/maxsim/`);
     }
-    // 1b. Remove MAXSIM skills (skills/ directory for Claude/Gemini/OpenCode)
-    if (!isCodex) {
+    // 1b. Remove MAXSIM skills
+    {
         const skillsDir = path.join(targetDir, 'skills');
         if (fs.existsSync(skillsDir)) {
             let skillCount = 0;

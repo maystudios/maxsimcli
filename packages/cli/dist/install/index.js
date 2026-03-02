@@ -335,72 +335,47 @@ async function install(isGlobal) {
         }
     }
     // Write .mcp.json for Claude Code MCP server auto-discovery
-<<<<<<< HEAD
     const mcpJsonPath = isGlobal
         ? path.join(targetDir, '..', '.mcp.json')
         : path.join(process.cwd(), '.mcp.json');
     let mcpConfig = {};
+    let skipMcpConfig = false;
     if (fs.existsSync(mcpJsonPath)) {
+        // Back up existing .mcp.json before modification
+        fs.copyFileSync(mcpJsonPath, mcpJsonPath + '.bak');
         try {
             mcpConfig = JSON.parse(fs.readFileSync(mcpJsonPath, 'utf-8'));
         }
         catch {
-            // Corrupted file — start fresh
-        }
-=======
-    if (!isOpencode && !isCodex && !isGemini) {
-        const mcpJsonPath = isGlobal
-            ? path.join(targetDir, '..', '.mcp.json')
-            : path.join(process.cwd(), '.mcp.json');
-        let mcpConfig = {};
-        let skipMcpConfig = false;
-        if (fs.existsSync(mcpJsonPath)) {
-            // Back up existing .mcp.json before modification
-            fs.copyFileSync(mcpJsonPath, mcpJsonPath + '.bak');
+            // Corrupted .mcp.json — warn user
+            console.warn(`  ${chalk_1.default.yellow('!')} .mcp.json is corrupted (invalid JSON). Backup saved to .mcp.json.bak`);
+            let startFresh = true;
             try {
-                mcpConfig = JSON.parse(fs.readFileSync(mcpJsonPath, 'utf-8'));
+                startFresh = await (0, prompts_1.confirm)({
+                    message: '.mcp.json is corrupted. Start with a fresh config? (No = abort MCP setup)',
+                    default: true,
+                });
             }
             catch {
-                // Corrupted .mcp.json — warn user
-                console.warn(`  ${chalk_1.default.yellow('!')} .mcp.json is corrupted (invalid JSON). Backup saved to .mcp.json.bak`);
-                let startFresh = true;
-                try {
-                    startFresh = await (0, prompts_1.confirm)({
-                        message: '.mcp.json is corrupted. Start with a fresh config? (No = abort MCP setup)',
-                        default: true,
-                    });
-                }
-                catch {
-                    // Non-interactive — default to starting fresh
-                }
-                if (!startFresh) {
-                    console.log(`  ${chalk_1.default.yellow('!')} Skipping .mcp.json configuration`);
-                    skipMcpConfig = true;
-                }
+                // Non-interactive — default to starting fresh
+            }
+            if (!startFresh) {
+                console.log(`  ${chalk_1.default.yellow('!')} Skipping .mcp.json configuration`);
+                skipMcpConfig = true;
             }
         }
-        if (!skipMcpConfig) {
-            const mcpServers = mcpConfig.mcpServers ?? {};
-            mcpServers['maxsim'] = {
-                command: 'node',
-                args: ['.claude/maxsim/bin/mcp-server.cjs'],
-                env: {},
-            };
-            mcpConfig.mcpServers = mcpServers;
-            fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + '\n', 'utf-8');
-            console.log(`  ${chalk_1.default.green('\u2713')} Configured .mcp.json for MCP server auto-discovery`);
-        }
->>>>>>> origin/worktree-agent-a59d4079
     }
-    const mcpServers = mcpConfig.mcpServers ?? {};
-    mcpServers['maxsim'] = {
-        command: 'node',
-        args: ['.claude/maxsim/bin/mcp-server.cjs'],
-        env: {},
-    };
-    mcpConfig.mcpServers = mcpServers;
-    fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + '\n', 'utf-8');
-    console.log(`  ${chalk_1.default.green('\u2713')} Configured .mcp.json for MCP server auto-discovery`);
+    if (!skipMcpConfig) {
+        const mcpServers = mcpConfig.mcpServers ?? {};
+        mcpServers['maxsim'] = {
+            command: 'node',
+            args: ['.claude/maxsim/bin/mcp-server.cjs'],
+            env: {},
+        };
+        mcpConfig.mcpServers = mcpServers;
+        fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + '\n', 'utf-8');
+        console.log(`  ${chalk_1.default.green('\u2713')} Configured .mcp.json for MCP server auto-discovery`);
+    }
     if (failures.length > 0) {
         console.error(`\n  ${chalk_1.default.yellow('Installation incomplete!')} Failed: ${failures.join(', ')}`);
         process.exit(1);

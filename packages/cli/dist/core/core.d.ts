@@ -41,8 +41,10 @@ export declare const planId: (f: string) => string;
 export declare const summaryId: (f: string) => string;
 /** List subdirectory names, optionally sorted by phase number. */
 export declare function listSubDirs(dir: string, sortByPhase?: boolean): string[];
-/** Log only when MAXSIM_DEBUG is set. */
-export declare function debugLog(e: unknown): void;
+/** Extract a human-readable message from an unknown thrown value. */
+export declare function errorMsg(e: unknown): string;
+/** Log only when MAXSIM_DEBUG is set. Accepts an optional context label. */
+export declare function debugLog(contextOrError: unknown, error?: unknown): void;
 /** Escape a phase number for use in regex. */
 export declare function escapePhaseNum(phase: string | number): string;
 export declare function safeReadFile(filePath: string): string | null;

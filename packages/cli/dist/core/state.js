@@ -28,18 +28,39 @@ const node_path_1 = __importDefault(require("node:path"));
 const escape_string_regexp_1 = __importDefault(require("escape-string-regexp"));
 const core_js_1 = require("./core.js");
 // ─── Internal helpers ────────────────────────────────────────────────────────
+/**
+ * Parse a markdown table row into cells, handling escaped pipes (`\|`) within cell content.
+ * Strips leading/trailing pipe characters and trims each cell.
+ */
+function parseTableRow(row) {
+    // Replace escaped pipes with a placeholder, split, then restore
+    const placeholder = '\x00PIPE\x00';
+    const safe = row.replace(/\\\|/g, placeholder);
+    return safe.split('|').map(c => c.replaceAll(placeholder, '|').trim()).filter(Boolean);
+}
 function stateExtractField(content, fieldName) {
-    const pattern = new RegExp(`\\*\\*${fieldName}:\\*\\*\\s*(.+)`, 'i');
-    const match = content.match(pattern);
-    return match ? match[1].trim() : null;
+    const escaped = (0, escape_string_regexp_1.default)(fieldName);
+    // Match **fieldName:** with optional extra whitespace around the name and colon
+    const boldPattern = new RegExp(`\\*\\*\\s*${escaped}\\s*:\\s*\\*\\*\\s*(.+)`, 'i');
+    const boldMatch = content.match(boldPattern);
+    if (boldMatch)
+        return boldMatch[1].trim();
+    // Fallback: match plain "fieldName: value" (no bold markers)
+    const plainPattern = new RegExp(`^\\s*${escaped}\\s*:\\s*(.+)`, 'im');
+    const plainMatch = content.match(plainPattern);
+    return plainMatch ? plainMatch[1].trim() : null;
 }
 function stateReplaceField(content, fieldName, newValue) {
     const escaped = (0, escape_string_regexp_1.default)(fieldName);
-    const pattern = new RegExp(`(\\*\\*${escaped}:\\*\\*\\s*)(.*)`, 'i');
-    if (pattern.test(content)) {
-        return content.replace(pattern, (_match, prefix) => `${prefix}${newValue}`);
-    }
-    return null;
+    // Match **fieldName:** with optional extra whitespace
+    const boldPattern = new RegExp(`(\\*\\*\\s*${escaped}\\s*:\\s*\\*\\*\\s*)(.*)`, 'i');
+    let replaced = content.replace(boldPattern, (_match, prefix) => `${prefix}${newValue}`);
+    if (replaced !== content)
+        return replaced;
+    // Fallback: plain "fieldName: value"
+    const plainPattern = new RegExp(`(^[ \\t]*${escaped}\\s*:\\s*)(.*)`, 'im');
+    replaced = content.replace(plainPattern, (_match, prefix) => `${prefix}${newValue}`);
+    return replaced !== content ? replaced : null;
 }
 function readTextArgOrFile(cwd, value, filePath, label) {
     if (!filePath)
@@ -76,8 +97,7 @@ function cmdStateLoad(cwd, raw) {
         stateRaw = node_fs_1.default.readFileSync((0, core_js_1.statePath)(cwd), 'utf-8');
     }
     catch (e) {
-        /* optional op, ignore */
-        (0, core_js_1.debugLog)(e);
+        (0, core_js_1.debugLog)('state-load-failed', e);
     }
     const configExists = node_fs_1.default.existsSync((0, core_js_1.configPath)(cwd));
     const roadmapExists = node_fs_1.default.existsSync((0, core_js_1.roadmapPath)(cwd));
@@ -117,16 +137,15 @@ function cmdStateGet(cwd, section, raw) {
             (0, core_js_1.output)({ content }, raw, content);
             return;
         }
-        const fieldEscaped = (0, escape_string_regexp_1.default)(section);
-        // Check for **field:** value
-        const fieldPattern = new RegExp(`\\*\\*${fieldEscaped}:\\*\\*\\s*(.*)`, 'i');
-        const fieldMatch = content.match(fieldPattern);
-        if (fieldMatch) {
-            (0, core_js_1.output)({ [section]: fieldMatch[1].trim() }, raw, fieldMatch[1].trim());
+        // Check for **field:** value (reuse stateExtractField for format tolerance)
+        const fieldValue = stateExtractField(content, section);
+        if (fieldValue !== null) {
+            (0, core_js_1.output)({ [section]: fieldValue }, raw, fieldValue);
             return;
         }
-        // Check for ## Section
-        const sectionPattern = new RegExp(`##\\s*${fieldEscaped}\\s*\n([\\s\\S]*?)(?=\\n##|$)`, 'i');
+        // Check for ## or ### Section, tolerating extra blank lines after header
+        const fieldEscaped = (0, escape_string_regexp_1.default)(section);
+        const sectionPattern = new RegExp(`#{2,3}\\s*${fieldEscaped}\\s*\\n\\s*\\n?([\\s\\S]*?)(?=\\n#{2,3}\\s|$)`, 'i');
         const sectionMatch = content.match(sectionPattern);
         if (sectionMatch) {
             (0, core_js_1.output)({ [section]: sectionMatch[1].trim() }, raw, sectionMatch[1].trim());
@@ -145,10 +164,9 @@ function cmdStatePatch(cwd, patches, raw) {
         let content = node_fs_1.default.readFileSync(statePath, 'utf-8');
         const results = { updated: [], failed: [] };
         for (const [field, value] of Object.entries(patches)) {
-            const fieldEscaped = (0, escape_string_regexp_1.default)(field);
-            const pattern = new RegExp(`(\\*\\*${fieldEscaped}:\\*\\*\\s*)(.*)`, 'i');
-            if (pattern.test(content)) {
-                content = content.replace(pattern, (_match, prefix) => `${prefix}${value}`);
+            const result = stateReplaceField(content, field, value);
+            if (result) {
+                content = result;
                 results.updated.push(field);
             }
             else {
@@ -171,12 +189,10 @@ function cmdStateUpdate(cwd, field, value) {
     }
     const statePath = (0, core_js_1.statePath)(cwd);
     try {
-        let content = node_fs_1.default.readFileSync(statePath, 'utf-8');
-        const fieldEscaped = (0, escape_string_regexp_1.default)(field);
-        const pattern = new RegExp(`(\\*\\*${fieldEscaped}:\\*\\*\\s*)(.*)`, 'i');
-        if (pattern.test(content)) {
-            content = content.replace(pattern, (_match, prefix) => `${prefix}${value}`);
-            node_fs_1.default.writeFileSync(statePath, content, 'utf-8');
+        const content = node_fs_1.default.readFileSync(statePath, 'utf-8');
+        const result = stateReplaceField(content, field, value);
+        if (result) {
+            node_fs_1.default.writeFileSync(statePath, result, 'utf-8');
             (0, core_js_1.output)({ updated: true });
         }
         else {
@@ -230,7 +246,8 @@ function cmdStateRecordMetric(cwd, options, raw) {
         (0, core_js_1.output)({ error: 'phase, plan, and duration required' }, raw);
         return;
     }
-    const metricsPattern = /(##\s*Performance Metrics[\s\S]*?\n\|[^\n]+\n\|[-|\s]+\n)([\s\S]*?)(?=\n##|\n$|$)/i;
+    // Flexible: tolerate varying heading levels (##/###), flexible separator lines (|---|, | --- |, |:---|)
+    const metricsPattern = /(#{2,3}\s*Performance Metrics[\s\S]*?\n\|[^\n]+\n\|[\s:|\-]+\n)([\s\S]*?)(?=\n#{2,3}\s|\n$|$)/i;
     const metricsMatch = content.match(metricsPattern);
     if (metricsMatch) {
         let tableBody = metricsMatch[2].trimEnd();
@@ -273,10 +290,9 @@ function cmdStateUpdateProgress(cwd, raw) {
     const filled = Math.round(percent / 100 * barWidth);
     const bar = '\u2588'.repeat(filled) + '\u2591'.repeat(barWidth - filled);
     const progressStr = `[${bar}] ${percent}%`;
-    const progressPattern = /(\*\*Progress:\*\*\s*).*/i;
-    if (progressPattern.test(content)) {
-        content = content.replace(progressPattern, (_match, prefix) => `${prefix}${progressStr}`);
-        node_fs_1.default.writeFileSync(statePath, content, 'utf-8');
+    const result = stateReplaceField(content, 'Progress', progressStr);
+    if (result) {
+        node_fs_1.default.writeFileSync(statePath, result, 'utf-8');
         (0, core_js_1.output)({ updated: true, percent, completed: totalSummaries, total: totalPlans, bar: progressStr }, raw, progressStr);
     }
     else {
@@ -360,18 +376,19 @@ function cmdStateResolveBlocker(cwd, text, raw) {
         return;
     }
     let content = node_fs_1.default.readFileSync(statePath, 'utf-8');
-    const sectionPattern = /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
+    const sectionPattern = /(#{2,3}\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n\s*\n?)([\s\S]*?)(?=\n#{2,3}\s|$)/i;
     const match = content.match(sectionPattern);
     if (match) {
         const sectionBody = match[2];
         const lines = sectionBody.split('\n');
         const filtered = lines.filter(line => {
-            if (!line.startsWith('- '))
+            // Match - or * bullets, optionally indented
+            if (!/^\s*[-*]\s+/.test(line))
                 return true;
             return !line.toLowerCase().includes(text.toLowerCase());
         });
         let newBody = filtered.join('\n');
-        if (!newBody.trim() || !newBody.includes('- ')) {
+        if (!newBody.trim() || !/^\s*[-*]\s+/m.test(newBody)) {
             newBody = 'None\n';
         }
         content = content.replace(sectionPattern, (_match, header) => `${header}${newBody}`);
@@ -433,11 +450,7 @@ function cmdStateSnapshot(cwd, raw) {
         return;
     }
     const content = node_fs_1.default.readFileSync(statePath, 'utf-8');
-    const extractField = (fieldName) => {
-        const pattern = new RegExp(`\\*\\*${fieldName}:\\*\\*\\s*(.+)`, 'i');
-        const match = content.match(pattern);
-        return match ? match[1].trim() : null;
-    };
+    const extractField = (fieldName) => stateExtractField(content, fieldName);
     const currentPhase = extractField('Current Phase');
     const currentPhaseName = extractField('Current Phase Name');
     const totalPhasesRaw = extractField('Total Phases');
@@ -452,12 +465,16 @@ function cmdStateSnapshot(cwd, raw) {
     const totalPlansInPhase = totalPlansRaw ? parseInt(totalPlansRaw, 10) : null;
     const progressPercent = progressRaw ? parseInt(progressRaw.replace('%', ''), 10) : null;
     const decisions = [];
-    const decisionsMatch = content.match(/##\s*Decisions Made[\s\S]*?\n\|[^\n]+\n\|[-|\s]+\n([\s\S]*?)(?=\n##|\n$|$)/i);
+    // Tolerate ##/### heading levels and flexible separator lines (|---|, | --- |, |:---|)
+    const decisionsMatch = content.match(/#{2,3}\s*Decisions Made[\s\S]*?\n\|[^\n]+\n\|[\s:|\-]+\n([\s\S]*?)(?=\n#{2,3}\s|\n$|$)/i);
     if (decisionsMatch) {
         const tableBody = decisionsMatch[1];
-        const rows = tableBody.trim().split('\n').filter(r => r.includes('|'));
+        const rows = tableBody.trim().split('\n').filter(r => r.includes('|') && !r.match(/^\s*$/));
         for (const row of rows) {
-            const cells = row.split('|').map(c => c.trim()).filter(Boolean);
+            // Skip separator lines that snuck through
+            if (/^\s*\|[\s:\-|]+\|\s*$/.test(row))
+                continue;
+            const cells = parseTableRow(row);
             if (cells.length >= 3) {
                 decisions.push({
                     phase: cells[0],
@@ -468,12 +485,14 @@ function cmdStateSnapshot(cwd, raw) {
         }
     }
     const blockers = [];
-    const blockersMatch = content.match(/##\s*Blockers\s*\n([\s\S]*?)(?=\n##|$)/i);
+    // Tolerate ##/### heading levels
+    const blockersMatch = content.match(/#{2,3}\s*Blockers\s*\n([\s\S]*?)(?=\n#{2,3}\s|$)/i);
     if (blockersMatch) {
         const blockersSection = blockersMatch[1];
-        const items = blockersSection.match(/^-\s+(.+)$/gm) || [];
+        // Match - or * bullets, optionally indented
+        const items = blockersSection.match(/^\s*[-*]\s+(.+)$/gm) || [];
         for (const item of items) {
-            blockers.push(item.replace(/^-\s+/, '').trim());
+            blockers.push(item.replace(/^\s*[-*]\s+/, '').trim());
         }
     }
     const session = {
@@ -481,18 +500,12 @@ function cmdStateSnapshot(cwd, raw) {
         stopped_at: null,
         resume_file: null,
     };
-    const sessionMatch = content.match(/##\s*Session\s*\n([\s\S]*?)(?=\n##|$)/i);
+    const sessionMatch = content.match(/#{2,3}\s*Session\s*\n\s*\n?([\s\S]*?)(?=\n#{2,3}\s|$)/i);
     if (sessionMatch) {
         const sessionSection = sessionMatch[1];
-        const lastDateMatch = sessionSection.match(/\*\*Last Date:\*\*\s*(.+)/i);
-        const stoppedAtMatch = sessionSection.match(/\*\*Stopped At:\*\*\s*(.+)/i);
-        const resumeFileMatch = sessionSection.match(/\*\*Resume File:\*\*\s*(.+)/i);
-        if (lastDateMatch)
-            session.last_date = lastDateMatch[1].trim();
-        if (stoppedAtMatch)
-            session.stopped_at = stoppedAtMatch[1].trim();
-        if (resumeFileMatch)
-            session.resume_file = resumeFileMatch[1].trim();
+        session.last_date = stateExtractField(sessionSection, 'Last Date');
+        session.stopped_at = stateExtractField(sessionSection, 'Stopped At') || stateExtractField(sessionSection, 'Stopped at');
+        session.resume_file = stateExtractField(sessionSection, 'Resume File') || stateExtractField(sessionSection, 'Resume file');
     }
     const snapshot = {
         current_phase: currentPhase,

@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.templatesRoot = exports.pkg = void 0;
+exports.builtInSkills = exports.templatesRoot = exports.pkg = void 0;
 exports.getGlobalDir = getGlobalDir;
 exports.getConfigDirFromHome = getConfigDirFromHome;
 exports.getDirName = getDirName;
@@ -54,6 +54,8 @@ const index_js_1 = require("../adapters/index.js");
 exports.pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'package.json'), 'utf-8'));
 // Resolve template asset root — bundled into dist/assets/templates at publish time
 exports.templatesRoot = path.resolve(__dirname, 'assets', 'templates');
+// Built-in skill names shipped with MAXSIM — used for cleanup during install/uninstall
+exports.builtInSkills = ['tdd', 'systematic-debugging', 'verification-before-completion', 'simplify', 'code-review', 'memory-management', 'using-maxsim'];
 /**
  * Get the global config directory, using the Claude adapter
  */
@@ -86,19 +88,8 @@ function copyDirRecursive(src, dest) {
     fs_extra_1.default.copySync(src, dest, { dereference: true });
 }
 /**
-<<<<<<< HEAD
- * Verify a directory exists and contains files
-=======
- * Get the global config directory for OpenCode (for JSONC permissions)
- * OpenCode follows XDG Base Directory spec
- */
-function getOpencodeGlobalDir() {
-    return index_js_1.opencodeAdapter.getGlobalDir();
-}
-/**
  * Verify a directory exists and contains files.
  * If expectedFiles is provided, also checks that those specific files exist inside the directory.
->>>>>>> origin/worktree-agent-a59d4079
  */
 function verifyInstalled(dirPath, description, expectedFiles) {
     if (!fs.existsSync(dirPath)) {
@@ -143,9 +134,7 @@ function verifyFileInstalled(filePath, description) {
  * Returns an object with `complete` (boolean) and `missing` (list of
  * component names that are absent or incomplete).
  */
-function verifyInstallComplete(configDir, runtime, manifest = null) {
-    const isOpencode = runtime === 'opencode';
-    const isCodex = runtime === 'codex';
+function verifyInstallComplete(configDir, _runtime, manifest = null) {
     const missing = [];
     // If a manifest exists, verify every file in it is still present
     if (manifest && manifest.files) {
@@ -160,19 +149,9 @@ function verifyInstallComplete(configDir, runtime, manifest = null) {
     const components = [
         { dir: path.join(configDir, 'maxsim'), label: 'maxsim (workflows/templates)' },
         { dir: path.join(configDir, 'agents'), label: 'agents' },
+        { dir: path.join(configDir, 'commands', 'maxsim'), label: 'commands' },
+        { dir: path.join(configDir, 'hooks'), label: 'hooks' },
     ];
-    if (isOpencode) {
-        components.push({ dir: path.join(configDir, 'command'), label: 'commands' });
-    }
-    else if (isCodex) {
-        components.push({ dir: path.join(configDir, 'skills'), label: 'skills' });
-    }
-    else {
-        components.push({ dir: path.join(configDir, 'commands', 'maxsim'), label: 'commands' });
-    }
-    if (!isCodex) {
-        components.push({ dir: path.join(configDir, 'hooks'), label: 'hooks' });
-    }
     for (const { dir, label } of components) {
         if (!fs.existsSync(dir)) {
             missing.push(label);
