@@ -1,6 +1,7 @@
 ---
 name: systematic-debugging
 description: Use when encountering any bug, test failure, or unexpected behavior — requires root cause investigation before attempting any fix
+context: fork
 ---
 
 # Systematic Debugging
@@ -110,9 +111,45 @@ Before claiming a bug is fixed, confirm:
 - [ ] The full test suite passes (no regressions)
 - [ ] The original error no longer occurs when running the original steps
 
-## Debugging in MAXSIM Context
+## Integration with MAXSIM
 
-When debugging during plan execution, MAXSIM deviation rules apply:
-- **Rule 1 (Auto-fix bugs):** You may auto-fix bugs found during execution, but you must still follow this debugging process.
+### Context Loading
+
+When debugging within a MAXSIM project, load project context first:
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs skill-context systematic-debugging
+```
+
+This returns current phase, artifacts, and recent decisions. Use this to:
+- Cross-reference memory files (`.claude/memory/errors.md`) for known bugs
+- Check if the issue was already investigated in a previous phase's RESEARCH.md
+- Understand the architectural context around the failing component
+
+### Memory Cross-Referencing
+
+Before starting the REPRODUCE step, check project memory:
+1. Read `.claude/memory/errors.md` if it exists — the bug may already be documented with a known fix
+2. Read `.planning/phases/{current}/RESEARCH.md` if it exists — prior research may explain the failure
+3. If you find a match, verify the documented fix still applies before using it
+
+### STATE.md Hooks
+
+Track debugging sessions in STATE.md:
+- When entering a debug session, record the bug description as a blocker
+- When Rule 4 triggers (3+ failed fix attempts), escalate the blocker with architectural flag
+- When the bug is resolved, remove the blocker and add a decision entry with the root cause
+
+### Deviation Rules in Plan Execution
+
+When debugging during MAXSIM plan execution:
+- **Rule 1 (Auto-fix bugs):** You may auto-fix bugs found during execution, but you must still follow this debugging process completely.
 - **Rule 4 (Architectural changes):** If 3+ fix attempts fail, STOP and return a checkpoint — this is an architectural decision for the user.
 - Track all debugging deviations for SUMMARY.md documentation.
+- Record the root cause analysis in the task's completion notes.
+
+### Artifact References
+
+- Check `.planning/phases/{current}/RESEARCH.md` for prior investigation context
+- Bug fixes feed into SUMMARY.md as deviation documentation
+- Root cause findings may warrant updates to `.planning/codebase/CONCERNS.md`
