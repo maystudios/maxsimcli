@@ -1,6 +1,7 @@
 ---
 name: tdd
 description: Use when implementing any feature or bug fix — requires writing a failing test before any implementation code
+context: fork
 ---
 
 # Test-Driven Development (TDD)
@@ -112,7 +113,35 @@ Cannot check all boxes? You skipped TDD. Start over.
 
 ## Integration with MAXSIM
 
+### Context Loading
+
+When running within a MAXSIM project, load project context:
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs skill-context tdd
+```
+
+This returns: current phase, active plan, artifact paths, and recent decisions. Use this to:
+- Reference the current plan's `<verify>` blocks when writing tests
+- Know which phase you are implementing within
+- Check for existing test patterns in the project
+
+### STATE.md Hooks
+
+Track TDD metrics in STATE.md via the tools router:
+- After each RED→GREEN→REFACTOR cycle, the executor records the cycle in the plan's task completion
+- TDD violations (production code before test) are recorded as deviations
+- Cycle count is tracked per task for velocity metrics
+
+### Commit Protocol
+
 In MAXSIM plan execution, tasks marked `tdd="true"` follow this cycle with per-step commits:
 - **RED commit:** `test({phase}-{plan}): add failing test for [feature]`
 - **GREEN commit:** `feat({phase}-{plan}): implement [feature]`
 - **REFACTOR commit (if changes made):** `refactor({phase}-{plan}): clean up [feature]`
+
+### Artifact References
+
+- Check `.planning/phases/{current}/PLAN.md` for task-specific test requirements
+- Reference `.planning/phases/{current}/RESEARCH.md` for test patterns discovered during research
+- Test results feed into SUMMARY.md documentation
