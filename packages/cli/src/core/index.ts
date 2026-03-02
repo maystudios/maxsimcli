@@ -246,6 +246,13 @@ export {
   cmdContextLoad,
 } from './context-loader.js';
 
+// Skills exports
+export {
+  cmdSkillList,
+  cmdSkillInstall,
+  cmdSkillUpdate,
+} from './skills.js';
+
 // Start command exports
 export {
   cmdStart,

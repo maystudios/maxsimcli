@@ -538,6 +538,33 @@ const subcommand = argv._[0];
     return;
   }
 
+  // Skill management subcommands
+  if (subcommand === 'skill-list' || subcommand === 'skill-install' || subcommand === 'skill-update') {
+    const { cmdSkillList, cmdSkillInstall, cmdSkillUpdate } = await import('../core/skills.js');
+    const { CliOutput, writeOutput, CliError } = await import('../core/core.js');
+    const cwd = process.cwd();
+    try {
+      if (subcommand === 'skill-list') {
+        cmdSkillList(cwd, false);
+      } else if (subcommand === 'skill-install') {
+        cmdSkillInstall(cwd, argv._[1] as string | undefined, false);
+      } else if (subcommand === 'skill-update') {
+        cmdSkillUpdate(cwd, argv._[1] as string | undefined, false);
+      }
+    } catch (thrown: unknown) {
+      if (thrown instanceof CliOutput) {
+        writeOutput(thrown);
+        process.exit(0);
+      }
+      if (thrown instanceof CliError) {
+        console.error('Error: ' + thrown.message);
+        process.exit(1);
+      }
+      throw thrown;
+    }
+    return;
+  }
+
   if (hasGlobal && hasLocal) {
     console.error(chalk.yellow('Cannot specify both --global and --local'));
     process.exit(1);
