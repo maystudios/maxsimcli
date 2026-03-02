@@ -2,12 +2,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import fsExtra from 'fs-extra';
 
-import type { RuntimeName, AdapterConfig } from '../adapters/index.js';
 import {
   claudeAdapter,
-  opencodeAdapter,
-  geminiAdapter,
-  codexAdapter,
 } from '../adapters/index.js';
 
 // Get version from package.json — read at runtime so semantic-release's version bump
@@ -18,41 +14,24 @@ export const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'pac
 export const templatesRoot = path.resolve(__dirname, 'assets', 'templates');
 
 /**
- * Adapter registry keyed by runtime name
+ * Get the global config directory, using the Claude adapter
  */
-const adapterMap: Record<RuntimeName, AdapterConfig> = {
-  claude: claudeAdapter,
-  opencode: opencodeAdapter,
-  gemini: geminiAdapter,
-  codex: codexAdapter,
-};
-
-/**
- * Get adapter for a runtime
- */
-export function getAdapter(runtime: RuntimeName): AdapterConfig {
-  return adapterMap[runtime];
-}
-
-/**
- * Get the global config directory for a runtime, using adapter
- */
-export function getGlobalDir(runtime: RuntimeName, explicitDir: string | null = null): string {
-  return getAdapter(runtime).getGlobalDir(explicitDir);
+export function getGlobalDir(explicitDir: string | null = null): string {
+  return claudeAdapter.getGlobalDir(explicitDir);
 }
 
 /**
  * Get the config directory path relative to home for hook templating
  */
-export function getConfigDirFromHome(runtime: RuntimeName, isGlobal: boolean): string {
-  return getAdapter(runtime).getConfigDirFromHome(isGlobal);
+export function getConfigDirFromHome(isGlobal: boolean): string {
+  return claudeAdapter.getConfigDirFromHome(isGlobal);
 }
 
 /**
- * Get the local directory name for a runtime
+ * Get the local directory name
  */
-export function getDirName(runtime: RuntimeName): string {
-  return getAdapter(runtime).dirName;
+export function getDirName(): string {
+  return claudeAdapter.dirName;
 }
 
 /**
@@ -68,14 +47,6 @@ export function safeRmDir(dirPath: string): void {
  */
 export function copyDirRecursive(src: string, dest: string): void {
   fsExtra.copySync(src, dest, { dereference: true });
-}
-
-/**
- * Get the global config directory for OpenCode (for JSONC permissions)
- * OpenCode follows XDG Base Directory spec
- */
-export function getOpencodeGlobalDir(): string {
-  return opencodeAdapter.getGlobalDir();
 }
 
 /**
@@ -122,5 +93,5 @@ export interface InstallResult {
   settingsPath: string | null;
   settings: Record<string, unknown> | null;
   statuslineCommand: string | null;
-  runtime: RuntimeName;
+  runtime: 'claude';
 }

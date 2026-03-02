@@ -95,7 +95,7 @@ function saveLocalPatches(configDir) {
 /**
  * After install, report backed-up patches for user to reapply.
  */
-function reportLocalPatches(configDir, runtime = 'claude') {
+function reportLocalPatches(configDir) {
     const patchesDir = path.join(configDir, exports.PATCHES_DIR_NAME);
     const metaPath = path.join(patchesDir, 'backup-meta.json');
     if (!fs.existsSync(metaPath))
@@ -108,11 +108,6 @@ function reportLocalPatches(configDir, runtime = 'claude') {
         return [];
     }
     if (meta.files && meta.files.length > 0) {
-        const reapplyCommand = runtime === 'opencode'
-            ? '/maxsim-reapply-patches'
-            : runtime === 'codex'
-                ? '$maxsim-reapply-patches'
-                : '/maxsim:reapply-patches';
         console.log('');
         console.log('  ' +
             chalk_1.default.yellow('Local patches detected') +
@@ -126,7 +121,7 @@ function reportLocalPatches(configDir, runtime = 'claude') {
         console.log('  Your modifications are saved in ' +
             chalk_1.default.cyan(exports.PATCHES_DIR_NAME + '/'));
         console.log('  Run ' +
-            chalk_1.default.cyan(reapplyCommand) +
+            chalk_1.default.cyan('/maxsim:reapply-patches') +
             ' to merge them into the new version.');
         console.log('  Or manually compare and merge the files.');
         console.log('');

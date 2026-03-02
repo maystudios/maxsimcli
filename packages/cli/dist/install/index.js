@@ -57,37 +57,13 @@ const uninstall_js_1 = require("./uninstall.js");
 // Parse args
 const args = process.argv.slice(2);
 const argv = (0, minimist_1.default)(args, {
-    boolean: ['global', 'local', 'opencode', 'claude', 'gemini', 'codex', 'both', 'all', 'uninstall', 'help', 'version', 'force-statusline', 'network'],
+    boolean: ['global', 'local', 'claude', 'uninstall', 'help', 'version', 'force-statusline', 'network'],
     string: ['config-dir'],
     alias: { g: 'global', l: 'local', u: 'uninstall', h: 'help', c: 'config-dir' },
 });
 const hasGlobal = !!argv['global'];
 const hasLocal = !!argv['local'];
-const hasOpencode = !!argv['opencode'];
-const hasClaude = !!argv['claude'];
-const hasGemini = !!argv['gemini'];
-const hasCodex = !!argv['codex'];
-const hasBoth = !!argv['both']; // Legacy flag, keeps working
-const hasAll = !!argv['all'];
 const hasUninstall = !!argv['uninstall'];
-// Runtime selection - can be set by flags or interactive prompt
-let selectedRuntimes = [];
-if (hasAll) {
-    selectedRuntimes = ['claude', 'opencode', 'gemini', 'codex'];
-}
-else if (hasBoth) {
-    selectedRuntimes = ['claude', 'opencode'];
-}
-else {
-    if (hasOpencode)
-        selectedRuntimes.push('opencode');
-    if (hasClaude)
-        selectedRuntimes.push('claude');
-    if (hasGemini)
-        selectedRuntimes.push('gemini');
-    if (hasCodex)
-        selectedRuntimes.push('codex');
-}
 const banner = '\n' +
     chalk_1.default.cyan(figlet_1.default.textSync('MAXSIM', { font: 'ANSI Shadow' })
         .split('\n')
@@ -99,7 +75,7 @@ const banner = '\n' +
     chalk_1.default.dim('v' + shared_js_1.pkg.version) +
     '\n' +
     '  A meta-prompting, context engineering and spec-driven\n' +
-    '  development system for Claude Code, OpenCode, Gemini, and Codex.\n';
+    '  development system for Claude Code.\n';
 // Parse --config-dir argument
 const explicitConfigDir = argv['config-dir'] || null;
 const hasHelp = !!argv['help'];
@@ -113,17 +89,15 @@ if (hasVersion) {
 console.log(banner);
 // Show help if requested
 if (hasHelp) {
-    console.log(`  ${chalk_1.default.yellow('Usage:')} npx maxsimcli [options]\n\n  ${chalk_1.default.yellow('Options:')}\n    ${chalk_1.default.cyan('-g, --global')}              Install globally (to config directory)\n    ${chalk_1.default.cyan('-l, --local')}               Install locally (to current directory)\n    ${chalk_1.default.cyan('--claude')}                  Install for Claude Code only\n    ${chalk_1.default.cyan('--opencode')}                Install for OpenCode only\n    ${chalk_1.default.cyan('--gemini')}                  Install for Gemini only\n    ${chalk_1.default.cyan('--codex')}                   Install for Codex only\n    ${chalk_1.default.cyan('--all')}                     Install for all runtimes\n    ${chalk_1.default.cyan('-u, --uninstall')}           Uninstall MAXSIM (remove all MAXSIM files)\n    ${chalk_1.default.cyan('-c, --config-dir <path>')}   Specify custom config directory\n    ${chalk_1.default.cyan('-h, --help')}                Show this help message\n    ${chalk_1.default.cyan('--force-statusline')}        Replace existing statusline config\n\n  ${chalk_1.default.yellow('Examples:')}\n    ${chalk_1.default.dim('# Interactive install (prompts for runtime and location)')}\n    npx maxsimcli\n\n    ${chalk_1.default.dim('# Install for Claude Code globally')}\n    npx maxsimcli --claude --global\n\n    ${chalk_1.default.dim('# Install for Gemini globally')}\n    npx maxsimcli --gemini --global\n\n    ${chalk_1.default.dim('# Install for Codex globally')}\n    npx maxsimcli --codex --global\n\n    ${chalk_1.default.dim('# Install for all runtimes globally')}\n    npx maxsimcli --all --global\n\n    ${chalk_1.default.dim('# Install to custom config directory')}\n    npx maxsimcli --codex --global --config-dir ~/.codex-work\n\n    ${chalk_1.default.dim('# Install to current project only')}\n    npx maxsimcli --claude --local\n\n    ${chalk_1.default.dim('# Uninstall MAXSIM from Codex globally')}\n    npx maxsimcli --codex --global --uninstall\n\n  ${chalk_1.default.yellow('Notes:')}\n    The --config-dir option is useful when you have multiple configurations.\n    It takes priority over CLAUDE_CONFIG_DIR / GEMINI_CONFIG_DIR / CODEX_HOME environment variables.\n`);
+    console.log(`  ${chalk_1.default.yellow('Usage:')} npx maxsimcli [options]\n\n  ${chalk_1.default.yellow('Options:')}\n    ${chalk_1.default.cyan('-g, --global')}              Install globally (to config directory)\n    ${chalk_1.default.cyan('-l, --local')}               Install locally (to current directory)\n    ${chalk_1.default.cyan('-u, --uninstall')}           Uninstall MAXSIM (remove all MAXSIM files)\n    ${chalk_1.default.cyan('-c, --config-dir <path>')}   Specify custom config directory\n    ${chalk_1.default.cyan('-h, --help')}                Show this help message\n    ${chalk_1.default.cyan('--force-statusline')}        Replace existing statusline config\n\n  ${chalk_1.default.yellow('Examples:')}\n    ${chalk_1.default.dim('# Interactive install (prompts for location)')}\n    npx maxsimcli\n\n    ${chalk_1.default.dim('# Install globally')}\n    npx maxsimcli --global\n\n    ${chalk_1.default.dim('# Install to current project only')}\n    npx maxsimcli --local\n\n    ${chalk_1.default.dim('# Install to custom config directory')}\n    npx maxsimcli --global --config-dir ~/.claude-work\n\n    ${chalk_1.default.dim('# Uninstall MAXSIM globally')}\n    npx maxsimcli --global --uninstall\n\n  ${chalk_1.default.yellow('Notes:')}\n    The --config-dir option is useful when you have multiple configurations.\n    It takes priority over the CLAUDE_CONFIG_DIR environment variable.\n`);
     process.exit(0);
 }
-async function install(isGlobal, runtime = 'claude') {
-    const isOpencode = runtime === 'opencode';
-    const isGemini = runtime === 'gemini';
-    const isCodex = runtime === 'codex';
-    const dirName = (0, shared_js_1.getDirName)(runtime);
+async function install(isGlobal) {
+    const runtime = 'claude';
+    const dirName = (0, shared_js_1.getDirName)();
     const src = shared_js_1.templatesRoot;
     const targetDir = isGlobal
-        ? (0, shared_js_1.getGlobalDir)(runtime, explicitConfigDir)
+        ? (0, shared_js_1.getGlobalDir)(explicitConfigDir)
         : path.join(process.cwd(), dirName);
     const locationLabel = isGlobal
         ? targetDir.replace(os.homedir(), '~')
@@ -131,63 +105,25 @@ async function install(isGlobal, runtime = 'claude') {
     const pathPrefix = isGlobal
         ? `${targetDir.replace(/\\/g, '/')}/`
         : `./${dirName}/`;
-    let runtimeLabel = 'Claude Code';
-    if (isOpencode)
-        runtimeLabel = 'OpenCode';
-    if (isGemini)
-        runtimeLabel = 'Gemini';
-    if (isCodex)
-        runtimeLabel = 'Codex';
-    console.log(`  Installing for ${chalk_1.default.cyan(runtimeLabel)} to ${chalk_1.default.cyan(locationLabel)}\n`);
+    console.log(`  Installing for ${chalk_1.default.cyan('Claude Code')} to ${chalk_1.default.cyan(locationLabel)}\n`);
     const failures = [];
     // Save any locally modified MAXSIM files before they get wiped
     (0, patches_js_1.saveLocalPatches)(targetDir);
     // Clean up orphaned files from previous versions
     (0, hooks_js_1.cleanupOrphanedFiles)(targetDir);
-    // OpenCode uses command/ (flat), Codex uses skills/, Claude/Gemini use commands/maxsim/
+    // Claude uses commands/maxsim/
     let spinner = (0, ora_1.default)({ text: 'Installing commands...', color: 'cyan' }).start();
-    if (isOpencode) {
-        const commandDir = path.join(targetDir, 'command');
-        fs.mkdirSync(commandDir, { recursive: true });
-        const maxsimSrc = path.join(src, 'commands', 'maxsim');
-        (0, copy_js_1.copyFlattenedCommands)(maxsimSrc, commandDir, 'maxsim', pathPrefix, runtime, explicitConfigDir);
-        if ((0, shared_js_1.verifyInstalled)(commandDir, 'command/maxsim-*')) {
-            const count = fs
-                .readdirSync(commandDir)
-                .filter((f) => f.startsWith('maxsim-')).length;
-            spinner.succeed(chalk_1.default.green('\u2713') + ` Installed ${count} commands to command/`);
-        }
-        else {
-            spinner.fail('Failed to install commands');
-            failures.push('command/maxsim-*');
-        }
-    }
-    else if (isCodex) {
-        const skillsDir = path.join(targetDir, 'skills');
-        const maxsimSrc = path.join(src, 'commands', 'maxsim');
-        (0, copy_js_1.copyCommandsAsCodexSkills)(maxsimSrc, skillsDir, 'maxsim', pathPrefix, runtime, explicitConfigDir);
-        const installedSkillNames = (0, copy_js_1.listCodexSkillNames)(skillsDir);
-        if (installedSkillNames.length > 0) {
-            spinner.succeed(chalk_1.default.green('\u2713') + ` Installed ${installedSkillNames.length} skills to skills/`);
-        }
-        else {
-            spinner.fail('Failed to install skills');
-            failures.push('skills/maxsim-*');
-        }
+    const commandsDir = path.join(targetDir, 'commands');
+    fs.mkdirSync(commandsDir, { recursive: true });
+    const maxsimSrc = path.join(src, 'commands', 'maxsim');
+    const maxsimDest = path.join(commandsDir, 'maxsim');
+    (0, copy_js_1.copyWithPathReplacement)(maxsimSrc, maxsimDest, pathPrefix, explicitConfigDir, true);
+    if ((0, shared_js_1.verifyInstalled)(maxsimDest, 'commands/maxsim')) {
+        spinner.succeed(chalk_1.default.green('\u2713') + ' Installed commands/maxsim');
     }
     else {
-        const commandsDir = path.join(targetDir, 'commands');
-        fs.mkdirSync(commandsDir, { recursive: true });
-        const maxsimSrc = path.join(src, 'commands', 'maxsim');
-        const maxsimDest = path.join(commandsDir, 'maxsim');
-        (0, copy_js_1.copyWithPathReplacement)(maxsimSrc, maxsimDest, pathPrefix, runtime, explicitConfigDir, true);
-        if ((0, shared_js_1.verifyInstalled)(maxsimDest, 'commands/maxsim')) {
-            spinner.succeed(chalk_1.default.green('\u2713') + ' Installed commands/maxsim');
-        }
-        else {
-            spinner.fail('Failed to install commands/maxsim');
-            failures.push('commands/maxsim');
-        }
+        spinner.fail('Failed to install commands/maxsim');
+        failures.push('commands/maxsim');
     }
     // Copy maxsim directory content (workflows, templates, references) with path replacement
     spinner = (0, ora_1.default)({ text: 'Installing workflows and templates...', color: 'cyan' }).start();
@@ -201,7 +137,7 @@ async function install(isGlobal, runtime = 'claude') {
         const subdirSrc = path.join(src, subdir);
         if (fs.existsSync(subdirSrc)) {
             const subdirDest = path.join(skillDest, subdir);
-            (0, copy_js_1.copyWithPathReplacement)(subdirSrc, subdirDest, pathPrefix, runtime, explicitConfigDir);
+            (0, copy_js_1.copyWithPathReplacement)(subdirSrc, subdirDest, pathPrefix, explicitConfigDir);
         }
     }
     if ((0, shared_js_1.verifyInstalled)(skillDest, 'maxsim')) {
@@ -231,16 +167,7 @@ async function install(isGlobal, runtime = 'claude') {
                 let content = fs.readFileSync(path.join(agentsSrc, entry.name), 'utf8');
                 const dirRegex = /~\/\.claude\//g;
                 content = content.replace(dirRegex, pathPrefix);
-                content = (0, index_js_1.processAttribution)(content, (0, adapters_js_1.getCommitAttribution)(runtime, explicitConfigDir));
-                if (isOpencode) {
-                    content = (0, index_js_1.convertClaudeToOpencodeFrontmatter)(content);
-                }
-                else if (isGemini) {
-                    content = (0, index_js_1.convertClaudeToGeminiAgent)(content);
-                }
-                else if (isCodex) {
-                    content = (0, index_js_1.convertClaudeToCodexMarkdown)(content);
-                }
+                content = (0, index_js_1.processAttribution)(content, (0, adapters_js_1.getCommitAttribution)(explicitConfigDir));
                 fs.writeFileSync(path.join(agentsDest, entry.name), content);
             }
         }
@@ -278,7 +205,7 @@ async function install(isGlobal, runtime = 'claude') {
                     let content = fs.readFileSync(skillMd, 'utf8');
                     const dirRegex = /~\/\.claude\//g;
                     content = content.replace(dirRegex, pathPrefix);
-                    content = (0, index_js_1.processAttribution)(content, (0, adapters_js_1.getCommitAttribution)(runtime, explicitConfigDir));
+                    content = (0, index_js_1.processAttribution)(content, (0, adapters_js_1.getCommitAttribution)(explicitConfigDir));
                     fs.writeFileSync(skillMd, content);
                 }
             }
@@ -330,38 +257,36 @@ async function install(isGlobal, runtime = 'claude') {
     else {
         failures.push('VERSION');
     }
-    if (!isCodex) {
-        // Write package.json to force CommonJS mode for MAXSIM scripts
-        const pkgJsonDest = path.join(targetDir, 'package.json');
-        fs.writeFileSync(pkgJsonDest, '{"type":"commonjs"}\n');
-        console.log(`  ${chalk_1.default.green('\u2713')} Wrote package.json (CommonJS mode)`);
-        // Install maxsim-tools.cjs binary
-        const toolSrc = path.resolve(__dirname, 'cli.cjs');
-        const binDir = path.join(targetDir, 'maxsim', 'bin');
-        const toolDest = path.join(binDir, 'maxsim-tools.cjs');
-        if (fs.existsSync(toolSrc)) {
-            fs.mkdirSync(binDir, { recursive: true });
-            fs.copyFileSync(toolSrc, toolDest);
-            console.log(`  ${chalk_1.default.green('\u2713')} Installed maxsim-tools.cjs`);
-        }
-        else {
-            console.warn(`  ${chalk_1.default.yellow('!')} cli.cjs not found at ${toolSrc} — maxsim-tools.cjs not installed`);
-            failures.push('maxsim-tools.cjs');
-        }
-        // Install mcp-server.cjs
-        const mcpSrc = path.resolve(__dirname, 'mcp-server.cjs');
-        const mcpDest = path.join(binDir, 'mcp-server.cjs');
-        if (fs.existsSync(mcpSrc)) {
-            fs.mkdirSync(binDir, { recursive: true });
-            fs.copyFileSync(mcpSrc, mcpDest);
-            console.log(`  ${chalk_1.default.green('\u2713')} Installed mcp-server.cjs`);
-        }
-        else {
-            console.warn(`  ${chalk_1.default.yellow('!')} mcp-server.cjs not found — MCP server not installed`);
-        }
-        // Install hooks
-        (0, hooks_js_1.installHookFiles)(targetDir, runtime, isGlobal, failures);
+    // Write package.json to force CommonJS mode for MAXSIM scripts
+    const pkgJsonDest = path.join(targetDir, 'package.json');
+    fs.writeFileSync(pkgJsonDest, '{"type":"commonjs"}\n');
+    console.log(`  ${chalk_1.default.green('\u2713')} Wrote package.json (CommonJS mode)`);
+    // Install maxsim-tools.cjs binary
+    const toolSrc = path.resolve(__dirname, 'cli.cjs');
+    const binDir = path.join(targetDir, 'maxsim', 'bin');
+    const toolDest = path.join(binDir, 'maxsim-tools.cjs');
+    if (fs.existsSync(toolSrc)) {
+        fs.mkdirSync(binDir, { recursive: true });
+        fs.copyFileSync(toolSrc, toolDest);
+        console.log(`  ${chalk_1.default.green('\u2713')} Installed maxsim-tools.cjs`);
     }
+    else {
+        console.warn(`  ${chalk_1.default.yellow('!')} cli.cjs not found at ${toolSrc} — maxsim-tools.cjs not installed`);
+        failures.push('maxsim-tools.cjs');
+    }
+    // Install mcp-server.cjs
+    const mcpSrc = path.resolve(__dirname, 'mcp-server.cjs');
+    const mcpDest = path.join(binDir, 'mcp-server.cjs');
+    if (fs.existsSync(mcpSrc)) {
+        fs.mkdirSync(binDir, { recursive: true });
+        fs.copyFileSync(mcpSrc, mcpDest);
+        console.log(`  ${chalk_1.default.green('\u2713')} Installed mcp-server.cjs`);
+    }
+    else {
+        console.warn(`  ${chalk_1.default.yellow('!')} mcp-server.cjs not found — MCP server not installed`);
+    }
+    // Install hooks
+    (0, hooks_js_1.installHookFiles)(targetDir, isGlobal, failures);
     // Copy dashboard
     const dashboardSrc = path.resolve(__dirname, 'assets', 'dashboard');
     if (fs.existsSync(dashboardSrc)) {
@@ -393,98 +318,58 @@ async function install(isGlobal, runtime = 'claude') {
         }
     }
     // Write .mcp.json for Claude Code MCP server auto-discovery
-    if (!isOpencode && !isCodex && !isGemini) {
-        const mcpJsonPath = isGlobal
-            ? path.join(targetDir, '..', '.mcp.json')
-            : path.join(process.cwd(), '.mcp.json');
-        let mcpConfig = {};
-        if (fs.existsSync(mcpJsonPath)) {
-            try {
-                mcpConfig = JSON.parse(fs.readFileSync(mcpJsonPath, 'utf-8'));
-            }
-            catch {
-                // Corrupted file — start fresh
-            }
+    const mcpJsonPath = isGlobal
+        ? path.join(targetDir, '..', '.mcp.json')
+        : path.join(process.cwd(), '.mcp.json');
+    let mcpConfig = {};
+    if (fs.existsSync(mcpJsonPath)) {
+        try {
+            mcpConfig = JSON.parse(fs.readFileSync(mcpJsonPath, 'utf-8'));
         }
-        const mcpServers = mcpConfig.mcpServers ?? {};
-        mcpServers['maxsim'] = {
-            command: 'node',
-            args: ['.claude/maxsim/bin/mcp-server.cjs'],
-            env: {},
-        };
-        mcpConfig.mcpServers = mcpServers;
-        fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + '\n', 'utf-8');
-        console.log(`  ${chalk_1.default.green('\u2713')} Configured .mcp.json for MCP server auto-discovery`);
+        catch {
+            // Corrupted file — start fresh
+        }
     }
+    const mcpServers = mcpConfig.mcpServers ?? {};
+    mcpServers['maxsim'] = {
+        command: 'node',
+        args: ['.claude/maxsim/bin/mcp-server.cjs'],
+        env: {},
+    };
+    mcpConfig.mcpServers = mcpServers;
+    fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + '\n', 'utf-8');
+    console.log(`  ${chalk_1.default.green('\u2713')} Configured .mcp.json for MCP server auto-discovery`);
     if (failures.length > 0) {
         console.error(`\n  ${chalk_1.default.yellow('Installation incomplete!')} Failed: ${failures.join(', ')}`);
         process.exit(1);
     }
     // Write file manifest for future modification detection
-    (0, manifest_js_1.writeManifest)(targetDir, runtime);
+    (0, manifest_js_1.writeManifest)(targetDir);
     console.log(`  ${chalk_1.default.green('\u2713')} Wrote file manifest (${manifest_js_1.MANIFEST_NAME})`);
     // Report any backed-up local patches
-    (0, patches_js_1.reportLocalPatches)(targetDir, runtime);
-    if (isCodex) {
-        return {
-            settingsPath: null,
-            settings: null,
-            statuslineCommand: null,
-            runtime,
-        };
-    }
+    (0, patches_js_1.reportLocalPatches)(targetDir);
     // Configure statusline and hooks in settings.json
-    const { settingsPath, settings, statuslineCommand } = (0, hooks_js_1.configureSettingsHooks)(targetDir, runtime, isGlobal);
-    // Enable experimental agents for Gemini CLI
-    if (isGemini) {
-        if (!settings.experimental) {
-            settings.experimental = {};
-        }
-        const experimental = settings.experimental;
-        if (!experimental.enableAgents) {
-            experimental.enableAgents = true;
-            console.log(`  ${chalk_1.default.green('\u2713')} Enabled experimental agents`);
-        }
-    }
+    const { settingsPath, settings, statuslineCommand } = (0, hooks_js_1.configureSettingsHooks)(targetDir, isGlobal);
     return { settingsPath, settings, statuslineCommand, runtime };
-}
-/**
- * Prompt for runtime selection (multi-select)
- */
-async function promptRuntime() {
-    const selected = await (0, prompts_1.checkbox)({
-        message: 'Which runtime(s) would you like to install for?',
-        choices: [
-            { name: 'Claude Code  ' + chalk_1.default.dim('(~/.claude)'), value: 'claude', checked: true },
-            { name: 'OpenCode     ' + chalk_1.default.dim('(~/.config/opencode)') + '  — open source, free models', value: 'opencode' },
-            { name: 'Gemini       ' + chalk_1.default.dim('(~/.gemini)'), value: 'gemini' },
-            { name: 'Codex        ' + chalk_1.default.dim('(~/.codex)'), value: 'codex' },
-        ],
-        validate: (choices) => choices.length > 0 || 'Please select at least one runtime',
-    });
-    return selected;
 }
 /**
  * Prompt for install location
  */
-async function promptLocation(runtimes) {
+async function promptLocation() {
     if (!process.stdin.isTTY) {
         console.log(chalk_1.default.yellow('Non-interactive terminal detected, defaulting to global install') + '\n');
         return true; // isGlobal
     }
-    const pathExamples = runtimes
-        .map((r) => (0, shared_js_1.getGlobalDir)(r, explicitConfigDir).replace(os.homedir(), '~'))
-        .join(', ');
-    const localExamples = runtimes.map((r) => `./${(0, shared_js_1.getDirName)(r)}`).join(', ');
+    const globalPath = (0, shared_js_1.getGlobalDir)(explicitConfigDir).replace(os.homedir(), '~');
     const choice = await (0, prompts_1.select)({
         message: 'Where would you like to install?',
         choices: [
             {
-                name: 'Global  ' + chalk_1.default.dim(`(${pathExamples})`) + '  — available in all projects',
+                name: 'Global  ' + chalk_1.default.dim(`(${globalPath})`) + '  — available in all projects',
                 value: 'global',
             },
             {
-                name: 'Local   ' + chalk_1.default.dim(`(${localExamples})`) + '  — this project only',
+                name: 'Local   ' + chalk_1.default.dim('(./.claude)') + '  — this project only',
                 value: 'local',
             },
         ],
@@ -492,7 +377,7 @@ async function promptLocation(runtimes) {
     return choice === 'global';
 }
 /**
- * Prompt whether to enable Agent Teams (Claude only, experimental feature)
+ * Prompt whether to enable Agent Teams (experimental feature)
  */
 async function promptAgentTeams() {
     console.log();
@@ -506,35 +391,26 @@ async function promptAgentTeams() {
     });
 }
 /**
- * Install MAXSIM for all selected runtimes
+ * Install MAXSIM for Claude Code
  */
-async function installAllRuntimes(runtimes, isGlobal, isInteractive) {
-    const results = [];
-    for (const runtime of runtimes) {
-        const result = await install(isGlobal, runtime);
-        results.push(result);
-    }
-    const statuslineRuntimes = ['claude', 'gemini'];
-    const primaryStatuslineResult = results.find((r) => statuslineRuntimes.includes(r.runtime));
+async function installForClaude(isGlobal, isInteractive) {
+    const result = await install(isGlobal);
     let shouldInstallStatusline = false;
-    if (primaryStatuslineResult && primaryStatuslineResult.settings) {
-        shouldInstallStatusline = await (0, hooks_js_1.handleStatusline)(primaryStatuslineResult.settings, isInteractive, forceStatusline);
+    if (result.settings) {
+        shouldInstallStatusline = await (0, hooks_js_1.handleStatusline)(result.settings, isInteractive, forceStatusline);
     }
-    // Prompt for Agent Teams if Claude is in the selected runtimes
+    // Prompt for Agent Teams
     let enableAgentTeams = false;
-    if (isInteractive && runtimes.includes('claude')) {
+    if (isInteractive) {
         enableAgentTeams = await promptAgentTeams();
     }
-    for (const result of results) {
-        const useStatusline = statuslineRuntimes.includes(result.runtime) && shouldInstallStatusline;
-        // Apply Agent Teams setting for Claude
-        if (result.runtime === 'claude' && enableAgentTeams && result.settings) {
-            const env = result.settings.env ?? {};
-            env['CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS'] = '1';
-            result.settings.env = env;
-        }
-        (0, hooks_js_1.finishInstall)(result.settingsPath, result.settings, result.statuslineCommand, useStatusline, result.runtime, isGlobal);
+    // Apply Agent Teams setting
+    if (enableAgentTeams && result.settings) {
+        const env = result.settings.env ?? {};
+        env['CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS'] = '1';
+        result.settings.env = env;
     }
+    (0, hooks_js_1.finishInstall)(result.settingsPath, result.settings, result.statuslineCommand, shouldInstallStatusline, isGlobal);
 }
 // Main logic
 // Subcommand routing — intercept before install flow
@@ -558,32 +434,19 @@ const subcommand = argv._[0];
             console.error(chalk_1.default.yellow('--uninstall requires --global or --local'));
             process.exit(1);
         }
-        const runtimes = selectedRuntimes.length > 0 ? selectedRuntimes : ['claude'];
-        for (const runtime of runtimes) {
-            (0, uninstall_js_1.uninstall)(hasGlobal, runtime, explicitConfigDir);
-        }
-    }
-    else if (selectedRuntimes.length > 0) {
-        if (!hasGlobal && !hasLocal) {
-            const isGlobal = await promptLocation(selectedRuntimes);
-            await installAllRuntimes(selectedRuntimes, isGlobal, true);
-        }
-        else {
-            await installAllRuntimes(selectedRuntimes, hasGlobal, false);
-        }
+        (0, uninstall_js_1.uninstall)(hasGlobal, explicitConfigDir);
     }
     else if (hasGlobal || hasLocal) {
-        await installAllRuntimes(['claude'], hasGlobal, false);
+        await installForClaude(hasGlobal, false);
     }
     else {
         if (!process.stdin.isTTY) {
-            console.log(chalk_1.default.yellow('Non-interactive terminal detected, defaulting to Claude Code global install') + '\n');
-            await installAllRuntimes(['claude'], true, false);
+            console.log(chalk_1.default.yellow('Non-interactive terminal detected, defaulting to global install') + '\n');
+            await installForClaude(true, false);
         }
         else {
-            const runtimes = await promptRuntime();
-            const isGlobal = await promptLocation(runtimes);
-            await installAllRuntimes(runtimes, isGlobal, true);
+            const isGlobal = await promptLocation();
+            await installForClaude(isGlobal, true);
         }
     }
 })().catch((err) => {

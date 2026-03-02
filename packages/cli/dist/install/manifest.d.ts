@@ -1,4 +1,3 @@
-import type { RuntimeName } from '../adapters/index.js';
 export declare const MANIFEST_NAME = "maxsim-file-manifest.json";
 /**
  * Compute SHA256 hash of file contents
@@ -16,5 +15,5 @@ export interface Manifest {
 /**
  * Write file manifest after installation for future modification detection
  */
-export declare function writeManifest(configDir: string, runtime?: RuntimeName): Manifest;
+export declare function writeManifest(configDir: string): Manifest;
 //# sourceMappingURL=manifest.d.ts.map

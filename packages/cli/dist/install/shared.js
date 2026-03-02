@@ -37,13 +37,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.templatesRoot = exports.pkg = void 0;
-exports.getAdapter = getAdapter;
 exports.getGlobalDir = getGlobalDir;
 exports.getConfigDirFromHome = getConfigDirFromHome;
 exports.getDirName = getDirName;
 exports.safeRmDir = safeRmDir;
 exports.copyDirRecursive = copyDirRecursive;
-exports.getOpencodeGlobalDir = getOpencodeGlobalDir;
 exports.verifyInstalled = verifyInstalled;
 exports.verifyFileInstalled = verifyFileInstalled;
 const fs = __importStar(require("node:fs"));
@@ -56,37 +54,22 @@ exports.pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'package.
 // Resolve template asset root — bundled into dist/assets/templates at publish time
 exports.templatesRoot = path.resolve(__dirname, 'assets', 'templates');
 /**
- * Adapter registry keyed by runtime name
+ * Get the global config directory, using the Claude adapter
  */
-const adapterMap = {
-    claude: index_js_1.claudeAdapter,
-    opencode: index_js_1.opencodeAdapter,
-    gemini: index_js_1.geminiAdapter,
-    codex: index_js_1.codexAdapter,
-};
-/**
- * Get adapter for a runtime
- */
-function getAdapter(runtime) {
-    return adapterMap[runtime];
-}
-/**
- * Get the global config directory for a runtime, using adapter
- */
-function getGlobalDir(runtime, explicitDir = null) {
-    return getAdapter(runtime).getGlobalDir(explicitDir);
+function getGlobalDir(explicitDir = null) {
+    return index_js_1.claudeAdapter.getGlobalDir(explicitDir);
 }
 /**
  * Get the config directory path relative to home for hook templating
  */
-function getConfigDirFromHome(runtime, isGlobal) {
-    return getAdapter(runtime).getConfigDirFromHome(isGlobal);
+function getConfigDirFromHome(isGlobal) {
+    return index_js_1.claudeAdapter.getConfigDirFromHome(isGlobal);
 }
 /**
- * Get the local directory name for a runtime
+ * Get the local directory name
  */
-function getDirName(runtime) {
-    return getAdapter(runtime).dirName;
+function getDirName() {
+    return index_js_1.claudeAdapter.dirName;
 }
 /**
  * Recursively remove a directory, handling Windows read-only file attributes.
@@ -100,13 +83,6 @@ function safeRmDir(dirPath) {
  */
 function copyDirRecursive(src, dest) {
     fs_extra_1.default.copySync(src, dest, { dereference: true });
-}
-/**
- * Get the global config directory for OpenCode (for JSONC permissions)
- * OpenCode follows XDG Base Directory spec
- */
-function getOpencodeGlobalDir() {
-    return index_js_1.opencodeAdapter.getGlobalDir();
 }
 /**
  * Verify a directory exists and contains files
