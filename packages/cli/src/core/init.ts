@@ -7,7 +7,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { execSync } from 'node:child_process';
 
 import {
   loadConfig,
@@ -17,8 +16,6 @@ import {
   pathExistsInternal,
   generateSlugInternal,
   getMilestoneInfo,
-  output,
-  error,
   debugLog,
   planningPath,
   phasesPath,
@@ -28,6 +25,7 @@ import {
   isPlanFile,
 } from './core.js';
 
+import { cmdOk, cmdErr } from './types.js';
 import type {
   AgentType,
   BranchingStrategy,
@@ -35,6 +33,7 @@ import type {
   PhaseSearchResult,
   MilestoneInfo,
   AppConfig,
+  CmdResult,
 } from './types.js';
 
 // ─── Init result types ──────────────────────────────────────────────────────
@@ -219,13 +218,7 @@ export interface TodosContext {
   date: string;
   timestamp: string;
   todo_count: number;
-  todos: Array<{
-    file: string;
-    created: string;
-    title: string;
-    area: string;
-    path: string;
-  }>;
+  todos: Array<{ file: string; created: string; title: string; area: string; path: string }>;
   area_filter: string | null;
   pending_dir: string;
   completed_dir: string;
@@ -338,20 +331,13 @@ export type InitContext =
 function extractReqIds(cwd: string, phase: string): string | null {
   const roadmapPhase = getRoadmapPhaseInternal(cwd, phase);
   const reqMatch = roadmapPhase?.section?.match(/^\*\*Requirements\*\*:[^\S\n]*([^\n]*)$/m);
-  const reqExtracted = reqMatch
-    ? reqMatch[1].replace(/[\[\]]/g, '').split(',').map((s: string) => s.trim()).filter(Boolean).join(', ')
-    : null;
+  const reqExtracted = reqMatch ? reqMatch[1].replace(/[\[\]]/g, '').split(',').map((s: string) => s.trim()).filter(Boolean).join(', ') : null;
   return (reqExtracted && reqExtracted !== 'TBD') ? reqExtracted : null;
 }
 
 // ─── Helper: scan phase dir for artifact files ──────────────────────────────
 
-interface PhaseArtifacts {
-  context_path?: string;
-  research_path?: string;
-  verification_path?: string;
-  uat_path?: string;
-}
+interface PhaseArtifacts { context_path?: string; research_path?: string; verification_path?: string; uat_path?: string; }
 
 function scanPhaseArtifacts(cwd: string, phaseDirectory: string): PhaseArtifacts {
   const result: PhaseArtifacts = {};
@@ -359,40 +345,48 @@ function scanPhaseArtifacts(cwd: string, phaseDirectory: string): PhaseArtifacts
   try {
     const files = fs.readdirSync(phaseDirFull);
     const contextFile = files.find(f => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
-    if (contextFile) {
-      result.context_path = path.join(phaseDirectory, contextFile);
-    }
+    if (contextFile) result.context_path = path.join(phaseDirectory, contextFile);
     const researchFile = files.find(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
-    if (researchFile) {
-      result.research_path = path.join(phaseDirectory, researchFile);
-    }
+    if (researchFile) result.research_path = path.join(phaseDirectory, researchFile);
     const verificationFile = files.find(f => f.endsWith('-VERIFICATION.md') || f === 'VERIFICATION.md');
-    if (verificationFile) {
-      result.verification_path = path.join(phaseDirectory, verificationFile);
-    }
+    if (verificationFile) result.verification_path = path.join(phaseDirectory, verificationFile);
     const uatFile = files.find(f => f.endsWith('-UAT.md') || f === 'UAT.md');
-    if (uatFile) {
-      result.uat_path = path.join(phaseDirectory, uatFile);
-    }
-  } catch (e) {
-    /* optional op, ignore */
-    debugLog(e);
-  }
+    if (uatFile) result.uat_path = path.join(phaseDirectory, uatFile);
+  } catch (e) { debugLog(e); }
   return result;
+}
+
+// ─── Helper: cross-platform code file detection ─────────────────────────────
+
+const CODE_EXTENSIONS = new Set(['.ts', '.js', '.py', '.go', '.rs', '.swift', '.java']);
+const EXCLUDED_DIRS = new Set(['node_modules', '.git']);
+
+function findCodeFiles(dir: string, maxDepth: number = 3, limit: number = 5): string[] {
+  const results: string[] = [];
+  function walk(currentDir: string, depth: number): void {
+    if (depth > maxDepth || results.length >= limit) return;
+    let entries: fs.Dirent[];
+    try { entries = fs.readdirSync(currentDir, { withFileTypes: true }); } catch { return; }
+    for (const entry of entries) {
+      if (results.length >= limit) return;
+      if (EXCLUDED_DIRS.has(entry.name)) continue;
+      const fullPath = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) { walk(fullPath, depth + 1); }
+      else if (entry.isFile()) { const ext = path.extname(entry.name).toLowerCase(); if (CODE_EXTENSIONS.has(ext)) results.push(fullPath); }
+    }
+  }
+  walk(dir, 1);
+  return results;
 }
 
 // ─── Init commands ──────────────────────────────────────────────────────────
 
-export function cmdInitExecutePhase(cwd: string, phase: string | undefined, raw: boolean): void {
-  if (!phase) {
-    error('phase required for init execute-phase');
-  }
-
+export function cmdInitExecutePhase(cwd: string, phase: string | undefined): CmdResult {
+  if (!phase) return cmdErr('phase required for init execute-phase');
   const config = loadConfig(cwd);
   const phaseInfo = findPhaseInternal(cwd, phase!);
   const milestone = getMilestoneInfo(cwd);
   const phase_req_ids = extractReqIds(cwd, phase!);
-
   const result: ExecutePhaseContext = {
     executor_model: resolveModelInternal(cwd, 'maxsim-executor'),
     verifier_model: resolveModelInternal(cwd, 'maxsim-verifier'),
@@ -414,13 +408,9 @@ export function cmdInitExecutePhase(cwd: string, phase: string | undefined, raw:
     plan_count: phaseInfo?.plans?.length ?? 0,
     incomplete_count: phaseInfo?.incomplete_plans?.length ?? 0,
     branch_name: config.branching_strategy === 'phase' && phaseInfo
-      ? config.phase_branch_template
-          .replace('{phase}', phaseInfo.phase_number)
-          .replace('{slug}', phaseInfo.phase_slug || 'phase')
+      ? config.phase_branch_template.replace('{phase}', phaseInfo.phase_number).replace('{slug}', phaseInfo.phase_slug || 'phase')
       : config.branching_strategy === 'milestone'
-        ? config.milestone_branch_template
-            .replace('{milestone}', milestone.version)
-            .replace('{slug}', generateSlugInternal(milestone.name) || 'milestone')
+        ? config.milestone_branch_template.replace('{milestone}', milestone.version).replace('{slug}', generateSlugInternal(milestone.name) || 'milestone')
         : null,
     milestone_version: milestone.version,
     milestone_name: milestone.name,
@@ -432,19 +422,14 @@ export function cmdInitExecutePhase(cwd: string, phase: string | undefined, raw:
     roadmap_path: '.planning/ROADMAP.md',
     config_path: '.planning/config.json',
   };
-
-  output(result, raw);
+  return cmdOk(result);
 }
 
-export function cmdInitPlanPhase(cwd: string, phase: string | undefined, raw: boolean): void {
-  if (!phase) {
-    error('phase required for init plan-phase');
-  }
-
+export function cmdInitPlanPhase(cwd: string, phase: string | undefined): CmdResult {
+  if (!phase) return cmdErr('phase required for init plan-phase');
   const config = loadConfig(cwd);
   const phaseInfo = findPhaseInternal(cwd, phase!);
   const phase_req_ids = extractReqIds(cwd, phase!);
-
   const result: PlanPhaseContext = {
     researcher_model: resolveModelInternal(cwd, 'maxsim-phase-researcher'),
     planner_model: resolveModelInternal(cwd, 'maxsim-planner'),
@@ -469,7 +454,6 @@ export function cmdInitPlanPhase(cwd: string, phase: string | undefined, raw: bo
     roadmap_path: '.planning/ROADMAP.md',
     requirements_path: '.planning/REQUIREMENTS.md',
   };
-
   if (phaseInfo?.directory) {
     const artifacts = scanPhaseArtifacts(cwd, phaseInfo.directory);
     if (artifacts.context_path) result.context_path = artifacts.context_path;
@@ -477,37 +461,16 @@ export function cmdInitPlanPhase(cwd: string, phase: string | undefined, raw: bo
     if (artifacts.verification_path) result.verification_path = artifacts.verification_path;
     if (artifacts.uat_path) result.uat_path = artifacts.uat_path;
   }
-
-  output(result, raw);
+  return cmdOk(result);
 }
 
-export function cmdInitNewProject(cwd: string, raw: boolean): void {
+export function cmdInitNewProject(cwd: string): CmdResult {
   const config = loadConfig(cwd);
-
   const homedir = os.homedir();
   const braveKeyFile = path.join(homedir, '.maxsim', 'brave_api_key');
   const hasBraveSearch = !!(process.env.BRAVE_API_KEY || fs.existsSync(braveKeyFile));
-
-  let hasCode = false;
-  let hasPackageFile = false;
-  try {
-    const files = execSync('find . -maxdepth 3 \\( -name "*.ts" -o -name "*.js" -o -name "*.py" -o -name "*.go" -o -name "*.rs" -o -name "*.swift" -o -name "*.java" \\) 2>/dev/null | grep -v node_modules | grep -v .git | head -5', {
-      cwd,
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
-    hasCode = files.trim().length > 0;
-  } catch (e) {
-    /* optional op, ignore */
-    debugLog(e);
-  }
-
-  hasPackageFile = pathExistsInternal(cwd, 'package.json') ||
-                   pathExistsInternal(cwd, 'requirements.txt') ||
-                   pathExistsInternal(cwd, 'Cargo.toml') ||
-                   pathExistsInternal(cwd, 'go.mod') ||
-                   pathExistsInternal(cwd, 'Package.swift');
-
+  const hasCode = findCodeFiles(cwd).length > 0;
+  const hasPackageFile = pathExistsInternal(cwd, 'package.json') || pathExistsInternal(cwd, 'requirements.txt') || pathExistsInternal(cwd, 'Cargo.toml') || pathExistsInternal(cwd, 'go.mod') || pathExistsInternal(cwd, 'Package.swift');
   const result: NewProjectContext = {
     researcher_model: resolveModelInternal(cwd, 'maxsim-project-researcher'),
     synthesizer_model: resolveModelInternal(cwd, 'maxsim-research-synthesizer'),
@@ -524,14 +487,12 @@ export function cmdInitNewProject(cwd: string, raw: boolean): void {
     brave_search_available: hasBraveSearch,
     project_path: '.planning/PROJECT.md',
   };
-
-  output(result, raw);
+  return cmdOk(result);
 }
 
-export function cmdInitNewMilestone(cwd: string, raw: boolean): void {
+export function cmdInitNewMilestone(cwd: string): CmdResult {
   const config = loadConfig(cwd);
   const milestone = getMilestoneInfo(cwd);
-
   const result: NewMilestoneContext = {
     researcher_model: resolveModelInternal(cwd, 'maxsim-project-researcher'),
     synthesizer_model: resolveModelInternal(cwd, 'maxsim-research-synthesizer'),
@@ -547,30 +508,19 @@ export function cmdInitNewMilestone(cwd: string, raw: boolean): void {
     roadmap_path: '.planning/ROADMAP.md',
     state_path: '.planning/STATE.md',
   };
-
-  output(result, raw);
+  return cmdOk(result);
 }
 
-export function cmdInitQuick(cwd: string, description: string | undefined, raw: boolean): void {
+export function cmdInitQuick(cwd: string, description: string | undefined): CmdResult {
   const config = loadConfig(cwd);
   const now = new Date();
   const slug = description ? generateSlugInternal(description)?.substring(0, 40) ?? null : null;
-
   const quickDir = planningPath(cwd, 'quick');
   let nextNum = 1;
   try {
-    const existing = fs.readdirSync(quickDir)
-      .filter(f => /^\d+-/.test(f))
-      .map(f => parseInt(f.split('-')[0], 10))
-      .filter(n => !isNaN(n));
-    if (existing.length > 0) {
-      nextNum = Math.max(...existing) + 1;
-    }
-  } catch (e) {
-    /* optional op, ignore */
-    debugLog(e);
-  }
-
+    const existing = fs.readdirSync(quickDir).filter(f => /^\d+-/.test(f)).map(f => parseInt(f.split('-')[0], 10)).filter(n => !isNaN(n));
+    if (existing.length > 0) nextNum = Math.max(...existing) + 1;
+  } catch (e) { debugLog(e); }
   const result: QuickContext = {
     planner_model: resolveModelInternal(cwd, 'maxsim-planner'),
     executor_model: resolveModelInternal(cwd, 'maxsim-executor'),
@@ -587,21 +537,13 @@ export function cmdInitQuick(cwd: string, description: string | undefined, raw: 
     roadmap_exists: pathExistsInternal(cwd, '.planning/ROADMAP.md'),
     planning_exists: pathExistsInternal(cwd, '.planning'),
   };
-
-  output(result, raw);
+  return cmdOk(result);
 }
 
-export function cmdInitResume(cwd: string, raw: boolean): void {
+export function cmdInitResume(cwd: string): CmdResult {
   const config = loadConfig(cwd);
-
   let interruptedAgentId: string | null = null;
-  try {
-    interruptedAgentId = fs.readFileSync(planningPath(cwd, 'current-agent-id.txt'), 'utf-8').trim();
-  } catch (e) {
-    /* optional op, ignore */
-    debugLog(e);
-  }
-
+  try { interruptedAgentId = fs.readFileSync(planningPath(cwd, 'current-agent-id.txt'), 'utf-8').trim(); } catch (e) { debugLog(e); }
   const result: ResumeContext = {
     state_exists: pathExistsInternal(cwd, '.planning/STATE.md'),
     roadmap_exists: pathExistsInternal(cwd, '.planning/ROADMAP.md'),
@@ -614,18 +556,13 @@ export function cmdInitResume(cwd: string, raw: boolean): void {
     interrupted_agent_id: interruptedAgentId,
     commit_docs: config.commit_docs,
   };
-
-  output(result, raw);
+  return cmdOk(result);
 }
 
-export function cmdInitVerifyWork(cwd: string, phase: string | undefined, raw: boolean): void {
-  if (!phase) {
-    error('phase required for init verify-work');
-  }
-
+export function cmdInitVerifyWork(cwd: string, phase: string | undefined): CmdResult {
+  if (!phase) return cmdErr('phase required for init verify-work');
   const config = loadConfig(cwd);
   const phaseInfo = findPhaseInternal(cwd, phase!);
-
   const result: VerifyWorkContext = {
     planner_model: resolveModelInternal(cwd, 'maxsim-planner'),
     checker_model: resolveModelInternal(cwd, 'maxsim-plan-checker'),
@@ -636,34 +573,19 @@ export function cmdInitVerifyWork(cwd: string, phase: string | undefined, raw: b
     phase_name: phaseInfo?.phase_name ?? null,
     has_verification: phaseInfo?.has_verification ?? false,
   };
-
-  output(result, raw);
+  return cmdOk(result);
 }
 
-export function cmdInitPhaseOp(cwd: string, phase: string | undefined, raw: boolean): void {
+export function cmdInitPhaseOp(cwd: string, phase: string | undefined): CmdResult {
   const config = loadConfig(cwd);
   let phaseInfo = findPhaseInternal(cwd, phase ?? '');
-
   if (!phaseInfo) {
     const roadmapPhase = getRoadmapPhaseInternal(cwd, phase ?? '');
     if (roadmapPhase?.found) {
       const phaseName = roadmapPhase.phase_name;
-      phaseInfo = {
-        found: true,
-        directory: '',  // no directory yet
-        phase_number: roadmapPhase.phase_number,
-        phase_name: phaseName,
-        phase_slug: phaseName ? phaseName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : null,
-        plans: [],
-        summaries: [],
-        incomplete_plans: [],
-        has_research: false,
-        has_context: false,
-        has_verification: false,
-      };
+      phaseInfo = { found: true, directory: '', phase_number: roadmapPhase.phase_number, phase_name: phaseName, phase_slug: phaseName ? phaseName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : null, plans: [], summaries: [], incomplete_plans: [], has_research: false, has_context: false, has_verification: false };
     }
   }
-
   const result: PhaseOpContext = {
     commit_docs: config.commit_docs,
     brave_search: config.brave_search,
@@ -684,7 +606,6 @@ export function cmdInitPhaseOp(cwd: string, phase: string | undefined, raw: bool
     roadmap_path: '.planning/ROADMAP.md',
     requirements_path: '.planning/REQUIREMENTS.md',
   };
-
   if (phaseInfo?.directory) {
     const artifacts = scanPhaseArtifacts(cwd, phaseInfo.directory);
     if (artifacts.context_path) result.context_path = artifacts.context_path;
@@ -692,18 +613,15 @@ export function cmdInitPhaseOp(cwd: string, phase: string | undefined, raw: bool
     if (artifacts.verification_path) result.verification_path = artifacts.verification_path;
     if (artifacts.uat_path) result.uat_path = artifacts.uat_path;
   }
-
-  output(result, raw);
+  return cmdOk(result);
 }
 
-export function cmdInitTodos(cwd: string, area: string | undefined, raw: boolean): void {
+export function cmdInitTodos(cwd: string, area: string | undefined): CmdResult {
   const config = loadConfig(cwd);
   const now = new Date();
-
   const pendingDir = planningPath(cwd, 'todos', 'pending');
   let count = 0;
   const todos: Array<{ file: string; created: string; title: string; area: string; path: string }> = [];
-
   try {
     const files = fs.readdirSync(pendingDir).filter(f => f.endsWith('.md'));
     for (const file of files) {
@@ -713,27 +631,12 @@ export function cmdInitTodos(cwd: string, area: string | undefined, raw: boolean
         const titleMatch = content.match(/^title:\s*(.+)$/m);
         const areaMatch = content.match(/^area:\s*(.+)$/m);
         const todoArea = areaMatch ? areaMatch[1].trim() : 'general';
-
         if (area && todoArea !== area) continue;
-
         count++;
-        todos.push({
-          file,
-          created: createdMatch ? createdMatch[1].trim() : 'unknown',
-          title: titleMatch ? titleMatch[1].trim() : 'Untitled',
-          area: todoArea,
-          path: path.join('.planning', 'todos', 'pending', file),
-        });
-      } catch (e) {
-        /* optional op, ignore */
-        debugLog(e);
-      }
+        todos.push({ file, created: createdMatch ? createdMatch[1].trim() : 'unknown', title: titleMatch ? titleMatch[1].trim() : 'Untitled', area: todoArea, path: path.join('.planning', 'todos', 'pending', file) });
+      } catch (e) { debugLog(e); }
     }
-  } catch (e) {
-    /* optional op, ignore */
-    debugLog(e);
-  }
-
+  } catch (e) { debugLog(e); }
   const result: TodosContext = {
     commit_docs: config.commit_docs,
     date: todayISO(),
@@ -747,45 +650,23 @@ export function cmdInitTodos(cwd: string, area: string | undefined, raw: boolean
     todos_dir_exists: pathExistsInternal(cwd, '.planning/todos'),
     pending_dir_exists: pathExistsInternal(cwd, '.planning/todos/pending'),
   };
-
-  output(result, raw);
+  return cmdOk(result);
 }
 
-export function cmdInitMilestoneOp(cwd: string, raw: boolean): void {
+export function cmdInitMilestoneOp(cwd: string): CmdResult {
   const config = loadConfig(cwd);
   const milestone = getMilestoneInfo(cwd);
-
   let phaseCount = 0;
   let completedPhases = 0;
   const phasesDir = phasesPath(cwd);
   try {
     const dirs = listSubDirs(phasesDir);
     phaseCount = dirs.length;
-
-    for (const dir of dirs) {
-      try {
-        const phaseFiles = fs.readdirSync(path.join(phasesDir, dir));
-        const hasSummary = phaseFiles.some(f => isSummaryFile(f));
-        if (hasSummary) completedPhases++;
-      } catch (e) {
-        /* optional op, ignore */
-        debugLog(e);
-      }
-    }
-  } catch (e) {
-    /* optional op, ignore */
-    debugLog(e);
-  }
-
+    for (const dir of dirs) { try { const phaseFiles = fs.readdirSync(path.join(phasesDir, dir)); if (phaseFiles.some(f => isSummaryFile(f))) completedPhases++; } catch (e) { debugLog(e); } }
+  } catch (e) { debugLog(e); }
   const archiveDir = planningPath(cwd, 'archive');
   let archivedMilestones: string[] = [];
-  try {
-    archivedMilestones = listSubDirs(archiveDir);
-  } catch (e) {
-    /* optional op, ignore */
-    debugLog(e);
-  }
-
+  try { archivedMilestones = listSubDirs(archiveDir); } catch (e) { debugLog(e); }
   const result: MilestoneOpContext = {
     commit_docs: config.commit_docs,
     milestone_version: milestone.version,
@@ -802,22 +683,14 @@ export function cmdInitMilestoneOp(cwd: string, raw: boolean): void {
     archive_exists: pathExistsInternal(cwd, '.planning/archive'),
     phases_dir_exists: pathExistsInternal(cwd, '.planning/phases'),
   };
-
-  output(result, raw);
+  return cmdOk(result);
 }
 
-export function cmdInitMapCodebase(cwd: string, raw: boolean): void {
+export function cmdInitMapCodebase(cwd: string): CmdResult {
   const config = loadConfig(cwd);
-
   const codebaseDir = planningPath(cwd, 'codebase');
   let existingMaps: string[] = [];
-  try {
-    existingMaps = fs.readdirSync(codebaseDir).filter(f => f.endsWith('.md'));
-  } catch (e) {
-    /* optional op, ignore */
-    debugLog(e);
-  }
-
+  try { existingMaps = fs.readdirSync(codebaseDir).filter(f => f.endsWith('.md')); } catch (e) { debugLog(e); }
   const result: MapCodebaseContext = {
     mapper_model: resolveModelInternal(cwd, 'maxsim-codebase-mapper'),
     commit_docs: config.commit_docs,
@@ -829,51 +702,18 @@ export function cmdInitMapCodebase(cwd: string, raw: boolean): void {
     planning_exists: pathExistsInternal(cwd, '.planning'),
     codebase_dir_exists: pathExistsInternal(cwd, '.planning/codebase'),
   };
-
-  output(result, raw);
+  return cmdOk(result);
 }
 
-export function cmdInitExisting(cwd: string, raw: boolean): void {
+export function cmdInitExisting(cwd: string): CmdResult {
   const config = loadConfig(cwd);
-
   const homedir = os.homedir();
   const braveKeyFile = path.join(homedir, '.maxsim', 'brave_api_key');
   const hasBraveSearch = !!(process.env.BRAVE_API_KEY || fs.existsSync(braveKeyFile));
-
-  // Detect existing code (same logic as cmdInitNewProject)
-  let hasCode = false;
-  let hasPackageFile = false;
-  try {
-    const files = execSync(
-      'find . -maxdepth 3 \\( -name "*.ts" -o -name "*.js" -o -name "*.py" -o -name "*.go" -o -name "*.rs" -o -name "*.swift" -o -name "*.java" \\) 2>/dev/null | grep -v node_modules | grep -v .git | head -5',
-      { cwd, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] }
-    );
-    hasCode = files.trim().length > 0;
-  } catch (e) {
-    debugLog(e);
-  }
-
-  hasPackageFile =
-    pathExistsInternal(cwd, 'package.json') ||
-    pathExistsInternal(cwd, 'requirements.txt') ||
-    pathExistsInternal(cwd, 'Cargo.toml') ||
-    pathExistsInternal(cwd, 'go.mod') ||
-    pathExistsInternal(cwd, 'Package.swift');
-
-  // Detect existing .planning/ content for conflict dialog
+  const hasCode = findCodeFiles(cwd).length > 0;
+  const hasPackageFile = pathExistsInternal(cwd, 'package.json') || pathExistsInternal(cwd, 'requirements.txt') || pathExistsInternal(cwd, 'Cargo.toml') || pathExistsInternal(cwd, 'go.mod') || pathExistsInternal(cwd, 'Package.swift');
   let planningFiles: string[] = [];
-  try {
-    const planDir = planningPath(cwd);
-    if (fs.existsSync(planDir)) {
-      planningFiles = fs
-        .readdirSync(planDir, { recursive: true })
-        .map((f) => String(f))
-        .filter((f) => !f.startsWith('.'));
-    }
-  } catch (e) {
-    debugLog(e);
-  }
-
+  try { const planDir = planningPath(cwd); if (fs.existsSync(planDir)) planningFiles = fs.readdirSync(planDir, { recursive: true }).map((f) => String(f)).filter((f) => !f.startsWith('.')); } catch (e) { debugLog(e); }
   const result: InitExistingContext = {
     researcher_model: resolveModelInternal(cwd, 'maxsim-project-researcher'),
     synthesizer_model: resolveModelInternal(cwd, 'maxsim-research-synthesizer'),
@@ -895,72 +735,36 @@ export function cmdInitExisting(cwd: string, raw: boolean): void {
     project_path: '.planning/PROJECT.md',
     codebase_dir: '.planning/codebase',
   };
-
-  output(result, raw);
+  return cmdOk(result);
 }
 
-export function cmdInitProgress(cwd: string, raw: boolean): void {
+export function cmdInitProgress(cwd: string): CmdResult {
   const config = loadConfig(cwd);
   const milestone = getMilestoneInfo(cwd);
-
   const progressPhasesDir = phasesPath(cwd);
   const phases: ProgressPhaseInfo[] = [];
   let currentPhase: ProgressPhaseInfo | null = null;
   let nextPhase: ProgressPhaseInfo | null = null;
-
   try {
     const dirs = listSubDirs(progressPhasesDir, true);
-
     for (const dir of dirs) {
       const match = dir.match(/^(\d+(?:\.\d+)?)-?(.*)/);
       const phaseNumber = match ? match[1] : dir;
       const phaseName = match && match[2] ? match[2] : null;
-
       const phaseDirPath = path.join(progressPhasesDir, dir);
       const phaseFiles = fs.readdirSync(phaseDirPath);
-
-      const plans = phaseFiles.filter(f => isPlanFile(f));
+      const plansList = phaseFiles.filter(f => isPlanFile(f));
       const summaries = phaseFiles.filter(f => isSummaryFile(f));
       const hasResearch = phaseFiles.some(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
-
-      const status = summaries.length >= plans.length && plans.length > 0 ? 'complete' :
-                     plans.length > 0 ? 'in_progress' :
-                     hasResearch ? 'researched' : 'pending';
-
-      const phaseInfo: ProgressPhaseInfo = {
-        number: phaseNumber,
-        name: phaseName,
-        directory: path.join('.planning', 'phases', dir),
-        status,
-        plan_count: plans.length,
-        summary_count: summaries.length,
-        has_research: hasResearch,
-      };
-
-      phases.push(phaseInfo);
-
-      if (!currentPhase && (status === 'in_progress' || status === 'researched')) {
-        currentPhase = phaseInfo;
-      }
-      if (!nextPhase && status === 'pending') {
-        nextPhase = phaseInfo;
-      }
+      const status = summaries.length >= plansList.length && plansList.length > 0 ? 'complete' : plansList.length > 0 ? 'in_progress' : hasResearch ? 'researched' : 'pending';
+      const phaseInfoItem: ProgressPhaseInfo = { number: phaseNumber, name: phaseName, directory: path.join('.planning', 'phases', dir), status, plan_count: plansList.length, summary_count: summaries.length, has_research: hasResearch };
+      phases.push(phaseInfoItem);
+      if (!currentPhase && (status === 'in_progress' || status === 'researched')) currentPhase = phaseInfoItem;
+      if (!nextPhase && status === 'pending') nextPhase = phaseInfoItem;
     }
-  } catch (e) {
-    /* optional op, ignore */
-    debugLog(e);
-  }
-
+  } catch (e) { debugLog(e); }
   let pausedAt: string | null = null;
-  try {
-    const state = fs.readFileSync(planningPath(cwd, 'STATE.md'), 'utf-8');
-    const pauseMatch = state.match(/\*\*Paused At:\*\*\s*(.+)/);
-    if (pauseMatch) pausedAt = pauseMatch[1].trim();
-  } catch (e) {
-    /* optional op, ignore */
-    debugLog(e);
-  }
-
+  try { const state = fs.readFileSync(planningPath(cwd, 'STATE.md'), 'utf-8'); const pauseMatch = state.match(/\*\*Paused At:\*\*\s*(.+)/); if (pauseMatch) pausedAt = pauseMatch[1].trim(); } catch (e) { debugLog(e); }
   const result: ProgressContext = {
     executor_model: resolveModelInternal(cwd, 'maxsim-executor'),
     planner_model: resolveModelInternal(cwd, 'maxsim-planner'),
@@ -983,6 +787,5 @@ export function cmdInitProgress(cwd: string, raw: boolean): void {
     project_path: '.planning/PROJECT.md',
     config_path: '.planning/config.json',
   };
-
-  output(result, raw);
+  return cmdOk(result);
 }

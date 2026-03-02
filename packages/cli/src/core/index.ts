@@ -4,6 +4,7 @@
 
 // Type-only exports
 export type {
+  CmdResult,
   BranchingStrategy,
   PhaseNumber,
   PhasePath,
@@ -74,6 +75,8 @@ export {
   phaseSlug,
   ok,
   err,
+  cmdOk,
+  cmdErr,
   PLANNING_CONFIG_DEFAULTS,
 } from './types.js';
 

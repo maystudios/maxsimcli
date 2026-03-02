@@ -8,6 +8,14 @@ When a MAXSIM agent is spawned, it checks this registry to determine which skill
 
 Agents load skills by reading `SKILL.md` from each skill directory listed in their entry below. Skills are loaded once at agent startup and enforced throughout the session.
 
+### Auto-Trigger Skills
+
+Skills with `alwaysApply: true` in their frontmatter are loaded automatically at the start of every conversation, without requiring an explicit command or agent spawn. This ensures foundational workflow rules are always active.
+
+| Skill | Purpose |
+|-------|---------|
+| `using-maxsim` | Routes all work through MAXSIM commands — prevents ad-hoc coding without plans |
+
 ## Registry
 
 ### maxsim-executor
@@ -71,8 +79,12 @@ The integration checker validates cross-component wiring. Verification ensures i
 | `systematic-debugging` | `skills/systematic-debugging/` | Root cause investigation before fixes |
 | `tdd` | `skills/tdd/` | Failing test before implementation |
 | `verification-before-completion` | `skills/verification-before-completion/` | Evidence before completion claims |
-| `using-maxsim` | `skills/using-maxsim/` | Workflow routing and structure |
+| `using-maxsim` | `skills/using-maxsim/` | Workflow routing and structure (alwaysApply) |
 | `memory-management` | `skills/memory-management/` | Pattern and error persistence |
+| `brainstorming` | `skills/brainstorming/` | Multi-approach exploration before design |
+| `roadmap-writing` | `skills/roadmap-writing/` | Phased planning with success criteria |
+| `simplify` | `skills/simplify/` | Code simplification and cleanup |
+| `code-review` | `skills/code-review/` | Implementation quality review |
 
 ## Adding New Skills
 

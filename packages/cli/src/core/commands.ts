@@ -20,8 +20,6 @@ import {
   getMilestoneInfo,
   resolveModelInternal,
   MODEL_PROFILES,
-  output,
-  error,
   rethrowCliSignals,
   findPhaseInternal,
   todayISO,
@@ -44,7 +42,9 @@ import type {
   ModelProfileName,
   AgentType,
   FrontmatterData,
+  CmdResult,
 } from './types.js';
+import { cmdOk, cmdErr } from './types.js';
 
 // ─── Todo frontmatter parsing ────────────────────────────────────────────────
 
@@ -71,20 +71,20 @@ export function parseTodoFrontmatter(content: string): TodoFrontmatter {
 
 // ─── Slug generation ────────────────────────────────────────────────────────
 
-export function cmdGenerateSlug(text: string | undefined, raw: boolean): void {
+export function cmdGenerateSlug(text: string | undefined, raw: boolean): CmdResult {
   if (!text) {
-    error('text required for slug generation');
+    return cmdErr('text required for slug generation');
   }
 
   const slug = slugify(text, { lower: true, strict: true });
 
   const result = { slug };
-  output(result, raw, slug);
+  return cmdOk(result, raw ? slug : undefined);
 }
 
 // ─── Timestamp ──────────────────────────────────────────────────────────────
 
-export function cmdCurrentTimestamp(format: TimestampFormat, raw: boolean): void {
+export function cmdCurrentTimestamp(format: TimestampFormat, raw: boolean): CmdResult {
   const now = new Date();
   let result: string;
 
@@ -101,12 +101,12 @@ export function cmdCurrentTimestamp(format: TimestampFormat, raw: boolean): void
       break;
   }
 
-  output({ timestamp: result }, raw, result);
+  return cmdOk({ timestamp: result }, raw ? result : undefined);
 }
 
 // ─── Todos ──────────────────────────────────────────────────────────────────
 
-export function cmdListTodos(cwd: string, area: string | undefined, raw: boolean): void {
+export function cmdListTodos(cwd: string, area: string | undefined, raw: boolean): CmdResult {
   const pendingDir = planningPath(cwd, 'todos', 'pending');
 
   let count = 0;
@@ -142,14 +142,14 @@ export function cmdListTodos(cwd: string, area: string | undefined, raw: boolean
   }
 
   const result = { count, todos };
-  output(result, raw, count.toString());
+  return cmdOk(result, raw ? count.toString() : undefined);
 }
 
 // ─── Path verification ──────────────────────────────────────────────────────
 
-export function cmdVerifyPathExists(cwd: string, targetPath: string | undefined, raw: boolean): void {
+export function cmdVerifyPathExists(cwd: string, targetPath: string | undefined, raw: boolean): CmdResult {
   if (!targetPath) {
-    error('path required for verification');
+    return cmdErr('path required for verification');
   }
 
   const fullPath = path.isAbsolute(targetPath) ? targetPath : path.join(cwd, targetPath);
@@ -158,17 +158,17 @@ export function cmdVerifyPathExists(cwd: string, targetPath: string | undefined,
     const stats = fs.statSync(fullPath);
     const type = stats.isDirectory() ? 'directory' : stats.isFile() ? 'file' : 'other';
     const result = { exists: true, type };
-    output(result, raw, 'true');
+    return cmdOk(result, raw ? 'true' : undefined);
   } catch (e: unknown) {
     rethrowCliSignals(e);
     const result = { exists: false, type: null };
-    output(result, raw, 'false');
+    return cmdOk(result, raw ? 'false' : undefined);
   }
 }
 
 // ─── History digest ─────────────────────────────────────────────────────────
 
-export function cmdHistoryDigest(cwd: string, raw: boolean): void {
+export function cmdHistoryDigest(cwd: string, raw: boolean): CmdResult {
   const phasesDir = phasesPath(cwd);
   const digest: {
     phases: Record<string, { name: string; provides: Set<string>; affects: Set<string>; patterns: Set<string> }>;
@@ -200,8 +200,7 @@ export function cmdHistoryDigest(cwd: string, raw: boolean): void {
 
   if (allPhaseDirs.length === 0) {
     const emptyDigest: HistoryDigest = { phases: {}, decisions: [], tech_stack: [] };
-    output(emptyDigest, raw);
-    return;
+    return cmdOk(emptyDigest);
   }
 
   try {
@@ -278,18 +277,18 @@ export function cmdHistoryDigest(cwd: string, raw: boolean): void {
       };
     }
 
-    output(outputDigest, raw);
+    return cmdOk(outputDigest);
   } catch (e: unknown) {
     rethrowCliSignals(e);
-    error('Failed to generate history digest: ' + (e as Error).message);
+    return cmdErr('Failed to generate history digest: ' + (e as Error).message);
   }
 }
 
 // ─── Model resolution ───────────────────────────────────────────────────────
 
-export function cmdResolveModel(cwd: string, agentType: string | undefined, raw: boolean): void {
+export function cmdResolveModel(cwd: string, agentType: string | undefined, raw: boolean): CmdResult {
   if (!agentType) {
-    error('agent-type required');
+    return cmdErr('agent-type required');
   }
 
   const config = loadConfig(cwd);
@@ -298,14 +297,13 @@ export function cmdResolveModel(cwd: string, agentType: string | undefined, raw:
   const agentModels = MODEL_PROFILES[agentType as AgentType];
   if (!agentModels) {
     const result = { model: 'sonnet', profile, unknown_agent: true };
-    output(result, raw, 'sonnet');
-    return;
+    return cmdOk(result, raw ? 'sonnet' : undefined);
   }
 
   const resolved = agentModels[profile] || agentModels['balanced'] || 'sonnet';
   const model = resolved === 'opus' ? 'inherit' : resolved;
   const result = { model, profile };
-  output(result, raw, model);
+  return cmdOk(result, raw ? model : undefined);
 }
 
 // ─── Commit ─────────────────────────────────────────────────────────────────
@@ -316,9 +314,9 @@ export async function cmdCommit(
   files: string[],
   raw: boolean,
   amend: boolean,
-): Promise<void> {
+): Promise<CmdResult> {
   if (!message && !amend) {
-    error('commit message required');
+    return cmdErr('commit message required');
   }
 
   const config = loadConfig(cwd);
@@ -326,15 +324,13 @@ export async function cmdCommit(
   // Check commit_docs config
   if (!config.commit_docs) {
     const result = { committed: false, hash: null, reason: 'skipped_commit_docs_false' };
-    output(result, raw, 'skipped');
-    return;
+    return cmdOk(result, raw ? 'skipped' : undefined);
   }
 
   // Check if .planning is gitignored
   if (await isGitIgnored(cwd, '.planning')) {
     const result = { committed: false, hash: null, reason: 'skipped_gitignored' };
-    output(result, raw, 'skipped');
-    return;
+    return cmdOk(result, raw ? 'skipped' : undefined);
   }
 
   // Stage files
@@ -349,19 +345,17 @@ export async function cmdCommit(
   if (commitResult.exitCode !== 0) {
     if (commitResult.stdout.includes('nothing to commit') || commitResult.stderr.includes('nothing to commit')) {
       const result = { committed: false, hash: null, reason: 'nothing_to_commit' };
-      output(result, raw, 'nothing');
-      return;
+      return cmdOk(result, raw ? 'nothing' : undefined);
     }
     const result = { committed: false, hash: null, reason: 'nothing_to_commit', error: commitResult.stderr };
-    output(result, raw, 'nothing');
-    return;
+    return cmdOk(result, raw ? 'nothing' : undefined);
   }
 
   // Get short hash
   const hashResult = await execGit(cwd, ['rev-parse', '--short', 'HEAD']);
   const hash = hashResult.exitCode === 0 ? hashResult.stdout : null;
   const result = { committed: true, hash, reason: 'committed' };
-  output(result, raw, hash || 'committed');
+  return cmdOk(result, raw ? (hash || 'committed') : undefined);
 }
 
 // ─── Summary extract ────────────────────────────────────────────────────────
@@ -371,16 +365,15 @@ export function cmdSummaryExtract(
   summaryPath: string | undefined,
   fields: string[] | null,
   raw: boolean,
-): void {
+): CmdResult {
   if (!summaryPath) {
-    error('summary-path required for summary-extract');
+    return cmdErr('summary-path required for summary-extract');
   }
 
   const fullPath = path.join(cwd, summaryPath);
 
   if (!fs.existsSync(fullPath)) {
-    output({ error: 'File not found', path: summaryPath }, raw);
-    return;
+    return cmdOk({ error: 'File not found', path: summaryPath });
   }
 
   const content = fs.readFileSync(fullPath, 'utf-8');
@@ -422,11 +415,10 @@ export function cmdSummaryExtract(
         filtered[field] = fullResult[field];
       }
     }
-    output(filtered, raw);
-    return;
+    return cmdOk(filtered);
   }
 
-  output(fullResult, raw);
+  return cmdOk(fullResult);
 }
 
 // ─── Web search ─────────────────────────────────────────────────────────────
@@ -435,17 +427,15 @@ export async function cmdWebsearch(
   query: string | undefined,
   options: WebSearchOptions,
   raw: boolean,
-): Promise<void> {
+): Promise<CmdResult> {
   const apiKey = process.env.BRAVE_API_KEY;
 
   if (!apiKey) {
-    output({ available: false, reason: 'BRAVE_API_KEY not set' }, raw, '');
-    return;
+    return cmdOk({ available: false, reason: 'BRAVE_API_KEY not set' }, raw ? '' : undefined);
   }
 
   if (!query) {
-    output({ available: false, error: 'Query required' }, raw, '');
-    return;
+    return cmdOk({ available: false, error: 'Query required' }, raw ? '' : undefined);
   }
 
   const params = new URLSearchParams({
@@ -472,8 +462,7 @@ export async function cmdWebsearch(
     );
 
     if (!response.ok) {
-      output({ available: false, error: `API error: ${response.status}` }, raw, '');
-      return;
+      return cmdOk({ available: false, error: `API error: ${response.status}` }, raw ? '' : undefined);
     }
 
     const data = (await response.json()) as { web?: { results?: Array<{ title: string; url: string; description: string; age?: string }> } };
@@ -485,25 +474,24 @@ export async function cmdWebsearch(
       age: r.age || null,
     }));
 
-    output(
+    return cmdOk(
       {
         available: true,
         query,
         count: results.length,
         results,
       },
-      raw,
-      results.map(r => `${r.title}\n${r.url}\n${r.description}`).join('\n\n'),
+      raw ? results.map(r => `${r.title}\n${r.url}\n${r.description}`).join('\n\n') : undefined,
     );
   } catch (err: unknown) {
     rethrowCliSignals(err);
-    output({ available: false, error: (err as Error).message }, raw, '');
+    return cmdOk({ available: false, error: (err as Error).message }, raw ? '' : undefined);
   }
 }
 
 // ─── Progress render ────────────────────────────────────────────────────────
 
-export function cmdProgressRender(cwd: string, format: string, raw: boolean): void {
+export function cmdProgressRender(cwd: string, format: string, raw: boolean): CmdResult {
   const phasesDir = phasesPath(cwd);
   const milestone = getMilestoneInfo(cwd);
 
@@ -559,13 +547,13 @@ export function cmdProgressRender(cwd: string, format: string, raw: boolean): vo
     for (const p of phases) {
       out += `| ${p.number} | ${p.name} | ${p.summaries}/${p.plans} | ${p.status} |\n`;
     }
-    output({ rendered: out }, raw, out);
+    return cmdOk({ rendered: out }, raw ? out : undefined);
   } else if (format === 'bar') {
     const barWidth = 20;
     const filled = Math.round((percent / 100) * barWidth);
     const bar = '\u2588'.repeat(filled) + '\u2591'.repeat(barWidth - filled);
     const text = `[${bar}] ${totalSummaries}/${totalPlans} plans (${percent}%)`;
-    output({ bar: text, percent, completed: totalSummaries, total: totalPlans }, raw, text);
+    return cmdOk({ bar: text, percent, completed: totalSummaries, total: totalPlans }, raw ? text : undefined);
   } else if (format === 'phase-bars') {
     const doneCount = phases.filter(p => p.status === 'Complete').length;
     const inProgressCount = phases.filter(p => p.status === 'In Progress').length;
@@ -598,24 +586,24 @@ export function cmdProgressRender(cwd: string, format: string, raw: boolean): vo
     }
 
     const rendered = lines.join('\n');
-    output({ rendered, done: doneCount, in_progress: inProgressCount, total: totalCount, percent }, raw, rendered);
+    return cmdOk({ rendered, done: doneCount, in_progress: inProgressCount, total: totalCount, percent }, raw ? rendered : undefined);
   } else {
-    output({
+    return cmdOk({
       milestone_version: milestone.version,
       milestone_name: milestone.name,
       phases,
       total_plans: totalPlans,
       total_summaries: totalSummaries,
       percent,
-    }, raw);
+    });
   }
 }
 
 // ─── Todo complete ──────────────────────────────────────────────────────────
 
-export function cmdTodoComplete(cwd: string, filename: string | undefined, raw: boolean): void {
+export function cmdTodoComplete(cwd: string, filename: string | undefined, raw: boolean): CmdResult {
   if (!filename) {
-    error('filename required for todo complete');
+    return cmdErr('filename required for todo complete');
   }
 
   const pendingDir = planningPath(cwd, 'todos', 'pending');
@@ -623,7 +611,7 @@ export function cmdTodoComplete(cwd: string, filename: string | undefined, raw: 
   const sourcePath = path.join(pendingDir, filename);
 
   if (!fs.existsSync(sourcePath)) {
-    error(`Todo not found: ${filename}`);
+    return cmdErr(`Todo not found: ${filename}`);
   }
 
   // Ensure completed directory exists
@@ -637,7 +625,7 @@ export function cmdTodoComplete(cwd: string, filename: string | undefined, raw: 
   fs.writeFileSync(path.join(completedDir, filename), content, 'utf-8');
   fs.unlinkSync(sourcePath);
 
-  output({ completed: true, file: filename, date: today }, raw, 'completed');
+  return cmdOk({ completed: true, file: filename, date: today }, raw ? 'completed' : undefined);
 }
 
 // ─── Scaffold ───────────────────────────────────────────────────────────────
@@ -647,7 +635,7 @@ export function cmdScaffold(
   type: string | undefined,
   options: ScaffoldOptions,
   raw: boolean,
-): void {
+): CmdResult {
   const { phase, name } = options;
   const padded = phase ? normalizePhaseName(phase) : '00';
   const today = todayISO();
@@ -657,7 +645,7 @@ export function cmdScaffold(
   const phaseDir = phaseInfo ? path.join(cwd, phaseInfo.directory) : null;
 
   if (phase && !phaseDir && type !== 'phase-dir') {
-    error(`Phase ${phase} directory not found`);
+    return cmdErr(`Phase ${phase} directory not found`);
   }
 
   let filePath: string;
@@ -681,7 +669,7 @@ export function cmdScaffold(
     }
     case 'phase-dir': {
       if (!phase || !name) {
-        error('phase and name required for phase-dir scaffold');
+        return cmdErr('phase and name required for phase-dir scaffold');
       }
       const slug = generateSlugInternal(name);
       const dirName = `${padded}-${slug}`;
@@ -689,20 +677,17 @@ export function cmdScaffold(
       fs.mkdirSync(phasesParent, { recursive: true });
       const dirPath = path.join(phasesParent, dirName);
       fs.mkdirSync(dirPath, { recursive: true });
-      output({ created: true, directory: `.planning/phases/${dirName}`, path: dirPath }, raw, dirPath);
-      return;
+      return cmdOk({ created: true, directory: `.planning/phases/${dirName}`, path: dirPath }, raw ? dirPath : undefined);
     }
     default:
-      error(`Unknown scaffold type: ${type}. Available: context, uat, verification, phase-dir`);
-      return; // unreachable but satisfies TS
+      return cmdErr(`Unknown scaffold type: ${type}. Available: context, uat, verification, phase-dir`);
   }
 
   if (fs.existsSync(filePath)) {
-    output({ created: false, reason: 'already_exists', path: filePath }, raw, 'exists');
-    return;
+    return cmdOk({ created: false, reason: 'already_exists', path: filePath }, raw ? 'exists' : undefined);
   }
 
   fs.writeFileSync(filePath, content, 'utf-8');
   const relPath = path.relative(cwd, filePath);
-  output({ created: true, path: relPath }, raw, relPath);
+  return cmdOk({ created: true, path: relPath }, raw ? relPath : undefined);
 }

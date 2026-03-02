@@ -14,9 +14,6 @@ import {
   findPhaseInternal,
   getArchivedPhaseDirs,
   generateSlugInternal,
-  output,
-  error,
-  rethrowCliSignals,
   phasesPath,
   roadmapPath,
   statePath,
@@ -33,10 +30,10 @@ import {
   escapePhaseNum,
 } from './core.js';
 import { extractFrontmatter } from './frontmatter.js';
+import { cmdOk, cmdErr } from './types.js';
 import type {
-  PhaseNumber,
   PhasesListOptions,
-  FrontmatterData,
+  CmdResult,
 } from './types.js';
 
 // ─── Core result types ──────────────────────────────────────────────────────
@@ -372,17 +369,16 @@ export function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteR
 
 // ─── Phase list ─────────────────────────────────────────────────────────────
 
-export async function cmdPhasesList(cwd: string, options: PhasesListOptions, raw: boolean): Promise<void> {
+export async function cmdPhasesList(cwd: string, options: PhasesListOptions): Promise<CmdResult> {
   const phasesDirPath = phasesPath(cwd);
   const { type, phase, includeArchived, offset, limit } = options;
 
   if (!fs.existsSync(phasesDirPath)) {
     if (type) {
-      output({ files: [], count: 0, total: 0 }, raw, '');
+      return cmdOk({ files: [], count: 0, total: 0 }, '');
     } else {
-      output({ directories: [], count: 0, total: 0 }, raw, '');
+      return cmdOk({ directories: [], count: 0, total: 0 }, '');
     }
-    return;
   }
 
   try {
@@ -401,8 +397,7 @@ export async function cmdPhasesList(cwd: string, options: PhasesListOptions, raw
       const normalized = normalizePhaseName(phase);
       const match = dirs.find(d => d.startsWith(normalized));
       if (!match) {
-        output({ files: [], count: 0, total: 0, phase_dir: null, error: 'Phase not found' }, raw, '');
-        return;
+        return cmdOk({ files: [], count: 0, total: 0, phase_dir: null, error: 'Phase not found' }, '');
       }
       dirs = [match];
     }
@@ -433,8 +428,7 @@ export async function cmdPhasesList(cwd: string, options: PhasesListOptions, raw
         total: files.length,
         phase_dir: phase ? dirs[0].replace(/^\d+(?:\.\d+)?-?/, '') : null,
       };
-      output(result, raw, files.join('\n'));
-      return;
+      return cmdOk(result, files.join('\n'));
     }
 
     // Apply pagination
@@ -442,26 +436,23 @@ export async function cmdPhasesList(cwd: string, options: PhasesListOptions, raw
     const start = offset ?? 0;
     const paginated = limit !== undefined ? dirs.slice(start, start + limit) : dirs.slice(start);
 
-    output({ directories: paginated, count: paginated.length, total }, raw, paginated.join('\n'));
+    return cmdOk({ directories: paginated, count: paginated.length, total }, paginated.join('\n'));
   } catch (e: unknown) {
-    rethrowCliSignals(e);
-    error('Failed to list phases: ' + (e as Error).message);
+    return cmdErr('Failed to list phases: ' + (e as Error).message);
   }
 }
 
 // ─── Next decimal ───────────────────────────────────────────────────────────
 
-export function cmdPhaseNextDecimal(cwd: string, basePhase: string, raw: boolean): void {
+export function cmdPhaseNextDecimal(cwd: string, basePhase: string): CmdResult {
   const phasesDirPath = phasesPath(cwd);
   const normalized = normalizePhaseName(basePhase);
 
   if (!fs.existsSync(phasesDirPath)) {
-    output(
+    return cmdOk(
       { found: false, base_phase: normalized, next: `${normalized}.1`, existing: [] },
-      raw,
       `${normalized}.1`,
     );
-    return;
   }
 
   try {
@@ -494,22 +485,20 @@ export function cmdPhaseNextDecimal(cwd: string, basePhase: string, raw: boolean
       nextDecimal = `${normalized}.${lastNum + 1}`;
     }
 
-    output(
+    return cmdOk(
       { found: baseExists, base_phase: normalized, next: nextDecimal, existing: existingDecimals },
-      raw,
       nextDecimal,
     );
   } catch (e: unknown) {
-    rethrowCliSignals(e);
-    error('Failed to calculate next decimal phase: ' + (e as Error).message);
+    return cmdErr('Failed to calculate next decimal phase: ' + (e as Error).message);
   }
 }
 
 // ─── Find phase ─────────────────────────────────────────────────────────────
 
-export function cmdFindPhase(cwd: string, phase: string | undefined, raw: boolean): void {
+export function cmdFindPhase(cwd: string, phase: string | undefined): CmdResult {
   if (!phase) {
-    error('phase identifier required');
+    return cmdErr('phase identifier required');
   }
 
   const phasesDirPath = phasesPath(cwd);
@@ -522,8 +511,7 @@ export function cmdFindPhase(cwd: string, phase: string | undefined, raw: boolea
 
     const match = dirs.find(d => d.startsWith(normalized));
     if (!match) {
-      output(notFound, raw, '');
-      return;
+      return cmdOk(notFound, '');
     }
 
     const dirMatch = match.match(/^(\d+[A-Z]?(?:\.\d+)?)-?(.*)/i);
@@ -544,18 +532,17 @@ export function cmdFindPhase(cwd: string, phase: string | undefined, raw: boolea
       summaries,
     };
 
-    output(result, raw, result.directory);
+    return cmdOk(result, result.directory);
   } catch (e: unknown) {
-    rethrowCliSignals(e);
-    output(notFound, raw, '');
+    return cmdOk(notFound, '');
   }
 }
 
 // ─── Phase plan index ───────────────────────────────────────────────────────
 
-export function cmdPhasePlanIndex(cwd: string, phase: string | undefined, raw: boolean): void {
+export function cmdPhasePlanIndex(cwd: string, phase: string | undefined): CmdResult {
   if (!phase) {
-    error('phase required for phase-plan-index');
+    return cmdErr('phase required for phase-plan-index');
   }
 
   const phasesDirPath = phasesPath(cwd);
@@ -575,8 +562,7 @@ export function cmdPhasePlanIndex(cwd: string, phase: string | undefined, raw: b
   }
 
   if (!phaseDir) {
-    output({ phase: normalized, error: 'Phase not found', plans: [], waves: {}, incomplete: [], has_checkpoints: false }, raw);
-    return;
+    return cmdOk({ phase: normalized, error: 'Phase not found', plans: [], waves: {}, incomplete: [], has_checkpoints: false });
   }
 
   const phaseFiles = fs.readdirSync(phaseDir);
@@ -649,46 +635,42 @@ export function cmdPhasePlanIndex(cwd: string, phase: string | undefined, raw: b
     waves[waveKey].push(id);
   }
 
-  output({ phase: normalized, plans, waves, incomplete, has_checkpoints: hasCheckpoints }, raw);
+  return cmdOk({ phase: normalized, plans, waves, incomplete, has_checkpoints: hasCheckpoints });
 }
 
 // ─── Phase add ──────────────────────────────────────────────────────────────
 
-export function cmdPhaseAdd(cwd: string, description: string | undefined, raw: boolean): void {
+export function cmdPhaseAdd(cwd: string, description: string | undefined): CmdResult {
   if (!description) {
-    error('description required for phase add');
+    return cmdErr('description required for phase add');
   }
 
   try {
     const result = phaseAddCore(cwd, description, { includeStubs: false });
-    output(
+    return cmdOk(
       { phase_number: result.phase_number, padded: result.padded, name: result.description, slug: result.slug, directory: result.directory },
-      raw,
       result.padded,
     );
   } catch (e) {
-    rethrowCliSignals(e);
-    error((e as Error).message);
+    return cmdErr((e as Error).message);
   }
 }
 
 // ─── Phase insert ───────────────────────────────────────────────────────────
 
-export function cmdPhaseInsert(cwd: string, afterPhase: string | undefined, description: string | undefined, raw: boolean): void {
+export function cmdPhaseInsert(cwd: string, afterPhase: string | undefined, description: string | undefined): CmdResult {
   if (!afterPhase || !description) {
-    error('after-phase and description required for phase insert');
+    return cmdErr('after-phase and description required for phase insert');
   }
 
   try {
     const result = phaseInsertCore(cwd, afterPhase, description, { includeStubs: false });
-    output(
+    return cmdOk(
       { phase_number: result.phase_number, after_phase: result.after_phase, name: result.description, slug: result.slug, directory: result.directory },
-      raw,
       result.phase_number,
     );
   } catch (e) {
-    rethrowCliSignals(e);
-    error((e as Error).message);
+    return cmdErr((e as Error).message);
   }
 }
 
@@ -698,10 +680,9 @@ export function cmdPhaseRemove(
   cwd: string,
   targetPhase: string | undefined,
   options: { force: boolean },
-  raw: boolean,
-): void {
+): CmdResult {
   if (!targetPhase) {
-    error('phase number required for phase remove');
+    return cmdErr('phase number required for phase remove');
   }
 
   const rmPath = roadmapPath(cwd);
@@ -709,7 +690,7 @@ export function cmdPhaseRemove(
   const force = options.force || false;
 
   if (!fs.existsSync(rmPath)) {
-    error('ROADMAP.md not found');
+    return cmdErr('ROADMAP.md not found');
   }
 
   const normalized = normalizePhaseName(targetPhase);
@@ -728,7 +709,7 @@ export function cmdPhaseRemove(
     const files = fs.readdirSync(targetPath);
     const summaries = files.filter(isSummaryFile);
     if (summaries.length > 0) {
-      error(`Phase ${targetPhase} has ${summaries.length} executed plan(s). Use --force to remove anyway.`);
+      return cmdErr(`Phase ${targetPhase} has ${summaries.length} executed plan(s). Use --force to remove anyway.`);
     }
   }
 
@@ -909,26 +890,26 @@ export function cmdPhaseRemove(
     fs.writeFileSync(stPath, stateContent, 'utf-8');
   }
 
-  output({
+  return cmdOk({
     removed: targetPhase,
     directory_deleted: targetDir || null,
     renamed_directories: renamedDirs,
     renamed_files: renamedFiles,
     roadmap_updated: true,
     state_updated: fs.existsSync(stPath),
-  }, raw);
+  });
 }
 
 // ─── Phase complete ─────────────────────────────────────────────────────────
 
-export function cmdPhaseComplete(cwd: string, phaseNum: string | undefined, raw: boolean): void {
+export function cmdPhaseComplete(cwd: string, phaseNum: string | undefined): CmdResult {
   if (!phaseNum) {
-    error('phase number required for phase complete');
+    return cmdErr('phase number required for phase complete');
   }
 
   try {
     const result = phaseCompleteCore(cwd, phaseNum);
-    output({
+    return cmdOk({
       completed_phase: result.completed_phase,
       phase_name: result.phase_name,
       plans_executed: result.plans_executed,
@@ -938,9 +919,8 @@ export function cmdPhaseComplete(cwd: string, phaseNum: string | undefined, raw:
       date: result.date,
       roadmap_updated: result.roadmap_updated,
       state_updated: result.state_updated,
-    }, raw);
+    });
   } catch (e) {
-    rethrowCliSignals(e);
-    error((e as Error).message);
+    return cmdErr((e as Error).message);
   }
 }
