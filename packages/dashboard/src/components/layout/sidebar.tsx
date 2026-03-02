@@ -5,6 +5,19 @@ import { NetworkQRButton } from "@/components/network/NetworkQRButton";
 import { cn } from "@/lib/utils";
 import type { DashboardPhase } from "@/lib/types";
 
+function useProjectName(): string | null {
+  const [name, setName] = useState<string | null>(null);
+  useEffect(() => {
+    fetch("/api/server-info")
+      .then((r) => r.json())
+      .then((data: { projectName?: string }) => {
+        if (data.projectName) setName(data.projectName);
+      })
+      .catch(() => {});
+  }, []);
+  return name;
+}
+
 type ActiveView = "overview" | "phase" | "todos" | "blockers" | "discussion";
 
 interface SidebarProps {
@@ -33,6 +46,7 @@ function statusDotClass(status: DashboardPhase["diskStatus"]): string {
 export function Sidebar({ activeView, activePhaseId, onNavigate, terminalOpen, onTerminalToggle }: SidebarProps) {
   const { roadmap, state, todos } = useDashboardData();
   const { connected } = useWebSocket();
+  const projectName = useProjectName();
   const [confirmShutdown, setConfirmShutdown] = useState(false);
 
   useEffect(() => {
@@ -72,18 +86,18 @@ export function Sidebar({ activeView, activePhaseId, onNavigate, terminalOpen, o
 
   return (
     <aside className="flex h-full w-56 shrink-0 flex-col border-r border-border bg-card">
-      {/* Logo */}
+      {/* Logo + project name */}
       <div className="border-b border-border px-5 py-4 flex items-center justify-between">
         <button
           type="button"
           onClick={() => onNavigate("overview")}
-          className="flex flex-col gap-0.5 text-left"
+          className="flex flex-col gap-0.5 text-left min-w-0"
         >
           <span className="text-sm font-bold tracking-tight text-foreground">
             MAXSIM
           </span>
-          <span className="text-xs text-muted-foreground">
-            Dashboard
+          <span className="text-xs text-muted-foreground truncate max-w-[160px]" title={projectName ?? "Dashboard"}>
+            {projectName ?? "Dashboard"}
           </span>
         </button>
       </div>
