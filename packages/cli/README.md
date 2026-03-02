@@ -23,7 +23,7 @@ MAXSIM solves this by offloading work to fresh-context subagents, each with a si
 npx maxsimcli@latest
 ```
 
-**Works with Claude Code, OpenCode, Gemini CLI, and Codex — on Mac, Windows, and Linux.**
+**Works with Claude Code — on Mac, Windows, and Linux.**
 
 > ⚠️ **Early Alpha** — APIs, commands, and workflows may change between releases. Expect rough edges.
 
@@ -75,7 +75,7 @@ That's the loop. Discuss → Plan → Execute → Verify. Each phase is isolated
 
 ## How It Works
 
-MAXSIM installs 30+ slash commands into your AI runtime. Each command is a structured workflow that spawns specialized subagents with fresh context.
+MAXSIM installs 32 slash commands, 11 skills, and an MCP server into Claude Code. Each command is a structured workflow that spawns specialized subagents with fresh context.
 
 ### The Core Loop
 
@@ -251,26 +251,17 @@ npx maxsimcli@latest
 ```
 
 The installer prompts you to choose:
-1. **Runtime** — Claude Code, OpenCode, Gemini, Codex, or all
-2. **Location** — Global (all projects) or local (current project only)
+1. **Location** — Global (all projects) or local (current project only)
 
-Verify with:
-- Claude Code / Gemini: `/maxsim:help`
-- OpenCode: `/maxsim-help`
-- Codex: `$maxsim-help`
+Verify with: `/maxsim:help`
 
 <details>
 <summary><strong>Non-interactive Install (Docker, CI, Scripts)</strong></summary>
 
 ```bash
-npx maxsimcli --claude --global    # Claude Code → ~/.claude/
-npx maxsimcli --opencode --global  # OpenCode → ~/.config/opencode/
-npx maxsimcli --gemini --global    # Gemini CLI → ~/.gemini/
-npx maxsimcli --codex --global     # Codex → ~/.codex/
-npx maxsimcli --all --global       # All runtimes
+npx maxsimcli --claude --global    # Global install → ~/.claude/
+npx maxsimcli --claude --local     # Project-scoped install → ./.claude/
 ```
-
-Add `--local` instead of `--global` for project-scoped installs.
 
 </details>
 
@@ -306,7 +297,7 @@ Project settings live in `.planning/config.json`, created during `/maxsim:new-pr
 
 ### Model Profiles
 
-MAXSIM has **4 model profiles** that control which Claude model each of the 11 specialized agents uses:
+MAXSIM has **4 model profiles** that control which Claude model each of the 13 specialized agents uses:
 
 | Profile | Planners & Executors | Researchers | Orchestrators |
 |---------|---------------------|-------------|---------------|
@@ -356,7 +347,7 @@ The context bar shows a 10-segment indicator that turns red and blinks above 95%
 
 ## Agents
 
-11 specialized subagents, each with fresh context and a single responsibility:
+13 specialized subagents, each with fresh context and a single responsibility:
 
 | Agent | Role |
 |-------|------|
@@ -367,10 +358,45 @@ The context bar shows a 10-segment indicator that turns red and blinks above 95%
 | `maxsim-roadmapper` | Creates project roadmaps with phase breakdown |
 | `maxsim-plan-checker` | Verifies plans will achieve the phase goal |
 | `maxsim-executor` | Implements plans with atomic commits |
+| `maxsim-spec-reviewer` | Reviews implementation for spec compliance after execution |
+| `maxsim-code-reviewer` | Reviews implementation for code quality and patterns |
 | `maxsim-verifier` | Goal-backward verification after execution |
 | `maxsim-debugger` | Scientific-method debugging with persistent state |
 | `maxsim-integration-checker` | Verifies cross-phase integration and E2E flows |
 | `maxsim-codebase-mapper` | Explores codebase and writes structured analysis |
+
+---
+
+## Skills
+
+MAXSIM includes 11 built-in skills that enforce workflow constraints and best practices. Skills auto-trigger based on context — they're not optional guidelines, they're active workflow enforcement.
+
+| Skill | Description |
+|-------|-------------|
+| `batch-worktree` | Run parallel tasks in isolated git worktrees |
+| `brainstorming` | Structured ideation and feature exploration |
+| `code-review` | Automated code review with quality checks |
+| `memory-management` | Persistent memory across sessions |
+| `roadmap-writing` | Guided roadmap and requirements authoring |
+| `sdd` | Spec-driven development workflow |
+| `simplify` | Review changed code for reuse, quality, and efficiency |
+| `systematic-debugging` | Root-cause investigation before attempting fixes |
+| `tdd` | Test-driven development — failing test before implementation |
+| `using-maxsim` | Guide for effective MAXSIM usage |
+| `verification-before-completion` | Verify work before claiming completion |
+
+---
+
+## MCP Server
+
+MAXSIM installs an MCP (Model Context Protocol) server that exposes project tools directly to Claude Code. The server is auto-configured during installation via `.mcp.json`.
+
+**Exposed tools:**
+- **Phase operations** — list, add, complete, and remove phases
+- **State management** — read/update STATE.md (decisions, blockers, metrics)
+- **Todo operations** — create, list, and complete todos
+
+The MCP server runs as a stdio process managed by Claude Code — no manual startup needed.
 
 ---
 

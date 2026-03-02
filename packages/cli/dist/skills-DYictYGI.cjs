@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const require_install = require('./install.cjs');
-const require_core = require('./core-TFSlUjV1.cjs');
+const require_core = require('./core-Cqn3M3eD.cjs');
 let node_fs = require("node:fs");
 node_fs = require_install.__toESM(node_fs);
 let node_path = require("node:path");
@@ -6656,13 +6656,29 @@ var require_dist = /* @__PURE__ */ require_install.__commonJSMin(((exports) => {
 }));
 
 //#endregion
+//#region src/core/types.ts
+var import_dist = /* @__PURE__ */ require_install.__toESM(require_dist());
+function cmdOk(result, rawValue) {
+	return {
+		ok: true,
+		result,
+		rawValue
+	};
+}
+function cmdErr(error) {
+	return {
+		ok: false,
+		error
+	};
+}
+
+//#endregion
 //#region src/core/frontmatter.ts
 /**
 * Frontmatter — YAML frontmatter parsing, serialization, and CRUD commands
 *
 * Uses the `yaml` npm package instead of a hand-rolled parser.
 */
-var import_dist = /* @__PURE__ */ require_install.__toESM(require_dist());
 /**
 * Extract YAML frontmatter from markdown content into a typed object.
 */
@@ -6715,12 +6731,12 @@ function readSkillInfo(skillDir, dirName) {
 /**
 * List all installed skills from `.claude/skills/`.
 */
-function cmdSkillList(cwd, raw) {
+function cmdSkillList(cwd) {
 	const dir = skillsDir(cwd);
-	if (!node_fs.default.existsSync(dir)) require_core.output({
+	if (!node_fs.default.existsSync(dir)) return cmdOk({
 		skills: [],
 		count: 0
-	}, raw, "No skills installed.");
+	}, "No skills installed.");
 	const entries = node_fs.default.readdirSync(dir, { withFileTypes: true });
 	const skills = [];
 	for (const entry of entries) {
@@ -6728,56 +6744,52 @@ function cmdSkillList(cwd, raw) {
 		const info = readSkillInfo(node_path.default.join(dir, entry.name), entry.name);
 		if (info) skills.push(info);
 	}
-	require_core.output({
+	return cmdOk({
 		skills,
 		count: skills.length
-	}, raw, skills.map((s) => `${s.name}: ${s.description}`).join("\n"));
+	}, skills.map((s) => `${s.name}: ${s.description}`).join("\n"));
 }
 /**
 * Install a specific skill from the templates directory.
 */
-function cmdSkillInstall(cwd, skillName, raw) {
-	if (!skillName) require_core.error("skill name required. Usage: skill-install <name>");
+function cmdSkillInstall(cwd, skillName) {
+	if (!skillName) return cmdErr("skill name required. Usage: skill-install <name>");
 	const srcFile = node_path.default.join(skillsTemplateDir(), skillName, "SKILL.md");
-	if (!node_fs.default.existsSync(srcFile)) require_core.error(`Skill "${skillName}" not found in templates. Available: ${listAvailableTemplates().join(", ")}`);
+	if (!node_fs.default.existsSync(srcFile)) return cmdErr(`Skill "${skillName}" not found in templates. Available: ${listAvailableTemplates().join(", ")}`);
 	const destDir = node_path.default.join(skillsDir(cwd), skillName);
 	const destFile = node_path.default.join(destDir, "SKILL.md");
 	node_fs.default.mkdirSync(destDir, { recursive: true });
 	node_fs.default.copyFileSync(srcFile, destFile);
-	require_core.output({
+	return cmdOk({
 		installed: true,
 		skill: skillName,
 		path: node_path.default.relative(cwd, destFile)
-	}, raw, `Installed skill: ${skillName}`);
+	}, `Installed skill: ${skillName}`);
 }
 /**
 * Update one or all installed skills from the templates source.
 */
-function cmdSkillUpdate(cwd, skillName, raw) {
+function cmdSkillUpdate(cwd, skillName) {
 	const dir = skillsDir(cwd);
 	const templateDir = skillsTemplateDir();
 	if (skillName) {
 		const srcFile = node_path.default.join(templateDir, skillName, "SKILL.md");
-		if (!node_fs.default.existsSync(srcFile)) require_core.error(`Skill template "${skillName}" not found.`);
+		if (!node_fs.default.existsSync(srcFile)) return cmdErr(`Skill template "${skillName}" not found.`);
 		const destDir = node_path.default.join(dir, skillName);
-		if (!node_fs.default.existsSync(destDir)) require_core.error(`Skill "${skillName}" is not installed. Use skill-install first.`);
+		if (!node_fs.default.existsSync(destDir)) return cmdErr(`Skill "${skillName}" is not installed. Use skill-install first.`);
 		const destFile = node_path.default.join(destDir, "SKILL.md");
 		node_fs.default.copyFileSync(srcFile, destFile);
-		require_core.output({
+		return cmdOk({
 			updated: [skillName],
 			skipped: [],
 			not_found: []
-		}, raw, `Updated skill: ${skillName}`);
-		return;
+		}, `Updated skill: ${skillName}`);
 	}
-	if (!node_fs.default.existsSync(dir)) {
-		require_core.output({
-			updated: [],
-			skipped: [],
-			not_found: []
-		}, raw, "No skills installed.");
-		return;
-	}
+	if (!node_fs.default.existsSync(dir)) return cmdOk({
+		updated: [],
+		skipped: [],
+		not_found: []
+	}, "No skills installed.");
 	const entries = node_fs.default.readdirSync(dir, { withFileTypes: true });
 	const updated = [];
 	const skipped = [];
@@ -6794,10 +6806,10 @@ function cmdSkillUpdate(cwd, skillName, raw) {
 		updated.push(name);
 	}
 	const summary = updated.length > 0 ? `Updated ${updated.length} skill(s): ${updated.join(", ")}` : "No skills updated.";
-	require_core.output({
+	return cmdOk({
 		updated,
 		skipped
-	}, raw, summary);
+	}, summary);
 }
 function listAvailableTemplates() {
 	const dir = skillsTemplateDir();
@@ -6809,4 +6821,4 @@ function listAvailableTemplates() {
 exports.cmdSkillInstall = cmdSkillInstall;
 exports.cmdSkillList = cmdSkillList;
 exports.cmdSkillUpdate = cmdSkillUpdate;
-//# sourceMappingURL=skills-BOSxYUzf.cjs.map
+//# sourceMappingURL=skills-DYictYGI.cjs.map

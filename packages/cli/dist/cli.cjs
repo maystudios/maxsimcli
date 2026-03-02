@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 //#region \0rolldown/runtime.js
 var __create = Object.create;
 var __defProp$1 = Object.defineProperty;
@@ -593,7 +594,7 @@ var require_browser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/has-flag/index.js
+//#region ../../../../../node_modules/has-flag/index.js
 var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = (flag, argv = process.argv) => {
 		const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
@@ -604,7 +605,7 @@ var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/supports-color/index.js
+//#region ../../../../../node_modules/supports-color/index.js
 var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const os$5 = require("os");
 	const tty$2 = require("tty");
@@ -15372,12 +15373,12 @@ function readSkillInfo(skillDir, dirName) {
 /**
 * List all installed skills from `.claude/skills/`.
 */
-function cmdSkillList(cwd, raw) {
+function cmdSkillList(cwd) {
 	const dir = skillsDir(cwd);
-	if (!node_fs.default.existsSync(dir)) output({
+	if (!node_fs.default.existsSync(dir)) return cmdOk({
 		skills: [],
 		count: 0
-	}, raw, "No skills installed.");
+	}, "No skills installed.");
 	const entries = node_fs.default.readdirSync(dir, { withFileTypes: true });
 	const skills = [];
 	for (const entry of entries) {
@@ -15385,56 +15386,52 @@ function cmdSkillList(cwd, raw) {
 		const info = readSkillInfo(node_path.default.join(dir, entry.name), entry.name);
 		if (info) skills.push(info);
 	}
-	output({
+	return cmdOk({
 		skills,
 		count: skills.length
-	}, raw, skills.map((s) => `${s.name}: ${s.description}`).join("\n"));
+	}, skills.map((s) => `${s.name}: ${s.description}`).join("\n"));
 }
 /**
 * Install a specific skill from the templates directory.
 */
-function cmdSkillInstall(cwd, skillName, raw) {
-	if (!skillName) error("skill name required. Usage: skill-install <name>");
+function cmdSkillInstall(cwd, skillName) {
+	if (!skillName) return cmdErr("skill name required. Usage: skill-install <name>");
 	const srcFile = node_path.default.join(skillsTemplateDir(), skillName, "SKILL.md");
-	if (!node_fs.default.existsSync(srcFile)) error(`Skill "${skillName}" not found in templates. Available: ${listAvailableTemplates().join(", ")}`);
+	if (!node_fs.default.existsSync(srcFile)) return cmdErr(`Skill "${skillName}" not found in templates. Available: ${listAvailableTemplates().join(", ")}`);
 	const destDir = node_path.default.join(skillsDir(cwd), skillName);
 	const destFile = node_path.default.join(destDir, "SKILL.md");
 	node_fs.default.mkdirSync(destDir, { recursive: true });
 	node_fs.default.copyFileSync(srcFile, destFile);
-	output({
+	return cmdOk({
 		installed: true,
 		skill: skillName,
 		path: node_path.default.relative(cwd, destFile)
-	}, raw, `Installed skill: ${skillName}`);
+	}, `Installed skill: ${skillName}`);
 }
 /**
 * Update one or all installed skills from the templates source.
 */
-function cmdSkillUpdate(cwd, skillName, raw) {
+function cmdSkillUpdate(cwd, skillName) {
 	const dir = skillsDir(cwd);
 	const templateDir = skillsTemplateDir();
 	if (skillName) {
 		const srcFile = node_path.default.join(templateDir, skillName, "SKILL.md");
-		if (!node_fs.default.existsSync(srcFile)) error(`Skill template "${skillName}" not found.`);
+		if (!node_fs.default.existsSync(srcFile)) return cmdErr(`Skill template "${skillName}" not found.`);
 		const destDir = node_path.default.join(dir, skillName);
-		if (!node_fs.default.existsSync(destDir)) error(`Skill "${skillName}" is not installed. Use skill-install first.`);
+		if (!node_fs.default.existsSync(destDir)) return cmdErr(`Skill "${skillName}" is not installed. Use skill-install first.`);
 		const destFile = node_path.default.join(destDir, "SKILL.md");
 		node_fs.default.copyFileSync(srcFile, destFile);
-		output({
+		return cmdOk({
 			updated: [skillName],
 			skipped: [],
 			not_found: []
-		}, raw, `Updated skill: ${skillName}`);
-		return;
+		}, `Updated skill: ${skillName}`);
 	}
-	if (!node_fs.default.existsSync(dir)) {
-		output({
-			updated: [],
-			skipped: [],
-			not_found: []
-		}, raw, "No skills installed.");
-		return;
-	}
+	if (!node_fs.default.existsSync(dir)) return cmdOk({
+		updated: [],
+		skipped: [],
+		not_found: []
+	}, "No skills installed.");
 	const entries = node_fs.default.readdirSync(dir, { withFileTypes: true });
 	const updated = [];
 	const skipped = [];
@@ -15451,10 +15448,10 @@ function cmdSkillUpdate(cwd, skillName, raw) {
 		updated.push(name);
 	}
 	const summary = updated.length > 0 ? `Updated ${updated.length} skill(s): ${updated.join(", ")}` : "No skills updated.";
-	output({
+	return cmdOk({
 		updated,
 		skipped
-	}, raw, summary);
+	}, summary);
 }
 function listAvailableTemplates() {
 	const dir = skillsTemplateDir();
@@ -16501,9 +16498,9 @@ const COMMANDS = {
 	"artefakte-append": (args, cwd, raw) => handleResult(cmdArtefakteAppend(cwd, args[1], getFlag(args, "--entry") ?? void 0, getFlag(args, "--phase") ?? void 0, raw), raw),
 	"artefakte-list": (args, cwd, raw) => handleResult(cmdArtefakteList(cwd, getFlag(args, "--phase") ?? void 0, raw), raw),
 	"context-load": (args, cwd, raw) => handleResult(cmdContextLoad(cwd, getFlag(args, "--phase") ?? void 0, getFlag(args, "--topic") ?? void 0, hasFlag(args, "include-history")), raw),
-	"skill-list": (_args, cwd, raw) => cmdSkillList(cwd, raw),
-	"skill-install": (args, cwd, raw) => cmdSkillInstall(cwd, args[1], raw),
-	"skill-update": (args, cwd, raw) => cmdSkillUpdate(cwd, args[1], raw),
+	"skill-list": (_args, cwd, raw) => handleResult(cmdSkillList(cwd), raw),
+	"skill-install": (args, cwd, raw) => handleResult(cmdSkillInstall(cwd, args[1]), raw),
+	"skill-update": (args, cwd, raw) => handleResult(cmdSkillUpdate(cwd, args[1]), raw),
 	"start": async (args, cwd, raw) => handleResult(await cmdStart(cwd, {
 		noBrowser: hasFlag(args, "no-browser"),
 		networkMode: hasFlag(args, "network")
@@ -16512,6 +16509,23 @@ const COMMANDS = {
 	"start-server": async () => {
 		const serverPath = node_path.join(__dirname, "mcp-server.cjs");
 		(0, node_child_process.spawn)(process.execPath, [serverPath], { stdio: "inherit" }).on("exit", (code) => process.exit(code ?? 0));
+	},
+	"backend-start": async (args, cwd, raw) => {
+		const { startBackend } = await Promise.resolve().then(() => require("./lifecycle-B6gdn2NV.cjs"));
+		const portFlag = args.find((a) => a.startsWith("--port="))?.split("=")[1];
+		const background = !args.includes("--foreground");
+		output(await startBackend(cwd, {
+			port: portFlag ? parseInt(portFlag, 10) : void 0,
+			background
+		}), raw);
+	},
+	"backend-stop": async (_args, cwd, raw) => {
+		const { stopBackend } = await Promise.resolve().then(() => require("./lifecycle-B6gdn2NV.cjs"));
+		output({ stopped: await stopBackend(cwd) }, raw);
+	},
+	"backend-status": async (_args, cwd, raw) => {
+		const { getBackendStatus } = await Promise.resolve().then(() => require("./lifecycle-B6gdn2NV.cjs"));
+		output(await getBackendStatus(cwd) || { running: false }, raw);
 	}
 };
 async function main() {
@@ -16604,4 +16618,26 @@ async function handleDashboard(args) {
 main();
 
 //#endregion
+exports.__commonJSMin = __commonJSMin;
+exports.__toESM = __toESM;
+exports.appendToStateSection = appendToStateSection;
+exports.comparePhaseNum = comparePhaseNum;
+exports.escapeStringRegexp = escapeStringRegexp;
+exports.extractFrontmatter = extractFrontmatter;
+exports.findPhaseInternal = findPhaseInternal;
+exports.generateSlugInternal = generateSlugInternal;
+exports.getArchivedPhaseDirs = getArchivedPhaseDirs;
+exports.getPhasePattern = getPhasePattern;
+exports.listSubDirs = listSubDirs;
+exports.normalizePhaseName = normalizePhaseName;
+exports.parseTodoFrontmatter = parseTodoFrontmatter;
+exports.phaseAddCore = phaseAddCore;
+exports.phaseCompleteCore = phaseCompleteCore;
+exports.phaseInsertCore = phaseInsertCore;
+exports.phasesPath = phasesPath;
+exports.planningPath = planningPath;
+exports.stateExtractField = stateExtractField;
+exports.statePath = statePath;
+exports.stateReplaceField = stateReplaceField;
+exports.todayISO = todayISO;
 //# sourceMappingURL=cli.cjs.map

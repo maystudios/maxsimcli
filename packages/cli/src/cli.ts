@@ -400,6 +400,26 @@ const COMMANDS: Record<string, Handler> = {
     const child = spawn(process.execPath, [serverPath], { stdio: 'inherit' });
     child.on('exit', (code) => process.exit(code ?? 0));
   },
+  'backend-start': async (args, cwd, raw) => {
+    const { startBackend } = await import('./backend/lifecycle.js');
+    const portFlag = args.find(a => a.startsWith('--port='))?.split('=')[1];
+    const background = !args.includes('--foreground');
+    const result = await startBackend(cwd, {
+      port: portFlag ? parseInt(portFlag, 10) : undefined,
+      background,
+    });
+    output(result, raw);
+  },
+  'backend-stop': async (_args, cwd, raw) => {
+    const { stopBackend } = await import('./backend/lifecycle.js');
+    const stopped = await stopBackend(cwd);
+    output({ stopped }, raw);
+  },
+  'backend-status': async (_args, cwd, raw) => {
+    const { getBackendStatus } = await import('./backend/lifecycle.js');
+    const status = await getBackendStatus(cwd);
+    output(status || { running: false }, raw);
+  },
 };
 
 // ─── Main ────────────────────────────────────────────────────────────────────

@@ -1,28 +1,20 @@
 ---
 name: roadmap-writing
-description: Use when creating or restructuring a project roadmap — requires phased planning with dependencies, success criteria, and MAXSIM-compatible format
+description: >-
+  Creates structured project roadmaps with phased planning, dependency graphs,
+  and testable success criteria in MAXSIM-compatible format. Use when creating a
+  new roadmap, restructuring project phases, or planning milestones.
 ---
 
 # Roadmap Writing
 
 A roadmap without success criteria is a wish list. Define what done looks like for every phase.
 
-**If a phase does not have measurable success criteria, it is not a plan — it is a hope.**
+**HARD GATE: No phase without success criteria and dependencies. Every phase must have a number, name, goal, testable success criteria, and explicit dependencies. Violating this rule is a violation, not flexibility.**
 
-## The Iron Law
+## Process
 
-<HARD-GATE>
-NO PHASE WITHOUT SUCCESS CRITERIA AND DEPENDENCIES.
-Every phase MUST have: a number, a name, a goal, success criteria (testable statements), and explicit dependencies.
-"We'll figure it out as we go" is not planning — it is drifting.
-Violating this rule is a violation — not flexibility.
-</HARD-GATE>
-
-## The Gate Function
-
-Follow these steps IN ORDER when creating or restructuring a roadmap.
-
-### 1. SCOPE — Understand the Project
+### 1. SCOPE -- Understand the Project
 
 Before writing phases, understand what you are planning:
 
@@ -31,26 +23,18 @@ Before writing phases, understand what you are planning:
 - Check existing STATE.md for decisions and blockers
 - Identify the delivery target (MVP, v1, v2, etc.)
 
-```bash
-# Load project context
-node ~/.claude/maxsim/bin/maxsim-tools.cjs state read --raw
-
-# Check existing roadmap (if any)
-node ~/.claude/maxsim/bin/maxsim-tools.cjs roadmap read --raw
-```
-
-### 2. DECOMPOSE — Break Into Phases
+### 2. DECOMPOSE -- Break Into Phases
 
 Each phase should be:
 
 | Property | Requirement |
 |----------|------------|
-| **Independently deliverable** | The phase produces a working increment — not a half-built feature |
+| **Independently deliverable** | The phase produces a working increment, not a half-built feature |
 | **1-3 days of work** | Larger phases should be split; smaller ones should be merged |
 | **Clear boundary** | You can tell when the phase is done without ambiguity |
 | **Ordered by dependency** | No phase depends on a later phase |
 
-**Phase numbering convention:**
+Phase numbering convention:
 
 | Format | When to Use |
 |--------|------------|
@@ -58,54 +42,51 @@ Each phase should be:
 | `01A`, `01B` | Parallel sub-phases that can execute concurrently |
 | `01.1`, `01.2` | Sequential sub-phases within a parent phase |
 
-Sort order: `01 < 01A < 01B < 01.1 < 01.2 < 02`
+Sort order: `01` then `01A` then `01B` then `01.1` then `01.2` then `02`.
 
-### 3. DEFINE — Write Each Phase
+### 3. DEFINE -- Write Each Phase
 
-Every phase MUST include all of these fields:
+Every phase must include all of these fields:
 
 ```markdown
 ### Phase {number}: {name}
-**Goal**: {one sentence — what this phase achieves}
+**Goal**: {one sentence -- what this phase achieves}
 **Depends on**: {phase numbers, or "Nothing" for the first phase}
 **Requirements**: {requirement IDs from REQUIREMENTS.md, if applicable}
 **Success Criteria** (what must be TRUE):
-  1. {Testable statement — can be verified with a command, test, or inspection}
+  1. {Testable statement -- can be verified with a command, test, or inspection}
   2. {Testable statement}
   3. {Testable statement}
 **Plans**: TBD
 ```
 
-**Success criteria rules:**
-- Each criterion must be testable — "code is clean" is not testable; "no lint warnings" is testable
+Success criteria rules:
+- Each criterion must be testable -- "code is clean" is not testable; "no lint warnings" is testable
 - Include at least 2 criteria per phase
 - At least one criterion should be verifiable by running a command (test, build, lint)
-- Criteria describe the END STATE, not the process ("tests pass" not "write tests")
+- Criteria describe the end state, not the process ("tests pass" not "write tests")
 
-### 4. CONNECT — Map Dependencies
+### 4. CONNECT -- Map Dependencies
 
-Draw the dependency graph:
 - Which phases can run in parallel? (Use letter suffixes: `03A`, `03B`)
 - Which phases are strictly sequential? (Use number suffixes: `03.1`, `03.2`)
-- Are there any circular dependencies? (This is a design error — restructure)
+- Are there any circular dependencies? (This is a design error -- restructure)
 
-**Rule: Every phase except the first must declare at least one dependency.**
+Every phase except the first must declare at least one dependency.
 
-### 5. MILESTONE — Group Into Milestones
+### 5. MILESTONE -- Group Into Milestones
 
-Group phases into milestones that represent user-visible releases:
+Group phases into milestones that represent user-visible releases. Each milestone should be a coherent deliverable that could ship independently.
 
 ```markdown
 ## Milestones
 
-- **v1.0 MVP** — Phases 1-4
-- **v1.1 Polish** — Phases 5-7
-- **v2.0 Scale** — Phases 8-10
+- **v1.0 MVP** -- Phases 1-4
+- **v1.1 Polish** -- Phases 5-7
+- **v2.0 Scale** -- Phases 8-10
 ```
 
-Each milestone should be a coherent deliverable that could ship independently.
-
-### 6. WRITE — Produce the Roadmap
+### 6. WRITE -- Produce the Roadmap
 
 Assemble the complete ROADMAP.md:
 
@@ -118,7 +99,7 @@ Assemble the complete ROADMAP.md:
 
 ## Milestones
 
-- {emoji} **{milestone name}** — Phases {range} ({status})
+- **{milestone name}** -- Phases {range} ({status})
 
 ## Phases
 
@@ -135,47 +116,32 @@ Assemble the complete ROADMAP.md:
 **Plans**: TBD
 ```
 
-### 7. VALIDATE — Check the Roadmap
+### 7. VALIDATE -- Check the Roadmap
 
 Before finalizing, verify:
-
-```bash
-# Write the roadmap (creates or overwrites .planning/ROADMAP.md)
-# Then verify phase structure
-node ~/.claude/maxsim/bin/maxsim-tools.cjs roadmap read --raw
-```
 
 | Check | How to Verify |
 |-------|--------------|
 | Every phase has success criteria | Read each phase detail section |
-| Dependencies are acyclic | Trace the dependency chain — no loops |
+| Dependencies are acyclic | Trace the dependency chain -- no loops |
 | Phase numbering is sequential | Numbers increase, no gaps larger than 1 |
 | Milestones cover all phases | Every phase appears in exactly one milestone |
 | Success criteria are testable | Each criterion can be verified by command, test, or inspection |
 
-## Common Rationalizations — REJECT THESE
+## Common Pitfalls
 
-| Excuse | Why It Violates the Rule |
-|--------|--------------------------|
+| Pitfall | Why It Fails |
+|---------|-------------|
 | "We don't know enough to plan" | Plan what you know. Unknown phases get a research spike first. |
-| "The roadmap will change anyway" | Plans change — that is expected. No plan guarantees drift. |
+| "The roadmap will change anyway" | Plans change -- that is expected. No plan guarantees drift. |
 | "Success criteria are too rigid" | Vague criteria are useless. Rigid criteria are adjustable. |
 | "One big phase is simpler" | Big phases hide complexity and delay feedback. Split them. |
 | "Dependencies are obvious" | Obvious to you now. Not obvious to the agent running phase 5 next week. |
 | "We'll add details later" | Later never comes. Write the details now while context is fresh. |
 
-## Red Flags — STOP If You Catch Yourself:
+Stop if you catch yourself writing a phase without success criteria, creating phases longer than 3 days of work, skipping dependency declarations, writing vague criteria like "code is good", creating circular dependencies, or putting all work in one or two massive phases.
 
-- Writing a phase without success criteria
-- Creating phases longer than 3 days of work
-- Skipping dependency declarations
-- Writing vague criteria like "code is good" or "feature works"
-- Creating circular dependencies between phases
-- Putting all work in one or two massive phases
-
-**If any red flag triggers: STOP. Review the phase structure and fix it.**
-
-## Verification Checklist
+## Verification
 
 Before finalizing a roadmap, confirm:
 
@@ -188,11 +154,11 @@ Before finalizing a roadmap, confirm:
 - [ ] ROADMAP.md matches the expected format for MAXSIM CLI parsing
 - [ ] Overview section summarizes the project and delivery strategy
 
-## In MAXSIM Plan Execution
+## MAXSIM Integration
 
 Roadmap writing integrates with the MAXSIM lifecycle:
-- Use during project initialization (`/maxsim:plan-phase`) to create the initial roadmap
+- Use during project initialization to create the initial roadmap
 - Use when restructuring after a significant scope change or pivot
-- The roadmap is read by MAXSIM agents via `roadmap read` — format compliance is mandatory
+- The roadmap is read by MAXSIM agents via `roadmap read` -- format compliance is mandatory
 - Phase numbering must be parseable by `normalizePhaseName()` and `comparePhaseNum()` in core
 - Config `model_profile` in `.planning/config.json` affects agent assignment per phase
