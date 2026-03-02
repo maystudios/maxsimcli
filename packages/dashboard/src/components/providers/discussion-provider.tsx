@@ -55,6 +55,7 @@ type DiscussionAction =
   | { type: "QUESTIONS_RECEIVED"; questions: DiscussionQuestion[] }
   | { type: "SUBMIT_ANSWER"; answer: AnsweredQuestion }
   | { type: "ANSWER_ACCEPTED" }
+  | { type: "SUBMIT_FAILED" }
   | { type: "ASK_MORE" }
   | { type: "DONE_EXECUTE" }
   | { type: "RESET" };
@@ -99,6 +100,17 @@ function reducer(state: DiscussionState, action: DiscussionAction): DiscussionSt
         phase: next ? "active" : "loading",
         currentQuestion: next ?? null,
         questions: remaining,
+      };
+    }
+
+    case "SUBMIT_FAILED": {
+      // Revert: remove the last answered question and restore active state
+      // currentQuestion is still set (SUBMIT_ANSWER does not clear it)
+      return {
+        ...state,
+        phase: "active",
+        answeredQuestions: state.answeredQuestions.slice(0, -1),
+        answerCount: Math.max(0, state.answerCount - 1),
       };
     }
 
@@ -156,13 +168,21 @@ export function DiscussionProvider({ children }: { children: ReactNode }) {
       : answer.selectedLabels.join(', ');
 
     try {
-      await fetch('/api/mcp-answer', {
+      const res = await fetch('/api/mcp-answer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ questionId: answer.questionId, answer: answerText }),
       });
+
+      if (!res.ok) {
+        console.error('[discussion] Answer rejected by server:', res.status);
+        dispatch({ type: "SUBMIT_FAILED" });
+        return;
+      }
     } catch (err) {
       console.error('[discussion] Failed to submit answer:', err);
+      dispatch({ type: "SUBMIT_FAILED" });
+      return;
     }
 
     dispatch({ type: "ANSWER_ACCEPTED" });

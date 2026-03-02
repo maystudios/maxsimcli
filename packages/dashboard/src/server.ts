@@ -961,6 +961,8 @@ app.get('/api/server-info', (_req: Request, res: Response) => {
     localUrl: `http://localhost:${resolvedPort}`,
     networkUrl: localNetworkIp ? `http://${localNetworkIp}:${resolvedPort}` : null,
     tailscaleUrl: tailscaleIp ? `http://${tailscaleIp}:${resolvedPort}` : null,
+    projectName: path.basename(projectCwd),
+    projectCwd,
   });
 });
 
@@ -1120,26 +1122,45 @@ async function main(): Promise<void> {
       log('INFO', 'server', `Auto-shutdown scheduled in ${AUTO_SHUTDOWN_DELAY_MS / 1000}s (no clients)`);
     }
   });
-  // ── MCP Server ──
-  const mcpServer = createMcpServer({
+  // ── MCP Server (stateless — new instance per request) ──
+  const mcpDeps = {
     wss,
     questionQueue,
     pendingAnswers,
     currentLifecycleState,
     conversations,
     broadcast,
-  });
+  };
 
   app.post('/mcp', async (req: Request, res: Response) => {
-    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
-    await mcpServer.connect(transport);
-    await transport.handleRequest(req, res, req.body);
+    const mcpServer = createMcpServer(mcpDeps);
+    try {
+      const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+      await mcpServer.connect(transport);
+      await transport.handleRequest(req, res, req.body);
+      res.on('close', () => {
+        transport.close();
+        mcpServer.close();
+      });
+    } catch (error) {
+      log('ERROR', 'mcp', 'Error handling MCP POST request:', error);
+      if (!res.headersSent) {
+        res.status(500).json({
+          jsonrpc: '2.0',
+          error: { code: -32603, message: 'Internal server error' },
+          id: null,
+        });
+      }
+    }
   });
 
   app.get('/mcp', async (req: Request, res: Response) => {
-    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
-    await mcpServer.connect(transport);
-    await transport.handleRequest(req, res);
+    log('INFO', 'mcp', 'Received GET /mcp — method not allowed in stateless mode');
+    res.writeHead(405).end(JSON.stringify({
+      jsonrpc: '2.0',
+      error: { code: -32000, message: 'Method not allowed.' },
+      id: null,
+    }));
   });
 
   app.delete('/mcp', (_req: Request, res: Response) => {
