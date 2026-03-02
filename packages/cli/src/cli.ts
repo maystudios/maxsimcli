@@ -372,7 +372,7 @@ const COMMANDS: Record<string, Handler> = {
   },
   'init': handleInit,
   'phase-plan-index': (args, cwd, raw) => handleResult(cmdPhasePlanIndex(cwd, args[1]), raw),
-  'state-snapshot': (_args, cwd, raw) => handleResult(cmdStateSnapshot(cwd, raw), raw),
+  'state-snapshot': async (_args, cwd, raw) => handleResult(await cmdStateSnapshot(cwd, raw), raw),
   'summary-extract': (args, cwd, raw) => {
     const fieldsIndex = args.indexOf('--fields');
     const fields = fieldsIndex !== -1 ? args[fieldsIndex + 1].split(',') : null;

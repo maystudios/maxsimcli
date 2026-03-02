@@ -4,12 +4,12 @@
  * Ported from maxsim/bin/lib/state.cjs
  */
 
-import fs from 'node:fs';
+import { promises as fsp } from 'node:fs';
 import path from 'node:path';
 
 import escapeStringRegexp from 'escape-string-regexp';
 
-import { loadConfig, rethrowCliSignals, safeReadFile, safeReadFileAsync, planningPath, statePath as statePathUtil, configPath, roadmapPath, phasesPath, debugLog, todayISO, isPlanFile, isSummaryFile } from './core.js';
+import { loadConfig, rethrowCliSignals, safeReadFileAsync, pathExistsAsync, statePath as statePathUtil, configPath, roadmapPath, phasesPath, todayISO, isPlanFile, isSummaryFile } from './core.js';
 import type {
   AppConfig,
   StatePatchResult,
@@ -60,11 +60,11 @@ export function stateReplaceField(content: string, fieldName: string, newValue: 
   return replaced !== content ? replaced : null;
 }
 
-function readTextArgOrFile(cwd: string, value: string | undefined, filePath: string | undefined, label: string): string | undefined {
+async function readTextArgOrFile(cwd: string, value: string | undefined, filePath: string | undefined, label: string): Promise<string | undefined> {
   if (!filePath) return value;
   const resolvedPath = path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
   try {
-    return fs.readFileSync(resolvedPath, 'utf-8').trimEnd();
+    return (await fsp.readFile(resolvedPath, 'utf-8')).trimEnd();
   } catch {
     throw new Error(`${label} file not found: ${filePath}`);
   }
@@ -100,8 +100,8 @@ export async function cmdStateLoad(cwd: string, raw: boolean): Promise<CmdResult
 
   const [stateContent, configExists, roadmapExists] = await Promise.all([
     safeReadFileAsync(statePathUtil(cwd)),
-    fs.promises.access(configPath(cwd)).then(() => true, () => false),
-    fs.promises.access(roadmapPath(cwd)).then(() => true, () => false),
+    pathExistsAsync(configPath(cwd)),
+    pathExistsAsync(roadmapPath(cwd)),
   ]);
 
   const stateRaw = stateContent ?? '';
@@ -137,10 +137,10 @@ export async function cmdStateLoad(cwd: string, raw: boolean): Promise<CmdResult
   return cmdOk(result);
 }
 
-export function cmdStateGet(cwd: string, section: string | null, raw: boolean): CmdResult {
+export async function cmdStateGet(cwd: string, section: string | null, raw: boolean): Promise<CmdResult> {
   const statePath = statePathUtil(cwd);
   try {
-    const content = fs.readFileSync(statePath, 'utf-8');
+    const content = await fsp.readFile(statePath, 'utf-8');
 
     if (!section) {
       return cmdOk({ content }, raw ? content : undefined);
@@ -167,10 +167,10 @@ export function cmdStateGet(cwd: string, section: string | null, raw: boolean): 
   }
 }
 
-export function cmdStatePatch(cwd: string, patches: Record<string, string>, raw: boolean): CmdResult {
+export async function cmdStatePatch(cwd: string, patches: Record<string, string>, raw: boolean): Promise<CmdResult> {
   const statePath = statePathUtil(cwd);
   try {
-    let content = fs.readFileSync(statePath, 'utf-8');
+    let content = await fsp.readFile(statePath, 'utf-8');
     const results: StatePatchResult = { updated: [], failed: [] };
 
     for (const [field, value] of Object.entries(patches)) {
@@ -184,7 +184,7 @@ export function cmdStatePatch(cwd: string, patches: Record<string, string>, raw:
     }
 
     if (results.updated.length > 0) {
-      fs.writeFileSync(statePath, content, 'utf-8');
+      await fsp.writeFile(statePath, content, 'utf-8');
     }
 
     return cmdOk(results, raw ? (results.updated.length > 0 ? 'true' : 'false') : undefined);
@@ -194,17 +194,17 @@ export function cmdStatePatch(cwd: string, patches: Record<string, string>, raw:
   }
 }
 
-export function cmdStateUpdate(cwd: string, field: string | undefined, value: string | undefined): CmdResult {
+export async function cmdStateUpdate(cwd: string, field: string | undefined, value: string | undefined): Promise<CmdResult> {
   if (!field || value === undefined) {
     return cmdErr('field and value required for state update');
   }
 
   const statePath = statePathUtil(cwd);
   try {
-    const content = fs.readFileSync(statePath, 'utf-8');
+    const content = await fsp.readFile(statePath, 'utf-8');
     const result = stateReplaceField(content, field, value);
     if (result) {
-      fs.writeFileSync(statePath, result, 'utf-8');
+      await fsp.writeFile(statePath, result, 'utf-8');
       return cmdOk({ updated: true });
     } else {
       return cmdOk({ updated: false, reason: `Field "${field}" not found in STATE.md` });
@@ -217,11 +217,11 @@ export function cmdStateUpdate(cwd: string, field: string | undefined, value: st
 
 // ─── State Progression Engine ────────────────────────────────────────────────
 
-export function cmdStateAdvancePlan(cwd: string, raw: boolean): CmdResult {
+export async function cmdStateAdvancePlan(cwd: string, raw: boolean): Promise<CmdResult> {
   const statePath = statePathUtil(cwd);
-  if (!fs.existsSync(statePath)) { return cmdOk({ error: 'STATE.md not found' }); }
+  if (!(await pathExistsAsync(statePath))) { return cmdOk({ error: 'STATE.md not found' }); }
 
-  let content = fs.readFileSync(statePath, 'utf-8');
+  let content = await fsp.readFile(statePath, 'utf-8');
   const currentPlan = parseInt(stateExtractField(content, 'Current Plan') ?? '', 10);
   const totalPlans = parseInt(stateExtractField(content, 'Total Plans in Phase') ?? '', 10);
   const today = todayISO();
@@ -233,23 +233,23 @@ export function cmdStateAdvancePlan(cwd: string, raw: boolean): CmdResult {
   if (currentPlan >= totalPlans) {
     content = stateReplaceField(content, 'Status', 'Phase complete — ready for verification') || content;
     content = stateReplaceField(content, 'Last Activity', today) || content;
-    fs.writeFileSync(statePath, content, 'utf-8');
+    await fsp.writeFile(statePath, content, 'utf-8');
     return cmdOk({ advanced: false, reason: 'last_plan', current_plan: currentPlan, total_plans: totalPlans, status: 'ready_for_verification' }, raw ? 'false' : undefined);
   } else {
     const newPlan = currentPlan + 1;
     content = stateReplaceField(content, 'Current Plan', String(newPlan)) || content;
     content = stateReplaceField(content, 'Status', 'Ready to execute') || content;
     content = stateReplaceField(content, 'Last Activity', today) || content;
-    fs.writeFileSync(statePath, content, 'utf-8');
+    await fsp.writeFile(statePath, content, 'utf-8');
     return cmdOk({ advanced: true, previous_plan: currentPlan, current_plan: newPlan, total_plans: totalPlans }, raw ? 'true' : undefined);
   }
 }
 
-export function cmdStateRecordMetric(cwd: string, options: StateMetricOptions, raw: boolean): CmdResult {
+export async function cmdStateRecordMetric(cwd: string, options: StateMetricOptions, raw: boolean): Promise<CmdResult> {
   const statePath = statePathUtil(cwd);
-  if (!fs.existsSync(statePath)) { return cmdOk({ error: 'STATE.md not found' }); }
+  if (!(await pathExistsAsync(statePath))) { return cmdOk({ error: 'STATE.md not found' }); }
 
-  let content = fs.readFileSync(statePath, 'utf-8');
+  let content = await fsp.readFile(statePath, 'utf-8');
   const { phase, plan, duration, tasks, files } = options;
 
   if (!phase || !plan || !duration) {
@@ -271,30 +271,36 @@ export function cmdStateRecordMetric(cwd: string, options: StateMetricOptions, r
     }
 
     content = content.replace(metricsPattern, (_match, header: string) => `${header}${tableBody}\n`);
-    fs.writeFileSync(statePath, content, 'utf-8');
+    await fsp.writeFile(statePath, content, 'utf-8');
     return cmdOk({ recorded: true, phase, plan, duration }, raw ? 'true' : undefined);
   } else {
     return cmdOk({ recorded: false, reason: 'Performance Metrics section not found in STATE.md' }, raw ? 'false' : undefined);
   }
 }
 
-export function cmdStateUpdateProgress(cwd: string, raw: boolean): CmdResult {
+export async function cmdStateUpdateProgress(cwd: string, raw: boolean): Promise<CmdResult> {
   const statePath = statePathUtil(cwd);
-  if (!fs.existsSync(statePath)) { return cmdOk({ error: 'STATE.md not found' }); }
+  if (!(await pathExistsAsync(statePath))) { return cmdOk({ error: 'STATE.md not found' }); }
 
-  let content = fs.readFileSync(statePath, 'utf-8');
+  let content = await fsp.readFile(statePath, 'utf-8');
 
   const phasesDir = phasesPath(cwd);
   let totalPlans = 0;
   let totalSummaries = 0;
 
-  if (fs.existsSync(phasesDir)) {
-    const phaseDirs = fs.readdirSync(phasesDir, { withFileTypes: true })
+  if (await pathExistsAsync(phasesDir)) {
+    const phaseDirs = (await fsp.readdir(phasesDir, { withFileTypes: true }))
       .filter(e => e.isDirectory()).map(e => e.name);
-    for (const dir of phaseDirs) {
-      const files = fs.readdirSync(path.join(phasesDir, dir));
-      totalPlans += files.filter(f => isPlanFile(f)).length;
-      totalSummaries += files.filter(f => isSummaryFile(f)).length;
+    const counts = await Promise.all(phaseDirs.map(async (dir) => {
+      const files = await fsp.readdir(path.join(phasesDir, dir));
+      return {
+        plans: files.filter(f => isPlanFile(f)).length,
+        summaries: files.filter(f => isSummaryFile(f)).length,
+      };
+    }));
+    for (const c of counts) {
+      totalPlans += c.plans;
+      totalSummaries += c.summaries;
     }
   }
 
@@ -306,24 +312,24 @@ export function cmdStateUpdateProgress(cwd: string, raw: boolean): CmdResult {
 
   const result = stateReplaceField(content, 'Progress', progressStr);
   if (result) {
-    fs.writeFileSync(statePath, result, 'utf-8');
+    await fsp.writeFile(statePath, result, 'utf-8');
     return cmdOk({ updated: true, percent, completed: totalSummaries, total: totalPlans, bar: progressStr }, raw ? progressStr : undefined);
   } else {
     return cmdOk({ updated: false, reason: 'Progress field not found in STATE.md' }, raw ? 'false' : undefined);
   }
 }
 
-export function cmdStateAddDecision(cwd: string, options: StateDecisionOptions, raw: boolean): CmdResult {
+export async function cmdStateAddDecision(cwd: string, options: StateDecisionOptions, raw: boolean): Promise<CmdResult> {
   const statePath = statePathUtil(cwd);
-  if (!fs.existsSync(statePath)) { return cmdOk({ error: 'STATE.md not found' }); }
+  if (!(await pathExistsAsync(statePath))) { return cmdOk({ error: 'STATE.md not found' }); }
 
   const { phase, summary, summary_file, rationale, rationale_file } = options;
   let summaryText: string | undefined;
   let rationaleText = '';
 
   try {
-    summaryText = readTextArgOrFile(cwd, summary, summary_file, 'summary');
-    rationaleText = readTextArgOrFile(cwd, rationale || '', rationale_file, 'rationale') || '';
+    summaryText = await readTextArgOrFile(cwd, summary, summary_file, 'summary');
+    rationaleText = (await readTextArgOrFile(cwd, rationale || '', rationale_file, 'rationale')) || '';
   } catch (thrown: unknown) {
     const e = thrown as Error;
     return cmdOk({ added: false, reason: e.message }, raw ? 'false' : undefined);
@@ -331,28 +337,28 @@ export function cmdStateAddDecision(cwd: string, options: StateDecisionOptions, 
 
   if (!summaryText) { return cmdOk({ error: 'summary required' }); }
 
-  const content = fs.readFileSync(statePath, 'utf-8');
+  const content = await fsp.readFile(statePath, 'utf-8');
   const entry = `- [Phase ${phase || '?'}]: ${summaryText}${rationaleText ? ` — ${rationaleText}` : ''}`;
 
   const sectionPattern = /(###?\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
   const updated = appendToStateSection(content, sectionPattern, entry, [/None yet\.?\s*\n?/gi, /No decisions yet\.?\s*\n?/gi]);
 
   if (updated) {
-    fs.writeFileSync(statePath, updated, 'utf-8');
+    await fsp.writeFile(statePath, updated, 'utf-8');
     return cmdOk({ added: true, decision: entry }, raw ? 'true' : undefined);
   } else {
     return cmdOk({ added: false, reason: 'Decisions section not found in STATE.md' }, raw ? 'false' : undefined);
   }
 }
 
-export function cmdStateAddBlocker(cwd: string, text: string | StateBlockerOptions, raw: boolean): CmdResult {
+export async function cmdStateAddBlocker(cwd: string, text: string | StateBlockerOptions, raw: boolean): Promise<CmdResult> {
   const statePath = statePathUtil(cwd);
-  if (!fs.existsSync(statePath)) { return cmdOk({ error: 'STATE.md not found' }); }
+  if (!(await pathExistsAsync(statePath))) { return cmdOk({ error: 'STATE.md not found' }); }
   const blockerOptions: StateBlockerOptions = typeof text === 'object' && text !== null ? text : { text: text as string };
   let blockerText: string | undefined;
 
   try {
-    blockerText = readTextArgOrFile(cwd, blockerOptions.text, blockerOptions.text_file, 'blocker');
+    blockerText = await readTextArgOrFile(cwd, blockerOptions.text, blockerOptions.text_file, 'blocker');
   } catch (thrown: unknown) {
     const e = thrown as Error;
     return cmdOk({ added: false, reason: e.message }, raw ? 'false' : undefined);
@@ -360,26 +366,26 @@ export function cmdStateAddBlocker(cwd: string, text: string | StateBlockerOptio
 
   if (!blockerText) { return cmdOk({ error: 'text required' }); }
 
-  const content = fs.readFileSync(statePath, 'utf-8');
+  const content = await fsp.readFile(statePath, 'utf-8');
   const entry = `- ${blockerText}`;
 
   const sectionPattern = /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
   const updated = appendToStateSection(content, sectionPattern, entry, [/None\.?\s*\n?/gi, /None yet\.?\s*\n?/gi]);
 
   if (updated) {
-    fs.writeFileSync(statePath, updated, 'utf-8');
+    await fsp.writeFile(statePath, updated, 'utf-8');
     return cmdOk({ added: true, blocker: blockerText }, raw ? 'true' : undefined);
   } else {
     return cmdOk({ added: false, reason: 'Blockers section not found in STATE.md' }, raw ? 'false' : undefined);
   }
 }
 
-export function cmdStateResolveBlocker(cwd: string, text: string | null, raw: boolean): CmdResult {
+export async function cmdStateResolveBlocker(cwd: string, text: string | null, raw: boolean): Promise<CmdResult> {
   const statePath = statePathUtil(cwd);
-  if (!fs.existsSync(statePath)) { return cmdOk({ error: 'STATE.md not found' }); }
+  if (!(await pathExistsAsync(statePath))) { return cmdOk({ error: 'STATE.md not found' }); }
   if (!text) { return cmdOk({ error: 'text required' }); }
 
-  let content = fs.readFileSync(statePath, 'utf-8');
+  let content = await fsp.readFile(statePath, 'utf-8');
 
   const sectionPattern = /(#{2,3}\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n\s*\n?)([\s\S]*?)(?=\n#{2,3}\s|$)/i;
   const match = content.match(sectionPattern);
@@ -399,18 +405,18 @@ export function cmdStateResolveBlocker(cwd: string, text: string | null, raw: bo
     }
 
     content = content.replace(sectionPattern, (_match, header: string) => `${header}${newBody}`);
-    fs.writeFileSync(statePath, content, 'utf-8');
+    await fsp.writeFile(statePath, content, 'utf-8');
     return cmdOk({ resolved: true, blocker: text }, raw ? 'true' : undefined);
   } else {
     return cmdOk({ resolved: false, reason: 'Blockers section not found in STATE.md' }, raw ? 'false' : undefined);
   }
 }
 
-export function cmdStateRecordSession(cwd: string, options: StateSessionOptions, raw: boolean): CmdResult {
+export async function cmdStateRecordSession(cwd: string, options: StateSessionOptions, raw: boolean): Promise<CmdResult> {
   const statePath = statePathUtil(cwd);
-  if (!fs.existsSync(statePath)) { return cmdOk({ error: 'STATE.md not found' }); }
+  if (!(await pathExistsAsync(statePath))) { return cmdOk({ error: 'STATE.md not found' }); }
 
-  let content = fs.readFileSync(statePath, 'utf-8');
+  let content = await fsp.readFile(statePath, 'utf-8');
   const now = new Date().toISOString();
   const updated: string[] = [];
 
@@ -431,21 +437,21 @@ export function cmdStateRecordSession(cwd: string, options: StateSessionOptions,
   if (result) { content = result; updated.push('Resume File'); }
 
   if (updated.length > 0) {
-    fs.writeFileSync(statePath, content, 'utf-8');
+    await fsp.writeFile(statePath, content, 'utf-8');
     return cmdOk({ recorded: true, updated }, raw ? 'true' : undefined);
   } else {
     return cmdOk({ recorded: false, reason: 'No session fields found in STATE.md' }, raw ? 'false' : undefined);
   }
 }
 
-export function cmdStateSnapshot(cwd: string, raw: boolean): CmdResult {
+export async function cmdStateSnapshot(cwd: string, raw: boolean): Promise<CmdResult> {
   const statePath = statePathUtil(cwd);
 
-  if (!fs.existsSync(statePath)) {
+  if (!(await pathExistsAsync(statePath))) {
     return cmdOk({ error: 'STATE.md not found' });
   }
 
-  const content = fs.readFileSync(statePath, 'utf-8');
+  const content = await fsp.readFile(statePath, 'utf-8');
 
   const extractField = (fieldName: string): string | null => stateExtractField(content, fieldName);
 
