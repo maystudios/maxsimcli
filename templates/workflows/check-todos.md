@@ -138,7 +138,91 @@ Display: `/maxsim:add-phase [description from todo]`
 Keep in pending. User runs command in fresh context.
 
 **Brainstorm approach:**
-Keep in pending. Start discussion about problem and approaches.
+Keep in pending. Enter structured thinking-partner discussion to clarify and enrich the todo.
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ MAXSIM ► TODO BRAINSTORM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+Apply thinking-partner behaviors from `@./references/thinking-partner.md` to explore the todo before deciding next steps.
+
+**Round 1 — Problem clarity (2-3 questions):**
+
+Use AskUserQuestion to probe:
+- What exactly is the problem? (Challenge vagueness — if the todo description is abstract, push for specifics)
+- What does "done" look like? (Make abstract concrete — what observable change marks completion?)
+- Is this one thing or multiple? (Surface hidden scope — does this todo contain sub-tasks?)
+
+Build on the todo's existing Problem and Solution sections. Quote specifics from the todo to ground the discussion.
+
+**Round 2 — Approach exploration (2-3 questions):**
+
+Use AskUserQuestion to explore:
+- What approaches have you considered? (Propose 2-3 alternatives with trade-offs if the user has no strong opinion)
+- What constraints exist? (Surface unstated assumptions — time, dependencies, tech debt, team knowledge)
+- What could go wrong? (Make consequences visible — breaking changes, performance, migration risk)
+
+Follow the thread from Round 1. React to the user's energy — if they are excited about an approach, dig into it. If uncertain, help narrow options.
+
+**Round 3 — Readiness check:**
+
+Use AskUserQuestion:
+- header: "Todo"
+- question: "Ready to refine this todo with what we discussed?"
+- options:
+  - "Refine todo" — Update with discussion insights
+  - "Keep discussing" — Explore more
+  - "Split into multiple" — This is actually several todos
+
+If "Keep discussing": ask 2-3 more probing questions focusing on the most important open question, then check readiness again.
+If "Split into multiple": help the user define 2-3 separate todos. For each, create a new todo file in `.planning/todos/pending/` using the enriched format below. Commit all new files.
+If "Refine todo": continue to enrichment below.
+
+**After discussion — enrich the todo file:**
+
+Rewrite the selected todo's markdown file with enriched content:
+
+```markdown
+---
+created: [preserve original]
+title: [preserve or refine from discussion]
+area: [preserve or update]
+mode: discussed
+files:
+  - [preserve and add any new files surfaced]
+---
+
+## Problem
+
+[Problem description enriched with discussion insights from Round 1]
+
+## Scope
+
+[What is in scope and out of scope — from Round 1 clarity questions]
+
+## Approach
+
+[Chosen approach with trade-offs explored — from Round 2]
+[Include alternatives considered and why this approach was chosen]
+
+## Risks
+
+[What could go wrong — from Round 2 consequences discussion]
+
+## Solution
+
+[Concrete next steps or "TBD"]
+```
+
+Commit the updated todo:
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs: enrich todo after brainstorm - [title]" --files [todo-file-path] .planning/STATE.md
+```
+
+**Time budget:** 20-30 minutes max. After 6 rounds of questions, offer to file what you have.
 
 **Put it back:**
 Return to list_todos step.
