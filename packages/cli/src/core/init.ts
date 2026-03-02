@@ -7,7 +7,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { execSync } from 'node:child_process';
 
 import {
   loadConfig,
@@ -381,6 +380,46 @@ function scanPhaseArtifacts(cwd: string, phaseDirectory: string): PhaseArtifacts
   return result;
 }
 
+// ─── Helper: cross-platform code file detection ─────────────────────────────
+
+const CODE_EXTENSIONS = new Set(['.ts', '.js', '.py', '.go', '.rs', '.swift', '.java']);
+const EXCLUDED_DIRS = new Set(['node_modules', '.git']);
+
+/**
+ * Recursively finds code files up to `maxDepth` levels deep, excluding
+ * node_modules and .git directories. Returns up to `limit` matching paths.
+ * Works on Windows, macOS, and Linux (no shell commands).
+ */
+function findCodeFiles(dir: string, maxDepth: number = 3, limit: number = 5): string[] {
+  const results: string[] = [];
+
+  function walk(currentDir: string, depth: number): void {
+    if (depth > maxDepth || results.length >= limit) return;
+    let entries: fs.Dirent[];
+    try {
+      entries = fs.readdirSync(currentDir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      if (results.length >= limit) return;
+      if (EXCLUDED_DIRS.has(entry.name)) continue;
+      const fullPath = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        walk(fullPath, depth + 1);
+      } else if (entry.isFile()) {
+        const ext = path.extname(entry.name).toLowerCase();
+        if (CODE_EXTENSIONS.has(ext)) {
+          results.push(fullPath);
+        }
+      }
+    }
+  }
+
+  walk(dir, 1);
+  return results;
+}
+
 // ─── Init commands ──────────────────────────────────────────────────────────
 
 export function cmdInitExecutePhase(cwd: string, phase: string | undefined, raw: boolean): void {
@@ -488,25 +527,13 @@ export function cmdInitNewProject(cwd: string, raw: boolean): void {
   const braveKeyFile = path.join(homedir, '.maxsim', 'brave_api_key');
   const hasBraveSearch = !!(process.env.BRAVE_API_KEY || fs.existsSync(braveKeyFile));
 
-  let hasCode = false;
-  let hasPackageFile = false;
-  try {
-    const files = execSync('find . -maxdepth 3 \\( -name "*.ts" -o -name "*.js" -o -name "*.py" -o -name "*.go" -o -name "*.rs" -o -name "*.swift" -o -name "*.java" \\) 2>/dev/null | grep -v node_modules | grep -v .git | head -5', {
-      cwd,
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
-    hasCode = files.trim().length > 0;
-  } catch (e) {
-    /* optional op, ignore */
-    debugLog(e);
-  }
+  const hasCode = findCodeFiles(cwd).length > 0;
 
-  hasPackageFile = pathExistsInternal(cwd, 'package.json') ||
-                   pathExistsInternal(cwd, 'requirements.txt') ||
-                   pathExistsInternal(cwd, 'Cargo.toml') ||
-                   pathExistsInternal(cwd, 'go.mod') ||
-                   pathExistsInternal(cwd, 'Package.swift');
+  const hasPackageFile = pathExistsInternal(cwd, 'package.json') ||
+                         pathExistsInternal(cwd, 'requirements.txt') ||
+                         pathExistsInternal(cwd, 'Cargo.toml') ||
+                         pathExistsInternal(cwd, 'go.mod') ||
+                         pathExistsInternal(cwd, 'Package.swift');
 
   const result: NewProjectContext = {
     researcher_model: resolveModelInternal(cwd, 'maxsim-project-researcher'),
@@ -841,19 +868,9 @@ export function cmdInitExisting(cwd: string, raw: boolean): void {
   const hasBraveSearch = !!(process.env.BRAVE_API_KEY || fs.existsSync(braveKeyFile));
 
   // Detect existing code (same logic as cmdInitNewProject)
-  let hasCode = false;
-  let hasPackageFile = false;
-  try {
-    const files = execSync(
-      'find . -maxdepth 3 \\( -name "*.ts" -o -name "*.js" -o -name "*.py" -o -name "*.go" -o -name "*.rs" -o -name "*.swift" -o -name "*.java" \\) 2>/dev/null | grep -v node_modules | grep -v .git | head -5',
-      { cwd, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] }
-    );
-    hasCode = files.trim().length > 0;
-  } catch (e) {
-    debugLog(e);
-  }
+  const hasCode = findCodeFiles(cwd).length > 0;
 
-  hasPackageFile =
+  const hasPackageFile =
     pathExistsInternal(cwd, 'package.json') ||
     pathExistsInternal(cwd, 'requirements.txt') ||
     pathExistsInternal(cwd, 'Cargo.toml') ||
