@@ -182,14 +182,14 @@ const handleState: Handler = async (args, cwd, raw) => {
 const handleTemplate: Handler = (args, cwd, raw) => {
   const sub = args[1];
   if (sub === 'select') {
-    cmdTemplateSelect(cwd, args[2], raw);
+    handleResult(cmdTemplateSelect(cwd, args[2]), raw);
   } else if (sub === 'fill') {
     const f = getFlags(args, 'phase', 'plan', 'name', 'type', 'wave', 'fields');
-    cmdTemplateFill(cwd, args[2], {
+    handleResult(cmdTemplateFill(cwd, args[2], {
       phase: f.phase ?? '', plan: f.plan ?? undefined, name: f.name ?? undefined,
       type: f.type ?? 'execute', wave: f.wave ?? '1',
       fields: f.fields ? JSON.parse(f.fields) : {},
-    }, raw);
+    }), raw);
   } else {
     error('Unknown template subcommand. Available: select, fill');
   }
@@ -199,10 +199,10 @@ const handleFrontmatter: Handler = (args, cwd, raw) => {
   const sub = args[1];
   const file = args[2];
   const handlers: Record<string, () => void> = {
-    'get': () => cmdFrontmatterGet(cwd, file, getFlag(args, '--field'), raw),
-    'set': () => cmdFrontmatterSet(cwd, file, getFlag(args, '--field'), getFlag(args, '--value') ?? undefined, raw),
-    'merge': () => cmdFrontmatterMerge(cwd, file, getFlag(args, '--data'), raw),
-    'validate': () => cmdFrontmatterValidate(cwd, file, getFlag(args, '--schema'), raw),
+    'get': () => handleResult(cmdFrontmatterGet(cwd, file, getFlag(args, '--field')), raw),
+    'set': () => handleResult(cmdFrontmatterSet(cwd, file, getFlag(args, '--field'), getFlag(args, '--value') ?? undefined), raw),
+    'merge': () => handleResult(cmdFrontmatterMerge(cwd, file, getFlag(args, '--data')), raw),
+    'validate': () => handleResult(cmdFrontmatterValidate(cwd, file, getFlag(args, '--schema')), raw),
   };
   const handler = sub ? handlers[sub] : undefined;
   if (handler) return handler();
@@ -212,12 +212,12 @@ const handleFrontmatter: Handler = (args, cwd, raw) => {
 const handleVerify: Handler = async (args, cwd, raw) => {
   const sub = args[1];
   const handlers: Record<string, () => void | Promise<void>> = {
-    'plan-structure': () => cmdVerifyPlanStructure(cwd, args[2], raw),
-    'phase-completeness': () => cmdVerifyPhaseCompleteness(cwd, args[2], raw),
-    'references': () => cmdVerifyReferences(cwd, args[2], raw),
-    'commits': () => cmdVerifyCommits(cwd, args.slice(2), raw),
-    'artifacts': () => cmdVerifyArtifacts(cwd, args[2], raw),
-    'key-links': () => cmdVerifyKeyLinks(cwd, args[2], raw),
+    'plan-structure': () => handleResult(cmdVerifyPlanStructure(cwd, args[2]), raw),
+    'phase-completeness': () => handleResult(cmdVerifyPhaseCompleteness(cwd, args[2]), raw),
+    'references': () => handleResult(cmdVerifyReferences(cwd, args[2]), raw),
+    'commits': async () => handleResult(await cmdVerifyCommits(cwd, args.slice(2)), raw),
+    'artifacts': () => handleResult(cmdVerifyArtifacts(cwd, args[2]), raw),
+    'key-links': () => handleResult(cmdVerifyKeyLinks(cwd, args[2]), raw),
   };
   const handler = sub ? handlers[sub] : undefined;
   if (handler) return handler();
@@ -228,13 +228,13 @@ const handlePhases: Handler = async (args, cwd, raw) => {
   const sub = args[1];
   if (sub === 'list') {
     const f = getFlags(args, 'type', 'phase', 'offset', 'limit');
-    await cmdPhasesList(cwd, {
+    handleResult(await cmdPhasesList(cwd, {
       type: f.type,
       phase: f.phase,
       includeArchived: hasFlag(args, 'include-archived'),
       offset: f.offset !== null ? parseInt(f.offset, 10) : undefined,
       limit: f.limit !== null ? parseInt(f.limit, 10) : undefined,
-    }, raw);
+    }), raw);
   } else {
     error('Unknown phases subcommand. Available: list');
   }
@@ -242,27 +242,27 @@ const handlePhases: Handler = async (args, cwd, raw) => {
 
 const handleRoadmap: Handler = async (args, cwd, raw) => {
   const sub = args[1];
-  const handlers: Record<string, () => void | Promise<void>> = {
-    'get-phase': () => cmdRoadmapGetPhase(cwd, args[2], raw),
-    'analyze': () => cmdRoadmapAnalyze(cwd, raw),
-    'update-plan-progress': () => cmdRoadmapUpdatePlanProgress(cwd, args[2], raw),
+  const handlers: Record<string, () => CmdResult | Promise<CmdResult>> = {
+    'get-phase': () => cmdRoadmapGetPhase(cwd, args[2]),
+    'analyze': () => cmdRoadmapAnalyze(cwd),
+    'update-plan-progress': () => cmdRoadmapUpdatePlanProgress(cwd, args[2]),
   };
   const handler = sub ? handlers[sub] : undefined;
-  if (handler) return handler();
+  if (handler) return handleResult(await handler(), raw);
   error('Unknown roadmap subcommand. Available: get-phase, analyze, update-plan-progress');
 };
 
 const handlePhase: Handler = (args, cwd, raw) => {
   const sub = args[1];
-  const handlers: Record<string, () => void> = {
-    'next-decimal': () => cmdPhaseNextDecimal(cwd, args[2], raw),
-    'add': () => cmdPhaseAdd(cwd, args.slice(2).join(' '), raw),
-    'insert': () => cmdPhaseInsert(cwd, args[2], args.slice(3).join(' '), raw),
-    'remove': () => cmdPhaseRemove(cwd, args[2], { force: hasFlag(args, 'force') }, raw),
-    'complete': () => cmdPhaseComplete(cwd, args[2], raw),
+  const handlers: Record<string, () => CmdResult> = {
+    'next-decimal': () => cmdPhaseNextDecimal(cwd, args[2]),
+    'add': () => cmdPhaseAdd(cwd, args.slice(2).join(' ')),
+    'insert': () => cmdPhaseInsert(cwd, args[2], args.slice(3).join(' ')),
+    'remove': () => cmdPhaseRemove(cwd, args[2], { force: hasFlag(args, 'force') }),
+    'complete': () => cmdPhaseComplete(cwd, args[2]),
   };
   const handler = sub ? handlers[sub] : undefined;
-  if (handler) return handler();
+  if (handler) return handleResult(handler(), raw);
   error('Unknown phase subcommand. Available: next-decimal, add, insert, remove, complete');
 };
 
@@ -279,10 +279,10 @@ const handleMilestone: Handler = (args, cwd, raw) => {
       }
       milestoneName = nameArgs.join(' ') || null;
     }
-    cmdMilestoneComplete(cwd, args[2], {
+    handleResult(cmdMilestoneComplete(cwd, args[2], {
       name: milestoneName ?? undefined,
       archivePhases: hasFlag(args, 'archive-phases'),
-    }, raw);
+    }), raw);
   } else {
     error('Unknown milestone subcommand. Available: complete');
   }
@@ -291,8 +291,8 @@ const handleMilestone: Handler = (args, cwd, raw) => {
 const handleValidate: Handler = (args, cwd, raw) => {
   const sub = args[1];
   const handlers: Record<string, () => void> = {
-    'consistency': () => cmdValidateConsistency(cwd, raw),
-    'health': () => cmdValidateHealth(cwd, { repair: hasFlag(args, 'repair') }, raw),
+    'consistency': () => handleResult(cmdValidateConsistency(cwd), raw),
+    'health': () => handleResult(cmdValidateHealth(cwd, { repair: hasFlag(args, 'repair') }), raw),
   };
   const handler = sub ? handlers[sub] : undefined;
   if (handler) return handler();
@@ -301,23 +301,23 @@ const handleValidate: Handler = (args, cwd, raw) => {
 
 const handleInit: Handler = (args, cwd, raw) => {
   const workflow = args[1];
-  const handlers: Record<string, () => void> = {
-    'execute-phase': () => cmdInitExecutePhase(cwd, args[2], raw),
-    'plan-phase': () => cmdInitPlanPhase(cwd, args[2], raw),
-    'new-project': () => cmdInitNewProject(cwd, raw),
-    'new-milestone': () => cmdInitNewMilestone(cwd, raw),
-    'quick': () => cmdInitQuick(cwd, args.slice(2).join(' '), raw),
-    'resume': () => cmdInitResume(cwd, raw),
-    'verify-work': () => cmdInitVerifyWork(cwd, args[2], raw),
-    'phase-op': () => cmdInitPhaseOp(cwd, args[2], raw),
-    'todos': () => cmdInitTodos(cwd, args[2], raw),
-    'milestone-op': () => cmdInitMilestoneOp(cwd, raw),
-    'map-codebase': () => cmdInitMapCodebase(cwd, raw),
-    'init-existing': () => cmdInitExisting(cwd, raw),
-    'progress': () => cmdInitProgress(cwd, raw),
+  const handlers: Record<string, () => CmdResult> = {
+    'execute-phase': () => cmdInitExecutePhase(cwd, args[2]),
+    'plan-phase': () => cmdInitPlanPhase(cwd, args[2]),
+    'new-project': () => cmdInitNewProject(cwd),
+    'new-milestone': () => cmdInitNewMilestone(cwd),
+    'quick': () => cmdInitQuick(cwd, args.slice(2).join(' ')),
+    'resume': () => cmdInitResume(cwd),
+    'verify-work': () => cmdInitVerifyWork(cwd, args[2]),
+    'phase-op': () => cmdInitPhaseOp(cwd, args[2]),
+    'todos': () => cmdInitTodos(cwd, args[2]),
+    'milestone-op': () => cmdInitMilestoneOp(cwd),
+    'map-codebase': () => cmdInitMapCodebase(cwd),
+    'init-existing': () => cmdInitExisting(cwd),
+    'progress': () => cmdInitProgress(cwd),
   };
   const handler = workflow ? handlers[workflow] : undefined;
-  if (handler) return handler();
+  if (handler) return handleResult(handler(), raw);
   error(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, init-existing, progress`);
 };
 
@@ -326,7 +326,7 @@ const handleInit: Handler = (args, cwd, raw) => {
 const COMMANDS: Record<string, Handler> = {
   'state': handleState,
   'resolve-model': (args, cwd, raw) => handleResult(cmdResolveModel(cwd, args[1], raw), raw),
-  'find-phase': (args, cwd, raw) => cmdFindPhase(cwd, args[1], raw),
+  'find-phase': (args, cwd, raw) => handleResult(cmdFindPhase(cwd, args[1]), raw),
   'commit': async (args, cwd, raw) => {
     const files = args.indexOf('--files') !== -1
       ? args.slice(args.indexOf('--files') + 1).filter(a => !a.startsWith('--'))
@@ -336,7 +336,7 @@ const COMMANDS: Record<string, Handler> = {
   'verify-summary': async (args, cwd, raw) => {
     const countIndex = args.indexOf('--check-count');
     const checkCount = countIndex !== -1 ? parseInt(args[countIndex + 1], 10) : 2;
-    await cmdVerifySummary(cwd, args[1], checkCount, raw);
+    handleResult(await cmdVerifySummary(cwd, args[1], checkCount), raw);
   },
   'template': handleTemplate,
   'frontmatter': handleFrontmatter,
@@ -352,7 +352,7 @@ const COMMANDS: Record<string, Handler> = {
   'phases': handlePhases,
   'roadmap': handleRoadmap,
   'requirements': (args, cwd, raw) => {
-    if (args[1] === 'mark-complete') cmdRequirementsMarkComplete(cwd, args.slice(2), raw);
+    if (args[1] === 'mark-complete') handleResult(cmdRequirementsMarkComplete(cwd, args.slice(2)), raw);
     else error('Unknown requirements subcommand. Available: mark-complete');
   },
   'phase': handlePhase,
@@ -368,7 +368,7 @@ const COMMANDS: Record<string, Handler> = {
     handleResult(cmdScaffold(cwd, args[1], { phase: f.phase, name: f.name ? args.slice(args.indexOf('--name') + 1).join(' ') : null }, raw), raw);
   },
   'init': handleInit,
-  'phase-plan-index': (args, cwd, raw) => cmdPhasePlanIndex(cwd, args[1], raw),
+  'phase-plan-index': (args, cwd, raw) => handleResult(cmdPhasePlanIndex(cwd, args[1]), raw),
   'state-snapshot': (_args, cwd, raw) => handleResult(cmdStateSnapshot(cwd, raw), raw),
   'summary-extract': (args, cwd, raw) => {
     const fieldsIndex = args.indexOf('--fields');
@@ -386,8 +386,8 @@ const COMMANDS: Record<string, Handler> = {
   'artefakte-write': (args, cwd, raw) => handleResult(cmdArtefakteWrite(cwd, args[1], getFlag(args, '--content') ?? undefined, getFlag(args, '--phase') ?? undefined, raw), raw),
   'artefakte-append': (args, cwd, raw) => handleResult(cmdArtefakteAppend(cwd, args[1], getFlag(args, '--entry') ?? undefined, getFlag(args, '--phase') ?? undefined, raw), raw),
   'artefakte-list': (args, cwd, raw) => handleResult(cmdArtefakteList(cwd, getFlag(args, '--phase') ?? undefined, raw), raw),
-  'context-load': (args, cwd, raw) => cmdContextLoad(cwd, getFlag(args, '--phase') ?? undefined, getFlag(args, '--topic') ?? undefined, hasFlag(args, 'include-history'), raw),
-  'start': async (args, cwd, raw) => cmdStart(cwd, { noBrowser: hasFlag(args, 'no-browser'), networkMode: hasFlag(args, 'network') }, raw),
+  'context-load': (args, cwd, raw) => handleResult(cmdContextLoad(cwd, getFlag(args, '--phase') ?? undefined, getFlag(args, '--topic') ?? undefined, hasFlag(args, 'include-history')), raw),
+  'start': async (args, cwd, raw) => handleResult(await cmdStart(cwd, { noBrowser: hasFlag(args, 'no-browser'), networkMode: hasFlag(args, 'network') }), raw),
   'dashboard': (args) => handleDashboard(args.slice(1)),
   'start-server': async () => {
     const serverPath = path.join(__dirname, 'mcp-server.cjs');
