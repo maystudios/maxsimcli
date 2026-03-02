@@ -152,7 +152,7 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
        - .planning/STATE.md (State)
        - .planning/config.json (Config, if exists)
        - ./CLAUDE.md (Project instructions, if exists — follow project-specific guidelines and coding conventions)
-       - skills/ (Project skills, if exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
+       - ~/.claude/skills/ (Skills, if exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
        </files_to_read>
 
        <success_criteria>
@@ -177,13 +177,36 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
 
    If ANY spot-check fails: report which plan failed, route to failure handler — ask "Retry plan?" or "Continue with remaining waves?"
 
-   If pass — **emit plan-complete lifecycle event** (if `DASHBOARD_ACTIVE`):
+   If pass — **verify wave results with code review:**
+
+   Review the wave's combined changes for spec compliance and code quality:
+   ```bash
+   # Get all files changed in this wave
+   WAVE_FIRST_COMMIT=$(git log --oneline --all --grep="{phase}-{first_plan_in_wave}" --reverse | head -1 | cut -d' ' -f1)
+   git diff ${WAVE_FIRST_COMMIT}^..HEAD --name-only
+   ```
+
+   - **Spec compliance:** Cross-check each plan's `<done>` criteria against actual implementation
+   - **Code quality:** Scan for inconsistent patterns, missing error handling, hardcoded values
+   - If blocking issues found: fix before proceeding to next wave
+   - Record review verdict: `Wave {N} Review: PASS` or `Wave {N} Review: PASS after fixes (N fixes)`
+
+   **Emit plan-complete lifecycle event** (if `DASHBOARD_ACTIVE`):
    ```
    mcp__maxsim-dashboard__submit_lifecycle_event(
      event_type: "plan-complete",
      phase_name: PHASE_NAME, phase_number: PHASE_NUMBER,
      step: plan_index, total_steps: total_plans
    )
+   ```
+
+   **Update progress table** (maintain throughout execution):
+   ```markdown
+   | Wave | Plan | Status | Review |
+   |------|------|--------|--------|
+   | 1 | 01-01 | Complete | Passed |
+   | 1 | 01-02 | Complete | Passed |
+   | 2 | 01-03 | In Progress | Pending |
    ```
 
    Then report:
@@ -194,13 +217,14 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
    **{Plan ID}: {Plan Name}**
    {What was built — from SUMMARY.md}
    {Notable deviations, if any}
+   {Wave review verdict}
 
    {If more waves: what this enables for next wave}
    ---
    ```
 
    - Bad: "Wave 2 complete. Proceeding to Wave 3."
-   - Good: "Terrain system complete — 3 biome types, height-based texturing, physics collision meshes. Vehicle physics (Wave 3) can now reference ground surfaces."
+   - Good: "Terrain system complete — 3 biome types, height-based texturing, physics collision meshes. Wave review: PASS. Vehicle physics (Wave 3) can now reference ground surfaces."
 
 5. **Handle failures:**
 
@@ -265,19 +289,31 @@ After all waves:
 
 **Waves:** {N} | **Plans:** {M}/{total} complete
 
-| Wave | Plans | Status |
-|------|-------|--------|
-| 1 | plan-01, plan-02 | ✓ Complete |
-| CP | plan-03 | ✓ Verified |
-| 2 | plan-04 | ✓ Complete |
+| Wave | Plans | Status | Review |
+|------|-------|--------|--------|
+| 1 | plan-01, plan-02 | Complete | Passed |
+| CP | plan-03 | Verified | Passed |
+| 2 | plan-04 | Complete | Passed after 1 fix |
 
 ### Plan Details
 1. **03-01**: [one-liner from SUMMARY.md]
 2. **03-02**: [one-liner from SUMMARY.md]
 
+### Wave Reviews
+| Wave | Spec Review | Code Review | Fixes Applied |
+|------|------------|-------------|---------------|
+| 1 | Pass | Pass | 0 |
+| 2 | Pass | Pass after fix | 1 |
+
 ### Issues Encountered
 [Aggregate from SUMMARYs, or "None"]
 ```
+
+Aggregate task results from all executor agents. For each plan's SUMMARY.md, extract:
+- One-liner description
+- Deviation count and categories
+- Wave review verdicts
+- Any deferred issues
 </step>
 
 <step name="close_parent_artifacts">
