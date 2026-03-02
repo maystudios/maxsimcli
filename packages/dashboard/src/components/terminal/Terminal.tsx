@@ -8,6 +8,7 @@ import "@xterm/xterm/css/xterm.css";
 import { useTerminal } from "@/hooks/use-terminal";
 import { TerminalStatusBar } from "./TerminalStatusBar";
 import { QuickActionBar } from "./QuickActionBar";
+import { TerminalQuestionOverlay } from "./TerminalQuestionOverlay";
 
 interface TerminalProps {
   onReady?: (term: XTerm) => void;
@@ -148,6 +149,9 @@ export function Terminal({ onReady, writeInputRef }: TerminalProps) {
       {/* Terminal area */}
       <div className="relative min-h-0 flex-1 overflow-hidden">
         <div ref={containerRef} className="h-full w-full" />
+
+        {/* Q&A overlay */}
+        <TerminalQuestionOverlay />
 
         {/* Quick action bar */}
         <QuickActionBar

@@ -45,7 +45,7 @@ function statusDotClass(status: DashboardPhase["diskStatus"]): string {
 
 export function Sidebar({ activeView, activePhaseId, onNavigate, terminalOpen, onTerminalToggle }: SidebarProps) {
   const { roadmap, state, todos } = useDashboardData();
-  const { connected } = useWebSocket();
+  const { connected, pendingQuestionCount } = useWebSocket();
   const projectName = useProjectName();
   const [confirmShutdown, setConfirmShutdown] = useState(false);
 
@@ -206,6 +206,9 @@ export function Sidebar({ activeView, activePhaseId, onNavigate, terminalOpen, o
         >
           <span className="font-mono text-xs">{">"}_</span>
           <span className="text-sm">Terminal</span>
+          {!terminalOpen && pendingQuestionCount > 0 && (
+            <span className="ml-auto font-mono text-xs text-accent tabular-nums">{pendingQuestionCount}</span>
+          )}
           {terminalOpen && (
             <span className="ml-auto inline-block h-1.5 w-1.5 bg-success" />
           )}
