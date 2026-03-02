@@ -95,7 +95,8 @@ function DashboardApp() {
 
   const executeInTerminal = useCallback((cmd: string) => {
     if (terminalWriteRef.current) {
-      terminalWriteRef.current(cmd + "\r");
+      // Use \r\n: on Windows ConPTY programmatic writes need both CR+LF to trigger Enter
+      terminalWriteRef.current(cmd + "\r\n");
     } else {
       pendingCommandRef.current = cmd;
     }
@@ -106,7 +107,7 @@ function DashboardApp() {
   useEffect(() => {
     const interval = setInterval(() => {
       if (pendingCommandRef.current && terminalWriteRef.current) {
-        terminalWriteRef.current(pendingCommandRef.current + "\r");
+        terminalWriteRef.current(pendingCommandRef.current + "\r\n");
         pendingCommandRef.current = null;
         clearInterval(interval);
       }
