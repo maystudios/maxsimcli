@@ -343,6 +343,172 @@ Include: duration, start/end times, task count, file count.
 Next: more plans → "Ready for {next-plan}" | last → "Phase complete, ready for transition".
 </step>
 
+<step name="review_cycle">
+## Execute-Review-Simplify-Review Cycle
+
+After implementation is complete and SUMMARY.md is created, run the full review cycle before proceeding. All four stages must pass before the plan is considered done.
+
+**Stage 1: Spec Review** — Verify implementation matches plan spec.
+
+```
+Task(
+  subagent_type="maxsim-spec-reviewer",
+  prompt="
+    <objective>
+    Review plan {phase}-{plan} for spec compliance.
+    </objective>
+
+    <plan_spec>
+    Plan file: {phase_dir}/{phase}-{plan}-PLAN.md
+    Summary file: {phase_dir}/{phase}-{plan}-SUMMARY.md
+    </plan_spec>
+
+    <task_specs>
+    {For each task in the plan: task number, name, done criteria, files modified}
+    </task_specs>
+
+    <files_modified>
+    {List all files created/modified during execution from SUMMARY.md key-files}
+    </files_modified>
+
+    <instructions>
+    1. Read the plan file and extract every task requirement
+    2. For each requirement, verify the implementation exists and matches the spec
+    3. Check that nothing was added beyond scope
+    4. Report: PASS (all requirements met) or FAIL (list unmet requirements)
+    </instructions>
+  "
+)
+```
+
+**If spec review FAILS:** Fix unmet requirements, re-run verification, update SUMMARY.md, then re-run spec review. Do not proceed until PASS.
+
+**Stage 2: Code Review** — Check code quality, security, error handling.
+
+```
+Task(
+  subagent_type="maxsim-code-reviewer",
+  prompt="
+    <objective>
+    Review plan {phase}-{plan} code quality. Spec compliance already verified.
+    </objective>
+
+    <files_modified>
+    {List all files created/modified during execution from SUMMARY.md key-files}
+    </files_modified>
+
+    <instructions>
+    1. Read CLAUDE.md for project conventions
+    2. Review every modified file for: correctness, conventions, error handling, security, maintainability
+    3. Categorize findings: BLOCKER (must fix), HIGH (should fix), MEDIUM (file for follow-up)
+    4. Report: APPROVED (no blockers/high) or BLOCKED (list blocking issues)
+    </instructions>
+  "
+)
+```
+
+**If code review is BLOCKED:** Fix all blocker and high-severity issues. Re-run code review. Do not proceed until APPROVED.
+
+**Stage 3: Simplify** — Spawn 3 parallel reviewers to catch reuse opportunities, quality issues, and inefficiencies.
+
+```
+Task(
+  subagent_type="maxsim-executor",
+  prompt="
+    <objective>
+    Run simplification review on plan {phase}-{plan} with 3 parallel reviewers.
+    </objective>
+
+    <instructions>
+    Spawn 3 parallel review agents for the files modified in this plan:
+
+    Agent 1 — Code Reuse:
+    - Find duplicated logic across the codebase
+    - Identify copy-paste from other files that should be extracted
+    - Suggest shared helpers for patterns appearing 3+ times
+    - Check if existing utilities could replace new code
+
+    Agent 2 — Code Quality:
+    - Check naming consistency with codebase conventions
+    - Verify error handling covers all external calls
+    - Look for dead code: unused imports, unreachable branches, commented-out code
+    - Check for unnecessary abstractions or premature generalizations
+
+    Agent 3 — Efficiency:
+    - Find O(n^2) operations where O(n) is straightforward
+    - Identify repeated computations that could be cached or hoisted
+    - Check for unnecessary allocations in hot paths
+    - Look for redundant data transformations
+
+    After all 3 agents report:
+    1. Consolidate findings into a single list
+    2. Apply fixes for all actionable items (skip speculative optimizations)
+    3. Run tests to confirm fixes do not break anything
+    4. Report: CLEAN (no issues found), FIXED (issues found and resolved), or BLOCKED (issues found but cannot fix without architectural change)
+    </instructions>
+
+    <files_to_review>
+    {List all files created/modified during execution from SUMMARY.md key-files}
+    </files_to_review>
+  "
+)
+```
+
+**If simplify is BLOCKED:** Present architectural issues to user via checkpoint protocol. Do not proceed until resolved.
+
+**Stage 4: Final Review** — If simplify made changes, one more code review pass.
+
+Run this stage ONLY if Stage 3 reported FIXED (i.e., simplify found and applied fixes).
+
+```
+Task(
+  subagent_type="maxsim-code-reviewer",
+  prompt="
+    <objective>
+    Final review pass after simplification changes on plan {phase}-{plan}.
+    Verify simplification fixes did not introduce regressions.
+    </objective>
+
+    <context>
+    Previous code review: APPROVED
+    Simplification: FIXED — changes were applied
+    This is a focused re-review of simplification changes only.
+    </context>
+
+    <files_modified>
+    {List files changed by simplification stage}
+    </files_modified>
+
+    <instructions>
+    1. Review only the changes made during simplification
+    2. Verify no regressions were introduced
+    3. Check that simplification changes follow project conventions
+    4. Report: APPROVED or BLOCKED (list issues)
+    </instructions>
+  "
+)
+```
+
+**If final review is BLOCKED:** Fix issues, re-run final review. Do not proceed until APPROVED.
+
+**Review cycle tracking:** Record review results in SUMMARY.md under a `## Review Cycle` section:
+```markdown
+## Review Cycle
+
+| Stage | Result | Findings |
+|-------|--------|----------|
+| Spec Review | PASS | All requirements met |
+| Code Review | APPROVED | No blocking issues |
+| Simplify | FIXED | Extracted shared helper for X, removed unused import Y |
+| Final Review | APPROVED | Simplification changes verified |
+```
+
+Update the SUMMARY.md commit after the review cycle completes:
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs({phase}-{plan}): add review cycle results" --files {phase_dir}/{phase}-{plan}-SUMMARY.md
+```
+</step>
+
 <step name="update_current_position">
 Update STATE.md using maxsim-tools:
 
