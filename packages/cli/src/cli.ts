@@ -83,6 +83,7 @@ import {
   cmdInitMapCodebase,
   cmdInitExisting,
   cmdInitProgress,
+  cmdSkillContext,
 } from './core/index.js';
 
 // ─── Arg parsing utilities ───────────────────────────────────────────────────
@@ -347,6 +348,7 @@ const COMMANDS: Record<string, Handler> = {
     cmdScaffold(cwd, args[1], { phase: f.phase, name: f.name ? args.slice(args.indexOf('--name') + 1).join(' ') : null }, raw);
   },
   'init': handleInit,
+  'skill-context': (args, cwd, raw) => cmdSkillContext(cwd, args[1] || 'unknown', raw),
   'phase-plan-index': (args, cwd, raw) => cmdPhasePlanIndex(cwd, args[1], raw),
   'state-snapshot': (_args, cwd, raw) => cmdStateSnapshot(cwd, raw),
   'summary-extract': (args, cwd, raw) => {

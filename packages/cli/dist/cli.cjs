@@ -61,7 +61,7 @@ const PLANNING_CONFIG_DEFAULTS = {
 };
 
 //#endregion
-//#region ../../node_modules/ms/index.js
+//#region ../../../../../node_modules/ms/index.js
 var require_ms = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Helpers.
@@ -180,7 +180,7 @@ var require_ms = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/debug/src/common.js
+//#region ../../../../../node_modules/debug/src/common.js
 var require_common = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* This is the common logic for both the Node.js and web browser
@@ -383,7 +383,7 @@ var require_common = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/debug/src/browser.js
+//#region ../../../../../node_modules/debug/src/browser.js
 var require_browser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* This is the web browser implementation of `debug()`.
@@ -580,7 +580,7 @@ var require_browser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/has-flag/index.js
+//#region ../../../../../node_modules/has-flag/index.js
 var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = (flag, argv = process.argv) => {
 		const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
@@ -591,7 +591,7 @@ var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/supports-color/index.js
+//#region ../../../../../node_modules/supports-color/index.js
 var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const os$5 = require("os");
 	const tty$2 = require("tty");
@@ -660,7 +660,7 @@ var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 }));
 
 //#endregion
-//#region ../../node_modules/debug/src/node.js
+//#region ../../../../../node_modules/debug/src/node.js
 var require_node = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Module dependencies.
@@ -868,7 +868,7 @@ var require_node = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/debug/src/index.js
+//#region ../../../../../node_modules/debug/src/index.js
 var require_src$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Detect Electron renderer / nwjs process, which is node, but we should
@@ -879,7 +879,7 @@ var require_src$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/@kwsites/file-exists/dist/src/index.js
+//#region ../../../../../node_modules/@kwsites/file-exists/dist/src/index.js
 var require_src = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var __importDefault = exports && exports.__importDefault || function(mod) {
 		return mod && mod.__esModule ? mod : { "default": mod };
@@ -935,7 +935,7 @@ var require_src = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/@kwsites/file-exists/dist/index.js
+//#region ../../../../../node_modules/@kwsites/file-exists/dist/index.js
 var require_dist$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function __export(m) {
 		for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -945,7 +945,7 @@ var require_dist$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/@kwsites/promise-deferred/dist/index.js
+//#region ../../../../../node_modules/@kwsites/promise-deferred/dist/index.js
 var require_dist$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.createDeferred = exports.deferred = void 0;
@@ -998,7 +998,7 @@ var require_dist$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/simple-git/dist/esm/index.js
+//#region ../../../../../node_modules/simple-git/dist/esm/index.js
 var import_dist$1 = require_dist$2();
 var import_src = /* @__PURE__ */ __toESM(require_src$1(), 1);
 var import_dist$2 = require_dist$1();
@@ -4597,7 +4597,7 @@ init_git_response_error();
 var simpleGit = gitInstanceFactory;
 
 //#endregion
-//#region ../../node_modules/slugify/slugify.js
+//#region ../../../../../node_modules/slugify/slugify.js
 var require_slugify = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	(function(name, root, factory) {
 		if (typeof exports === "object") {
@@ -5104,7 +5104,7 @@ function getMilestoneInfo(cwd) {
 }
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/identity.js
+//#region ../../../../../node_modules/yaml/dist/nodes/identity.js
 var require_identity = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const ALIAS = Symbol.for("yaml.alias");
 	const DOC = Symbol.for("yaml.document");
@@ -5155,7 +5155,7 @@ var require_identity = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/visit.js
+//#region ../../../../../node_modules/yaml/dist/visit.js
 var require_visit = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	const BREAK = Symbol("break visit");
@@ -5346,7 +5346,7 @@ var require_visit = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/doc/directives.js
+//#region ../../../../../node_modules/yaml/dist/doc/directives.js
 var require_directives = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var visit = require_visit();
@@ -5512,7 +5512,7 @@ var require_directives = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/doc/anchors.js
+//#region ../../../../../node_modules/yaml/dist/doc/anchors.js
 var require_anchors = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var visit = require_visit();
@@ -5575,7 +5575,7 @@ var require_anchors = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/doc/applyReviver.js
+//#region ../../../../../node_modules/yaml/dist/doc/applyReviver.js
 var require_applyReviver = /* @__PURE__ */ __commonJSMin(((exports) => {
 	/**
 	* Applies the JSON.parse reviver algorithm as defined in the ECMA-262 spec,
@@ -5616,7 +5616,7 @@ var require_applyReviver = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/toJS.js
+//#region ../../../../../node_modules/yaml/dist/nodes/toJS.js
 var require_toJS = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	/**
@@ -5654,7 +5654,7 @@ var require_toJS = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/Node.js
+//#region ../../../../../node_modules/yaml/dist/nodes/Node.js
 var require_Node = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var applyReviver = require_applyReviver();
 	var identity = require_identity();
@@ -5689,7 +5689,7 @@ var require_Node = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/Alias.js
+//#region ../../../../../node_modules/yaml/dist/nodes/Alias.js
 var require_Alias = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var anchors = require_anchors();
 	var visit = require_visit();
@@ -5783,7 +5783,7 @@ var require_Alias = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/Scalar.js
+//#region ../../../../../node_modules/yaml/dist/nodes/Scalar.js
 var require_Scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Node = require_Node();
@@ -5811,7 +5811,7 @@ var require_Scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/doc/createNode.js
+//#region ../../../../../node_modules/yaml/dist/doc/createNode.js
 var require_createNode = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Alias = require_Alias();
 	var identity = require_identity();
@@ -5875,7 +5875,7 @@ var require_createNode = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/Collection.js
+//#region ../../../../../node_modules/yaml/dist/nodes/Collection.js
 var require_Collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var createNode = require_createNode();
 	var identity = require_identity();
@@ -5997,7 +5997,7 @@ var require_Collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/stringifyComment.js
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyComment.js
 var require_stringifyComment = /* @__PURE__ */ __commonJSMin(((exports) => {
 	/**
 	* Stringifies a comment.
@@ -6018,7 +6018,7 @@ var require_stringifyComment = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/foldFlowLines.js
+//#region ../../../../../node_modules/yaml/dist/stringify/foldFlowLines.js
 var require_foldFlowLines = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const FOLD_FLOW = "flow";
 	const FOLD_BLOCK = "block";
@@ -6135,7 +6135,7 @@ var require_foldFlowLines = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/stringifyString.js
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyString.js
 var require_stringifyString = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var foldFlowLines = require_foldFlowLines();
@@ -6360,7 +6360,7 @@ var require_stringifyString = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/stringify.js
+//#region ../../../../../node_modules/yaml/dist/stringify/stringify.js
 var require_stringify = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var anchors = require_anchors();
 	var identity = require_identity();
@@ -6468,7 +6468,7 @@ var require_stringify = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/stringifyPair.js
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyPair.js
 var require_stringifyPair = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Scalar = require_Scalar();
@@ -6566,7 +6566,7 @@ var require_stringifyPair = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/log.js
+//#region ../../../../../node_modules/yaml/dist/log.js
 var require_log = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var node_process$3 = require("process");
 	function debug(logLevel, ...messages) {
@@ -6581,7 +6581,7 @@ var require_log = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/merge.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/merge.js
 var require_merge = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Scalar = require_Scalar();
@@ -6622,7 +6622,7 @@ var require_merge = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/addPairToJSMap.js
+//#region ../../../../../node_modules/yaml/dist/nodes/addPairToJSMap.js
 var require_addPairToJSMap = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var log = require_log();
 	var merge = require_merge();
@@ -6674,7 +6674,7 @@ var require_addPairToJSMap = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/Pair.js
+//#region ../../../../../node_modules/yaml/dist/nodes/Pair.js
 var require_Pair = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var createNode = require_createNode();
 	var stringifyPair = require_stringifyPair();
@@ -6708,7 +6708,7 @@ var require_Pair = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/stringifyCollection.js
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyCollection.js
 var require_stringifyCollection = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var stringify = require_stringify();
@@ -6823,7 +6823,7 @@ var require_stringifyCollection = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/YAMLMap.js
+//#region ../../../../../node_modules/yaml/dist/nodes/YAMLMap.js
 var require_YAMLMap = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyCollection = require_stringifyCollection();
 	var addPairToJSMap = require_addPairToJSMap();
@@ -6933,7 +6933,7 @@ var require_YAMLMap = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/common/map.js
+//#region ../../../../../node_modules/yaml/dist/schema/common/map.js
 var require_map = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var YAMLMap = require_YAMLMap();
@@ -6952,7 +6952,7 @@ var require_map = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/YAMLSeq.js
+//#region ../../../../../node_modules/yaml/dist/nodes/YAMLSeq.js
 var require_YAMLSeq = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var createNode = require_createNode();
 	var stringifyCollection = require_stringifyCollection();
@@ -7059,7 +7059,7 @@ var require_YAMLSeq = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/common/seq.js
+//#region ../../../../../node_modules/yaml/dist/schema/common/seq.js
 var require_seq = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var YAMLSeq = require_YAMLSeq();
@@ -7078,7 +7078,7 @@ var require_seq = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/common/string.js
+//#region ../../../../../node_modules/yaml/dist/schema/common/string.js
 var require_string = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyString = require_stringifyString();
 	const string = {
@@ -7095,7 +7095,7 @@ var require_string = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/common/null.js
+//#region ../../../../../node_modules/yaml/dist/schema/common/null.js
 var require_null = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	const nullTag = {
@@ -7111,7 +7111,7 @@ var require_null = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/core/bool.js
+//#region ../../../../../node_modules/yaml/dist/schema/core/bool.js
 var require_bool$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	const boolTag = {
@@ -7131,7 +7131,7 @@ var require_bool$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/stringifyNumber.js
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyNumber.js
 var require_stringifyNumber = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function stringifyNumber({ format, minFractionDigits, tag, value }) {
 		if (typeof value === "bigint") return String(value);
@@ -7153,7 +7153,7 @@ var require_stringifyNumber = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/core/float.js
+//#region ../../../../../node_modules/yaml/dist/schema/core/float.js
 var require_float$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var stringifyNumber = require_stringifyNumber();
@@ -7196,7 +7196,7 @@ var require_float$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/core/int.js
+//#region ../../../../../node_modules/yaml/dist/schema/core/int.js
 var require_int$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyNumber = require_stringifyNumber();
 	const intIdentify = (value) => typeof value === "bigint" || Number.isInteger(value);
@@ -7238,7 +7238,7 @@ var require_int$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/core/schema.js
+//#region ../../../../../node_modules/yaml/dist/schema/core/schema.js
 var require_schema$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var map = require_map();
 	var _null = require_null();
@@ -7264,7 +7264,7 @@ var require_schema$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/json/schema.js
+//#region ../../../../../node_modules/yaml/dist/schema/json/schema.js
 var require_schema$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var map = require_map();
@@ -7328,7 +7328,7 @@ var require_schema$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/binary.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/binary.js
 var require_binary = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var node_buffer$1 = require("buffer");
 	var Scalar = require_Scalar();
@@ -7378,7 +7378,7 @@ var require_binary = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/pairs.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/pairs.js
 var require_pairs = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Pair = require_Pair();
@@ -7439,7 +7439,7 @@ var require_pairs = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/omap.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/omap.js
 var require_omap = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var toJS = require_toJS();
@@ -7503,7 +7503,7 @@ var require_omap = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/bool.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/bool.js
 var require_bool = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	function boolStringify({ value, source }, ctx) {
@@ -7531,7 +7531,7 @@ var require_bool = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/float.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/float.js
 var require_float = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var stringifyNumber = require_stringifyNumber();
@@ -7577,7 +7577,7 @@ var require_float = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/int.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/int.js
 var require_int = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyNumber = require_stringifyNumber();
 	const intIdentify = (value) => typeof value === "bigint" || Number.isInteger(value);
@@ -7653,7 +7653,7 @@ var require_int = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/set.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/set.js
 var require_set = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Pair = require_Pair();
@@ -7722,7 +7722,7 @@ var require_set = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/timestamp.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/timestamp.js
 var require_timestamp = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyNumber = require_stringifyNumber();
 	/** Internal types handle bigint as number, because TS can't figure it out. */
@@ -7806,7 +7806,7 @@ var require_timestamp = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/schema.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/schema.js
 var require_schema = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var map = require_map();
 	var _null = require_null();
@@ -7848,7 +7848,7 @@ var require_schema = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/tags.js
+//#region ../../../../../node_modules/yaml/dist/schema/tags.js
 var require_tags = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var map = require_map();
 	var _null = require_null();
@@ -7933,7 +7933,7 @@ var require_tags = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/Schema.js
+//#region ../../../../../node_modules/yaml/dist/schema/Schema.js
 var require_Schema = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var map = require_map();
@@ -7963,7 +7963,7 @@ var require_Schema = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/stringifyDocument.js
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyDocument.js
 var require_stringifyDocument = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var stringify = require_stringify();
@@ -8025,7 +8025,7 @@ var require_stringifyDocument = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/doc/Document.js
+//#region ../../../../../node_modules/yaml/dist/doc/Document.js
 var require_Document = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Alias = require_Alias();
 	var Collection = require_Collection();
@@ -8307,7 +8307,7 @@ var require_Document = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/errors.js
+//#region ../../../../../node_modules/yaml/dist/errors.js
 var require_errors = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var YAMLError = class extends Error {
 		constructor(name, pos, code, message) {
@@ -8361,7 +8361,7 @@ var require_errors = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/resolve-props.js
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-props.js
 var require_resolve_props = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function resolveProps(tokens, { flow, indicator, next, offset, onError, parentIndent, startOnNewline }) {
 		let spaceBefore = false;
@@ -8469,7 +8469,7 @@ var require_resolve_props = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/util-contains-newline.js
+//#region ../../../../../node_modules/yaml/dist/compose/util-contains-newline.js
 var require_util_contains_newline = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function containsNewline(key) {
 		if (!key) return null;
@@ -8499,7 +8499,7 @@ var require_util_contains_newline = /* @__PURE__ */ __commonJSMin(((exports) => 
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/util-flow-indent-check.js
+//#region ../../../../../node_modules/yaml/dist/compose/util-flow-indent-check.js
 var require_util_flow_indent_check = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var utilContainsNewline = require_util_contains_newline();
 	function flowIndentCheck(indent, fc, onError) {
@@ -8512,7 +8512,7 @@ var require_util_flow_indent_check = /* @__PURE__ */ __commonJSMin(((exports) =>
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/util-map-includes.js
+//#region ../../../../../node_modules/yaml/dist/compose/util-map-includes.js
 var require_util_map_includes = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	function mapIncludes(ctx, items, search) {
@@ -8525,7 +8525,7 @@ var require_util_map_includes = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/resolve-block-map.js
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-block-map.js
 var require_resolve_block_map = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Pair = require_Pair();
 	var YAMLMap = require_YAMLMap();
@@ -8610,7 +8610,7 @@ var require_resolve_block_map = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/resolve-block-seq.js
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-block-seq.js
 var require_resolve_block_seq = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var YAMLSeq = require_YAMLSeq();
 	var resolveProps = require_resolve_props();
@@ -8653,7 +8653,7 @@ var require_resolve_block_seq = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/resolve-end.js
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-end.js
 var require_resolve_end = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function resolveEnd(end, offset, reqSpace, onError) {
 		let comment = "";
@@ -8692,7 +8692,7 @@ var require_resolve_end = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/resolve-flow-collection.js
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-flow-collection.js
 var require_resolve_flow_collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Pair = require_Pair();
@@ -8848,7 +8848,7 @@ var require_resolve_flow_collection = /* @__PURE__ */ __commonJSMin(((exports) =
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/compose-collection.js
+//#region ../../../../../node_modules/yaml/dist/compose/compose-collection.js
 var require_compose_collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Scalar = require_Scalar();
@@ -8901,7 +8901,7 @@ var require_compose_collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/resolve-block-scalar.js
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-block-scalar.js
 var require_resolve_block_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	function resolveBlockScalar(ctx, scalar, onError) {
@@ -9077,7 +9077,7 @@ var require_resolve_block_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/resolve-flow-scalar.js
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-flow-scalar.js
 var require_resolve_flow_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var resolveEnd = require_resolve_end();
@@ -9284,7 +9284,7 @@ var require_resolve_flow_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/compose-scalar.js
+//#region ../../../../../node_modules/yaml/dist/compose/compose-scalar.js
 var require_compose_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Scalar = require_Scalar();
@@ -9344,7 +9344,7 @@ var require_compose_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/util-empty-scalar-position.js
+//#region ../../../../../node_modules/yaml/dist/compose/util-empty-scalar-position.js
 var require_util_empty_scalar_position = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function emptyScalarPosition(offset, before, pos) {
 		if (before) {
@@ -9372,7 +9372,7 @@ var require_util_empty_scalar_position = /* @__PURE__ */ __commonJSMin(((exports
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/compose-node.js
+//#region ../../../../../node_modules/yaml/dist/compose/compose-node.js
 var require_compose_node = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Alias = require_Alias();
 	var identity = require_identity();
@@ -9458,7 +9458,7 @@ var require_compose_node = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/compose-doc.js
+//#region ../../../../../node_modules/yaml/dist/compose/compose-doc.js
 var require_compose_doc = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Document = require_Document();
 	var composeNode = require_compose_node();
@@ -9501,7 +9501,7 @@ var require_compose_doc = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/composer.js
+//#region ../../../../../node_modules/yaml/dist/compose/composer.js
 var require_composer = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var node_process$2 = require("process");
 	var directives = require_directives();
@@ -9700,7 +9700,7 @@ var require_composer = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/parse/cst-scalar.js
+//#region ../../../../../node_modules/yaml/dist/parse/cst-scalar.js
 var require_cst_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var resolveBlockScalar = require_resolve_block_scalar();
 	var resolveFlowScalar = require_resolve_flow_scalar();
@@ -9968,7 +9968,7 @@ var require_cst_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/parse/cst-stringify.js
+//#region ../../../../../node_modules/yaml/dist/parse/cst-stringify.js
 var require_cst_stringify = /* @__PURE__ */ __commonJSMin(((exports) => {
 	/**
 	* Stringify a CST document, token, or collection item
@@ -10020,7 +10020,7 @@ var require_cst_stringify = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/parse/cst-visit.js
+//#region ../../../../../node_modules/yaml/dist/parse/cst-visit.js
 var require_cst_visit = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const BREAK = Symbol("break visit");
 	const SKIP = Symbol("skip children");
@@ -10112,7 +10112,7 @@ var require_cst_visit = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/parse/cst.js
+//#region ../../../../../node_modules/yaml/dist/parse/cst.js
 var require_cst = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var cstScalar = require_cst_scalar();
 	var cstStringify = require_cst_stringify();
@@ -10192,7 +10192,7 @@ var require_cst = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/parse/lexer.js
+//#region ../../../../../node_modules/yaml/dist/parse/lexer.js
 var require_lexer = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var cst = require_cst();
 	function isEmpty(ch) {
@@ -10712,7 +10712,7 @@ var require_lexer = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/parse/line-counter.js
+//#region ../../../../../node_modules/yaml/dist/parse/line-counter.js
 var require_line_counter = /* @__PURE__ */ __commonJSMin(((exports) => {
 	/**
 	* Tracks newlines during parsing in order to provide an efficient API for
@@ -10760,7 +10760,7 @@ var require_line_counter = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/parse/parser.js
+//#region ../../../../../node_modules/yaml/dist/parse/parser.js
 var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var node_process$1 = require("process");
 	var cst = require_cst();
@@ -11617,7 +11617,7 @@ var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/public-api.js
+//#region ../../../../../node_modules/yaml/dist/public-api.js
 var require_public_api = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var composer = require_composer();
 	var Document = require_Document();
@@ -11705,7 +11705,7 @@ var require_public_api = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/index.js
+//#region ../../../../../node_modules/yaml/dist/index.js
 var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var composer = require_composer();
 	var Document = require_Document();
@@ -12038,7 +12038,7 @@ function cmdConfigGet(cwd, keyPath, raw) {
 }
 
 //#endregion
-//#region ../../node_modules/escape-string-regexp/index.js
+//#region ../../../../../node_modules/escape-string-regexp/index.js
 function escapeStringRegexp(string) {
 	if (typeof string !== "string") throw new TypeError("Expected a string");
 	return string.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
@@ -12872,7 +12872,7 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
 }
 
 //#endregion
-//#region ../../node_modules/chalk/source/vendor/ansi-styles/index.js
+//#region ../../../../../node_modules/chalk/source/vendor/ansi-styles/index.js
 const ANSI_BACKGROUND_OFFSET = 10;
 const wrapAnsi16 = (offset = 0) => (code) => `\u001B[${code + offset}m`;
 const wrapAnsi256 = (offset = 0) => (code) => `\u001B[${38 + offset};5;${code}m`;
@@ -13037,7 +13037,7 @@ function assembleStyles() {
 const ansiStyles = assembleStyles();
 
 //#endregion
-//#region ../../node_modules/chalk/source/vendor/supports-color/index.js
+//#region ../../../../../node_modules/chalk/source/vendor/supports-color/index.js
 function hasFlag$1(flag, argv = globalThis.Deno ? globalThis.Deno.args : node_process.default.argv) {
 	const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
 	const position = argv.indexOf(prefix + flag);
@@ -13126,7 +13126,7 @@ const supportsColor = {
 };
 
 //#endregion
-//#region ../../node_modules/chalk/source/utilities.js
+//#region ../../../../../node_modules/chalk/source/utilities.js
 function stringReplaceAll(string, substring, replacer) {
 	let index = string.indexOf(substring);
 	if (index === -1) return string;
@@ -13155,7 +13155,7 @@ function stringEncaseCRLFWithFirstIndex(string, prefix, postfix, index) {
 }
 
 //#endregion
-//#region ../../node_modules/chalk/source/index.js
+//#region ../../../../../node_modules/chalk/source/index.js
 const { stdout: stdoutColor, stderr: stderrColor } = supportsColor;
 const GENERATOR = Symbol("GENERATOR");
 const STYLER = Symbol("STYLER");
@@ -15368,6 +15368,122 @@ function spawnDashboard(options) {
 }
 
 //#endregion
+//#region src/core/skill-context.ts
+/**
+* Skill Context — Provides MAXSIM state to skills via a single CLI call
+*/
+function cmdSkillContext(cwd, skillName, raw) {
+	if (!pathExistsInternal(cwd, ".planning")) {
+		output({
+			skill_name: skillName,
+			planning_dir: null,
+			phase: {
+				number: null,
+				name: null,
+				directory: null
+			},
+			state: {
+				current_focus: null,
+				position: null,
+				status: null
+			},
+			blockers: [],
+			decisions: [],
+			artifacts: {
+				plan: null,
+				summary: null,
+				research: null,
+				context: null,
+				verification: null
+			},
+			config: {
+				model_profile: "balanced",
+				commit_docs: true,
+				branching_strategy: "none"
+			}
+		}, raw);
+		return;
+	}
+	const config = loadConfig(cwd);
+	const stateContent = safeReadFile(statePath(cwd));
+	let currentPhase = null;
+	let currentPhaseName = null;
+	let currentPlan = null;
+	let status = null;
+	const blockers = [];
+	const decisions = [];
+	if (stateContent) {
+		currentPhase = stateExtractField(stateContent, "Current Phase");
+		currentPhaseName = stateExtractField(stateContent, "Current Phase Name");
+		currentPlan = stateExtractField(stateContent, "Current Plan");
+		status = stateExtractField(stateContent, "Status");
+		const blockersMatch = stateContent.match(/##\s*Blockers\s*\n([\s\S]*?)(?=\n##|$)/i);
+		if (blockersMatch) {
+			const items = blockersMatch[1].match(/^-\s+(.+)$/gm) || [];
+			for (const item of items) blockers.push(item.replace(/^-\s+/, "").trim());
+		}
+		const decisionsMatch = stateContent.match(/##\s*Decisions Made[\s\S]*?\n\|[^\n]+\n\|[-|\s]+\n([\s\S]*?)(?=\n##|\n$|$)/i);
+		if (decisionsMatch) {
+			const rows = decisionsMatch[1].trim().split("\n").filter((r) => r.includes("|"));
+			for (const row of rows) {
+				const cells = row.split("|").map((c) => c.trim()).filter(Boolean);
+				if (cells.length >= 3) decisions.push({
+					phase: cells[0],
+					summary: cells[1],
+					rationale: cells[2]
+				});
+			}
+		}
+	}
+	const phaseInfo = currentPhase ? findPhaseInternal(cwd, currentPhase) : null;
+	const phaseDir = phaseInfo?.directory ?? null;
+	const phaseNumber = phaseInfo?.phase_number ?? currentPhase;
+	const phaseName = phaseInfo?.phase_name ?? currentPhaseName;
+	const artifacts = {
+		plan: null,
+		summary: null,
+		research: null,
+		context: null,
+		verification: null
+	};
+	if (phaseDir) {
+		const absPhaseDir = node_path.default.isAbsolute(phaseDir) ? phaseDir : node_path.default.join(cwd, phaseDir);
+		try {
+			const files = node_fs.default.readdirSync(absPhaseDir);
+			for (const f of files) if (isPlanFile(f)) artifacts.plan = node_path.default.join(phaseDir, f);
+			else if (isSummaryFile(f)) artifacts.summary = node_path.default.join(phaseDir, f);
+			else if (f.endsWith("-RESEARCH.md") || f === "RESEARCH.md") artifacts.research = node_path.default.join(phaseDir, f);
+			else if (f.endsWith("-CONTEXT.md") || f === "CONTEXT.md") artifacts.context = node_path.default.join(phaseDir, f);
+			else if (f.endsWith("-VERIFICATION.md") || f === "VERIFICATION.md") artifacts.verification = node_path.default.join(phaseDir, f);
+		} catch {}
+	}
+	const totalPlans = stateContent ? stateExtractField(stateContent, "Total Plans in Phase") : null;
+	const position = currentPlan && totalPlans ? `Plan ${currentPlan} of ${totalPlans}` : currentPlan ? `Plan ${currentPlan}` : null;
+	output({
+		skill_name: skillName,
+		planning_dir: ".planning",
+		phase: {
+			number: phaseNumber ?? null,
+			name: phaseName ?? null,
+			directory: phaseDir
+		},
+		state: {
+			current_focus: currentPhaseName ?? null,
+			position,
+			status
+		},
+		blockers,
+		decisions,
+		artifacts,
+		config: {
+			model_profile: config.model_profile,
+			commit_docs: config.commit_docs,
+			branching_strategy: config.branching_strategy
+		}
+	}, raw);
+}
+
+//#endregion
 //#region src/core/init.ts
 /**
 * Init — Compound init commands for workflow bootstrapping
@@ -16112,6 +16228,7 @@ const COMMANDS = {
 		}, raw);
 	},
 	"init": handleInit,
+	"skill-context": (args, cwd, raw) => cmdSkillContext(cwd, args[1] || "unknown", raw),
 	"phase-plan-index": (args, cwd, raw) => cmdPhasePlanIndex(cwd, args[1], raw),
 	"state-snapshot": (_args, cwd, raw) => cmdStateSnapshot(cwd, raw),
 	"summary-extract": (args, cwd, raw) => {

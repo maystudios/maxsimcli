@@ -243,6 +243,10 @@ export type {
   SpawnDashboardOptions,
 } from './dashboard-launcher.js';
 
+// Skill context exports
+export type { SkillContextResult } from './skill-context.js';
+export { cmdSkillContext } from './skill-context.js';
+
 // Init exports
 export type {
   WorkflowType,

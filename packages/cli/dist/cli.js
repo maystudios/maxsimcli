@@ -300,6 +300,7 @@ const COMMANDS = {
         (0, index_js_1.cmdScaffold)(cwd, args[1], { phase: f.phase, name: f.name ? args.slice(args.indexOf('--name') + 1).join(' ') : null }, raw);
     },
     'init': handleInit,
+    'skill-context': (args, cwd, raw) => (0, index_js_1.cmdSkillContext)(cwd, args[1] || 'unknown', raw),
     'phase-plan-index': (args, cwd, raw) => (0, index_js_1.cmdPhasePlanIndex)(cwd, args[1], raw),
     'state-snapshot': (_args, cwd, raw) => (0, index_js_1.cmdStateSnapshot)(cwd, raw),
     'summary-extract': (args, cwd, raw) => {
