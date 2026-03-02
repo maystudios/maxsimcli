@@ -68,6 +68,30 @@ function uninstall(isGlobal, explicitConfigDir = null) {
         removedCount++;
         console.log(`  ${chalk_1.default.green('\u2713')} Removed commands/maxsim/`);
     }
+    // 1b. Remove MAXSIM skills (skills/ directory for Claude/Gemini/OpenCode)
+    if (!isCodex) {
+        const skillsDir = path.join(targetDir, 'skills');
+        if (fs.existsSync(skillsDir)) {
+            let skillCount = 0;
+            for (const skill of shared_js_1.builtInSkills) {
+                const skillDir = path.join(skillsDir, skill);
+                if (fs.existsSync(skillDir)) {
+                    fs.rmSync(skillDir, { recursive: true });
+                    skillCount++;
+                }
+            }
+            if (skillCount > 0) {
+                removedCount++;
+                console.log(`  ${chalk_1.default.green('\u2713')} Removed ${skillCount} MAXSIM skills`);
+            }
+        }
+        // Also clean up legacy agents/skills/ location
+        const legacySkillsDir = path.join(targetDir, 'agents', 'skills');
+        if (fs.existsSync(legacySkillsDir)) {
+            fs.rmSync(legacySkillsDir, { recursive: true });
+            console.log(`  ${chalk_1.default.green('\u2713')} Removed legacy agents/skills/ directory`);
+        }
+    }
     // 2. Remove maxsim directory
     const maxsimDir = path.join(targetDir, 'maxsim');
     if (fs.existsSync(maxsimDir)) {

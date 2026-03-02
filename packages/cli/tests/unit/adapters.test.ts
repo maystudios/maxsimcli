@@ -20,7 +20,6 @@ import {
 } from '../../src/adapters/base.js';
 
 import { claudeAdapter } from '../../src/adapters/claude.js';
-import { getAllAdapters } from '../../src/adapters/index.js';
 
 // ─── Base utilities ──────────────────────────────────────────────────────────
 
@@ -220,30 +219,15 @@ describe('claudeAdapter', () => {
   });
 });
 
-// ─── Adapter registry ────────────────────────────────────────────────────────
+// ─── Adapter registry (post-cleanup: Claude-only) ───────────────────────────
 
-describe('getAllAdapters', () => {
-  it('returns exactly 4 adapters (pre-removal verification)', () => {
-    const adapters = getAllAdapters();
-    expect(adapters).toHaveLength(4);
-  });
-
-  it('includes all four runtime names', () => {
-    const runtimes = getAllAdapters().map((a) => a.runtime);
-    expect(runtimes).toContain('claude');
-    expect(runtimes).toContain('opencode');
-    expect(runtimes).toContain('gemini');
-    expect(runtimes).toContain('codex');
-  });
-
-  it('every adapter satisfies the AdapterConfig interface', () => {
-    for (const adapter of getAllAdapters()) {
-      expect(typeof adapter.runtime).toBe('string');
-      expect(typeof adapter.dirName).toBe('string');
-      expect(typeof adapter.getGlobalDir).toBe('function');
-      expect(typeof adapter.getConfigDirFromHome).toBe('function');
-      expect(typeof adapter.transformContent).toBe('function');
-      expect(['nested', 'flat', 'skills']).toContain(adapter.commandStructure);
-    }
+describe('claudeAdapter (registry)', () => {
+  it('Claude adapter satisfies the AdapterConfig interface', () => {
+    expect(typeof claudeAdapter.runtime).toBe('string');
+    expect(typeof claudeAdapter.dirName).toBe('string');
+    expect(typeof claudeAdapter.getGlobalDir).toBe('function');
+    expect(typeof claudeAdapter.getConfigDirFromHome).toBe('function');
+    expect(typeof claudeAdapter.transformContent).toBe('function');
+    expect(claudeAdapter.commandStructure).toBe('nested');
   });
 });

@@ -13,6 +13,9 @@ export const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'pac
 // Resolve template asset root — bundled into dist/assets/templates at publish time
 export const templatesRoot = path.resolve(__dirname, 'assets', 'templates');
 
+// Built-in skill names shipped with MAXSIM — used for cleanup during install/uninstall
+export const builtInSkills = ['tdd', 'systematic-debugging', 'verification-before-completion', 'simplify', 'code-review', 'memory-management', 'using-maxsim'] as const;
+
 /**
  * Get the global config directory, using the Claude adapter
  */

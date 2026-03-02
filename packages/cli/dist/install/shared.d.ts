@@ -2,6 +2,7 @@ export declare const pkg: {
     version: string;
 };
 export declare const templatesRoot: string;
+export declare const builtInSkills: readonly ["tdd", "systematic-debugging", "verification-before-completion", "simplify", "code-review", "memory-management", "using-maxsim"];
 /**
  * Get the global config directory, using the Claude adapter
  */

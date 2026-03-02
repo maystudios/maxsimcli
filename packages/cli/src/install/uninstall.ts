@@ -5,7 +5,7 @@ import * as os from 'node:os';
 import chalk from 'chalk';
 
 import { readSettings, writeSettings } from '../adapters/index.js';
-import { getDirName, getGlobalDir } from './shared.js';
+import { getDirName, getGlobalDir, builtInSkills } from './shared.js';
 
 /**
  * Uninstall MAXSIM from the specified directory
@@ -41,6 +41,36 @@ export function uninstall(isGlobal: boolean, explicitConfigDir: string | null = 
     fs.rmSync(maxsimCommandsDir, { recursive: true });
     removedCount++;
     console.log(`  ${chalk.green('\u2713')} Removed commands/maxsim/`);
+  }
+
+  // 1b. Remove MAXSIM skills
+  {
+    const skillsDir = path.join(targetDir, 'skills');
+    if (fs.existsSync(skillsDir)) {
+      let skillCount = 0;
+      for (const skill of builtInSkills) {
+        const skillDir = path.join(skillsDir, skill);
+        if (fs.existsSync(skillDir)) {
+          fs.rmSync(skillDir, { recursive: true });
+          skillCount++;
+        }
+      }
+      if (skillCount > 0) {
+        removedCount++;
+        console.log(
+          `  ${chalk.green('\u2713')} Removed ${skillCount} MAXSIM skills`,
+        );
+      }
+    }
+
+    // Also clean up legacy agents/skills/ location
+    const legacySkillsDir = path.join(targetDir, 'agents', 'skills');
+    if (fs.existsSync(legacySkillsDir)) {
+      fs.rmSync(legacySkillsDir, { recursive: true });
+      console.log(
+        `  ${chalk.green('\u2713')} Removed legacy agents/skills/ directory`,
+      );
+    }
   }
 
   // 2. Remove maxsim directory

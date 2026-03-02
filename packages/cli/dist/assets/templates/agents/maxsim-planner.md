@@ -35,7 +35,7 @@ Before planning, discover project context:
 
 **Self-improvement lessons:** Read `.planning/LESSONS.md` if it exists — accumulated lessons from past executions on this codebase. Apply planning insights proactively: avoid known gaps, include wiring tasks for patterns that historically broke, reference codebase-specific conventions in task actions.
 
-**Project skills:** Check `.agents/skills/` directory if it exists:
+**Project skills:** Check `.skills/` directory if it exists:
 1. List available skills (subdirectories)
 2. Read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during planning
@@ -1199,8 +1199,8 @@ When any trigger condition below applies, read the full skill file via the Read 
 
 | Skill | Read | Trigger |
 |-------|------|---------|
-| TDD Enforcement | `.agents/skills/tdd/SKILL.md` | When identifying TDD candidates during task breakdown |
-| Verification Before Completion | `.agents/skills/verification-before-completion/SKILL.md` | When writing <verify> sections for tasks |
+| TDD Enforcement | `.skills/tdd/SKILL.md` | When identifying TDD candidates during task breakdown |
+| Verification Before Completion | `.skills/verification-before-completion/SKILL.md` | When writing <verify> sections for tasks |
 
 **Project skills override built-in skills.**
 
