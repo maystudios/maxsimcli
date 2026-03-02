@@ -14,6 +14,7 @@ exports.cmdArtefakteWrite = cmdArtefakteWrite;
 exports.cmdArtefakteAppend = cmdArtefakteAppend;
 exports.cmdArtefakteList = cmdArtefakteList;
 const node_fs_1 = __importDefault(require("node:fs"));
+const node_os_1 = __importDefault(require("node:os"));
 const node_path_1 = __importDefault(require("node:path"));
 const core_js_1 = require("./core.js");
 const types_js_1 = require("./types.js");
@@ -36,7 +37,22 @@ function resolveArtefaktPath(cwd, type, phase) {
     }
     return (0, core_js_1.planningPath)(cwd, filename);
 }
+const TEMPLATE_FILES = {
+    'decisions': 'decisions.md',
+    'acceptance-criteria': 'acceptance-criteria.md',
+    'no-gos': 'no-gos.md',
+};
 function getTemplate(type) {
+    // Try loading from installed template files first
+    const templatePath = node_path_1.default.join(node_os_1.default.homedir(), '.claude', 'maxsim', 'templates', TEMPLATE_FILES[type]);
+    const content = (0, core_js_1.safeReadFile)(templatePath);
+    if (content) {
+        return content.replace(/\{\{date\}\}/g, (0, core_js_1.todayISO)());
+    }
+    // Fallback to hardcoded templates
+    return getHardcodedTemplate(type);
+}
+function getHardcodedTemplate(type) {
     const today = (0, core_js_1.todayISO)();
     switch (type) {
         case 'decisions':

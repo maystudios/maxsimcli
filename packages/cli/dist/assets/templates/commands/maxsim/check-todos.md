@@ -22,6 +22,7 @@ Routes to the check-todos workflow which handles:
 
 <execution_context>
 @./workflows/check-todos.md
+@./references/thinking-partner.md
 </execution_context>
 
 <context>

@@ -80,4 +80,10 @@ export declare function resolveModelInternal(cwd: string, agentType: AgentType, 
 export declare function pathExistsInternal(cwd: string, targetPath: string): boolean;
 export declare function generateSlugInternal(text: string | null | undefined): string | null;
 export declare function getMilestoneInfo(cwd: string): MilestoneInfo;
+export declare function pathExistsAsync(p: string): Promise<boolean>;
+export declare function loadConfigAsync(cwd: string): Promise<AppConfig>;
+export declare function findPhaseInternalAsync(cwd: string, phase: string): Promise<PhaseSearchResult | null>;
+export declare function getArchivedPhaseDirsAsync(cwd: string): Promise<ArchivedPhaseDir[]>;
+export declare function getRoadmapPhaseInternalAsync(cwd: string, phaseNum: string | number): Promise<RoadmapPhaseInfo | null>;
+export declare function getMilestoneInfoAsync(cwd: string): Promise<MilestoneInfo>;
 //# sourceMappingURL=core.d.ts.map

@@ -194,7 +194,7 @@ const handleRoadmap = async (args, cwd, raw) => {
         return handleResult(await handler(), raw);
     (0, index_js_1.error)('Unknown roadmap subcommand. Available: get-phase, analyze, update-plan-progress');
 };
-const handlePhase = (args, cwd, raw) => {
+const handlePhase = async (args, cwd, raw) => {
     const sub = args[1];
     const handlers = {
         'next-decimal': () => (0, index_js_1.cmdPhaseNextDecimal)(cwd, args[2]),
@@ -205,7 +205,7 @@ const handlePhase = (args, cwd, raw) => {
     };
     const handler = sub ? handlers[sub] : undefined;
     if (handler)
-        return handleResult(handler(), raw);
+        return handleResult(await handler(), raw);
     (0, index_js_1.error)('Unknown phase subcommand. Available: next-decimal, add, insert, remove, complete');
 };
 const handleMilestone = (args, cwd, raw) => {
@@ -268,7 +268,7 @@ const handleInit = (args, cwd, raw) => {
 const COMMANDS = {
     'state': handleState,
     'resolve-model': (args, cwd, raw) => handleResult((0, index_js_1.cmdResolveModel)(cwd, args[1], raw), raw),
-    'find-phase': (args, cwd, raw) => handleResult((0, index_js_1.cmdFindPhase)(cwd, args[1]), raw),
+    'find-phase': async (args, cwd, raw) => handleResult(await (0, index_js_1.cmdFindPhase)(cwd, args[1]), raw),
     'commit': async (args, cwd, raw) => {
         const files = args.indexOf('--files') !== -1
             ? args.slice(args.indexOf('--files') + 1).filter(a => !a.startsWith('--'))
@@ -314,8 +314,8 @@ const COMMANDS = {
         handleResult((0, index_js_1.cmdScaffold)(cwd, args[1], { phase: f.phase, name: f.name ? args.slice(args.indexOf('--name') + 1).join(' ') : null }, raw), raw);
     },
     'init': handleInit,
-    'phase-plan-index': (args, cwd, raw) => handleResult((0, index_js_1.cmdPhasePlanIndex)(cwd, args[1]), raw),
-    'state-snapshot': (_args, cwd, raw) => handleResult((0, index_js_1.cmdStateSnapshot)(cwd, raw), raw),
+    'phase-plan-index': async (args, cwd, raw) => handleResult(await (0, index_js_1.cmdPhasePlanIndex)(cwd, args[1]), raw),
+    'state-snapshot': async (_args, cwd, raw) => handleResult(await (0, index_js_1.cmdStateSnapshot)(cwd, raw), raw),
     'summary-extract': (args, cwd, raw) => {
         const fieldsIndex = args.indexOf('--fields');
         const fields = fieldsIndex !== -1 ? args[fieldsIndex + 1].split(',') : null;

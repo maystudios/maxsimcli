@@ -33,18 +33,18 @@ export interface PhaseCompleteResult {
     state_updated: boolean;
     requirements_updated: boolean;
 }
-export declare function scaffoldPhaseStubs(dirPath: string, phaseId: string, name: string): void;
-export declare function phaseAddCore(cwd: string, description: string, options?: PhaseCreateOptions): PhaseAddResult;
-export declare function phaseInsertCore(cwd: string, afterPhase: string, description: string, options?: PhaseCreateOptions): PhaseInsertResult;
-export declare function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteResult;
+export declare function scaffoldPhaseStubs(dirPath: string, phaseId: string, name: string): Promise<void>;
+export declare function phaseAddCore(cwd: string, description: string, options?: PhaseCreateOptions): Promise<PhaseAddResult>;
+export declare function phaseInsertCore(cwd: string, afterPhase: string, description: string, options?: PhaseCreateOptions): Promise<PhaseInsertResult>;
+export declare function phaseCompleteCore(cwd: string, phaseNum: string): Promise<PhaseCompleteResult>;
 export declare function cmdPhasesList(cwd: string, options: PhasesListOptions): Promise<CmdResult>;
-export declare function cmdPhaseNextDecimal(cwd: string, basePhase: string): CmdResult;
-export declare function cmdFindPhase(cwd: string, phase: string | undefined): CmdResult;
-export declare function cmdPhasePlanIndex(cwd: string, phase: string | undefined): CmdResult;
-export declare function cmdPhaseAdd(cwd: string, description: string | undefined): CmdResult;
-export declare function cmdPhaseInsert(cwd: string, afterPhase: string | undefined, description: string | undefined): CmdResult;
+export declare function cmdPhaseNextDecimal(cwd: string, basePhase: string): Promise<CmdResult>;
+export declare function cmdFindPhase(cwd: string, phase: string | undefined): Promise<CmdResult>;
+export declare function cmdPhasePlanIndex(cwd: string, phase: string | undefined): Promise<CmdResult>;
+export declare function cmdPhaseAdd(cwd: string, description: string | undefined): Promise<CmdResult>;
+export declare function cmdPhaseInsert(cwd: string, afterPhase: string | undefined, description: string | undefined): Promise<CmdResult>;
 export declare function cmdPhaseRemove(cwd: string, targetPhase: string | undefined, options: {
     force: boolean;
-}): CmdResult;
-export declare function cmdPhaseComplete(cwd: string, phaseNum: string | undefined): CmdResult;
+}): Promise<CmdResult>;
+export declare function cmdPhaseComplete(cwd: string, phaseNum: string | undefined): Promise<CmdResult>;
 //# sourceMappingURL=phase.d.ts.map

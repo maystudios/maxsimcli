@@ -50,6 +50,8 @@ Every question directed at the user MUST use a structured tool. NEVER write a qu
 **Your job:** Capture decisions clearly enough that downstream agents can act on them without asking the user again.
 
 **Not your job:** Figure out HOW to implement. That's what research and planning do with the decisions you capture.
+
+**Phase-scoped artefakte:** In addition to project-level artefakte (DECISIONS.md, ACCEPTANCE-CRITERIA.md, NO-GOS.md), this workflow creates phase-scoped copies in the phase directory. These contain ONLY the entries from this phase's discussion, giving downstream agents focused context without needing to parse the full project-level files.
 </downstream_awareness>
 
 <philosophy>
@@ -482,6 +484,35 @@ If no no-gos emerged from discussion, skip this append.
 
 ```bash
 node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs(${padded_phase}): update artefakte from phase discussion" --files .planning/DECISIONS.md .planning/ACCEPTANCE-CRITERIA.md .planning/NO-GOS.md
+```
+
+**Create phase-scoped artefakte:**
+
+After appending to project-level artefakte, create phase-scoped copies containing ONLY the entries from this phase's discussion. These give downstream agents (researcher, planner, executor) focused phase-specific context without parsing the full project-level files.
+
+For each artefakte type that had entries appended in the previous step:
+
+**Decisions (if phase decisions were captured):**
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs artefakte-write decisions --phase ${phase_num} --content "# Phase ${phase_num}: ${phase_name} — Decisions\n\n| # | Decision | Rationale | Alternatives Considered | Status |\n|---|----------|-----------|------------------------|--------|\n[phase-specific decision entries from the discussion above]"
+```
+
+**Acceptance Criteria (if phase criteria were defined):**
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs artefakte-write acceptance-criteria --phase ${phase_num} --content "# Phase ${phase_num}: ${phase_name} — Acceptance Criteria\n\n[phase-specific criteria entries from the discussion above, each as a - [ ] checkbox line]"
+```
+
+**No-Gos (if phase no-gos emerged):**
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs artefakte-write no-gos --phase ${phase_num} --content "# Phase ${phase_num}: ${phase_name} — No-Gos\n\n[phase-specific no-go entries from the discussion above, each as a - bullet]"
+```
+
+Only create artefakte files for types that actually had entries — skip any type where no relevant decisions/criteria/no-gos emerged.
+
+Include the phase-scoped artefakte files in the same git commit as the project-level artefakte:
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs(${padded_phase}): create phase-scoped artefakte from discussion" --files "${phase_dir}/"
 ```
 
 </step>

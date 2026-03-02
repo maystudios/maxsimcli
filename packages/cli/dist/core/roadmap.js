@@ -11,17 +11,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.cmdRoadmapGetPhase = cmdRoadmapGetPhase;
 exports.cmdRoadmapAnalyze = cmdRoadmapAnalyze;
 exports.cmdRoadmapUpdatePlanProgress = cmdRoadmapUpdatePlanProgress;
-const node_fs_1 = __importDefault(require("node:fs"));
+const node_fs_1 = require("node:fs");
 const node_path_1 = __importDefault(require("node:path"));
 const core_js_1 = require("./core.js");
 const types_js_1 = require("./types.js");
 // ─── Roadmap commands ────────────────────────────────────────────────────────
-function cmdRoadmapGetPhase(cwd, phaseNum) {
+async function cmdRoadmapGetPhase(cwd, phaseNum) {
     const rmPath = (0, core_js_1.roadmapPath)(cwd);
-    if (!node_fs_1.default.existsSync(rmPath))
+    const content = await (0, core_js_1.safeReadFileAsync)(rmPath);
+    if (!content)
         return (0, types_js_1.cmdOk)({ found: false, error: 'ROADMAP.md not found' }, '');
     try {
-        const content = node_fs_1.default.readFileSync(rmPath, 'utf-8');
         const escapedPhase = phaseNum.replace(/\./g, '\\.');
         const phasePattern = (0, core_js_1.getPhasePattern)(escapedPhase, 'i');
         const headerMatch = content.match(phasePattern);
@@ -86,7 +86,7 @@ async function cmdRoadmapAnalyze(cwd) {
         try {
             const dirMatch = allDirs.find(d => d.startsWith(p.normalized + '-') || d === p.normalized);
             if (dirMatch) {
-                const phaseFiles = await node_fs_1.default.promises.readdir(node_path_1.default.join(phasesDir, dirMatch));
+                const phaseFiles = await node_fs_1.promises.readdir(node_path_1.default.join(phasesDir, dirMatch));
                 planCount = phaseFiles.filter(f => (0, core_js_1.isPlanFile)(f)).length;
                 summaryCount = phaseFiles.filter(f => (0, core_js_1.isSummaryFile)(f)).length;
                 hasContext = phaseFiles.some(f => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
@@ -133,11 +133,11 @@ async function cmdRoadmapAnalyze(cwd) {
     const result = { milestones, phases, phase_count: phases.length, completed_phases: completedPhases, total_plans: totalPlans, total_summaries: totalSummaries, progress_percent: totalPlans > 0 ? Math.min(100, Math.round((totalSummaries / totalPlans) * 100)) : 0, current_phase: currentPhase ? currentPhase.number : null, next_phase: nextPhase ? nextPhase.number : null, missing_phase_details: missingDetails.length > 0 ? missingDetails : null };
     return (0, types_js_1.cmdOk)(result);
 }
-function cmdRoadmapUpdatePlanProgress(cwd, phaseNum) {
+async function cmdRoadmapUpdatePlanProgress(cwd, phaseNum) {
     if (!phaseNum)
         return (0, types_js_1.cmdErr)('phase number required for roadmap update-plan-progress');
     const rmPath = (0, core_js_1.roadmapPath)(cwd);
-    const phaseInfo = (0, core_js_1.findPhaseInternal)(cwd, phaseNum);
+    const phaseInfo = await (0, core_js_1.findPhaseInternalAsync)(cwd, phaseNum);
     if (!phaseInfo)
         return (0, types_js_1.cmdErr)(`Phase ${phaseNum} not found`);
     const planCount = phaseInfo.plans.length;
@@ -147,9 +147,10 @@ function cmdRoadmapUpdatePlanProgress(cwd, phaseNum) {
     const isComplete = summaryCount >= planCount;
     const status = isComplete ? 'Complete' : summaryCount > 0 ? 'In Progress' : 'Planned';
     const today = (0, core_js_1.todayISO)();
-    if (!node_fs_1.default.existsSync(rmPath))
+    const rawContent = await (0, core_js_1.safeReadFileAsync)(rmPath);
+    if (!rawContent)
         return (0, types_js_1.cmdOk)({ updated: false, reason: 'ROADMAP.md not found', plan_count: planCount, summary_count: summaryCount }, 'no roadmap');
-    let roadmapContent = node_fs_1.default.readFileSync(rmPath, 'utf-8');
+    let roadmapContent = rawContent;
     const phaseEscaped = phaseNum.replace('.', '\\.');
     const dateField = isComplete ? ` ${today} ` : '  ';
     roadmapContent = roadmapContent.replace(new RegExp(`(\\|\\s*${phaseEscaped}\\.?\\s[^|]*\\|)[^|]*(\\|)\\s*[^|]*(\\|)\\s*[^|]*(\\|)`, 'i'), `$1 ${summaryCount}/${planCount} $2 ${status.padEnd(11)}$3${dateField}$4`);
@@ -158,7 +159,7 @@ function cmdRoadmapUpdatePlanProgress(cwd, phaseNum) {
     if (isComplete) {
         roadmapContent = roadmapContent.replace(new RegExp(`(-\\s*\\[)[ ](\\]\\s*.*Phase\\s+${phaseEscaped}[:\\s][^\\n]*)`, 'i'), `$1x$2 (completed ${today})`);
     }
-    node_fs_1.default.writeFileSync(rmPath, roadmapContent, 'utf-8');
+    await node_fs_1.promises.writeFile(rmPath, roadmapContent, 'utf-8');
     return (0, types_js_1.cmdOk)({ updated: true, phase: phaseNum, plan_count: planCount, summary_count: summaryCount, status, complete: isComplete }, `${summaryCount}/${planCount} ${status}`);
 }
 //# sourceMappingURL=roadmap.js.map

@@ -607,7 +607,7 @@ var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 //#endregion
 //#region ../../node_modules/supports-color/index.js
 var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	const os$5 = require("os");
+	const os$6 = require("os");
 	const tty$2 = require("tty");
 	const hasFlag = require_has_flag();
 	const { env } = process;
@@ -634,7 +634,7 @@ var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 		const min = forceColor || 0;
 		if (env.TERM === "dumb") return min;
 		if (process.platform === "win32") {
-			const osRelease = os$5.release().split(".");
+			const osRelease = os$6.release().split(".");
 			if (Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) return Number(osRelease[2]) >= 14931 ? 3 : 2;
 			return 1;
 		}
@@ -5152,6 +5152,100 @@ function getMilestoneInfo(cwd) {
 			name: "milestone"
 		};
 	}
+}
+async function pathExistsAsync(p) {
+	try {
+		await node_fs.promises.access(p);
+		return true;
+	} catch {
+		return false;
+	}
+}
+async function searchPhaseInDirAsync(baseDir, relBase, normalized) {
+	try {
+		const match = (await listSubDirsAsync(baseDir, true)).find((d) => d.startsWith(normalized));
+		if (!match) return null;
+		const dirMatch = match.match(/^(\d+[A-Z]?(?:\.\d+)?)-?(.*)/i);
+		const phaseNumber = dirMatch ? dirMatch[1] : normalized;
+		const phaseName = dirMatch && dirMatch[2] ? dirMatch[2] : null;
+		const phaseDir = node_path.default.join(baseDir, match);
+		const phaseFiles = await node_fs.promises.readdir(phaseDir);
+		const plans = phaseFiles.filter(isPlanFile).sort();
+		const summaries = phaseFiles.filter(isSummaryFile).sort();
+		const hasResearch = phaseFiles.some((f) => f.endsWith("-RESEARCH.md") || f === "RESEARCH.md");
+		const hasContext = phaseFiles.some((f) => f.endsWith("-CONTEXT.md") || f === "CONTEXT.md");
+		const hasVerification = phaseFiles.some((f) => f.endsWith("-VERIFICATION.md") || f === "VERIFICATION.md");
+		const completedPlanIds = new Set(summaries.map(summaryId));
+		const incompletePlans = plans.filter((p) => !completedPlanIds.has(planId(p)));
+		return {
+			found: true,
+			directory: node_path.default.join(relBase, match),
+			phase_number: phaseNumber,
+			phase_name: phaseName,
+			phase_slug: phaseName ? phaseName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") : null,
+			plans,
+			summaries,
+			incomplete_plans: incompletePlans,
+			has_research: hasResearch,
+			has_context: hasContext,
+			has_verification: hasVerification
+		};
+	} catch (e) {
+		debugLog("search-phase-in-dir-async-failed", {
+			dir: baseDir,
+			phase: normalized,
+			error: errorMsg(e)
+		});
+		return null;
+	}
+}
+async function findPhaseInternalAsync(cwd, phase) {
+	if (!phase) return null;
+	const pd = phasesPath(cwd);
+	const normalized = normalizePhaseName(phase);
+	const current = await searchPhaseInDirAsync(pd, node_path.default.join(".planning", "phases"), normalized);
+	if (current) return current;
+	const milestonesDir = planningPath(cwd, "milestones");
+	if (!await pathExistsAsync(milestonesDir)) return null;
+	try {
+		const archiveDirs = (await node_fs.promises.readdir(milestonesDir, { withFileTypes: true })).filter((e) => e.isDirectory() && /^v[\d.]+-phases$/.test(e.name)).map((e) => e.name).sort().reverse();
+		for (const archiveName of archiveDirs) {
+			const versionMatch = archiveName.match(/^(v[\d.]+)-phases$/);
+			if (!versionMatch) continue;
+			const version = versionMatch[1];
+			const result = await searchPhaseInDirAsync(node_path.default.join(milestonesDir, archiveName), node_path.default.join(".planning", "milestones", archiveName), normalized);
+			if (result) {
+				result.archived = version;
+				return result;
+			}
+		}
+	} catch (e) {
+		debugLog("find-phase-async-milestone-search-failed", e);
+	}
+	return null;
+}
+async function getArchivedPhaseDirsAsync(cwd) {
+	const milestonesDir = planningPath(cwd, "milestones");
+	const results = [];
+	try {
+		const phaseDirs = (await node_fs.promises.readdir(milestonesDir, { withFileTypes: true })).filter((e) => e.isDirectory() && /^v[\d.]+-phases$/.test(e.name)).map((e) => e.name).sort().reverse();
+		for (const archiveName of phaseDirs) {
+			const versionMatch = archiveName.match(/^(v[\d.]+)-phases$/);
+			if (!versionMatch) continue;
+			const version = versionMatch[1];
+			const archivePath = node_path.default.join(milestonesDir, archiveName);
+			const dirs = await listSubDirsAsync(archivePath, true);
+			for (const dir of dirs) results.push({
+				name: dir,
+				milestone: version,
+				basePath: node_path.default.join(".planning", "milestones", archiveName),
+				fullPath: node_path.default.join(archivePath, dir)
+			});
+		}
+	} catch (e) {
+		debugLog("get-archived-phase-dirs-async-failed", e);
+	}
+	return results;
 }
 
 //#endregion
@@ -12108,11 +12202,11 @@ function stateReplaceField(content, fieldName, newValue) {
 	replaced = content.replace(plainPattern, (_match, prefix) => `${prefix}${newValue}`);
 	return replaced !== content ? replaced : null;
 }
-function readTextArgOrFile(cwd, value, filePath, label) {
+async function readTextArgOrFile(cwd, value, filePath, label) {
 	if (!filePath) return value;
 	const resolvedPath = node_path.default.isAbsolute(filePath) ? filePath : node_path.default.join(cwd, filePath);
 	try {
-		return node_fs.default.readFileSync(resolvedPath, "utf-8").trimEnd();
+		return (await node_fs.promises.readFile(resolvedPath, "utf-8")).trimEnd();
 	} catch {
 		throw new Error(`${label} file not found: ${filePath}`);
 	}
@@ -12137,8 +12231,8 @@ async function cmdStateLoad(cwd, raw) {
 	const config = loadConfig(cwd);
 	const [stateContent, configExists, roadmapExists] = await Promise.all([
 		safeReadFileAsync(statePath(cwd)),
-		node_fs.default.promises.access(configPath(cwd)).then(() => true, () => false),
-		node_fs.default.promises.access(roadmapPath(cwd)).then(() => true, () => false)
+		pathExistsAsync(configPath(cwd)),
+		pathExistsAsync(roadmapPath(cwd))
 	]);
 	const stateRaw = stateContent ?? "";
 	const stateExists = stateRaw.length > 0;
@@ -12168,10 +12262,10 @@ async function cmdStateLoad(cwd, raw) {
 	}
 	return cmdOk(result);
 }
-function cmdStateGet(cwd, section, raw) {
+async function cmdStateGet(cwd, section, raw) {
 	const statePath$2 = statePath(cwd);
 	try {
-		const content = node_fs.default.readFileSync(statePath$2, "utf-8");
+		const content = await node_fs.promises.readFile(statePath$2, "utf-8");
 		if (!section) return cmdOk({ content }, raw ? content : void 0);
 		const fieldValue = stateExtractField(content, section);
 		if (fieldValue !== null) return cmdOk({ [section]: fieldValue }, raw ? fieldValue : void 0);
@@ -12185,10 +12279,10 @@ function cmdStateGet(cwd, section, raw) {
 		return cmdErr("STATE.md not found");
 	}
 }
-function cmdStatePatch(cwd, patches, raw) {
+async function cmdStatePatch(cwd, patches, raw) {
 	const statePath$3 = statePath(cwd);
 	try {
-		let content = node_fs.default.readFileSync(statePath$3, "utf-8");
+		let content = await node_fs.promises.readFile(statePath$3, "utf-8");
 		const results = {
 			updated: [],
 			failed: []
@@ -12200,20 +12294,20 @@ function cmdStatePatch(cwd, patches, raw) {
 				results.updated.push(field);
 			} else results.failed.push(field);
 		}
-		if (results.updated.length > 0) node_fs.default.writeFileSync(statePath$3, content, "utf-8");
+		if (results.updated.length > 0) await node_fs.promises.writeFile(statePath$3, content, "utf-8");
 		return cmdOk(results, raw ? results.updated.length > 0 ? "true" : "false" : void 0);
 	} catch (e) {
 		rethrowCliSignals(e);
 		return cmdErr("STATE.md not found");
 	}
 }
-function cmdStateUpdate(cwd, field, value) {
+async function cmdStateUpdate(cwd, field, value) {
 	if (!field || value === void 0) return cmdErr("field and value required for state update");
 	const statePath$4 = statePath(cwd);
 	try {
-		const result = stateReplaceField(node_fs.default.readFileSync(statePath$4, "utf-8"), field, value);
+		const result = stateReplaceField(await node_fs.promises.readFile(statePath$4, "utf-8"), field, value);
 		if (result) {
-			node_fs.default.writeFileSync(statePath$4, result, "utf-8");
+			await node_fs.promises.writeFile(statePath$4, result, "utf-8");
 			return cmdOk({ updated: true });
 		} else return cmdOk({
 			updated: false,
@@ -12227,10 +12321,10 @@ function cmdStateUpdate(cwd, field, value) {
 		});
 	}
 }
-function cmdStateAdvancePlan(cwd, raw) {
+async function cmdStateAdvancePlan(cwd, raw) {
 	const statePath$5 = statePath(cwd);
-	if (!node_fs.default.existsSync(statePath$5)) return cmdOk({ error: "STATE.md not found" });
-	let content = node_fs.default.readFileSync(statePath$5, "utf-8");
+	if (!await pathExistsAsync(statePath$5)) return cmdOk({ error: "STATE.md not found" });
+	let content = await node_fs.promises.readFile(statePath$5, "utf-8");
 	const currentPlan = parseInt(stateExtractField(content, "Current Plan") ?? "", 10);
 	const totalPlans = parseInt(stateExtractField(content, "Total Plans in Phase") ?? "", 10);
 	const today = todayISO();
@@ -12238,7 +12332,7 @@ function cmdStateAdvancePlan(cwd, raw) {
 	if (currentPlan >= totalPlans) {
 		content = stateReplaceField(content, "Status", "Phase complete — ready for verification") || content;
 		content = stateReplaceField(content, "Last Activity", today) || content;
-		node_fs.default.writeFileSync(statePath$5, content, "utf-8");
+		await node_fs.promises.writeFile(statePath$5, content, "utf-8");
 		return cmdOk({
 			advanced: false,
 			reason: "last_plan",
@@ -12251,7 +12345,7 @@ function cmdStateAdvancePlan(cwd, raw) {
 		content = stateReplaceField(content, "Current Plan", String(newPlan)) || content;
 		content = stateReplaceField(content, "Status", "Ready to execute") || content;
 		content = stateReplaceField(content, "Last Activity", today) || content;
-		node_fs.default.writeFileSync(statePath$5, content, "utf-8");
+		await node_fs.promises.writeFile(statePath$5, content, "utf-8");
 		return cmdOk({
 			advanced: true,
 			previous_plan: currentPlan,
@@ -12260,10 +12354,10 @@ function cmdStateAdvancePlan(cwd, raw) {
 		}, raw ? "true" : void 0);
 	}
 }
-function cmdStateRecordMetric(cwd, options, raw) {
+async function cmdStateRecordMetric(cwd, options, raw) {
 	const statePath$6 = statePath(cwd);
-	if (!node_fs.default.existsSync(statePath$6)) return cmdOk({ error: "STATE.md not found" });
-	let content = node_fs.default.readFileSync(statePath$6, "utf-8");
+	if (!await pathExistsAsync(statePath$6)) return cmdOk({ error: "STATE.md not found" });
+	let content = await node_fs.promises.readFile(statePath$6, "utf-8");
 	const { phase, plan, duration, tasks, files } = options;
 	if (!phase || !plan || !duration) return cmdOk({ error: "phase, plan, and duration required" });
 	const metricsPattern = /(#{2,3}\s*Performance Metrics[\s\S]*?\n\|[^\n]+\n\|[\s:|\-]+\n)([\s\S]*?)(?=\n#{2,3}\s|\n$|$)/i;
@@ -12274,7 +12368,7 @@ function cmdStateRecordMetric(cwd, options, raw) {
 		if (tableBody.trim() === "" || tableBody.includes("None yet")) tableBody = newRow;
 		else tableBody = tableBody + "\n" + newRow;
 		content = content.replace(metricsPattern, (_match, header) => `${header}${tableBody}\n`);
-		node_fs.default.writeFileSync(statePath$6, content, "utf-8");
+		await node_fs.promises.writeFile(statePath$6, content, "utf-8");
 		return cmdOk({
 			recorded: true,
 			phase,
@@ -12286,19 +12380,25 @@ function cmdStateRecordMetric(cwd, options, raw) {
 		reason: "Performance Metrics section not found in STATE.md"
 	}, raw ? "false" : void 0);
 }
-function cmdStateUpdateProgress(cwd, raw) {
+async function cmdStateUpdateProgress(cwd, raw) {
 	const statePath$7 = statePath(cwd);
-	if (!node_fs.default.existsSync(statePath$7)) return cmdOk({ error: "STATE.md not found" });
-	let content = node_fs.default.readFileSync(statePath$7, "utf-8");
+	if (!await pathExistsAsync(statePath$7)) return cmdOk({ error: "STATE.md not found" });
+	let content = await node_fs.promises.readFile(statePath$7, "utf-8");
 	const phasesDir = phasesPath(cwd);
 	let totalPlans = 0;
 	let totalSummaries = 0;
-	if (node_fs.default.existsSync(phasesDir)) {
-		const phaseDirs = node_fs.default.readdirSync(phasesDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
-		for (const dir of phaseDirs) {
-			const files = node_fs.default.readdirSync(node_path.default.join(phasesDir, dir));
-			totalPlans += files.filter((f) => isPlanFile(f)).length;
-			totalSummaries += files.filter((f) => isSummaryFile(f)).length;
+	if (await pathExistsAsync(phasesDir)) {
+		const phaseDirs = (await node_fs.promises.readdir(phasesDir, { withFileTypes: true })).filter((e) => e.isDirectory()).map((e) => e.name);
+		const counts = await Promise.all(phaseDirs.map(async (dir) => {
+			const files = await node_fs.promises.readdir(node_path.default.join(phasesDir, dir));
+			return {
+				plans: files.filter((f) => isPlanFile(f)).length,
+				summaries: files.filter((f) => isSummaryFile(f)).length
+			};
+		}));
+		for (const c of counts) {
+			totalPlans += c.plans;
+			totalSummaries += c.summaries;
 		}
 	}
 	const percent = totalPlans > 0 ? Math.min(100, Math.round(totalSummaries / totalPlans * 100)) : 0;
@@ -12307,7 +12407,7 @@ function cmdStateUpdateProgress(cwd, raw) {
 	const progressStr = `[${"█".repeat(filled) + "░".repeat(barWidth - filled)}] ${percent}%`;
 	const result = stateReplaceField(content, "Progress", progressStr);
 	if (result) {
-		node_fs.default.writeFileSync(statePath$7, result, "utf-8");
+		await node_fs.promises.writeFile(statePath$7, result, "utf-8");
 		return cmdOk({
 			updated: true,
 			percent,
@@ -12320,15 +12420,15 @@ function cmdStateUpdateProgress(cwd, raw) {
 		reason: "Progress field not found in STATE.md"
 	}, raw ? "false" : void 0);
 }
-function cmdStateAddDecision(cwd, options, raw) {
+async function cmdStateAddDecision(cwd, options, raw) {
 	const statePath$8 = statePath(cwd);
-	if (!node_fs.default.existsSync(statePath$8)) return cmdOk({ error: "STATE.md not found" });
+	if (!await pathExistsAsync(statePath$8)) return cmdOk({ error: "STATE.md not found" });
 	const { phase, summary, summary_file, rationale, rationale_file } = options;
 	let summaryText;
 	let rationaleText = "";
 	try {
-		summaryText = readTextArgOrFile(cwd, summary, summary_file, "summary");
-		rationaleText = readTextArgOrFile(cwd, rationale || "", rationale_file, "rationale") || "";
+		summaryText = await readTextArgOrFile(cwd, summary, summary_file, "summary");
+		rationaleText = await readTextArgOrFile(cwd, rationale || "", rationale_file, "rationale") || "";
 	} catch (thrown) {
 		return cmdOk({
 			added: false,
@@ -12336,11 +12436,11 @@ function cmdStateAddDecision(cwd, options, raw) {
 		}, raw ? "false" : void 0);
 	}
 	if (!summaryText) return cmdOk({ error: "summary required" });
-	const content = node_fs.default.readFileSync(statePath$8, "utf-8");
+	const content = await node_fs.promises.readFile(statePath$8, "utf-8");
 	const entry = `- [Phase ${phase || "?"}]: ${summaryText}${rationaleText ? ` — ${rationaleText}` : ""}`;
 	const updated = appendToStateSection(content, /(###?\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i, entry, [/None yet\.?\s*\n?/gi, /No decisions yet\.?\s*\n?/gi]);
 	if (updated) {
-		node_fs.default.writeFileSync(statePath$8, updated, "utf-8");
+		await node_fs.promises.writeFile(statePath$8, updated, "utf-8");
 		return cmdOk({
 			added: true,
 			decision: entry
@@ -12350,13 +12450,13 @@ function cmdStateAddDecision(cwd, options, raw) {
 		reason: "Decisions section not found in STATE.md"
 	}, raw ? "false" : void 0);
 }
-function cmdStateAddBlocker(cwd, text, raw) {
+async function cmdStateAddBlocker(cwd, text, raw) {
 	const statePath$9 = statePath(cwd);
-	if (!node_fs.default.existsSync(statePath$9)) return cmdOk({ error: "STATE.md not found" });
+	if (!await pathExistsAsync(statePath$9)) return cmdOk({ error: "STATE.md not found" });
 	const blockerOptions = typeof text === "object" && text !== null ? text : { text };
 	let blockerText;
 	try {
-		blockerText = readTextArgOrFile(cwd, blockerOptions.text, blockerOptions.text_file, "blocker");
+		blockerText = await readTextArgOrFile(cwd, blockerOptions.text, blockerOptions.text_file, "blocker");
 	} catch (thrown) {
 		return cmdOk({
 			added: false,
@@ -12364,9 +12464,9 @@ function cmdStateAddBlocker(cwd, text, raw) {
 		}, raw ? "false" : void 0);
 	}
 	if (!blockerText) return cmdOk({ error: "text required" });
-	const updated = appendToStateSection(node_fs.default.readFileSync(statePath$9, "utf-8"), /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i, `- ${blockerText}`, [/None\.?\s*\n?/gi, /None yet\.?\s*\n?/gi]);
+	const updated = appendToStateSection(await node_fs.promises.readFile(statePath$9, "utf-8"), /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i, `- ${blockerText}`, [/None\.?\s*\n?/gi, /None yet\.?\s*\n?/gi]);
 	if (updated) {
-		node_fs.default.writeFileSync(statePath$9, updated, "utf-8");
+		await node_fs.promises.writeFile(statePath$9, updated, "utf-8");
 		return cmdOk({
 			added: true,
 			blocker: blockerText
@@ -12376,11 +12476,11 @@ function cmdStateAddBlocker(cwd, text, raw) {
 		reason: "Blockers section not found in STATE.md"
 	}, raw ? "false" : void 0);
 }
-function cmdStateResolveBlocker(cwd, text, raw) {
+async function cmdStateResolveBlocker(cwd, text, raw) {
 	const statePath$10 = statePath(cwd);
-	if (!node_fs.default.existsSync(statePath$10)) return cmdOk({ error: "STATE.md not found" });
+	if (!await pathExistsAsync(statePath$10)) return cmdOk({ error: "STATE.md not found" });
 	if (!text) return cmdOk({ error: "text required" });
-	let content = node_fs.default.readFileSync(statePath$10, "utf-8");
+	let content = await node_fs.promises.readFile(statePath$10, "utf-8");
 	const sectionPattern = /(#{2,3}\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n\s*\n?)([\s\S]*?)(?=\n#{2,3}\s|$)/i;
 	const match = content.match(sectionPattern);
 	if (match) {
@@ -12390,7 +12490,7 @@ function cmdStateResolveBlocker(cwd, text, raw) {
 		}).join("\n");
 		if (!newBody.trim() || !/^\s*[-*]\s+/m.test(newBody)) newBody = "None\n";
 		content = content.replace(sectionPattern, (_match, header) => `${header}${newBody}`);
-		node_fs.default.writeFileSync(statePath$10, content, "utf-8");
+		await node_fs.promises.writeFile(statePath$10, content, "utf-8");
 		return cmdOk({
 			resolved: true,
 			blocker: text
@@ -12400,10 +12500,10 @@ function cmdStateResolveBlocker(cwd, text, raw) {
 		reason: "Blockers section not found in STATE.md"
 	}, raw ? "false" : void 0);
 }
-function cmdStateRecordSession(cwd, options, raw) {
+async function cmdStateRecordSession(cwd, options, raw) {
 	const statePath$11 = statePath(cwd);
-	if (!node_fs.default.existsSync(statePath$11)) return cmdOk({ error: "STATE.md not found" });
-	let content = node_fs.default.readFileSync(statePath$11, "utf-8");
+	if (!await pathExistsAsync(statePath$11)) return cmdOk({ error: "STATE.md not found" });
+	let content = await node_fs.promises.readFile(statePath$11, "utf-8");
 	const now = (/* @__PURE__ */ new Date()).toISOString();
 	const updated = [];
 	let result = stateReplaceField(content, "Last session", now);
@@ -12432,7 +12532,7 @@ function cmdStateRecordSession(cwd, options, raw) {
 		updated.push("Resume File");
 	}
 	if (updated.length > 0) {
-		node_fs.default.writeFileSync(statePath$11, content, "utf-8");
+		await node_fs.promises.writeFile(statePath$11, content, "utf-8");
 		return cmdOk({
 			recorded: true,
 			updated
@@ -12442,10 +12542,10 @@ function cmdStateRecordSession(cwd, options, raw) {
 		reason: "No session fields found in STATE.md"
 	}, raw ? "false" : void 0);
 }
-function cmdStateSnapshot(cwd, raw) {
+async function cmdStateSnapshot(cwd, raw) {
 	const statePath$12 = statePath(cwd);
-	if (!node_fs.default.existsSync(statePath$12)) return cmdOk({ error: "STATE.md not found" });
-	const content = node_fs.default.readFileSync(statePath$12, "utf-8");
+	if (!await pathExistsAsync(statePath$12)) return cmdOk({ error: "STATE.md not found" });
+	const content = await node_fs.promises.readFile(statePath$12, "utf-8");
 	const extractField = (fieldName) => stateExtractField(content, fieldName);
 	const currentPhase = extractField("Current Phase");
 	const currentPhaseName = extractField("Current Phase Name");
@@ -12516,14 +12616,13 @@ function cmdStateSnapshot(cwd, raw) {
 *
 * Ported from maxsim/bin/lib/roadmap.cjs
 */
-function cmdRoadmapGetPhase(cwd, phaseNum) {
-	const rmPath = roadmapPath(cwd);
-	if (!node_fs.default.existsSync(rmPath)) return cmdOk({
+async function cmdRoadmapGetPhase(cwd, phaseNum) {
+	const content = await safeReadFileAsync(roadmapPath(cwd));
+	if (!content) return cmdOk({
 		found: false,
 		error: "ROADMAP.md not found"
 	}, "");
 	try {
-		const content = node_fs.default.readFileSync(rmPath, "utf-8");
 		const escapedPhase = phaseNum.replace(/\./g, "\\.");
 		const phasePattern = getPhasePattern(escapedPhase, "i");
 		const headerMatch = content.match(phasePattern);
@@ -12607,7 +12706,7 @@ async function cmdRoadmapAnalyze(cwd) {
 		try {
 			const dirMatch = allDirs.find((d) => d.startsWith(p.normalized + "-") || d === p.normalized);
 			if (dirMatch) {
-				const phaseFiles = await node_fs.default.promises.readdir(node_path.default.join(phasesDir, dirMatch));
+				const phaseFiles = await node_fs.promises.readdir(node_path.default.join(phasesDir, dirMatch));
 				planCount = phaseFiles.filter((f) => isPlanFile(f)).length;
 				summaryCount = phaseFiles.filter((f) => isSummaryFile(f)).length;
 				hasContext = phaseFiles.some((f) => f.endsWith("-CONTEXT.md") || f === "CONTEXT.md");
@@ -12668,10 +12767,10 @@ async function cmdRoadmapAnalyze(cwd) {
 		missing_phase_details: missingDetails.length > 0 ? missingDetails : null
 	});
 }
-function cmdRoadmapUpdatePlanProgress(cwd, phaseNum) {
+async function cmdRoadmapUpdatePlanProgress(cwd, phaseNum) {
 	if (!phaseNum) return cmdErr("phase number required for roadmap update-plan-progress");
 	const rmPath = roadmapPath(cwd);
-	const phaseInfo = findPhaseInternal(cwd, phaseNum);
+	const phaseInfo = await findPhaseInternalAsync(cwd, phaseNum);
 	if (!phaseInfo) return cmdErr(`Phase ${phaseNum} not found`);
 	const planCount = phaseInfo.plans.length;
 	const summaryCount = phaseInfo.summaries.length;
@@ -12684,20 +12783,21 @@ function cmdRoadmapUpdatePlanProgress(cwd, phaseNum) {
 	const isComplete = summaryCount >= planCount;
 	const status = isComplete ? "Complete" : summaryCount > 0 ? "In Progress" : "Planned";
 	const today = todayISO();
-	if (!node_fs.default.existsSync(rmPath)) return cmdOk({
+	const rawContent = await safeReadFileAsync(rmPath);
+	if (!rawContent) return cmdOk({
 		updated: false,
 		reason: "ROADMAP.md not found",
 		plan_count: planCount,
 		summary_count: summaryCount
 	}, "no roadmap");
-	let roadmapContent = node_fs.default.readFileSync(rmPath, "utf-8");
+	let roadmapContent = rawContent;
 	const phaseEscaped = phaseNum.replace(".", "\\.");
 	const dateField = isComplete ? ` ${today} ` : "  ";
 	roadmapContent = roadmapContent.replace(new RegExp(`(\\|\\s*${phaseEscaped}\\.?\\s[^|]*\\|)[^|]*(\\|)\\s*[^|]*(\\|)\\s*[^|]*(\\|)`, "i"), `$1 ${summaryCount}/${planCount} $2 ${status.padEnd(11)}$3${dateField}$4`);
 	const planCountText = isComplete ? `${summaryCount}/${planCount} plans complete` : `${summaryCount}/${planCount} plans executed`;
 	roadmapContent = roadmapContent.replace(new RegExp(`(#{2,4}\\s*Phase\\s+${phaseEscaped}[\\s\\S]*?\\*\\*Plans:\\*\\*\\s*)[^\\n]+`, "i"), `$1${planCountText}`);
 	if (isComplete) roadmapContent = roadmapContent.replace(new RegExp(`(-\\s*\\[)[ ](\\]\\s*.*Phase\\s+${phaseEscaped}[:\\s][^\\n]*)`, "i"), `$1x$2 (completed ${today})`);
-	node_fs.default.writeFileSync(rmPath, roadmapContent, "utf-8");
+	await node_fs.promises.writeFile(rmPath, roadmapContent, "utf-8");
 	return cmdOk({
 		updated: true,
 		phase: phaseNum,
@@ -14318,15 +14418,18 @@ function cmdValidateHealth(cwd, options) {
 *
 * Ported from maxsim/bin/lib/phase.cjs
 */
-function scaffoldPhaseStubs(dirPath, phaseId, name) {
+async function scaffoldPhaseStubs(dirPath, phaseId, name) {
 	const today = todayISO();
-	node_fs.default.writeFileSync(node_path.default.join(dirPath, `${phaseId}-CONTEXT.md`), `# Phase ${phaseId} Context: ${name}\n\n**Created:** ${today}\n**Phase goal:** [To be defined during /maxsim:discuss-phase]\n\n---\n\n_Context will be populated by /maxsim:discuss-phase_\n`);
-	node_fs.default.writeFileSync(node_path.default.join(dirPath, `${phaseId}-RESEARCH.md`), `# Phase ${phaseId}: ${name} - Research\n\n**Researched:** Not yet\n**Domain:** TBD\n**Confidence:** TBD\n\n---\n\n_Research will be populated by /maxsim:research-phase_\n`);
+	await Promise.all([node_fs.promises.writeFile(node_path.default.join(dirPath, `${phaseId}-CONTEXT.md`), `# Phase ${phaseId} Context: ${name}\n\n**Created:** ${today}\n**Phase goal:** [To be defined during /maxsim:discuss-phase]\n\n---\n\n_Context will be populated by /maxsim:discuss-phase_\n`), node_fs.promises.writeFile(node_path.default.join(dirPath, `${phaseId}-RESEARCH.md`), `# Phase ${phaseId}: ${name} - Research\n\n**Researched:** Not yet\n**Domain:** TBD\n**Confidence:** TBD\n\n---\n\n_Research will be populated by /maxsim:research-phase_\n`)]);
 }
-function phaseAddCore(cwd, description, options) {
+async function phaseAddCore(cwd, description, options) {
 	const rmPath = roadmapPath(cwd);
-	if (!node_fs.default.existsSync(rmPath)) throw new Error("ROADMAP.md not found");
-	const content = node_fs.default.readFileSync(rmPath, "utf-8");
+	let content;
+	try {
+		content = await node_fs.promises.readFile(rmPath, "utf-8");
+	} catch {
+		throw new Error("ROADMAP.md not found");
+	}
 	const slug = generateSlugInternal(description);
 	const phasePattern = getPhasePattern();
 	let maxPhase = 0;
@@ -14339,15 +14442,15 @@ function phaseAddCore(cwd, description, options) {
 	const paddedNum = String(newPhaseNum).padStart(2, "0");
 	const dirName = `${paddedNum}-${slug}`;
 	const dirPath = planningPath(cwd, "phases", dirName);
-	node_fs.default.mkdirSync(dirPath, { recursive: true });
-	node_fs.default.writeFileSync(node_path.default.join(dirPath, ".gitkeep"), "");
-	if (options?.includeStubs) scaffoldPhaseStubs(dirPath, paddedNum, description);
+	await node_fs.promises.mkdir(dirPath, { recursive: true });
+	await node_fs.promises.writeFile(node_path.default.join(dirPath, ".gitkeep"), "");
+	if (options?.includeStubs) await scaffoldPhaseStubs(dirPath, paddedNum, description);
 	const phaseEntry = `\n### Phase ${newPhaseNum}: ${description}\n\n**Goal:** [To be planned]\n**Requirements**: TBD\n**Depends on:** Phase ${maxPhase}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /maxsim:plan-phase ${newPhaseNum} to break down)\n`;
 	let updatedContent;
 	const lastSeparator = content.lastIndexOf("\n---");
 	if (lastSeparator > 0) updatedContent = content.slice(0, lastSeparator) + phaseEntry + content.slice(lastSeparator);
 	else updatedContent = content + phaseEntry;
-	node_fs.default.writeFileSync(rmPath, updatedContent, "utf-8");
+	await node_fs.promises.writeFile(rmPath, updatedContent, "utf-8");
 	return {
 		phase_number: newPhaseNum,
 		padded: paddedNum,
@@ -14356,10 +14459,14 @@ function phaseAddCore(cwd, description, options) {
 		description
 	};
 }
-function phaseInsertCore(cwd, afterPhase, description, options) {
+async function phaseInsertCore(cwd, afterPhase, description, options) {
 	const rmPath = roadmapPath(cwd);
-	if (!node_fs.default.existsSync(rmPath)) throw new Error("ROADMAP.md not found");
-	const content = node_fs.default.readFileSync(rmPath, "utf-8");
+	let content;
+	try {
+		content = await node_fs.promises.readFile(rmPath, "utf-8");
+	} catch {
+		throw new Error("ROADMAP.md not found");
+	}
 	const slug = generateSlugInternal(description);
 	const afterPhaseEscaped = "0*" + normalizePhaseName(afterPhase).replace(/^0+/, "").replace(/\./g, "\\.");
 	if (!getPhasePattern(afterPhaseEscaped, "i").test(content)) throw new Error(`Phase ${afterPhase} not found in ROADMAP.md`);
@@ -14367,7 +14474,7 @@ function phaseInsertCore(cwd, afterPhase, description, options) {
 	const normalizedBase = normalizePhaseName(afterPhase);
 	const existingDecimals = [];
 	try {
-		const dirs = listSubDirs(phasesDirPath);
+		const dirs = await listSubDirsAsync(phasesDirPath);
 		const decimalPattern = new RegExp(`^${normalizedBase}\\.(\\d+)`);
 		for (const dir of dirs) {
 			const dm = dir.match(decimalPattern);
@@ -14379,9 +14486,9 @@ function phaseInsertCore(cwd, afterPhase, description, options) {
 	const decimalPhase = `${normalizedBase}.${existingDecimals.length === 0 ? 1 : Math.max(...existingDecimals) + 1}`;
 	const dirName = `${decimalPhase}-${slug}`;
 	const dirPath = planningPath(cwd, "phases", dirName);
-	node_fs.default.mkdirSync(dirPath, { recursive: true });
-	node_fs.default.writeFileSync(node_path.default.join(dirPath, ".gitkeep"), "");
-	if (options?.includeStubs) scaffoldPhaseStubs(dirPath, decimalPhase, description);
+	await node_fs.promises.mkdir(dirPath, { recursive: true });
+	await node_fs.promises.writeFile(node_path.default.join(dirPath, ".gitkeep"), "");
+	if (options?.includeStubs) await scaffoldPhaseStubs(dirPath, decimalPhase, description);
 	const phaseEntry = `\n### Phase ${decimalPhase}: ${description} (INSERTED)\n\n**Goal:** [Urgent work - to be planned]\n**Requirements**: TBD\n**Depends on:** Phase ${afterPhase}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /maxsim:plan-phase ${decimalPhase} to break down)\n`;
 	const headerPattern = new RegExp(`(#{2,4}\\s*Phase\\s+0*${afterPhaseEscaped}:[^\\n]*\\n)`, "i");
 	const headerMatch = content.match(headerPattern);
@@ -14392,7 +14499,7 @@ function phaseInsertCore(cwd, afterPhase, description, options) {
 	if (nextPhaseMatch) insertIdx = headerIdx + headerMatch[0].length + nextPhaseMatch.index;
 	else insertIdx = content.length;
 	const updatedContent = content.slice(0, insertIdx) + phaseEntry + content.slice(insertIdx);
-	node_fs.default.writeFileSync(rmPath, updatedContent, "utf-8");
+	await node_fs.promises.writeFile(rmPath, updatedContent, "utf-8");
 	return {
 		phase_number: decimalPhase,
 		after_phase: afterPhase,
@@ -14401,18 +14508,19 @@ function phaseInsertCore(cwd, afterPhase, description, options) {
 		description
 	};
 }
-function phaseCompleteCore(cwd, phaseNum) {
+async function phaseCompleteCore(cwd, phaseNum) {
 	const rmPath = roadmapPath(cwd);
 	const stPath = statePath(cwd);
 	const phasesDirPath = phasesPath(cwd);
 	const today = todayISO();
-	const phaseInfo = findPhaseInternal(cwd, phaseNum);
+	const phaseInfo = await findPhaseInternalAsync(cwd, phaseNum);
 	if (!phaseInfo) throw new Error(`Phase ${phaseNum} not found`);
 	const planCount = phaseInfo.plans.length;
 	const summaryCount = phaseInfo.summaries.length;
 	let requirementsUpdated = false;
-	if (node_fs.default.existsSync(rmPath)) {
-		let roadmapContent = node_fs.default.readFileSync(rmPath, "utf-8");
+	const rmExists = await pathExistsAsync(rmPath);
+	if (rmExists) {
+		let roadmapContent = await node_fs.promises.readFile(rmPath, "utf-8");
 		const checkboxPattern = new RegExp(`(-\\s*\\[)[ ](\\]\\s*.*Phase\\s+${escapePhaseNum(phaseNum)}[:\\s][^\\n]*)`, "i");
 		roadmapContent = roadmapContent.replace(checkboxPattern, `$1x$2 (completed ${today})`);
 		const phaseEscaped = escapePhaseNum(phaseNum);
@@ -14421,20 +14529,20 @@ function phaseCompleteCore(cwd, phaseNum) {
 		const planCountPattern = new RegExp(`(#{2,4}\\s*Phase\\s+${phaseEscaped}[\\s\\S]*?\\*\\*Plans:\\*\\*\\s*)[^\\n]+`, "i");
 		roadmapContent = roadmapContent.replace(planCountPattern, `$1${summaryCount}/${planCount} plans complete`);
 		debugLog("phase-complete-write", `writing ROADMAP.md for phase ${phaseNum}`);
-		node_fs.default.writeFileSync(rmPath, roadmapContent, "utf-8");
+		await node_fs.promises.writeFile(rmPath, roadmapContent, "utf-8");
 		debugLog("phase-complete-write", `ROADMAP.md updated for phase ${phaseNum}`);
 		const reqPath = planningPath(cwd, "REQUIREMENTS.md");
-		if (node_fs.default.existsSync(reqPath)) {
+		if (await pathExistsAsync(reqPath)) {
 			const reqMatch = roadmapContent.match(new RegExp(`Phase\\s+${escapePhaseNum(phaseNum)}[\\s\\S]*?\\*\\*Requirements:\\*\\*\\s*([^\\n]+)`, "i"));
 			if (reqMatch) {
 				const reqIds = reqMatch[1].replace(/[\[\]]/g, "").split(/[,\s]+/).map((r) => r.trim()).filter(Boolean);
-				let reqContent = node_fs.default.readFileSync(reqPath, "utf-8");
+				let reqContent = await node_fs.promises.readFile(reqPath, "utf-8");
 				for (const reqId of reqIds) {
 					reqContent = reqContent.replace(new RegExp(`(-\\s*\\[)[ ](\\]\\s*\\*\\*${reqId}\\*\\*)`, "gi"), "$1x$2");
 					reqContent = reqContent.replace(new RegExp(`(\\|\\s*${reqId}\\s*\\|[^|]+\\|)\\s*Pending\\s*(\\|)`, "gi"), "$1 Complete $2");
 				}
 				debugLog("phase-complete-write", `writing REQUIREMENTS.md for phase ${phaseNum}`);
-				node_fs.default.writeFileSync(reqPath, reqContent, "utf-8");
+				await node_fs.promises.writeFile(reqPath, reqContent, "utf-8");
 				debugLog("phase-complete-write", `REQUIREMENTS.md updated for phase ${phaseNum}`);
 				requirementsUpdated = true;
 			}
@@ -14444,7 +14552,7 @@ function phaseCompleteCore(cwd, phaseNum) {
 	let nextPhaseName = null;
 	let isLastPhase = true;
 	try {
-		const dirs = listSubDirs(phasesDirPath, true);
+		const dirs = await listSubDirsAsync(phasesDirPath, true);
 		for (const dir of dirs) {
 			const dm = dir.match(/^(\d+[A-Z]?(?:\.\d+)?)-?(.*)/i);
 			if (dm) {
@@ -14459,8 +14567,9 @@ function phaseCompleteCore(cwd, phaseNum) {
 	} catch (e) {
 		debugLog("phase-complete-next-phase-scan-failed", e);
 	}
-	if (node_fs.default.existsSync(stPath)) {
-		let stateContent = node_fs.default.readFileSync(stPath, "utf-8");
+	const stExists = await pathExistsAsync(stPath);
+	if (stExists) {
+		let stateContent = await node_fs.promises.readFile(stPath, "utf-8");
 		stateContent = stateContent.replace(/(\*\*Current Phase:\*\*\s*).*/, `$1${nextPhaseNum || phaseNum}`);
 		if (nextPhaseName) stateContent = stateContent.replace(/(\*\*Current Phase Name:\*\*\s*).*/, `$1${nextPhaseName.replace(/-/g, " ")}`);
 		stateContent = stateContent.replace(/(\*\*Status:\*\*\s*).*/, `$1${isLastPhase ? "Milestone complete" : "Ready to plan"}`);
@@ -14468,7 +14577,7 @@ function phaseCompleteCore(cwd, phaseNum) {
 		stateContent = stateContent.replace(/(\*\*Last Activity:\*\*\s*).*/, `$1${today}`);
 		stateContent = stateContent.replace(/(\*\*Last Activity Description:\*\*\s*).*/, `$1Phase ${phaseNum} complete${nextPhaseNum ? `, transitioned to Phase ${nextPhaseNum}` : ""}`);
 		debugLog("phase-complete-write", `writing STATE.md for phase ${phaseNum}`);
-		node_fs.default.writeFileSync(stPath, stateContent, "utf-8");
+		await node_fs.promises.writeFile(stPath, stateContent, "utf-8");
 		debugLog("phase-complete-write", `STATE.md updated for phase ${phaseNum}`);
 	}
 	return {
@@ -14479,15 +14588,15 @@ function phaseCompleteCore(cwd, phaseNum) {
 		next_phase_name: nextPhaseName,
 		is_last_phase: isLastPhase,
 		date: today,
-		roadmap_updated: node_fs.default.existsSync(rmPath),
-		state_updated: node_fs.default.existsSync(stPath),
+		roadmap_updated: rmExists,
+		state_updated: stExists,
 		requirements_updated: requirementsUpdated
 	};
 }
 async function cmdPhasesList(cwd, options) {
 	const phasesDirPath = phasesPath(cwd);
 	const { type, phase, includeArchived, offset, limit } = options;
-	if (!node_fs.default.existsSync(phasesDirPath)) if (type) return cmdOk({
+	if (!await pathExistsAsync(phasesDirPath)) if (type) return cmdOk({
 		files: [],
 		count: 0,
 		total: 0
@@ -14500,7 +14609,7 @@ async function cmdPhasesList(cwd, options) {
 	try {
 		let dirs = await listSubDirsAsync(phasesDirPath);
 		if (includeArchived) {
-			const archived = getArchivedPhaseDirs(cwd);
+			const archived = await getArchivedPhaseDirsAsync(cwd);
 			for (const a of archived) dirs.push(`${a.name} [${a.milestone}]`);
 		}
 		dirs.sort((a, b) => comparePhaseNum(a, b));
@@ -14519,7 +14628,7 @@ async function cmdPhasesList(cwd, options) {
 		if (type) {
 			const files = (await Promise.all(dirs.map(async (dir) => {
 				const dirPath = node_path.default.join(phasesDirPath, dir);
-				const dirFiles = await node_fs.default.promises.readdir(dirPath);
+				const dirFiles = await node_fs.promises.readdir(dirPath);
 				let filtered;
 				if (type === "plans") filtered = dirFiles.filter(isPlanFile);
 				else if (type === "summaries") filtered = dirFiles.filter(isSummaryFile);
@@ -14545,17 +14654,17 @@ async function cmdPhasesList(cwd, options) {
 		return cmdErr("Failed to list phases: " + e.message);
 	}
 }
-function cmdPhaseNextDecimal(cwd, basePhase) {
+async function cmdPhaseNextDecimal(cwd, basePhase) {
 	const phasesDirPath = phasesPath(cwd);
 	const normalized = normalizePhaseName(basePhase);
-	if (!node_fs.default.existsSync(phasesDirPath)) return cmdOk({
+	if (!await pathExistsAsync(phasesDirPath)) return cmdOk({
 		found: false,
 		base_phase: normalized,
 		next: `${normalized}.1`,
 		existing: []
 	}, `${normalized}.1`);
 	try {
-		const dirs = listSubDirs(phasesDirPath);
+		const dirs = await listSubDirsAsync(phasesDirPath);
 		const baseExists = dirs.some((d) => d.startsWith(normalized + "-") || d === normalized);
 		const decimalPattern = new RegExp(`^${normalized}\\.(\\d+)`);
 		const existingDecimals = [];
@@ -14582,7 +14691,7 @@ function cmdPhaseNextDecimal(cwd, basePhase) {
 		return cmdErr("Failed to calculate next decimal phase: " + e.message);
 	}
 }
-function cmdFindPhase(cwd, phase) {
+async function cmdFindPhase(cwd, phase) {
 	if (!phase) return cmdErr("phase identifier required");
 	const phasesDirPath = phasesPath(cwd);
 	const normalized = normalizePhaseName(phase);
@@ -14595,13 +14704,13 @@ function cmdFindPhase(cwd, phase) {
 		summaries: []
 	};
 	try {
-		const match = listSubDirs(phasesDirPath, true).find((d) => d.startsWith(normalized));
+		const match = (await listSubDirsAsync(phasesDirPath, true)).find((d) => d.startsWith(normalized));
 		if (!match) return cmdOk(notFound, "");
 		const dirMatch = match.match(/^(\d+[A-Z]?(?:\.\d+)?)-?(.*)/i);
 		const phaseNumber = dirMatch ? dirMatch[1] : normalized;
 		const phaseName = dirMatch && dirMatch[2] ? dirMatch[2] : null;
 		const phaseDir = node_path.default.join(phasesDirPath, match);
-		const phaseFiles = node_fs.default.readdirSync(phaseDir);
+		const phaseFiles = await node_fs.promises.readdir(phaseDir);
 		const plans = phaseFiles.filter(isPlanFile).sort();
 		const summaries = phaseFiles.filter(isSummaryFile).sort();
 		const result = {
@@ -14617,13 +14726,13 @@ function cmdFindPhase(cwd, phase) {
 		return cmdOk(notFound, "");
 	}
 }
-function cmdPhasePlanIndex(cwd, phase) {
+async function cmdPhasePlanIndex(cwd, phase) {
 	if (!phase) return cmdErr("phase required for phase-plan-index");
 	const phasesDirPath = phasesPath(cwd);
 	const normalized = normalizePhaseName(phase);
 	let phaseDir = null;
 	try {
-		const match = listSubDirs(phasesDirPath, true).find((d) => d.startsWith(normalized));
+		const match = (await listSubDirsAsync(phasesDirPath, true)).find((d) => d.startsWith(normalized));
 		if (match) phaseDir = node_path.default.join(phasesDirPath, match);
 	} catch (e) {
 		debugLog("phase-plan-index-failed", e);
@@ -14636,7 +14745,7 @@ function cmdPhasePlanIndex(cwd, phase) {
 		incomplete: [],
 		has_checkpoints: false
 	});
-	const phaseFiles = node_fs.default.readdirSync(phaseDir);
+	const phaseFiles = await node_fs.promises.readdir(phaseDir);
 	const planFiles = phaseFiles.filter(isPlanFile).sort();
 	const summaryFiles = phaseFiles.filter(isSummaryFile);
 	const completedPlanIds = new Set(summaryFiles.map(summaryId));
@@ -14644,10 +14753,11 @@ function cmdPhasePlanIndex(cwd, phase) {
 	const waves = {};
 	const incomplete = [];
 	let hasCheckpoints = false;
-	for (const planFile of planFiles) {
+	const planContents = await Promise.all(planFiles.map((planFile) => node_fs.promises.readFile(node_path.default.join(phaseDir, planFile), "utf-8")));
+	for (let i = 0; i < planFiles.length; i++) {
+		const planFile = planFiles[i];
 		const id = planId(planFile);
-		const planPath = node_path.default.join(phaseDir, planFile);
-		const content = node_fs.default.readFileSync(planPath, "utf-8");
+		const content = planContents[i];
 		const fm = extractFrontmatter(content);
 		const taskCount = (content.match(/##\s*Task\s*\d+/gi) || []).length;
 		const wave = parseInt(fm.wave, 10) || 1;
@@ -14680,10 +14790,10 @@ function cmdPhasePlanIndex(cwd, phase) {
 		has_checkpoints: hasCheckpoints
 	});
 }
-function cmdPhaseAdd(cwd, description) {
+async function cmdPhaseAdd(cwd, description) {
 	if (!description) return cmdErr("description required for phase add");
 	try {
-		const result = phaseAddCore(cwd, description, { includeStubs: false });
+		const result = await phaseAddCore(cwd, description, { includeStubs: false });
 		return cmdOk({
 			phase_number: result.phase_number,
 			padded: result.padded,
@@ -14695,10 +14805,10 @@ function cmdPhaseAdd(cwd, description) {
 		return cmdErr(e.message);
 	}
 }
-function cmdPhaseInsert(cwd, afterPhase, description) {
+async function cmdPhaseInsert(cwd, afterPhase, description) {
 	if (!afterPhase || !description) return cmdErr("after-phase and description required for phase insert");
 	try {
-		const result = phaseInsertCore(cwd, afterPhase, description, { includeStubs: false });
+		const result = await phaseInsertCore(cwd, afterPhase, description, { includeStubs: false });
 		return cmdOk({
 			phase_number: result.phase_number,
 			after_phase: result.after_phase,
@@ -14710,26 +14820,26 @@ function cmdPhaseInsert(cwd, afterPhase, description) {
 		return cmdErr(e.message);
 	}
 }
-function cmdPhaseRemove(cwd, targetPhase, options) {
+async function cmdPhaseRemove(cwd, targetPhase, options) {
 	if (!targetPhase) return cmdErr("phase number required for phase remove");
 	const rmPath = roadmapPath(cwd);
 	const phasesDirPath = phasesPath(cwd);
 	const force = options.force || false;
-	if (!node_fs.default.existsSync(rmPath)) return cmdErr("ROADMAP.md not found");
+	if (!await pathExistsAsync(rmPath)) return cmdErr("ROADMAP.md not found");
 	const normalized = normalizePhaseName(targetPhase);
 	const isDecimal = targetPhase.includes(".");
 	let targetDir = null;
 	try {
-		targetDir = listSubDirs(phasesDirPath, true).find((d) => d.startsWith(normalized + "-") || d === normalized) || null;
+		targetDir = (await listSubDirsAsync(phasesDirPath, true)).find((d) => d.startsWith(normalized + "-") || d === normalized) || null;
 	} catch (e) {
 		debugLog("phase-remove-find-target-failed", e);
 	}
 	if (targetDir && !force) {
 		const targetPath = node_path.default.join(phasesDirPath, targetDir);
-		const summaries = node_fs.default.readdirSync(targetPath).filter(isSummaryFile);
+		const summaries = (await node_fs.promises.readdir(targetPath)).filter(isSummaryFile);
 		if (summaries.length > 0) return cmdErr(`Phase ${targetPhase} has ${summaries.length} executed plan(s). Use --force to remove anyway.`);
 	}
-	if (targetDir) node_fs.default.rmSync(node_path.default.join(phasesDirPath, targetDir), {
+	if (targetDir) await node_fs.promises.rm(node_path.default.join(phasesDirPath, targetDir), {
 		recursive: true,
 		force: true
 	});
@@ -14740,7 +14850,7 @@ function cmdPhaseRemove(cwd, targetPhase, options) {
 		const baseInt = baseParts[0];
 		const removedDecimal = parseInt(baseParts[1], 10);
 		try {
-			const dirs = listSubDirs(phasesDirPath, true);
+			const dirs = await listSubDirsAsync(phasesDirPath, true);
 			const decPattern = new RegExp(`^${baseInt}\\.(\\d+)-(.+)$`);
 			const toRename = [];
 			for (const dir of dirs) {
@@ -14757,15 +14867,15 @@ function cmdPhaseRemove(cwd, targetPhase, options) {
 				const oldPhaseId = `${baseInt}.${item.oldDecimal}`;
 				const newPhaseId = `${baseInt}.${newDecimal}`;
 				const newDirName = `${baseInt}.${newDecimal}-${item.slug}`;
-				node_fs.default.renameSync(node_path.default.join(phasesDirPath, item.dir), node_path.default.join(phasesDirPath, newDirName));
+				await node_fs.promises.rename(node_path.default.join(phasesDirPath, item.dir), node_path.default.join(phasesDirPath, newDirName));
 				renamedDirs.push({
 					from: item.dir,
 					to: newDirName
 				});
-				const dirFiles = node_fs.default.readdirSync(node_path.default.join(phasesDirPath, newDirName));
+				const dirFiles = await node_fs.promises.readdir(node_path.default.join(phasesDirPath, newDirName));
 				for (const f of dirFiles) if (f.includes(oldPhaseId)) {
 					const newFileName = f.replace(oldPhaseId, newPhaseId);
-					node_fs.default.renameSync(node_path.default.join(phasesDirPath, newDirName, f), node_path.default.join(phasesDirPath, newDirName, newFileName));
+					await node_fs.promises.rename(node_path.default.join(phasesDirPath, newDirName, f), node_path.default.join(phasesDirPath, newDirName, newFileName));
 					renamedFiles.push({
 						from: f,
 						to: newFileName
@@ -14781,7 +14891,7 @@ function cmdPhaseRemove(cwd, targetPhase, options) {
 	} else {
 		const removedInt = parseInt(normalized, 10);
 		try {
-			const dirs = listSubDirs(phasesDirPath, true);
+			const dirs = await listSubDirsAsync(phasesDirPath, true);
 			const toRename = [];
 			for (const dir of dirs) {
 				const dm = dir.match(/^(\d+)([A-Z])?(?:\.(\d+))?-(.+)$/i);
@@ -14808,15 +14918,15 @@ function cmdPhaseRemove(cwd, targetPhase, options) {
 				const oldPrefix = `${oldPadded}${letterSuffix}${decimalSuffix}`;
 				const newPrefix = `${newPadded}${letterSuffix}${decimalSuffix}`;
 				const newDirName = `${newPrefix}-${item.slug}`;
-				node_fs.default.renameSync(node_path.default.join(phasesDirPath, item.dir), node_path.default.join(phasesDirPath, newDirName));
+				await node_fs.promises.rename(node_path.default.join(phasesDirPath, item.dir), node_path.default.join(phasesDirPath, newDirName));
 				renamedDirs.push({
 					from: item.dir,
 					to: newDirName
 				});
-				const dirFiles = node_fs.default.readdirSync(node_path.default.join(phasesDirPath, newDirName));
+				const dirFiles = await node_fs.promises.readdir(node_path.default.join(phasesDirPath, newDirName));
 				for (const f of dirFiles) if (f.startsWith(oldPrefix)) {
 					const newFileName = newPrefix + f.slice(oldPrefix.length);
-					node_fs.default.renameSync(node_path.default.join(phasesDirPath, newDirName, f), node_path.default.join(phasesDirPath, newDirName, newFileName));
+					await node_fs.promises.rename(node_path.default.join(phasesDirPath, newDirName, f), node_path.default.join(phasesDirPath, newDirName, newFileName));
 					renamedFiles.push({
 						from: f,
 						to: newFileName
@@ -14830,7 +14940,7 @@ function cmdPhaseRemove(cwd, targetPhase, options) {
 			});
 		}
 	}
-	let roadmapContent = node_fs.default.readFileSync(rmPath, "utf-8");
+	let roadmapContent = await node_fs.promises.readFile(rmPath, "utf-8");
 	const targetEscaped = escapePhaseNum(targetPhase);
 	const sectionPattern = new RegExp(`\\n?#{2,4}\\s*Phase\\s+${targetEscaped}\\s*:[\\s\\S]*?(?=\\n#{2,4}\\s+Phase\\s+\\d|$)`, "i");
 	roadmapContent = roadmapContent.replace(sectionPattern, "");
@@ -14853,10 +14963,11 @@ function cmdPhaseRemove(cwd, targetPhase, options) {
 			roadmapContent = roadmapContent.replace(new RegExp(`(Depends on:\\*\\*\\s*Phase\\s+)${oldStr}\\b`, "gi"), `$1${newStr}`);
 		}
 	}
-	node_fs.default.writeFileSync(rmPath, roadmapContent, "utf-8");
+	await node_fs.promises.writeFile(rmPath, roadmapContent, "utf-8");
 	const stPath = statePath(cwd);
-	if (node_fs.default.existsSync(stPath)) {
-		let stateContent = node_fs.default.readFileSync(stPath, "utf-8");
+	const stExists = await pathExistsAsync(stPath);
+	if (stExists) {
+		let stateContent = await node_fs.promises.readFile(stPath, "utf-8");
 		const totalPattern = /(\*\*Total Phases:\*\*\s*)(\d+)/;
 		const totalMatch = stateContent.match(totalPattern);
 		if (totalMatch) {
@@ -14869,7 +14980,7 @@ function cmdPhaseRemove(cwd, targetPhase, options) {
 			const oldTotal = parseInt(ofMatch[2], 10);
 			stateContent = stateContent.replace(ofPattern, `$1${oldTotal - 1}$3`);
 		}
-		node_fs.default.writeFileSync(stPath, stateContent, "utf-8");
+		await node_fs.promises.writeFile(stPath, stateContent, "utf-8");
 	}
 	return cmdOk({
 		removed: targetPhase,
@@ -14877,13 +14988,13 @@ function cmdPhaseRemove(cwd, targetPhase, options) {
 		renamed_directories: renamedDirs,
 		renamed_files: renamedFiles,
 		roadmap_updated: true,
-		state_updated: node_fs.default.existsSync(stPath)
+		state_updated: stExists
 	});
 }
-function cmdPhaseComplete(cwd, phaseNum) {
+async function cmdPhaseComplete(cwd, phaseNum) {
 	if (!phaseNum) return cmdErr("phase number required for phase complete");
 	try {
-		const result = phaseCompleteCore(cwd, phaseNum);
+		const result = await phaseCompleteCore(cwd, phaseNum);
 		return cmdOk({
 			completed_phase: result.completed_phase,
 			phase_name: result.phase_name,
@@ -15138,7 +15249,17 @@ function resolveArtefaktPath(cwd, type, phase) {
 	}
 	return planningPath(cwd, filename);
 }
+const TEMPLATE_FILES = {
+	"decisions": "decisions.md",
+	"acceptance-criteria": "acceptance-criteria.md",
+	"no-gos": "no-gos.md"
+};
 function getTemplate(type) {
+	const content = safeReadFile(node_path.default.join(node_os.default.homedir(), ".claude", "maxsim", "templates", TEMPLATE_FILES[type]));
+	if (content) return content.replace(/\{\{date\}\}/g, todayISO());
+	return getHardcodedTemplate(type);
+}
+function getHardcodedTemplate(type) {
 	const today = todayISO();
 	switch (type) {
 		case "decisions": return `# Decisions\n\n> Architectural and design decisions for this project.\n\n**Created:** ${today}\n\n## Decision Log\n\n| # | Decision | Rationale | Date | Phase |\n|---|----------|-----------|------|-------|\n`;
@@ -16417,7 +16538,7 @@ const handleRoadmap = async (args, cwd, raw) => {
 	if (handler) return handleResult(await handler(), raw);
 	error("Unknown roadmap subcommand. Available: get-phase, analyze, update-plan-progress");
 };
-const handlePhase = (args, cwd, raw) => {
+const handlePhase = async (args, cwd, raw) => {
 	const sub = args[1];
 	const handler = sub ? {
 		"next-decimal": () => cmdPhaseNextDecimal(cwd, args[2]),
@@ -16426,7 +16547,7 @@ const handlePhase = (args, cwd, raw) => {
 		"remove": () => cmdPhaseRemove(cwd, args[2], { force: hasFlag(args, "force") }),
 		"complete": () => cmdPhaseComplete(cwd, args[2])
 	}[sub] : void 0;
-	if (handler) return handleResult(handler(), raw);
+	if (handler) return handleResult(await handler(), raw);
 	error("Unknown phase subcommand. Available: next-decimal, add, insert, remove, complete");
 };
 const handleMilestone = (args, cwd, raw) => {
@@ -16479,7 +16600,7 @@ const handleInit = (args, cwd, raw) => {
 const COMMANDS = {
 	"state": handleState,
 	"resolve-model": (args, cwd, raw) => handleResult(cmdResolveModel(cwd, args[1], raw), raw),
-	"find-phase": (args, cwd, raw) => handleResult(cmdFindPhase(cwd, args[1]), raw),
+	"find-phase": async (args, cwd, raw) => handleResult(await cmdFindPhase(cwd, args[1]), raw),
 	"commit": async (args, cwd, raw) => {
 		const files = args.indexOf("--files") !== -1 ? args.slice(args.indexOf("--files") + 1).filter((a) => !a.startsWith("--")) : [];
 		handleResult(await cmdCommit(cwd, args[1], files, raw, hasFlag(args, "amend")), raw);
@@ -16522,8 +16643,8 @@ const COMMANDS = {
 		}, raw), raw);
 	},
 	"init": handleInit,
-	"phase-plan-index": (args, cwd, raw) => handleResult(cmdPhasePlanIndex(cwd, args[1]), raw),
-	"state-snapshot": (_args, cwd, raw) => handleResult(cmdStateSnapshot(cwd, raw), raw),
+	"phase-plan-index": async (args, cwd, raw) => handleResult(await cmdPhasePlanIndex(cwd, args[1]), raw),
+	"state-snapshot": async (_args, cwd, raw) => handleResult(await cmdStateSnapshot(cwd, raw), raw),
 	"summary-extract": (args, cwd, raw) => {
 		const fieldsIndex = args.indexOf("--fields");
 		const fields = fieldsIndex !== -1 ? args[fieldsIndex + 1].split(",") : null;
@@ -16554,7 +16675,7 @@ const COMMANDS = {
 		(0, node_child_process.spawn)(process.execPath, [serverPath], { stdio: "inherit" }).on("exit", (code) => process.exit(code ?? 0));
 	},
 	"backend-start": async (args, cwd, raw) => {
-		const { startBackend } = await Promise.resolve().then(() => require("./lifecycle-Beld0prj.cjs"));
+		const { startBackend } = await Promise.resolve().then(() => require("./lifecycle-0M4VqOMm.cjs"));
 		const portFlag = args.find((a) => a.startsWith("--port="))?.split("=")[1];
 		const background = !args.includes("--foreground");
 		output(await startBackend(cwd, {
@@ -16563,11 +16684,11 @@ const COMMANDS = {
 		}), raw);
 	},
 	"backend-stop": async (_args, cwd, raw) => {
-		const { stopBackend } = await Promise.resolve().then(() => require("./lifecycle-Beld0prj.cjs"));
+		const { stopBackend } = await Promise.resolve().then(() => require("./lifecycle-0M4VqOMm.cjs"));
 		output({ stopped: await stopBackend(cwd) }, raw);
 	},
 	"backend-status": async (_args, cwd, raw) => {
-		const { getBackendStatus } = await Promise.resolve().then(() => require("./lifecycle-Beld0prj.cjs"));
+		const { getBackendStatus } = await Promise.resolve().then(() => require("./lifecycle-0M4VqOMm.cjs"));
 		output(await getBackendStatus(cwd) || { running: false }, raw);
 	}
 };

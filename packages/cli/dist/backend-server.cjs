@@ -32123,7 +32123,7 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*/
 	var debug = require_src$3()("express:view");
 	var path$22 = require("path");
-	var fs$23 = require("fs");
+	var fs$20 = require("fs");
 	/**
 	* Module variables.
 	* @private
@@ -32229,7 +32229,7 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	function tryStat(path) {
 		debug("stat \"%s\"", path);
 		try {
-			return fs$23.statSync(path);
+			return fs$20.statSync(path);
 		} catch (e) {
 			return;
 		}
@@ -34450,7 +34450,7 @@ var require_types$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 //#region ../../node_modules/send/node_modules/mime/mime.js
 var require_mime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	require("path");
-	var fs$22 = require("fs");
+	var fs$19 = require("fs");
 	function Mime() {
 		this.types = Object.create(null);
 		this.extensions = Object.create(null);
@@ -34485,7 +34485,7 @@ var require_mime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	Mime.prototype.load = function(file) {
 		this._loading = file;
 		var map = {};
-		fs$22.readFileSync(file, "ascii").split(/[\r\n]+/).forEach(function(line) {
+		fs$19.readFileSync(file, "ascii").split(/[\r\n]+/).forEach(function(line) {
 			var fields = line.replace(/\s*#.*|^\s*|\s*$/g, "").split(/\s+/);
 			map[fields.shift()] = fields;
 		});
@@ -34764,7 +34764,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var escapeHtml = require_escape_html();
 	var etag = require_etag();
 	var fresh = require_fresh();
-	var fs$21 = require("fs");
+	var fs$18 = require("fs");
 	var mime = require_mime();
 	var ms = require_ms();
 	var onFinished = require_on_finished();
@@ -35229,7 +35229,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		var i = 0;
 		var self = this;
 		debug("stat \"%s\"", path);
-		fs$21.stat(path, function onstat(err, stat) {
+		fs$18.stat(path, function onstat(err, stat) {
 			if (err && err.code === "ENOENT" && !extname(path) && path[path.length - 1] !== sep) return next(err);
 			if (err) return self.onStatError(err);
 			if (stat.isDirectory()) return self.redirect(path);
@@ -35240,7 +35240,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			if (self._extensions.length <= i) return err ? self.onStatError(err) : self.error(404);
 			var p = path + "." + self._extensions[i++];
 			debug("stat \"%s\"", p);
-			fs$21.stat(p, function(err, stat) {
+			fs$18.stat(p, function(err, stat) {
 				if (err) return next(err);
 				if (stat.isDirectory()) return next();
 				self.emit("file", p, stat);
@@ -35264,7 +35264,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			var p = join(path, self._index[i]);
 			debug("stat \"%s\"", p);
-			fs$21.stat(p, function(err, stat) {
+			fs$18.stat(p, function(err, stat) {
 				if (err) return next(err);
 				if (stat.isDirectory()) return next();
 				self.emit("file", p, stat);
@@ -35283,7 +35283,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	SendStream.prototype.stream = function stream(path, options) {
 		var self = this;
 		var res = this.res;
-		var stream$5 = fs$21.createReadStream(path, options);
+		var stream$5 = fs$18.createReadStream(path, options);
 		this.emit("stream", stream$5);
 		stream$5.pipe(res);
 		function cleanup() {
@@ -63942,7 +63942,7 @@ var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 //#endregion
 //#region ../../node_modules/supports-color/index.js
 var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	const os$4 = require("os");
+	const os$5 = require("os");
 	const tty$1 = require("tty");
 	const hasFlag = require_has_flag();
 	const { env } = process;
@@ -63969,7 +63969,7 @@ var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 		const min = forceColor || 0;
 		if (env.TERM === "dumb") return min;
 		if (process.platform === "win32") {
-			const osRelease = os$4.release().split(".");
+			const osRelease = os$5.release().split(".");
 			if (Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) return Number(osRelease[2]) >= 14931 ? 3 : 2;
 			return 1;
 		}
@@ -67950,6 +67950,77 @@ function generateSlugInternal(text) {
 		lower: true,
 		strict: true
 	});
+}
+async function pathExistsAsync(p) {
+	try {
+		await node_fs.promises.access(p);
+		return true;
+	} catch {
+		return false;
+	}
+}
+async function searchPhaseInDirAsync(baseDir, relBase, normalized) {
+	try {
+		const match = (await listSubDirsAsync(baseDir, true)).find((d) => d.startsWith(normalized));
+		if (!match) return null;
+		const dirMatch = match.match(/^(\d+[A-Z]?(?:\.\d+)?)-?(.*)/i);
+		const phaseNumber = dirMatch ? dirMatch[1] : normalized;
+		const phaseName = dirMatch && dirMatch[2] ? dirMatch[2] : null;
+		const phaseDir = node_path.default.join(baseDir, match);
+		const phaseFiles = await node_fs.promises.readdir(phaseDir);
+		const plans = phaseFiles.filter(isPlanFile).sort();
+		const summaries = phaseFiles.filter(isSummaryFile).sort();
+		const hasResearch = phaseFiles.some((f) => f.endsWith("-RESEARCH.md") || f === "RESEARCH.md");
+		const hasContext = phaseFiles.some((f) => f.endsWith("-CONTEXT.md") || f === "CONTEXT.md");
+		const hasVerification = phaseFiles.some((f) => f.endsWith("-VERIFICATION.md") || f === "VERIFICATION.md");
+		const completedPlanIds = new Set(summaries.map(summaryId));
+		const incompletePlans = plans.filter((p) => !completedPlanIds.has(planId(p)));
+		return {
+			found: true,
+			directory: node_path.default.join(relBase, match),
+			phase_number: phaseNumber,
+			phase_name: phaseName,
+			phase_slug: phaseName ? phaseName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") : null,
+			plans,
+			summaries,
+			incomplete_plans: incompletePlans,
+			has_research: hasResearch,
+			has_context: hasContext,
+			has_verification: hasVerification
+		};
+	} catch (e) {
+		debugLog("search-phase-in-dir-async-failed", {
+			dir: baseDir,
+			phase: normalized,
+			error: errorMsg(e)
+		});
+		return null;
+	}
+}
+async function findPhaseInternalAsync(cwd, phase) {
+	if (!phase) return null;
+	const pd = phasesPath(cwd);
+	const normalized = normalizePhaseName(phase);
+	const current = await searchPhaseInDirAsync(pd, node_path.default.join(".planning", "phases"), normalized);
+	if (current) return current;
+	const milestonesDir = planningPath(cwd, "milestones");
+	if (!await pathExistsAsync(milestonesDir)) return null;
+	try {
+		const archiveDirs = (await node_fs.promises.readdir(milestonesDir, { withFileTypes: true })).filter((e) => e.isDirectory() && /^v[\d.]+-phases$/.test(e.name)).map((e) => e.name).sort().reverse();
+		for (const archiveName of archiveDirs) {
+			const versionMatch = archiveName.match(/^(v[\d.]+)-phases$/);
+			if (!versionMatch) continue;
+			const version = versionMatch[1];
+			const result = await searchPhaseInDirAsync(node_path.default.join(milestonesDir, archiveName), node_path.default.join(".planning", "milestones", archiveName), normalized);
+			if (result) {
+				result.archived = version;
+				return result;
+			}
+		}
+	} catch (e) {
+		debugLog("find-phase-async-milestone-search-failed", e);
+	}
+	return null;
 }
 
 //#endregion
@@ -74784,7 +74855,7 @@ async function cmdRoadmapAnalyze(cwd) {
 		try {
 			const dirMatch = allDirs.find((d) => d.startsWith(p.normalized + "-") || d === p.normalized);
 			if (dirMatch) {
-				const phaseFiles = await node_fs.default.promises.readdir(node_path.default.join(phasesDir, dirMatch));
+				const phaseFiles = await node_fs.promises.readdir(node_path.default.join(phasesDir, dirMatch));
 				planCount = phaseFiles.filter((f) => isPlanFile(f)).length;
 				summaryCount = phaseFiles.filter((f) => isSummaryFile(f)).length;
 				hasContext = phaseFiles.some((f) => f.endsWith("-CONTEXT.md") || f === "CONTEXT.md");
@@ -74889,15 +74960,18 @@ function parseTodoFrontmatter(content) {
 *
 * Ported from maxsim/bin/lib/phase.cjs
 */
-function scaffoldPhaseStubs(dirPath, phaseId, name) {
+async function scaffoldPhaseStubs(dirPath, phaseId, name) {
 	const today = todayISO();
-	node_fs.default.writeFileSync(node_path.default.join(dirPath, `${phaseId}-CONTEXT.md`), `# Phase ${phaseId} Context: ${name}\n\n**Created:** ${today}\n**Phase goal:** [To be defined during /maxsim:discuss-phase]\n\n---\n\n_Context will be populated by /maxsim:discuss-phase_\n`);
-	node_fs.default.writeFileSync(node_path.default.join(dirPath, `${phaseId}-RESEARCH.md`), `# Phase ${phaseId}: ${name} - Research\n\n**Researched:** Not yet\n**Domain:** TBD\n**Confidence:** TBD\n\n---\n\n_Research will be populated by /maxsim:research-phase_\n`);
+	await Promise.all([node_fs.promises.writeFile(node_path.default.join(dirPath, `${phaseId}-CONTEXT.md`), `# Phase ${phaseId} Context: ${name}\n\n**Created:** ${today}\n**Phase goal:** [To be defined during /maxsim:discuss-phase]\n\n---\n\n_Context will be populated by /maxsim:discuss-phase_\n`), node_fs.promises.writeFile(node_path.default.join(dirPath, `${phaseId}-RESEARCH.md`), `# Phase ${phaseId}: ${name} - Research\n\n**Researched:** Not yet\n**Domain:** TBD\n**Confidence:** TBD\n\n---\n\n_Research will be populated by /maxsim:research-phase_\n`)]);
 }
-function phaseAddCore(cwd, description, options) {
+async function phaseAddCore(cwd, description, options) {
 	const rmPath = roadmapPath(cwd);
-	if (!node_fs.default.existsSync(rmPath)) throw new Error("ROADMAP.md not found");
-	const content = node_fs.default.readFileSync(rmPath, "utf-8");
+	let content;
+	try {
+		content = await node_fs.promises.readFile(rmPath, "utf-8");
+	} catch {
+		throw new Error("ROADMAP.md not found");
+	}
 	const slug = generateSlugInternal(description);
 	const phasePattern = getPhasePattern();
 	let maxPhase = 0;
@@ -74910,15 +74984,15 @@ function phaseAddCore(cwd, description, options) {
 	const paddedNum = String(newPhaseNum).padStart(2, "0");
 	const dirName = `${paddedNum}-${slug}`;
 	const dirPath = planningPath(cwd, "phases", dirName);
-	node_fs.default.mkdirSync(dirPath, { recursive: true });
-	node_fs.default.writeFileSync(node_path.default.join(dirPath, ".gitkeep"), "");
-	if (options?.includeStubs) scaffoldPhaseStubs(dirPath, paddedNum, description);
+	await node_fs.promises.mkdir(dirPath, { recursive: true });
+	await node_fs.promises.writeFile(node_path.default.join(dirPath, ".gitkeep"), "");
+	if (options?.includeStubs) await scaffoldPhaseStubs(dirPath, paddedNum, description);
 	const phaseEntry = `\n### Phase ${newPhaseNum}: ${description}\n\n**Goal:** [To be planned]\n**Requirements**: TBD\n**Depends on:** Phase ${maxPhase}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /maxsim:plan-phase ${newPhaseNum} to break down)\n`;
 	let updatedContent;
 	const lastSeparator = content.lastIndexOf("\n---");
 	if (lastSeparator > 0) updatedContent = content.slice(0, lastSeparator) + phaseEntry + content.slice(lastSeparator);
 	else updatedContent = content + phaseEntry;
-	node_fs.default.writeFileSync(rmPath, updatedContent, "utf-8");
+	await node_fs.promises.writeFile(rmPath, updatedContent, "utf-8");
 	return {
 		phase_number: newPhaseNum,
 		padded: paddedNum,
@@ -74927,10 +75001,14 @@ function phaseAddCore(cwd, description, options) {
 		description
 	};
 }
-function phaseInsertCore(cwd, afterPhase, description, options) {
+async function phaseInsertCore(cwd, afterPhase, description, options) {
 	const rmPath = roadmapPath(cwd);
-	if (!node_fs.default.existsSync(rmPath)) throw new Error("ROADMAP.md not found");
-	const content = node_fs.default.readFileSync(rmPath, "utf-8");
+	let content;
+	try {
+		content = await node_fs.promises.readFile(rmPath, "utf-8");
+	} catch {
+		throw new Error("ROADMAP.md not found");
+	}
 	const slug = generateSlugInternal(description);
 	const afterPhaseEscaped = "0*" + normalizePhaseName(afterPhase).replace(/^0+/, "").replace(/\./g, "\\.");
 	if (!getPhasePattern(afterPhaseEscaped, "i").test(content)) throw new Error(`Phase ${afterPhase} not found in ROADMAP.md`);
@@ -74938,7 +75016,7 @@ function phaseInsertCore(cwd, afterPhase, description, options) {
 	const normalizedBase = normalizePhaseName(afterPhase);
 	const existingDecimals = [];
 	try {
-		const dirs = listSubDirs(phasesDirPath);
+		const dirs = await listSubDirsAsync(phasesDirPath);
 		const decimalPattern = new RegExp(`^${normalizedBase}\\.(\\d+)`);
 		for (const dir of dirs) {
 			const dm = dir.match(decimalPattern);
@@ -74950,9 +75028,9 @@ function phaseInsertCore(cwd, afterPhase, description, options) {
 	const decimalPhase = `${normalizedBase}.${existingDecimals.length === 0 ? 1 : Math.max(...existingDecimals) + 1}`;
 	const dirName = `${decimalPhase}-${slug}`;
 	const dirPath = planningPath(cwd, "phases", dirName);
-	node_fs.default.mkdirSync(dirPath, { recursive: true });
-	node_fs.default.writeFileSync(node_path.default.join(dirPath, ".gitkeep"), "");
-	if (options?.includeStubs) scaffoldPhaseStubs(dirPath, decimalPhase, description);
+	await node_fs.promises.mkdir(dirPath, { recursive: true });
+	await node_fs.promises.writeFile(node_path.default.join(dirPath, ".gitkeep"), "");
+	if (options?.includeStubs) await scaffoldPhaseStubs(dirPath, decimalPhase, description);
 	const phaseEntry = `\n### Phase ${decimalPhase}: ${description} (INSERTED)\n\n**Goal:** [Urgent work - to be planned]\n**Requirements**: TBD\n**Depends on:** Phase ${afterPhase}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /maxsim:plan-phase ${decimalPhase} to break down)\n`;
 	const headerPattern = new RegExp(`(#{2,4}\\s*Phase\\s+0*${afterPhaseEscaped}:[^\\n]*\\n)`, "i");
 	const headerMatch = content.match(headerPattern);
@@ -74963,7 +75041,7 @@ function phaseInsertCore(cwd, afterPhase, description, options) {
 	if (nextPhaseMatch) insertIdx = headerIdx + headerMatch[0].length + nextPhaseMatch.index;
 	else insertIdx = content.length;
 	const updatedContent = content.slice(0, insertIdx) + phaseEntry + content.slice(insertIdx);
-	node_fs.default.writeFileSync(rmPath, updatedContent, "utf-8");
+	await node_fs.promises.writeFile(rmPath, updatedContent, "utf-8");
 	return {
 		phase_number: decimalPhase,
 		after_phase: afterPhase,
@@ -74972,18 +75050,19 @@ function phaseInsertCore(cwd, afterPhase, description, options) {
 		description
 	};
 }
-function phaseCompleteCore(cwd, phaseNum) {
+async function phaseCompleteCore(cwd, phaseNum) {
 	const rmPath = roadmapPath(cwd);
 	const stPath = statePath(cwd);
 	const phasesDirPath = phasesPath(cwd);
 	const today = todayISO();
-	const phaseInfo = findPhaseInternal(cwd, phaseNum);
+	const phaseInfo = await findPhaseInternalAsync(cwd, phaseNum);
 	if (!phaseInfo) throw new Error(`Phase ${phaseNum} not found`);
 	const planCount = phaseInfo.plans.length;
 	const summaryCount = phaseInfo.summaries.length;
 	let requirementsUpdated = false;
-	if (node_fs.default.existsSync(rmPath)) {
-		let roadmapContent = node_fs.default.readFileSync(rmPath, "utf-8");
+	const rmExists = await pathExistsAsync(rmPath);
+	if (rmExists) {
+		let roadmapContent = await node_fs.promises.readFile(rmPath, "utf-8");
 		const checkboxPattern = new RegExp(`(-\\s*\\[)[ ](\\]\\s*.*Phase\\s+${escapePhaseNum(phaseNum)}[:\\s][^\\n]*)`, "i");
 		roadmapContent = roadmapContent.replace(checkboxPattern, `$1x$2 (completed ${today})`);
 		const phaseEscaped = escapePhaseNum(phaseNum);
@@ -74992,20 +75071,20 @@ function phaseCompleteCore(cwd, phaseNum) {
 		const planCountPattern = new RegExp(`(#{2,4}\\s*Phase\\s+${phaseEscaped}[\\s\\S]*?\\*\\*Plans:\\*\\*\\s*)[^\\n]+`, "i");
 		roadmapContent = roadmapContent.replace(planCountPattern, `$1${summaryCount}/${planCount} plans complete`);
 		debugLog("phase-complete-write", `writing ROADMAP.md for phase ${phaseNum}`);
-		node_fs.default.writeFileSync(rmPath, roadmapContent, "utf-8");
+		await node_fs.promises.writeFile(rmPath, roadmapContent, "utf-8");
 		debugLog("phase-complete-write", `ROADMAP.md updated for phase ${phaseNum}`);
 		const reqPath = planningPath(cwd, "REQUIREMENTS.md");
-		if (node_fs.default.existsSync(reqPath)) {
+		if (await pathExistsAsync(reqPath)) {
 			const reqMatch = roadmapContent.match(new RegExp(`Phase\\s+${escapePhaseNum(phaseNum)}[\\s\\S]*?\\*\\*Requirements:\\*\\*\\s*([^\\n]+)`, "i"));
 			if (reqMatch) {
 				const reqIds = reqMatch[1].replace(/[\[\]]/g, "").split(/[,\s]+/).map((r) => r.trim()).filter(Boolean);
-				let reqContent = node_fs.default.readFileSync(reqPath, "utf-8");
+				let reqContent = await node_fs.promises.readFile(reqPath, "utf-8");
 				for (const reqId of reqIds) {
 					reqContent = reqContent.replace(new RegExp(`(-\\s*\\[)[ ](\\]\\s*\\*\\*${reqId}\\*\\*)`, "gi"), "$1x$2");
 					reqContent = reqContent.replace(new RegExp(`(\\|\\s*${reqId}\\s*\\|[^|]+\\|)\\s*Pending\\s*(\\|)`, "gi"), "$1 Complete $2");
 				}
 				debugLog("phase-complete-write", `writing REQUIREMENTS.md for phase ${phaseNum}`);
-				node_fs.default.writeFileSync(reqPath, reqContent, "utf-8");
+				await node_fs.promises.writeFile(reqPath, reqContent, "utf-8");
 				debugLog("phase-complete-write", `REQUIREMENTS.md updated for phase ${phaseNum}`);
 				requirementsUpdated = true;
 			}
@@ -75015,7 +75094,7 @@ function phaseCompleteCore(cwd, phaseNum) {
 	let nextPhaseName = null;
 	let isLastPhase = true;
 	try {
-		const dirs = listSubDirs(phasesDirPath, true);
+		const dirs = await listSubDirsAsync(phasesDirPath, true);
 		for (const dir of dirs) {
 			const dm = dir.match(/^(\d+[A-Z]?(?:\.\d+)?)-?(.*)/i);
 			if (dm) {
@@ -75030,8 +75109,9 @@ function phaseCompleteCore(cwd, phaseNum) {
 	} catch (e) {
 		debugLog("phase-complete-next-phase-scan-failed", e);
 	}
-	if (node_fs.default.existsSync(stPath)) {
-		let stateContent = node_fs.default.readFileSync(stPath, "utf-8");
+	const stExists = await pathExistsAsync(stPath);
+	if (stExists) {
+		let stateContent = await node_fs.promises.readFile(stPath, "utf-8");
 		stateContent = stateContent.replace(/(\*\*Current Phase:\*\*\s*).*/, `$1${nextPhaseNum || phaseNum}`);
 		if (nextPhaseName) stateContent = stateContent.replace(/(\*\*Current Phase Name:\*\*\s*).*/, `$1${nextPhaseName.replace(/-/g, " ")}`);
 		stateContent = stateContent.replace(/(\*\*Status:\*\*\s*).*/, `$1${isLastPhase ? "Milestone complete" : "Ready to plan"}`);
@@ -75039,7 +75119,7 @@ function phaseCompleteCore(cwd, phaseNum) {
 		stateContent = stateContent.replace(/(\*\*Last Activity:\*\*\s*).*/, `$1${today}`);
 		stateContent = stateContent.replace(/(\*\*Last Activity Description:\*\*\s*).*/, `$1Phase ${phaseNum} complete${nextPhaseNum ? `, transitioned to Phase ${nextPhaseNum}` : ""}`);
 		debugLog("phase-complete-write", `writing STATE.md for phase ${phaseNum}`);
-		node_fs.default.writeFileSync(stPath, stateContent, "utf-8");
+		await node_fs.promises.writeFile(stPath, stateContent, "utf-8");
 		debugLog("phase-complete-write", `STATE.md updated for phase ${phaseNum}`);
 	}
 	return {
@@ -75050,8 +75130,8 @@ function phaseCompleteCore(cwd, phaseNum) {
 		next_phase_name: nextPhaseName,
 		is_last_phase: isLastPhase,
 		date: today,
-		roadmap_updated: node_fs.default.existsSync(rmPath),
-		state_updated: node_fs.default.existsSync(stPath),
+		roadmap_updated: rmExists,
+		state_updated: stExists,
 		requirements_updated: requirementsUpdated
 	};
 }
@@ -78939,7 +79019,7 @@ function registerPhaseTools(server) {
 			const cwd = detectProjectRoot();
 			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
 			if (!name || !name.trim()) return mcpError("Phase name must not be empty", "Validation failed");
-			const result = phaseAddCore(cwd, name, { includeStubs: true });
+			const result = await phaseAddCore(cwd, name, { includeStubs: true });
 			return mcpSuccess({
 				phase_number: result.phase_number,
 				padded: result.padded,
@@ -78959,7 +79039,7 @@ function registerPhaseTools(server) {
 			const cwd = detectProjectRoot();
 			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
 			if (!name || !name.trim()) return mcpError("Phase name must not be empty", "Validation failed");
-			const result = phaseInsertCore(cwd, after, name, { includeStubs: true });
+			const result = await phaseInsertCore(cwd, after, name, { includeStubs: true });
 			return mcpSuccess({
 				phase_number: result.phase_number,
 				after_phase: result.after_phase,
@@ -78975,7 +79055,7 @@ function registerPhaseTools(server) {
 		try {
 			const cwd = detectProjectRoot();
 			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
-			const result = phaseCompleteCore(cwd, phase);
+			const result = await phaseCompleteCore(cwd, phase);
 			return mcpSuccess({
 				completed_phase: result.completed_phase,
 				phase_name: result.phase_name,

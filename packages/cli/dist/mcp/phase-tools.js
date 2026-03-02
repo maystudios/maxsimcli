@@ -95,7 +95,7 @@ function registerPhaseTools(server) {
             if (!name || !name.trim()) {
                 return (0, utils_js_1.mcpError)('Phase name must not be empty', 'Validation failed');
             }
-            const result = (0, phase_js_1.phaseAddCore)(cwd, name, { includeStubs: true });
+            const result = await (0, phase_js_1.phaseAddCore)(cwd, name, { includeStubs: true });
             return (0, utils_js_1.mcpSuccess)({
                 phase_number: result.phase_number,
                 padded: result.padded,
@@ -121,7 +121,7 @@ function registerPhaseTools(server) {
             if (!name || !name.trim()) {
                 return (0, utils_js_1.mcpError)('Phase name must not be empty', 'Validation failed');
             }
-            const result = (0, phase_js_1.phaseInsertCore)(cwd, after, name, { includeStubs: true });
+            const result = await (0, phase_js_1.phaseInsertCore)(cwd, after, name, { includeStubs: true });
             return (0, utils_js_1.mcpSuccess)({
                 phase_number: result.phase_number,
                 after_phase: result.after_phase,
@@ -143,7 +143,7 @@ function registerPhaseTools(server) {
             if (!cwd) {
                 return (0, utils_js_1.mcpError)('No .planning/ directory found', 'Project not detected');
             }
-            const result = (0, phase_js_1.phaseCompleteCore)(cwd, phase);
+            const result = await (0, phase_js_1.phaseCompleteCore)(cwd, phase);
             return (0, utils_js_1.mcpSuccess)({
                 completed_phase: result.completed_phase,
                 phase_name: result.phase_name,

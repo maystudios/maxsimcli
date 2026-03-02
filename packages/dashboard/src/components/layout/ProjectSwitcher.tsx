@@ -42,12 +42,17 @@ export function ProjectSwitcher() {
     };
   }, [open]);
 
-  function handleSelect(d: RunningDashboard) {
+  function handleSelect(d: RunningDashboard, newTab = false) {
     if (d.isCurrent) {
       setOpen(false);
       return;
     }
-    window.open(`http://localhost:${d.port}`, "_blank");
+    const url = `http://localhost:${d.port}`;
+    if (newTab) {
+      window.open(url, "_blank");
+    } else {
+      window.location.href = url;
+    }
     setOpen(false);
   }
 
@@ -100,7 +105,8 @@ export function ProjectSwitcher() {
               <button
                 key={d.port}
                 type="button"
-                onClick={() => handleSelect(d)}
+                onClick={(e) => handleSelect(d, e.ctrlKey || e.metaKey)}
+                onAuxClick={(e) => { if (e.button === 1) handleSelect(d, true); }}
                 className={cn(
                   "flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors duration-150",
                   d.isCurrent
@@ -124,9 +130,16 @@ export function ProjectSwitcher() {
                     {formatUptime(d.uptime)}
                   </span>
                 </div>
-                <span className="text-[10px] text-muted-foreground truncate" title={d.cwd}>
-                  {truncatePath(d.cwd)}
-                </span>
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] text-muted-foreground truncate" title={d.cwd}>
+                    {truncatePath(d.cwd)}
+                  </span>
+                  {!d.isCurrent && (
+                    <span className="ml-auto text-[9px] text-muted-foreground/50 shrink-0">
+                      Ctrl+click: new tab
+                    </span>
+                  )}
+                </div>
               </button>
             ))}
             {dashboards.length === 1 && (

@@ -145,28 +145,28 @@
 
 ### Quality Foundation
 
-- [ ] **QUAL-01**: Windows brownfield detection fixed — replace Unix `find` with Node.js fs walk
+- [x] **QUAL-01**: Windows brownfield detection fixed — replace Unix `find` with Node.js fs walk
   - Acceptance: `init-existing` and `new-project` correctly detect code presence on Windows
-- [ ] **QUAL-02**: `output()`/`error()` moved out of core layer — core modules return typed results
+- [x] **QUAL-02**: `output()`/`error()` moved out of core layer — core modules return typed results
   - Acceptance: Core module functions can be unit-tested without `process.exit()` side effects
 - [x] **QUAL-03**: `install.ts` split into focused modules with test coverage
   - Acceptance: install.ts broken into focused modules; unit tests cover runtime selection + file copying
 - [x] **QUAL-04**: Dashboard launch code consolidated — single `DashboardLauncher` shared by `cli.ts` and `install.ts`
   - Acceptance: No duplicate dashboard spawn logic; `--stop` works correctly from both entry points
-- [ ] **QUAL-05**: Codebase simplification pass — YAGNI, DRY, dead code removal
+- [x] **QUAL-05**: Codebase simplification pass — YAGNI, DRY, dead code removal
   - Acceptance: No dead code paths remain; duplicated logic extracted; overall LOC reduced without losing functionality
 
 ### Superpowers Skills System
 
-- [ ] **SKILL-01**: `using-maxsim` entry point skill — registered in AGENTS.md, triggers before any action
+- [x] **SKILL-01**: `using-maxsim` entry point skill — registered in AGENTS.md, triggers before any action
   - Acceptance: Skill loads at conversation start via AGENTS.md; agents check for relevant skills before responding
-- [ ] **SKILL-02**: Error/pattern memory — recurring errors (2-3x occurrences) auto-saved to `.claude/memory/`
+- [x] **SKILL-02**: Error/pattern memory — recurring errors (2-3x occurrences) auto-saved to `.claude/memory/`
   - Acceptance: After 2-3 identical error patterns, memory file updated
 - [x] **SKILL-03**: `memory-management` skill — defines when and how to save patterns, errors, decisions
   - Acceptance: Agents use skill to decide what to memorize; consistent memory format across projects
 - [x] **SKILL-04**: `code-review` skill — post-phase code review
   - Acceptance: After phase completion, code-review skill triggers automatically; critical issues block phase sign-off
-- [ ] **SKILL-05**: `simplify` skill — review changed code for reuse, quality, efficiency (3-reviewer upgrade)
+- [x] **SKILL-05**: `simplify` skill — review changed code for reuse, quality, efficiency (3-reviewer upgrade)
   - Acceptance: Simplify skill spawns 3 parallel reviewers and fixes findings
 - [x] **SKILL-06**: Existing skills (`systematic-debugging`, `tdd`, `verification-before-completion`) integrated into auto-trigger system
   - Acceptance: Relevant skills invoke automatically without user prompting
@@ -216,7 +216,7 @@
 | REL-03 | Phase 3 | Complete |
 | SINF-01 | Phase 4 | Complete |
 | SINF-02 | Phase 4 | Complete |
-| SINF-03 | Phase 4, 12 | Partial |
+| SINF-03 | Phase 4, 12 | Complete |
 | SINF-04 | Phase 4 | Complete |
 | CS-01 | Phase 5 | Complete |
 | CS-02 | Phase 5 | Complete |
@@ -254,19 +254,19 @@
 | DASH-04 | Phase 9 | Complete |
 | DASH-05 | Phase 9 | Complete |
 | DASH-06 | Phase 9 | Complete |
-| DASH-07 | Phase 9, 14 | Partial |
+| DASH-07 | Phase 9, 14 | Complete |
 | PERF-01 | Phase 10 | Complete |
 | PERF-02 | Phase 10 | Complete |
-| QUAL-01 | Phase 11 | Pending |
-| QUAL-02 | Phase 11 | Pending |
+| QUAL-01 | Phase 11 | Complete |
+| QUAL-02 | Phase 11 | Complete |
 | QUAL-03 | Phase 2 | Complete |
 | QUAL-04 | Phase 2 | Complete |
-| QUAL-05 | Phase 11 | Pending |
-| SKILL-01 | Phase 12 | Pending |
-| SKILL-02 | Phase 12 | Pending |
+| QUAL-05 | Phase 11 | Complete |
+| SKILL-01 | Phase 12 | Complete |
+| SKILL-02 | Phase 12 | Complete |
 | SKILL-03 | Phase 5 | Complete |
 | SKILL-04 | Phase 5 | Complete |
-| SKILL-05 | Phase 13 | Pending |
+| SKILL-05 | Phase 13 | Complete |
 | SKILL-06 | Phase 5 | Complete |
 | GUARD-01 | All phases | Active |
 | GUARD-02 | All phases | Active |
@@ -274,7 +274,7 @@
 | GUARD-04 | All phases | Active |
 
 **Coverage:**
-- v1 requirements: 62 total (53 complete, 2 partial, 7 pending)
+- v1 requirements: 62 total (60 complete, 1 partial, 1 pending)
 - Guards: 4 total (active)
 - Mapped to phases: 62
 - Unmapped: 0

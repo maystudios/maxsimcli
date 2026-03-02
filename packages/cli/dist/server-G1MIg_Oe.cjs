@@ -144,7 +144,7 @@ function registerPhaseTools(server) {
 			const cwd = detectProjectRoot();
 			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
 			if (!name || !name.trim()) return mcpError("Phase name must not be empty", "Validation failed");
-			const result = require_cli.phaseAddCore(cwd, name, { includeStubs: true });
+			const result = await require_cli.phaseAddCore(cwd, name, { includeStubs: true });
 			return mcpSuccess({
 				phase_number: result.phase_number,
 				padded: result.padded,
@@ -164,7 +164,7 @@ function registerPhaseTools(server) {
 			const cwd = detectProjectRoot();
 			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
 			if (!name || !name.trim()) return mcpError("Phase name must not be empty", "Validation failed");
-			const result = require_cli.phaseInsertCore(cwd, after, name, { includeStubs: true });
+			const result = await require_cli.phaseInsertCore(cwd, after, name, { includeStubs: true });
 			return mcpSuccess({
 				phase_number: result.phase_number,
 				after_phase: result.after_phase,
@@ -180,7 +180,7 @@ function registerPhaseTools(server) {
 		try {
 			const cwd = detectProjectRoot();
 			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
-			const result = require_cli.phaseCompleteCore(cwd, phase);
+			const result = await require_cli.phaseCompleteCore(cwd, phase);
 			return mcpSuccess({
 				completed_phase: result.completed_phase,
 				phase_name: result.phase_name,
@@ -2977,4 +2977,4 @@ function getLocalNetworkIp() {
 
 //#endregion
 exports.createBackendServer = createBackendServer;
-//# sourceMappingURL=server-BOoY5LKa.cjs.map
+//# sourceMappingURL=server-G1MIg_Oe.cjs.map

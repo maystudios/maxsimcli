@@ -32133,7 +32133,7 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*/
 	var debug = require_src$3()("express:view");
 	var path$19 = require("path");
-	var fs$23 = require("fs");
+	var fs$20 = require("fs");
 	/**
 	* Module variables.
 	* @private
@@ -32239,7 +32239,7 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	function tryStat(path$73) {
 		debug("stat \"%s\"", path$73);
 		try {
-			return fs$23.statSync(path$73);
+			return fs$20.statSync(path$73);
 		} catch (e) {
 			return;
 		}
@@ -34460,7 +34460,7 @@ var require_types$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 //#region ../../node_modules/send/node_modules/mime/mime.js
 var require_mime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	require("path");
-	var fs$22 = require("fs");
+	var fs$19 = require("fs");
 	function Mime() {
 		this.types = Object.create(null);
 		this.extensions = Object.create(null);
@@ -34495,7 +34495,7 @@ var require_mime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	Mime.prototype.load = function(file) {
 		this._loading = file;
 		var map = {};
-		fs$22.readFileSync(file, "ascii").split(/[\r\n]+/).forEach(function(line) {
+		fs$19.readFileSync(file, "ascii").split(/[\r\n]+/).forEach(function(line) {
 			var fields = line.replace(/\s*#.*|^\s*|\s*$/g, "").split(/\s+/);
 			map[fields.shift()] = fields;
 		});
@@ -34774,7 +34774,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var escapeHtml = require_escape_html();
 	var etag = require_etag();
 	var fresh = require_fresh();
-	var fs$21 = require("fs");
+	var fs$18 = require("fs");
 	var mime = require_mime();
 	var ms = require_ms();
 	var onFinished = require_on_finished();
@@ -35239,7 +35239,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		var i = 0;
 		var self = this;
 		debug("stat \"%s\"", path$64);
-		fs$21.stat(path$64, function onstat(err, stat) {
+		fs$18.stat(path$64, function onstat(err, stat) {
 			if (err && err.code === "ENOENT" && !extname(path$64) && path$64[path$64.length - 1] !== sep) return next(err);
 			if (err) return self.onStatError(err);
 			if (stat.isDirectory()) return self.redirect(path$64);
@@ -35250,7 +35250,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			if (self._extensions.length <= i) return err ? self.onStatError(err) : self.error(404);
 			var p = path$64 + "." + self._extensions[i++];
 			debug("stat \"%s\"", p);
-			fs$21.stat(p, function(err, stat) {
+			fs$18.stat(p, function(err, stat) {
 				if (err) return next(err);
 				if (stat.isDirectory()) return next();
 				self.emit("file", p, stat);
@@ -35274,7 +35274,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			var p = join(path$65, self._index[i]);
 			debug("stat \"%s\"", p);
-			fs$21.stat(p, function(err, stat) {
+			fs$18.stat(p, function(err, stat) {
 				if (err) return next(err);
 				if (stat.isDirectory()) return next();
 				self.emit("file", p, stat);
@@ -35293,7 +35293,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	SendStream.prototype.stream = function stream(path$66, options) {
 		var self = this;
 		var res = this.res;
-		var stream$5 = fs$21.createReadStream(path$66, options);
+		var stream$5 = fs$18.createReadStream(path$66, options);
 		this.emit("stream", stream$5);
 		stream$5.pipe(res);
 		function cleanup() {
@@ -65205,7 +65205,7 @@ var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 //#endregion
 //#region ../../node_modules/supports-color/index.js
 var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	const os$4 = require("os");
+	const os$5 = require("os");
 	const tty$1 = require("tty");
 	const hasFlag = require_has_flag();
 	const { env } = process;
@@ -65232,7 +65232,7 @@ var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 		const min = forceColor || 0;
 		if (env.TERM === "dumb") return min;
 		if (process.platform === "win32") {
-			const osRelease = os$4.release().split(".");
+			const osRelease = os$5.release().split(".");
 			if (Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) return Number(osRelease[2]) >= 14931 ? 3 : 2;
 			return 1;
 		}
@@ -78475,6 +78475,21 @@ app.get("/api/server-info", (_req, res) => {
 		projectName: node_path.basename(projectCwd),
 		projectCwd
 	});
+});
+app.get("/api/dashboards", async (_req, res) => {
+	try {
+		const dashboards = (await listRunningDashboards()).map((d) => ({
+			port: d.port,
+			cwd: d.cwd,
+			projectName: node_path.basename(d.cwd),
+			uptime: d.uptime,
+			isCurrent: d.port === resolvedPort
+		}));
+		return res.json({ dashboards });
+	} catch (err) {
+		log("ERROR", "api", "Failed to list dashboards:", err);
+		return res.status(500).json({ error: "Failed to list running dashboards" });
+	}
 });
 let shutdownFn = null;
 app.post("/api/shutdown", (_req, res) => {
