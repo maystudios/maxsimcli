@@ -6,6 +6,7 @@
  */
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
 import {
@@ -43,7 +44,25 @@ function resolveArtefaktPath(cwd: string, type: ArtefaktType, phase?: string): s
   return planningPath(cwd, filename);
 }
 
+const TEMPLATE_FILES: Record<ArtefaktType, string> = {
+  'decisions': 'decisions.md',
+  'acceptance-criteria': 'acceptance-criteria.md',
+  'no-gos': 'no-gos.md',
+};
+
 function getTemplate(type: ArtefaktType): string {
+  // Try loading from installed template files first
+  const templatePath = path.join(os.homedir(), '.claude', 'maxsim', 'templates', TEMPLATE_FILES[type]);
+  const content = safeReadFile(templatePath);
+  if (content) {
+    return content.replace(/\{\{date\}\}/g, todayISO());
+  }
+
+  // Fallback to hardcoded templates
+  return getHardcodedTemplate(type);
+}
+
+function getHardcodedTemplate(type: ArtefaktType): string {
   const today = todayISO();
   switch (type) {
     case 'decisions':
