@@ -482,7 +482,7 @@ export interface PhasesListOptions {
 
 // ─── Adapter interfaces ─────────────────────────────────────────────────────
 
-export type RuntimeName = 'claude' | 'opencode' | 'gemini' | 'codex';
+export type RuntimeName = 'claude';
 
 export interface AdapterConfig {
   runtime: RuntimeName;
@@ -490,5 +490,5 @@ export interface AdapterConfig {
   getGlobalDir(explicitDir?: string | null): string;
   getConfigDirFromHome(isGlobal: boolean): string;
   transformContent(content: string, pathPrefix: string): string;
-  commandStructure: 'nested' | 'flat' | 'skills';
+  commandStructure: 'nested';
 }

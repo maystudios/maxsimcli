@@ -28,5 +28,5 @@ export declare function handleStatusline(settings: Record<string, unknown>, isIn
 /**
  * Apply statusline config, then print completion message
  */
-export declare function finishInstall(settingsPath: string | null, settings: Record<string, unknown> | null, statuslineCommand: string | null, shouldInstallStatusline: boolean, runtime?: RuntimeName, isGlobal?: boolean): void;
+export declare function finishInstall(settingsPath: string | null, settings: Record<string, unknown> | null, statuslineCommand: string | null, shouldInstallStatusline: boolean, _runtime?: RuntimeName, _isGlobal?: boolean): void;
 //# sourceMappingURL=hooks.d.ts.map

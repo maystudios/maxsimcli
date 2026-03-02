@@ -5,9 +5,6 @@ import fsExtra from 'fs-extra';
 import type { RuntimeName, AdapterConfig } from '../adapters/index.js';
 import {
   claudeAdapter,
-  opencodeAdapter,
-  geminiAdapter,
-  codexAdapter,
 } from '../adapters/index.js';
 
 // Get version from package.json — read at runtime so semantic-release's version bump
@@ -22,9 +19,6 @@ export const templatesRoot = path.resolve(__dirname, 'assets', 'templates');
  */
 const adapterMap: Record<RuntimeName, AdapterConfig> = {
   claude: claudeAdapter,
-  opencode: opencodeAdapter,
-  gemini: geminiAdapter,
-  codex: codexAdapter,
 };
 
 /**
@@ -68,14 +62,6 @@ export function safeRmDir(dirPath: string): void {
  */
 export function copyDirRecursive(src: string, dest: string): void {
   fsExtra.copySync(src, dest, { dereference: true });
-}
-
-/**
- * Get the global config directory for OpenCode (for JSONC permissions)
- * OpenCode follows XDG Base Directory spec
- */
-export function getOpencodeGlobalDir(): string {
-  return opencodeAdapter.getGlobalDir();
 }
 
 /**

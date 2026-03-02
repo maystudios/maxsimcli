@@ -29,11 +29,6 @@ export declare function safeRmDir(dirPath: string): void;
  */
 export declare function copyDirRecursive(src: string, dest: string): void;
 /**
- * Get the global config directory for OpenCode (for JSONC permissions)
- * OpenCode follows XDG Base Directory spec
- */
-export declare function getOpencodeGlobalDir(): string;
-/**
  * Verify a directory exists and contains files
  */
 export declare function verifyInstalled(dirPath: string, description: string): boolean;

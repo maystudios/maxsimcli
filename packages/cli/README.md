@@ -23,7 +23,7 @@ MAXSIM solves this by offloading work to fresh-context subagents, each with a si
 npx maxsimcli@latest
 ```
 
-**Works with Claude Code, OpenCode, Gemini CLI, and Codex — on Mac, Windows, and Linux.**
+**Works with Claude Code — on Mac, Windows, and Linux.**
 
 > ⚠️ **Early Alpha** — APIs, commands, and workflows may change between releases. Expect rough edges.
 
@@ -251,26 +251,17 @@ npx maxsimcli@latest
 ```
 
 The installer prompts you to choose:
-1. **Runtime** — Claude Code, OpenCode, Gemini, Codex, or all
-2. **Location** — Global (all projects) or local (current project only)
+- **Location** — Global (all projects) or local (current project only)
 
-Verify with:
-- Claude Code / Gemini: `/maxsim:help`
-- OpenCode: `/maxsim-help`
-- Codex: `$maxsim-help`
+Verify with `/maxsim:help` in Claude Code.
 
 <details>
 <summary><strong>Non-interactive Install (Docker, CI, Scripts)</strong></summary>
 
 ```bash
-npx maxsimcli --claude --global    # Claude Code → ~/.claude/
-npx maxsimcli --opencode --global  # OpenCode → ~/.config/opencode/
-npx maxsimcli --gemini --global    # Gemini CLI → ~/.gemini/
-npx maxsimcli --codex --global     # Codex → ~/.codex/
-npx maxsimcli --all --global       # All runtimes
+npx maxsimcli --global    # Global install → ~/.claude/
+npx maxsimcli --local     # Project-scoped install → ./.claude/
 ```
-
-Add `--local` instead of `--global` for project-scoped installs.
 
 </details>
 

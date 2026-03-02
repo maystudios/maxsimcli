@@ -46,7 +46,6 @@ const fs = __importStar(require("node:fs"));
 const chalk_1 = __importDefault(require("chalk"));
 const prompts_1 = require("@inquirer/prompts");
 const index_js_1 = require("../adapters/index.js");
-const adapters_js_1 = require("./adapters.js");
 const shared_js_1 = require("./shared.js");
 const path = __importStar(require("node:path"));
 const ora_1 = __importDefault(require("ora"));
@@ -115,10 +114,6 @@ function cleanupOrphanedHooks(settings) {
  * Install hook files and configure settings.json for a runtime
  */
 function installHookFiles(targetDir, runtime, isGlobal, failures) {
-    const dirName = (0, shared_js_1.getDirName)(runtime);
-    const isCodex = runtime === 'codex';
-    if (isCodex)
-        return;
     // Copy hooks from bundled assets directory
     let hooksSrc = null;
     const bundledHooksDir = path.resolve(__dirname, 'assets', 'hooks');
@@ -158,7 +153,6 @@ function installHookFiles(targetDir, runtime, isGlobal, failures) {
  */
 function configureSettingsHooks(targetDir, runtime, isGlobal) {
     const dirName = (0, shared_js_1.getDirName)(runtime);
-    const isOpencode = runtime === 'opencode';
     const settingsPath = path.join(targetDir, 'settings.json');
     const settings = cleanupOrphanedHooks((0, index_js_1.readSettings)(settingsPath));
     const statuslineCommand = isGlobal
@@ -170,8 +164,8 @@ function configureSettingsHooks(targetDir, runtime, isGlobal) {
     const contextMonitorCommand = isGlobal
         ? (0, index_js_1.buildHookCommand)(targetDir, 'maxsim-context-monitor.js')
         : 'node ' + dirName + '/hooks/maxsim-context-monitor.js';
-    // Configure SessionStart hook for update checking (skip for opencode)
-    if (!isOpencode) {
+    // Configure SessionStart hook for update checking
+    {
         if (!settings.hooks) {
             settings.hooks = {};
         }
@@ -248,36 +242,19 @@ async function handleStatusline(settings, isInteractive, forceStatusline) {
 /**
  * Apply statusline config, then print completion message
  */
-function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline, runtime = 'claude', isGlobal = true) {
-    const isOpencode = runtime === 'opencode';
-    const isCodex = runtime === 'codex';
-    if (shouldInstallStatusline && !isOpencode && !isCodex) {
+function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline, _runtime = 'claude', _isGlobal = true) {
+    if (shouldInstallStatusline) {
         settings.statusLine = {
             type: 'command',
             command: statuslineCommand,
         };
         console.log(`  ${chalk_1.default.green('\u2713')} Configured statusline`);
     }
-    if (!isCodex && settingsPath && settings) {
+    if (settingsPath && settings) {
         (0, index_js_1.writeSettings)(settingsPath, settings);
     }
-    if (isOpencode) {
-        (0, adapters_js_1.configureOpencodePermissions)(isGlobal);
-    }
-    let program = 'Claude Code';
-    if (runtime === 'opencode')
-        program = 'OpenCode';
-    if (runtime === 'gemini')
-        program = 'Gemini';
-    if (runtime === 'codex')
-        program = 'Codex';
-    let command = '/maxsim:help';
-    if (runtime === 'opencode')
-        command = '/maxsim-help';
-    if (runtime === 'codex')
-        command = '$maxsim-help';
     console.log(`
-  ${chalk_1.default.green('Done!')} Launch ${program} and run ${chalk_1.default.cyan(command)}.
+  ${chalk_1.default.green('Done!')} Launch Claude Code and run ${chalk_1.default.cyan('/maxsim:help')}.
 
   ${chalk_1.default.cyan('Join the community:')} https://discord.gg/5JJgD5svVS
 `);

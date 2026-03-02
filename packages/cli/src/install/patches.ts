@@ -93,12 +93,7 @@ export function reportLocalPatches(
   }
 
   if (meta.files && meta.files.length > 0) {
-    const reapplyCommand =
-      runtime === 'opencode'
-        ? '/maxsim-reapply-patches'
-        : runtime === 'codex'
-          ? '$maxsim-reapply-patches'
-          : '/maxsim:reapply-patches';
+    const reapplyCommand = '/maxsim:reapply-patches';
     console.log('');
     console.log(
       '  ' +

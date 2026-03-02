@@ -9,9 +9,7 @@ import {
   writeSettings,
   buildHookCommand,
 } from '../adapters/index.js';
-import { configureOpencodePermissions } from './adapters.js';
 import { getDirName, getConfigDirFromHome, verifyInstalled } from './shared.js';
-import type { InstallResult } from './shared.js';
 import * as path from 'node:path';
 import ora from 'ora';
 
@@ -113,10 +111,6 @@ export function installHookFiles(
   isGlobal: boolean,
   failures: string[],
 ): void {
-  const dirName = getDirName(runtime);
-  const isCodex = runtime === 'codex';
-
-  if (isCodex) return;
 
   // Copy hooks from bundled assets directory
   let hooksSrc: string | null = null;
@@ -161,7 +155,6 @@ export function configureSettingsHooks(
   isGlobal: boolean,
 ): { settingsPath: string; settings: Record<string, unknown>; statuslineCommand: string; updateCheckCommand: string; contextMonitorCommand: string } {
   const dirName = getDirName(runtime);
-  const isOpencode = runtime === 'opencode';
 
   const settingsPath = path.join(targetDir, 'settings.json');
   const settings = cleanupOrphanedHooks(readSettings(settingsPath));
@@ -179,8 +172,8 @@ export function configureSettingsHooks(
     hooks?: Array<{ type: string; command: string }>;
   }
 
-  // Configure SessionStart hook for update checking (skip for opencode)
-  if (!isOpencode) {
+  // Configure SessionStart hook for update checking
+  {
     if (!settings.hooks) {
       settings.hooks = {};
     }
@@ -296,13 +289,10 @@ export function finishInstall(
   settings: Record<string, unknown> | null,
   statuslineCommand: string | null,
   shouldInstallStatusline: boolean,
-  runtime: RuntimeName = 'claude',
-  isGlobal: boolean = true,
+  _runtime: RuntimeName = 'claude',
+  _isGlobal: boolean = true,
 ): void {
-  const isOpencode = runtime === 'opencode';
-  const isCodex = runtime === 'codex';
-
-  if (shouldInstallStatusline && !isOpencode && !isCodex) {
+  if (shouldInstallStatusline) {
     settings!.statusLine = {
       type: 'command',
       command: statuslineCommand,
@@ -310,24 +300,12 @@ export function finishInstall(
     console.log(`  ${chalk.green('\u2713')} Configured statusline`);
   }
 
-  if (!isCodex && settingsPath && settings) {
+  if (settingsPath && settings) {
     writeSettings(settingsPath, settings);
   }
 
-  if (isOpencode) {
-    configureOpencodePermissions(isGlobal);
-  }
-
-  let program = 'Claude Code';
-  if (runtime === 'opencode') program = 'OpenCode';
-  if (runtime === 'gemini') program = 'Gemini';
-  if (runtime === 'codex') program = 'Codex';
-
-  let command = '/maxsim:help';
-  if (runtime === 'opencode') command = '/maxsim-help';
-  if (runtime === 'codex') command = '$maxsim-help';
   console.log(`
-  ${chalk.green('Done!')} Launch ${program} and run ${chalk.cyan(command)}.
+  ${chalk.green('Done!')} Launch Claude Code and run ${chalk.cyan('/maxsim:help')}.
 
   ${chalk.cyan('Join the community:')} https://discord.gg/5JJgD5svVS
 `);

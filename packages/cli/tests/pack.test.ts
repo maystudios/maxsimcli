@@ -35,4 +35,26 @@ describe('npm pack validation', () => {
     // Hooks bundled in assets (no longer a bundledDependency)
     expect(output).toContain('dist/assets/hooks/maxsim-statusline.cjs');
   }, 30_000);
+
+  it('npm pack --dry-run does NOT contain non-Claude runtime files', () => {
+    const output = execSync('npm pack --dry-run 2>&1', {
+      cwd: cliDir,
+      encoding: 'utf8',
+      timeout: 30_000,
+    });
+
+    // No OpenCode adapter files
+    expect(output).not.toMatch(/opencode\.(ts|cjs|js)\b/);
+
+    // No Gemini adapter files
+    expect(output).not.toMatch(/gemini\.(ts|cjs|js)\b/);
+
+    // No Codex adapter files
+    expect(output).not.toMatch(/codex\.(ts|cjs|js)\b/);
+
+    // No transform files (removed with non-Claude runtime support)
+    expect(output).not.toMatch(/transforms\/tool-maps\.(ts|cjs|js)\b/);
+    expect(output).not.toMatch(/transforms\/frontmatter\.(ts|cjs|js)\b/);
+    expect(output).not.toMatch(/transforms\/content\.(ts|cjs|js)\b/);
+  }, 30_000);
 });

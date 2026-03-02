@@ -43,7 +43,6 @@ exports.getConfigDirFromHome = getConfigDirFromHome;
 exports.getDirName = getDirName;
 exports.safeRmDir = safeRmDir;
 exports.copyDirRecursive = copyDirRecursive;
-exports.getOpencodeGlobalDir = getOpencodeGlobalDir;
 exports.verifyInstalled = verifyInstalled;
 exports.verifyFileInstalled = verifyFileInstalled;
 const fs = __importStar(require("node:fs"));
@@ -60,9 +59,6 @@ exports.templatesRoot = path.resolve(__dirname, 'assets', 'templates');
  */
 const adapterMap = {
     claude: index_js_1.claudeAdapter,
-    opencode: index_js_1.opencodeAdapter,
-    gemini: index_js_1.geminiAdapter,
-    codex: index_js_1.codexAdapter,
 };
 /**
  * Get adapter for a runtime
@@ -100,13 +96,6 @@ function safeRmDir(dirPath) {
  */
 function copyDirRecursive(src, dest) {
     fs_extra_1.default.copySync(src, dest, { dereference: true });
-}
-/**
- * Get the global config directory for OpenCode (for JSONC permissions)
- * OpenCode follows XDG Base Directory spec
- */
-function getOpencodeGlobalDir() {
-    return index_js_1.opencodeAdapter.getGlobalDir();
 }
 /**
  * Verify a directory exists and contains files

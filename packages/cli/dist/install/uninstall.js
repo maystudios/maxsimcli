@@ -44,11 +44,9 @@ const chalk_1 = __importDefault(require("chalk"));
 const index_js_1 = require("../adapters/index.js");
 const shared_js_1 = require("./shared.js");
 /**
- * Uninstall MAXSIM from the specified directory for a specific runtime
+ * Uninstall MAXSIM from the specified directory
  */
 function uninstall(isGlobal, runtime = 'claude', explicitConfigDir = null) {
-    const isOpencode = runtime === 'opencode';
-    const isCodex = runtime === 'codex';
     const dirName = (0, shared_js_1.getDirName)(runtime);
     const targetDir = isGlobal
         ? (0, shared_js_1.getGlobalDir)(runtime, explicitConfigDir)
@@ -56,58 +54,19 @@ function uninstall(isGlobal, runtime = 'claude', explicitConfigDir = null) {
     const locationLabel = isGlobal
         ? targetDir.replace(os.homedir(), '~')
         : targetDir.replace(process.cwd(), '.');
-    let runtimeLabel = 'Claude Code';
-    if (runtime === 'opencode')
-        runtimeLabel = 'OpenCode';
-    if (runtime === 'gemini')
-        runtimeLabel = 'Gemini';
-    if (runtime === 'codex')
-        runtimeLabel = 'Codex';
-    console.log(`  Uninstalling MAXSIM from ${chalk_1.default.cyan(runtimeLabel)} at ${chalk_1.default.cyan(locationLabel)}\n`);
+    console.log(`  Uninstalling MAXSIM from ${chalk_1.default.cyan('Claude Code')} at ${chalk_1.default.cyan(locationLabel)}\n`);
     if (!fs.existsSync(targetDir)) {
         console.log(`  ${chalk_1.default.yellow('\u26a0')} Directory does not exist: ${locationLabel}`);
         console.log(`  Nothing to uninstall.\n`);
         return;
     }
     let removedCount = 0;
-    // 1. Remove MAXSIM commands/skills
-    if (isOpencode) {
-        const commandDir = path.join(targetDir, 'command');
-        if (fs.existsSync(commandDir)) {
-            const files = fs.readdirSync(commandDir);
-            for (const file of files) {
-                if (file.startsWith('maxsim-') && file.endsWith('.md')) {
-                    fs.unlinkSync(path.join(commandDir, file));
-                    removedCount++;
-                }
-            }
-            console.log(`  ${chalk_1.default.green('\u2713')} Removed MAXSIM commands from command/`);
-        }
-    }
-    else if (isCodex) {
-        const skillsDir = path.join(targetDir, 'skills');
-        if (fs.existsSync(skillsDir)) {
-            let skillCount = 0;
-            const entries = fs.readdirSync(skillsDir, { withFileTypes: true });
-            for (const entry of entries) {
-                if (entry.isDirectory() && entry.name.startsWith('maxsim-')) {
-                    fs.rmSync(path.join(skillsDir, entry.name), { recursive: true });
-                    skillCount++;
-                }
-            }
-            if (skillCount > 0) {
-                removedCount++;
-                console.log(`  ${chalk_1.default.green('\u2713')} Removed ${skillCount} Codex skills`);
-            }
-        }
-    }
-    else {
-        const maxsimCommandsDir = path.join(targetDir, 'commands', 'maxsim');
-        if (fs.existsSync(maxsimCommandsDir)) {
-            fs.rmSync(maxsimCommandsDir, { recursive: true });
-            removedCount++;
-            console.log(`  ${chalk_1.default.green('\u2713')} Removed commands/maxsim/`);
-        }
+    // 1. Remove MAXSIM commands
+    const maxsimCommandsDir = path.join(targetDir, 'commands', 'maxsim');
+    if (fs.existsSync(maxsimCommandsDir)) {
+        fs.rmSync(maxsimCommandsDir, { recursive: true });
+        removedCount++;
+        console.log(`  ${chalk_1.default.green('\u2713')} Removed commands/maxsim/`);
     }
     // 2. Remove maxsim directory
     const maxsimDir = path.join(targetDir, 'maxsim');
@@ -228,52 +187,11 @@ function uninstall(isGlobal, runtime = 'claude', explicitConfigDir = null) {
             removedCount++;
         }
     }
-    // 7. For OpenCode, clean up permissions from opencode.json
-    if (isOpencode) {
-        const opencodeConfigDir = isGlobal
-            ? (0, shared_js_1.getOpencodeGlobalDir)()
-            : path.join(process.cwd(), '.opencode');
-        const configPath = path.join(opencodeConfigDir, 'opencode.json');
-        if (fs.existsSync(configPath)) {
-            try {
-                const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-                let modified = false;
-                const permission = config.permission;
-                if (permission) {
-                    for (const permType of ['read', 'external_directory']) {
-                        if (permission[permType]) {
-                            const keys = Object.keys(permission[permType]);
-                            for (const key of keys) {
-                                if (key.includes('maxsim')) {
-                                    delete permission[permType][key];
-                                    modified = true;
-                                }
-                            }
-                            if (Object.keys(permission[permType]).length === 0) {
-                                delete permission[permType];
-                            }
-                        }
-                    }
-                    if (Object.keys(permission).length === 0) {
-                        delete config.permission;
-                    }
-                }
-                if (modified) {
-                    fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n');
-                    removedCount++;
-                    console.log(`  ${chalk_1.default.green('\u2713')} Removed MAXSIM permissions from opencode.json`);
-                }
-            }
-            catch {
-                // Ignore JSON parse errors
-            }
-        }
-    }
     if (removedCount === 0) {
         console.log(`  ${chalk_1.default.yellow('\u26a0')} No MAXSIM files found to remove.`);
     }
     console.log(`
-  ${chalk_1.default.green('Done!')} MAXSIM has been uninstalled from ${runtimeLabel}.
+  ${chalk_1.default.green('Done!')} MAXSIM has been uninstalled from Claude Code.
   Your other files and settings have been preserved.
 `);
 }
