@@ -1,17 +1,18 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect } from "react";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { useWebSocket } from "@/components/providers/websocket-provider";
 import { NetworkQRButton } from "@/components/network/NetworkQRButton";
 import { cn } from "@/lib/utils";
 import type { DashboardPhase } from "@/lib/types";
 
-type ActiveView = "overview" | "phase" | "todos" | "blockers" | "terminal";
+type ActiveView = "overview" | "phase" | "todos" | "blockers" | "discussion";
 
 interface SidebarProps {
   activeView: ActiveView;
   activePhaseId: string | null;
   onNavigate: (view: ActiveView, id?: string) => void;
-  logoAction?: ReactNode;
+  terminalOpen?: boolean;
+  onTerminalToggle?: () => void;
 }
 
 function statusDotClass(status: DashboardPhase["diskStatus"]): string {
@@ -29,7 +30,7 @@ function statusDotClass(status: DashboardPhase["diskStatus"]): string {
   }
 }
 
-export function Sidebar({ activeView, activePhaseId, onNavigate, logoAction }: SidebarProps) {
+export function Sidebar({ activeView, activePhaseId, onNavigate, terminalOpen, onTerminalToggle }: SidebarProps) {
   const { roadmap, state, todos } = useDashboardData();
   const { connected } = useWebSocket();
   const [confirmShutdown, setConfirmShutdown] = useState(false);
@@ -71,7 +72,7 @@ export function Sidebar({ activeView, activePhaseId, onNavigate, logoAction }: S
 
   return (
     <aside className="flex h-full w-56 shrink-0 flex-col border-r border-border bg-card">
-      {/* Logo — matches website navbar style */}
+      {/* Logo */}
       <div className="border-b border-border px-5 py-4 flex items-center justify-between">
         <button
           type="button"
@@ -85,12 +86,29 @@ export function Sidebar({ activeView, activePhaseId, onNavigate, logoAction }: S
             Dashboard
           </span>
         </button>
-        {logoAction}
+      </div>
+
+      {/* Discussion / Q&A — primary action */}
+      <div className="border-b border-border">
+        <button
+          type="button"
+          onClick={() => onNavigate("discussion")}
+          className={cn(
+            "flex w-full items-center gap-2 px-5 py-2.5 text-left transition-colors duration-200",
+            activeView === "discussion"
+              ? "text-foreground bg-card-hover border-l-2 border-l-accent"
+              : "border-l-2 border-l-transparent text-muted-foreground hover:text-foreground hover:bg-card-hover"
+          )}
+        >
+          <svg className="h-3.5 w-3.5 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+            <path d="M2 3h12v8H6l-3 2.5V11H2V3z" strokeLinejoin="round" />
+          </svg>
+          <span className="text-sm">Q&A / Discussion</span>
+        </button>
       </div>
 
       {/* Phase section */}
       <div className="flex-1 overflow-y-auto">
-        {/* Section label with accent line — website style */}
         <div className="flex items-center gap-2 px-5 py-3">
           <span className="block w-4 h-px bg-border" />
           <span className="text-xs uppercase tracking-widest text-muted-foreground">
@@ -160,20 +178,23 @@ export function Sidebar({ activeView, activePhaseId, onNavigate, logoAction }: S
         </button>
       </div>
 
-      {/* Terminal */}
+      {/* Terminal toggle */}
       <div className="border-t border-border">
         <button
           type="button"
-          onClick={() => onNavigate("terminal")}
+          onClick={onTerminalToggle}
           className={cn(
             "flex w-full items-center gap-2 px-5 py-2.5 text-left transition-colors duration-200",
-            activeView === "terminal"
+            terminalOpen
               ? "text-foreground bg-card-hover"
               : "text-muted-foreground hover:text-foreground hover:bg-card-hover"
           )}
         >
           <span className="font-mono text-xs">{">"}_</span>
           <span className="text-sm">Terminal</span>
+          {terminalOpen && (
+            <span className="ml-auto inline-block h-1.5 w-1.5 bg-success" />
+          )}
         </button>
       </div>
 

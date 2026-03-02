@@ -26636,9 +26636,9 @@ var require_mime_types = /* @__PURE__ */ __commonJSMin(((exports) => {
 	* @param {string} path
 	* @return {boolean|string}
 	*/
-	function lookup(path$71) {
-		if (!path$71 || typeof path$71 !== "string") return false;
-		var extension = extname("x." + path$71).toLowerCase().substr(1);
+	function lookup(path$74) {
+		if (!path$74 || typeof path$74 !== "string") return false;
+		var extension = extname("x." + path$74).toLowerCase().substr(1);
 		if (!extension) return false;
 		return exports.types[extension] || false;
 	}
@@ -32132,17 +32132,17 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @private
 	*/
 	var debug = require_src$3()("express:view");
-	var path$16 = require("path");
-	var fs$21 = require("fs");
+	var path$19 = require("path");
+	var fs$23 = require("fs");
 	/**
 	* Module variables.
 	* @private
 	*/
-	var dirname = path$16.dirname;
-	var basename = path$16.basename;
-	var extname = path$16.extname;
-	var join = path$16.join;
-	var resolve = path$16.resolve;
+	var dirname = path$19.dirname;
+	var basename = path$19.basename;
+	var extname = path$19.extname;
+	var join = path$19.join;
+	var resolve = path$19.resolve;
 	/**
 	* Module exports.
 	* @public
@@ -32190,17 +32190,17 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @private
 	*/
 	View.prototype.lookup = function lookup(name) {
-		var path$68;
+		var path$71;
 		var roots = [].concat(this.root);
 		debug("lookup \"%s\"", name);
-		for (var i = 0; i < roots.length && !path$68; i++) {
+		for (var i = 0; i < roots.length && !path$71; i++) {
 			var root = roots[i];
 			var loc = resolve(root, name);
 			var dir = dirname(loc);
 			var file = basename(loc);
-			path$68 = this.resolve(dir, file);
+			path$71 = this.resolve(dir, file);
 		}
-		return path$68;
+		return path$71;
 	};
 	/**
 	* Render with the given options.
@@ -32222,12 +32222,12 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*/
 	View.prototype.resolve = function resolve(dir, file) {
 		var ext = this.ext;
-		var path$69 = join(dir, file);
-		var stat = tryStat(path$69);
-		if (stat && stat.isFile()) return path$69;
-		path$69 = join(dir, basename(file, ext), "index" + ext);
-		stat = tryStat(path$69);
-		if (stat && stat.isFile()) return path$69;
+		var path$72 = join(dir, file);
+		var stat = tryStat(path$72);
+		if (stat && stat.isFile()) return path$72;
+		path$72 = join(dir, basename(file, ext), "index" + ext);
+		stat = tryStat(path$72);
+		if (stat && stat.isFile()) return path$72;
 	};
 	/**
 	* Return a stat, maybe.
@@ -32236,10 +32236,10 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @return {fs.Stats}
 	* @private
 	*/
-	function tryStat(path$70) {
-		debug("stat \"%s\"", path$70);
+	function tryStat(path$73) {
+		debug("stat \"%s\"", path$73);
 		try {
-			return fs$21.statSync(path$70);
+			return fs$23.statSync(path$73);
 		} catch (e) {
 			return;
 		}
@@ -34460,7 +34460,7 @@ var require_types$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 //#region ../../node_modules/send/node_modules/mime/mime.js
 var require_mime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	require("path");
-	var fs$20 = require("fs");
+	var fs$22 = require("fs");
 	function Mime() {
 		this.types = Object.create(null);
 		this.extensions = Object.create(null);
@@ -34495,7 +34495,7 @@ var require_mime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	Mime.prototype.load = function(file) {
 		this._loading = file;
 		var map = {};
-		fs$20.readFileSync(file, "ascii").split(/[\r\n]+/).forEach(function(line) {
+		fs$22.readFileSync(file, "ascii").split(/[\r\n]+/).forEach(function(line) {
 			var fields = line.replace(/\s*#.*|^\s*|\s*$/g, "").split(/\s+/);
 			map[fields.shift()] = fields;
 		});
@@ -34505,8 +34505,8 @@ var require_mime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Lookup a mime type based on extension
 	*/
-	Mime.prototype.lookup = function(path$67, fallback) {
-		var ext = path$67.replace(/^.*[\.\/\\]/, "").toLowerCase();
+	Mime.prototype.lookup = function(path$70, fallback) {
+		var ext = path$70.replace(/^.*[\.\/\\]/, "").toLowerCase();
 		return this.types[ext] || fallback || this.default_type;
 	};
 	/**
@@ -34774,12 +34774,12 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var escapeHtml = require_escape_html();
 	var etag = require_etag();
 	var fresh = require_fresh();
-	var fs$19 = require("fs");
+	var fs$21 = require("fs");
 	var mime = require_mime();
 	var ms = require_ms();
 	var onFinished = require_on_finished();
 	var parseRange = require_range_parser();
-	var path$15 = require("path");
+	var path$18 = require("path");
 	var statuses = require_statuses();
 	var Stream = require("stream");
 	var util$2 = require("util");
@@ -34787,11 +34787,11 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* Path function references.
 	* @private
 	*/
-	var extname = path$15.extname;
-	var join = path$15.join;
-	var normalize = path$15.normalize;
-	var resolve = path$15.resolve;
-	var sep = path$15.sep;
+	var extname = path$18.extname;
+	var join = path$18.join;
+	var normalize = path$18.normalize;
+	var resolve = path$18.resolve;
+	var sep = path$18.sep;
 	/**
 	* Regular expression for identifying a bytes Range header.
 	* @private
@@ -34822,8 +34822,8 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @return {SendStream}
 	* @public
 	*/
-	function send(req, path$55, options) {
-		return new SendStream(req, path$55, options);
+	function send(req, path$58, options) {
+		return new SendStream(req, path$58, options);
 	}
 	/**
 	* Initialize a `SendStream` with the given `path`.
@@ -34833,11 +34833,11 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {object} [options]
 	* @private
 	*/
-	function SendStream(req, path$56, options) {
+	function SendStream(req, path$59, options) {
 		Stream.call(this);
 		var opts = options || {};
 		this.options = opts;
-		this.path = path$56;
+		this.path = path$59;
 		this.req = req;
 		this._acceptRanges = opts.acceptRanges !== void 0 ? Boolean(opts.acceptRanges) : true;
 		this._cacheControl = opts.cacheControl !== void 0 ? Boolean(opts.cacheControl) : true;
@@ -34907,8 +34907,8 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @return {SendStream}
 	* @api public
 	*/
-	SendStream.prototype.root = function root(path$57) {
-		this._root = resolve(String(path$57));
+	SendStream.prototype.root = function root(path$60) {
+		this._root = resolve(String(path$60));
 		debug("root %s", this._root);
 		return this;
 	};
@@ -35085,10 +35085,10 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {string} path
 	* @private
 	*/
-	SendStream.prototype.redirect = function redirect(path$58) {
+	SendStream.prototype.redirect = function redirect(path$61) {
 		var res = this.res;
 		if (hasListeners(this, "directory")) {
-			this.emit("directory", res, path$58);
+			this.emit("directory", res, path$61);
 			return;
 		}
 		if (this.hasTrailingSlash()) {
@@ -35115,38 +35115,38 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	SendStream.prototype.pipe = function pipe(res) {
 		var root = this._root;
 		this.res = res;
-		var path$59 = decode(this.path);
-		if (path$59 === -1) {
+		var path$62 = decode(this.path);
+		if (path$62 === -1) {
 			this.error(400);
 			return res;
 		}
-		if (~path$59.indexOf("\0")) {
+		if (~path$62.indexOf("\0")) {
 			this.error(400);
 			return res;
 		}
 		var parts;
 		if (root !== null) {
-			if (path$59) path$59 = normalize("." + sep + path$59);
-			if (UP_PATH_REGEXP.test(path$59)) {
-				debug("malicious path \"%s\"", path$59);
+			if (path$62) path$62 = normalize("." + sep + path$62);
+			if (UP_PATH_REGEXP.test(path$62)) {
+				debug("malicious path \"%s\"", path$62);
 				this.error(403);
 				return res;
 			}
-			parts = path$59.split(sep);
-			path$59 = normalize(join(root, path$59));
+			parts = path$62.split(sep);
+			path$62 = normalize(join(root, path$62));
 		} else {
-			if (UP_PATH_REGEXP.test(path$59)) {
-				debug("malicious path \"%s\"", path$59);
+			if (UP_PATH_REGEXP.test(path$62)) {
+				debug("malicious path \"%s\"", path$62);
 				this.error(403);
 				return res;
 			}
-			parts = normalize(path$59).split(sep);
-			path$59 = resolve(path$59);
+			parts = normalize(path$62).split(sep);
+			path$62 = resolve(path$62);
 		}
 		if (containsDotFile(parts)) {
 			var access = this._dotfiles;
 			if (access === void 0) access = parts[parts.length - 1][0] === "." ? this._hidden ? "allow" : "ignore" : "allow";
-			debug("%s dotfile \"%s\"", access, path$59);
+			debug("%s dotfile \"%s\"", access, path$62);
 			switch (access) {
 				case "allow": break;
 				case "deny":
@@ -35158,10 +35158,10 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 		}
 		if (this._index.length && this.hasTrailingSlash()) {
-			this.sendIndex(path$59);
+			this.sendIndex(path$62);
 			return res;
 		}
-		this.sendFile(path$59);
+		this.sendFile(path$62);
 		return res;
 	};
 	/**
@@ -35170,7 +35170,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {String} path
 	* @api public
 	*/
-	SendStream.prototype.send = function send(path$60, stat) {
+	SendStream.prototype.send = function send(path$63, stat) {
 		var len = stat.size;
 		var options = this.options;
 		var opts = {};
@@ -35182,9 +35182,9 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			this.headersAlreadySent();
 			return;
 		}
-		debug("pipe \"%s\"", path$60);
-		this.setHeader(path$60, stat);
-		this.type(path$60);
+		debug("pipe \"%s\"", path$63);
+		this.setHeader(path$63, stat);
+		this.type(path$63);
 		if (this.isConditionalGET()) {
 			if (this.isPreconditionFailure()) {
 				this.error(412);
@@ -35227,7 +35227,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			res.end();
 			return;
 		}
-		this.stream(path$60, opts);
+		this.stream(path$63, opts);
 	};
 	/**
 	* Transfer file for `path`.
@@ -35235,22 +35235,22 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {String} path
 	* @api private
 	*/
-	SendStream.prototype.sendFile = function sendFile(path$61) {
+	SendStream.prototype.sendFile = function sendFile(path$64) {
 		var i = 0;
 		var self = this;
-		debug("stat \"%s\"", path$61);
-		fs$19.stat(path$61, function onstat(err, stat) {
-			if (err && err.code === "ENOENT" && !extname(path$61) && path$61[path$61.length - 1] !== sep) return next(err);
+		debug("stat \"%s\"", path$64);
+		fs$21.stat(path$64, function onstat(err, stat) {
+			if (err && err.code === "ENOENT" && !extname(path$64) && path$64[path$64.length - 1] !== sep) return next(err);
 			if (err) return self.onStatError(err);
-			if (stat.isDirectory()) return self.redirect(path$61);
-			self.emit("file", path$61, stat);
-			self.send(path$61, stat);
+			if (stat.isDirectory()) return self.redirect(path$64);
+			self.emit("file", path$64, stat);
+			self.send(path$64, stat);
 		});
 		function next(err) {
 			if (self._extensions.length <= i) return err ? self.onStatError(err) : self.error(404);
-			var p = path$61 + "." + self._extensions[i++];
+			var p = path$64 + "." + self._extensions[i++];
 			debug("stat \"%s\"", p);
-			fs$19.stat(p, function(err, stat) {
+			fs$21.stat(p, function(err, stat) {
 				if (err) return next(err);
 				if (stat.isDirectory()) return next();
 				self.emit("file", p, stat);
@@ -35264,7 +35264,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {String} path
 	* @api private
 	*/
-	SendStream.prototype.sendIndex = function sendIndex(path$62) {
+	SendStream.prototype.sendIndex = function sendIndex(path$65) {
 		var i = -1;
 		var self = this;
 		function next(err) {
@@ -35272,9 +35272,9 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				if (err) return self.onStatError(err);
 				return self.error(404);
 			}
-			var p = join(path$62, self._index[i]);
+			var p = join(path$65, self._index[i]);
 			debug("stat \"%s\"", p);
-			fs$19.stat(p, function(err, stat) {
+			fs$21.stat(p, function(err, stat) {
 				if (err) return next(err);
 				if (stat.isDirectory()) return next();
 				self.emit("file", p, stat);
@@ -35290,10 +35290,10 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {Object} options
 	* @api private
 	*/
-	SendStream.prototype.stream = function stream(path$63, options) {
+	SendStream.prototype.stream = function stream(path$66, options) {
 		var self = this;
 		var res = this.res;
-		var stream$5 = fs$19.createReadStream(path$63, options);
+		var stream$5 = fs$21.createReadStream(path$66, options);
 		this.emit("stream", stream$5);
 		stream$5.pipe(res);
 		function cleanup() {
@@ -35315,10 +35315,10 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {String} path
 	* @api private
 	*/
-	SendStream.prototype.type = function type(path$64) {
+	SendStream.prototype.type = function type(path$67) {
 		var res = this.res;
 		if (res.getHeader("Content-Type")) return;
-		var type = mime.lookup(path$64);
+		var type = mime.lookup(path$67);
 		if (!type) {
 			debug("no content-type");
 			return;
@@ -35335,9 +35335,9 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {Object} stat
 	* @api private
 	*/
-	SendStream.prototype.setHeader = function setHeader(path$65, stat) {
+	SendStream.prototype.setHeader = function setHeader(path$68, stat) {
 		var res = this.res;
-		this.emit("headers", res, path$65, stat);
+		this.emit("headers", res, path$68, stat);
 		if (this._acceptRanges && !res.getHeader("Accept-Ranges")) {
 			debug("accept ranges");
 			res.setHeader("Accept-Ranges", "bytes");
@@ -35431,9 +35431,9 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {String} path
 	* @api private
 	*/
-	function decode(path$66) {
+	function decode(path$69) {
 		try {
-			return decodeURIComponent(path$66);
+			return decodeURIComponent(path$69);
 		} catch (err) {
 			return -1;
 		}
@@ -36855,13 +36855,13 @@ var require_application = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*/
 	app.use = function use(fn) {
 		var offset = 0;
-		var path$50 = "/";
+		var path$53 = "/";
 		if (typeof fn !== "function") {
 			var arg = fn;
 			while (Array.isArray(arg) && arg.length !== 0) arg = arg[0];
 			if (typeof arg !== "function") {
 				offset = 1;
-				path$50 = fn;
+				path$53 = fn;
 			}
 		}
 		var fns = flatten(slice.call(arguments, offset));
@@ -36869,11 +36869,11 @@ var require_application = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		this.lazyrouter();
 		var router = this._router;
 		fns.forEach(function(fn) {
-			if (!fn || !fn.handle || !fn.set) return router.use(path$50, fn);
-			debug(".use app under %s", path$50);
-			fn.mountpath = path$50;
+			if (!fn || !fn.handle || !fn.set) return router.use(path$53, fn);
+			debug(".use app under %s", path$53);
+			fn.mountpath = path$53;
 			fn.parent = this;
-			router.use(path$50, function mounted_app(req, res, next) {
+			router.use(path$53, function mounted_app(req, res, next) {
 				var orig = req.app;
 				fn.handle(req, res, function(err) {
 					setPrototypeOf(req, orig.request);
@@ -36894,9 +36894,9 @@ var require_application = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*
 	* @public
 	*/
-	app.route = function route(path$51) {
+	app.route = function route(path$54) {
 		this.lazyrouter();
-		return this._router.route(path$51);
+		return this._router.route(path$54);
 	};
 	/**
 	* Register the given template engine callback `fn`
@@ -37012,7 +37012,7 @@ var require_application = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @return {String}
 	* @private
 	*/
-	app.path = function path$52() {
+	app.path = function path$55() {
 		return this.parent ? this.parent.path() + this.mountpath : "";
 	};
 	/**
@@ -37073,10 +37073,10 @@ var require_application = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* Delegate `.VERB(...)` calls to `router.VERB(...)`.
 	*/
 	methods.forEach(function(method) {
-		app[method] = function(path$53) {
-			if (method === "get" && arguments.length === 1) return this.set(path$53);
+		app[method] = function(path$56) {
+			if (method === "get" && arguments.length === 1) return this.set(path$56);
 			this.lazyrouter();
-			var route = this._router.route(path$53);
+			var route = this._router.route(path$56);
 			route[method].apply(route, slice.call(arguments, 1));
 			return this;
 		};
@@ -37090,9 +37090,9 @@ var require_application = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @return {app} for chaining
 	* @public
 	*/
-	app.all = function all(path$54) {
+	app.all = function all(path$57) {
 		this.lazyrouter();
-		var route = this._router.route(path$54);
+		var route = this._router.route(path$57);
 		var args = slice.call(arguments, 1);
 		for (var i = 0; i < methods.length; i++) route[methods[i]].apply(route, args);
 		return this;
@@ -38827,7 +38827,7 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var http$3 = require("http");
 	var isAbsolute = require_utils$1().isAbsolute;
 	var onFinished = require_on_finished();
-	var path$14 = require("path");
+	var path$17 = require("path");
 	var statuses = require_statuses();
 	var merge = require_utils_merge();
 	var sign = require_cookie_signature().sign;
@@ -38836,9 +38836,9 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var setCharset = require_utils$1().setCharset;
 	var cookie = require_cookie();
 	var send = require_send();
-	var extname = path$14.extname;
+	var extname = path$17.extname;
 	var mime = send.mime;
-	var resolve = path$14.resolve;
+	var resolve = path$17.resolve;
 	var vary = require_vary();
 	/**
 	* Response prototype.
@@ -39102,20 +39102,20 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*
 	* @public
 	*/
-	res.sendFile = function sendFile(path$47, options, callback) {
+	res.sendFile = function sendFile(path$50, options, callback) {
 		var done = callback;
 		var req = this.req;
 		var res = this;
 		var next = req.next;
 		var opts = options || {};
-		if (!path$47) throw new TypeError("path argument is required to res.sendFile");
-		if (typeof path$47 !== "string") throw new TypeError("path must be a string to res.sendFile");
+		if (!path$50) throw new TypeError("path argument is required to res.sendFile");
+		if (typeof path$50 !== "string") throw new TypeError("path must be a string to res.sendFile");
 		if (typeof options === "function") {
 			done = options;
 			opts = {};
 		}
-		if (!opts.root && !isAbsolute(path$47)) throw new TypeError("path must be absolute or specify root to res.sendFile");
-		sendfile(res, send(req, encodeURI(path$47), opts), opts, function(err) {
+		if (!opts.root && !isAbsolute(path$50)) throw new TypeError("path must be absolute or specify root to res.sendFile");
+		sendfile(res, send(req, encodeURI(path$50), opts), opts, function(err) {
 			if (done) return done(err);
 			if (err && err.code === "EISDIR") return next();
 			if (err && err.code !== "ECONNABORTED" && err.syscall !== "write") next(err);
@@ -39161,7 +39161,7 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*
 	* @public
 	*/
-	res.sendfile = function(path$48, options, callback) {
+	res.sendfile = function(path$51, options, callback) {
 		var done = callback;
 		var req = this.req;
 		var res = this;
@@ -39171,7 +39171,7 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			done = options;
 			opts = {};
 		}
-		sendfile(res, send(req, path$48, opts), opts, function(err) {
+		sendfile(res, send(req, path$51, opts), opts, function(err) {
 			if (done) return done(err);
 			if (err && err.code === "EISDIR") return next();
 			if (err && err.code !== "ECONNABORTED" && err.syscall !== "write") next(err);
@@ -39195,7 +39195,7 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*
 	* @public
 	*/
-	res.download = function download(path$49, filename, options, callback) {
+	res.download = function download(path$52, filename, options, callback) {
 		var done = callback;
 		var name = filename;
 		var opts = options || null;
@@ -39211,7 +39211,7 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			name = null;
 			opts = filename;
 		}
-		var headers = { "Content-Disposition": contentDisposition(name || path$49) };
+		var headers = { "Content-Disposition": contentDisposition(name || path$52) };
 		if (opts && opts.headers) {
 			var keys = Object.keys(opts.headers);
 			for (var i = 0; i < keys.length; i++) {
@@ -39221,7 +39221,7 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		}
 		opts = Object.create(opts);
 		opts.headers = headers;
-		var fullPath = !opts.root ? resolve(path$49) : path$49;
+		var fullPath = !opts.root ? resolve(path$52) : path$52;
 		return this.sendFile(fullPath, opts, done);
 	};
 	/**
@@ -39707,9 +39707,9 @@ var require_serve_static = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			var forwardError = !fallthrough;
 			var originalUrl = parseUrl.original(req);
-			var path$46 = parseUrl(req).pathname;
-			if (path$46 === "/" && originalUrl.pathname.substr(-1) !== "/") path$46 = "";
-			var stream = send(req, path$46, opts);
+			var path$49 = parseUrl(req).pathname;
+			if (path$49 === "/" && originalUrl.pathname.substr(-1) !== "/") path$49 = "";
+			var stream = send(req, path$49, opts);
 			stream.on("directory", onDirectory);
 			if (setHeaders) stream.on("headers", setHeaders);
 			if (fallthrough) stream.on("file", function onFile() {
@@ -64021,28 +64021,40 @@ const EMPTY_COMPLETION_RESULT = { completion: {
 //#endregion
 //#region src/mcp-server.ts
 function createMcpServer(deps) {
-	const { wss, questionQueue, pendingAnswers, currentLifecycleState, broadcast } = deps;
+	const { wss, questionQueue, pendingAnswers, currentLifecycleState, conversations, broadcast } = deps;
 	const server = new McpServer({
 		name: "maxsim-dashboard",
 		version: "1.0.0"
 	});
-	server.tool("ask_question", "Present a question to the dashboard user and wait for their answer", {
+	server.tool("ask_question", "Present a question to the dashboard user and wait for their answer. Optionally link to a conversation for multi-turn discussions.", {
 		question: string(),
 		options: array(object$1({
 			value: string(),
 			label: string(),
 			description: string().optional()
 		})).optional(),
-		allow_free_text: boolean().default(true)
-	}, async ({ question, options, allow_free_text }) => {
+		allow_free_text: boolean().default(true),
+		conversation_id: string().optional().describe("Link this question to an existing conversation for multi-turn flow")
+	}, async ({ question, options, allow_free_text, conversation_id }) => {
 		const questionId = (0, node_crypto.randomUUID)();
 		const pending = {
 			id: questionId,
 			question,
 			options: options ?? [],
 			allowFreeText: allow_free_text,
-			receivedAt: Date.now()
+			receivedAt: Date.now(),
+			conversationId: conversation_id
 		};
+		if (conversation_id && conversations.has(conversation_id)) {
+			const conv = conversations.get(conversation_id);
+			conv.messages.push({
+				role: "assistant",
+				content: question,
+				timestamp: Date.now(),
+				questionId
+			});
+			conv.updatedAt = Date.now();
+		}
 		questionQueue.push(pending);
 		broadcast(wss, {
 			type: "question-received",
@@ -64054,14 +64066,62 @@ function createMcpServer(deps) {
 		});
 		const idx = questionQueue.findIndex((q) => q.id === questionId);
 		if (idx !== -1) questionQueue.splice(idx, 1);
+		if (conversation_id && conversations.has(conversation_id)) {
+			const conv = conversations.get(conversation_id);
+			conv.messages.push({
+				role: "user",
+				content: answer,
+				timestamp: Date.now(),
+				questionId
+			});
+			conv.updatedAt = Date.now();
+		}
 		broadcast(wss, {
 			type: "answer-given",
 			questionId,
+			conversationId: conversation_id,
 			remainingQueue: questionQueue.length
 		});
 		return { content: [{
 			type: "text",
 			text: answer
+		}] };
+	});
+	server.tool("start_conversation", "Start a new multi-turn conversation thread with the dashboard user", { topic: string().describe("A short label for this conversation thread") }, async ({ topic }) => {
+		const id = (0, node_crypto.randomUUID)();
+		const conv = {
+			id,
+			topic,
+			messages: [],
+			createdAt: Date.now(),
+			updatedAt: Date.now()
+		};
+		conversations.set(id, conv);
+		broadcast(wss, {
+			type: "conversation-started",
+			conversation: {
+				id,
+				topic,
+				createdAt: conv.createdAt
+			}
+		});
+		return { content: [{
+			type: "text",
+			text: JSON.stringify({
+				conversation_id: id,
+				topic
+			})
+		}] };
+	});
+	server.tool("get_conversation_history", "Retrieve the full message history of a conversation", { conversation_id: string() }, async ({ conversation_id }) => {
+		const conv = conversations.get(conversation_id);
+		if (!conv) return { content: [{
+			type: "text",
+			text: JSON.stringify({ error: "Conversation not found" })
+		}] };
+		return { content: [{
+			type: "text",
+			text: JSON.stringify(conv, null, 2)
 		}] };
 	});
 	server.tool("submit_lifecycle_event", "Broadcast a workflow lifecycle event to connected dashboard clients", {
@@ -75664,11 +75724,41 @@ function stateReplaceField(content, fieldName, newValue) {
 */
 
 //#endregion
+//#region ../cli/src/core/artefakte.ts
+/**
+* Artefakte — CRUD operations for project-level artefakte files
+*
+* Manages DECISIONS.md, ACCEPTANCE-CRITERIA.md, and NO-GOS.md
+* at both project level (.planning/) and phase level (.planning/phases/<phase>/).
+*/
+
+//#endregion
+//#region ../cli/src/core/context-loader.ts
+/**
+* Context Loader — Intelligent file selection for workflow context assembly
+*
+* Selects relevant planning files based on the current task/phase domain,
+* preventing context overload by loading only what matters.
+*/
+
+//#endregion
 //#region ../cli/src/core/dashboard-launcher.ts
 /**
 * Dashboard Launcher — Shared dashboard lifecycle utilities
 *
 * Used by both cli.ts (tool-router) and install.ts (npx entry point).
+*/
+
+//#endregion
+//#region ../cli/src/core/start.ts
+/**
+* Start — Orchestrates Dashboard launch + browser open
+*
+* Provides a unified `maxsimcli start` entry point that:
+* 1. Checks for a running dashboard
+* 2. Starts the dashboard if needed
+* 3. Opens the browser
+* 4. Reports status
 */
 
 //#endregion
@@ -76228,14 +76318,14 @@ const FsWatchInstances = /* @__PURE__ */ new Map();
 * @param emitRaw emits raw event data
 * @returns {NativeFsWatcher}
 */
-function createFsWatchInstance(path$38, options, listener, errHandler, emitRaw) {
+function createFsWatchInstance(path$41, options, listener, errHandler, emitRaw) {
 	const handleEvent = (rawEvent, evPath) => {
-		listener(path$38);
-		emitRaw(rawEvent, evPath, { watchedPath: path$38 });
-		if (evPath && path$38 !== evPath) fsWatchBroadcast(path.resolve(path$38, evPath), KEY_LISTENERS, path.join(path$38, evPath));
+		listener(path$41);
+		emitRaw(rawEvent, evPath, { watchedPath: path$41 });
+		if (evPath && path$41 !== evPath) fsWatchBroadcast(path.resolve(path$41, evPath), KEY_LISTENERS, path.join(path$41, evPath));
 	};
 	try {
-		return (0, fs.watch)(path$38, { persistent: options.persistent }, handleEvent);
+		return (0, fs.watch)(path$41, { persistent: options.persistent }, handleEvent);
 	} catch (error) {
 		errHandler(error);
 		return;
@@ -76260,12 +76350,12 @@ const fsWatchBroadcast = (fullPath, listenerType, val1, val2, val3) => {
 * @param options to be passed to fs_watch
 * @param handlers container for event listener functions
 */
-const setFsWatchListener = (path$42, fullPath, options, handlers) => {
+const setFsWatchListener = (path$45, fullPath, options, handlers) => {
 	const { listener, errHandler, rawEmitter } = handlers;
 	let cont = FsWatchInstances.get(fullPath);
 	let watcher;
 	if (!options.persistent) {
-		watcher = createFsWatchInstance(path$42, options, listener, errHandler, rawEmitter);
+		watcher = createFsWatchInstance(path$45, options, listener, errHandler, rawEmitter);
 		if (!watcher) return;
 		return watcher.close.bind(watcher);
 	}
@@ -76274,13 +76364,13 @@ const setFsWatchListener = (path$42, fullPath, options, handlers) => {
 		addAndConvert(cont, KEY_ERR, errHandler);
 		addAndConvert(cont, KEY_RAW, rawEmitter);
 	} else {
-		watcher = createFsWatchInstance(path$42, options, fsWatchBroadcast.bind(null, fullPath, KEY_LISTENERS), errHandler, fsWatchBroadcast.bind(null, fullPath, KEY_RAW));
+		watcher = createFsWatchInstance(path$45, options, fsWatchBroadcast.bind(null, fullPath, KEY_LISTENERS), errHandler, fsWatchBroadcast.bind(null, fullPath, KEY_RAW));
 		if (!watcher) return;
 		watcher.on(EV.ERROR, async (error) => {
 			const broadcastErr = fsWatchBroadcast.bind(null, fullPath, KEY_ERR);
 			if (cont) cont.watcherUnusable = true;
 			if (isWindows && error.code === "EPERM") try {
-				await (await (0, fs_promises.open)(path$42, "r")).close();
+				await (await (0, fs_promises.open)(path$45, "r")).close();
 				broadcastErr(error);
 			} catch (err) {}
 			else broadcastErr(error);
@@ -76316,7 +76406,7 @@ const FsWatchFileInstances = /* @__PURE__ */ new Map();
 * @param handlers container for event listener functions
 * @returns closer
 */
-const setFsWatchFileListener = (path$43, fullPath, options, handlers) => {
+const setFsWatchFileListener = (path$46, fullPath, options, handlers) => {
 	const { listener, rawEmitter } = handlers;
 	let cont = FsWatchFileInstances.get(fullPath);
 	const copts = cont && cont.options;
@@ -76340,7 +76430,7 @@ const setFsWatchFileListener = (path$43, fullPath, options, handlers) => {
 					});
 				});
 				const currmtime = curr.mtimeMs;
-				if (curr.size !== prev.size || currmtime > prev.mtimeMs || currmtime === 0) foreach(cont.listeners, (listener) => listener(path$43, curr));
+				if (curr.size !== prev.size || currmtime > prev.mtimeMs || currmtime === 0) foreach(cont.listeners, (listener) => listener(path$46, curr));
 			})
 		};
 		FsWatchFileInstances.set(fullPath, cont);
@@ -76370,22 +76460,22 @@ var NodeFsHandler = class {
 	* @param listener on fs change
 	* @returns closer for the watcher instance
 	*/
-	_watchWithNodeFs(path$39, listener) {
+	_watchWithNodeFs(path$42, listener) {
 		const opts = this.fsw.options;
-		const directory = path.dirname(path$39);
-		const basename = path.basename(path$39);
+		const directory = path.dirname(path$42);
+		const basename = path.basename(path$42);
 		this.fsw._getWatchedDir(directory).add(basename);
-		const absolutePath = path.resolve(path$39);
+		const absolutePath = path.resolve(path$42);
 		const options = { persistent: opts.persistent };
 		if (!listener) listener = EMPTY_FN;
 		let closer;
 		if (opts.usePolling) {
 			options.interval = opts.interval !== opts.binaryInterval && isBinaryPath(basename) ? opts.binaryInterval : opts.interval;
-			closer = setFsWatchFileListener(path$39, absolutePath, options, {
+			closer = setFsWatchFileListener(path$42, absolutePath, options, {
 				listener,
 				rawEmitter: this.fsw._emitRaw
 			});
-		} else closer = setFsWatchListener(path$39, absolutePath, options, {
+		} else closer = setFsWatchListener(path$42, absolutePath, options, {
 			listener,
 			errHandler: this._boundHandleError,
 			rawEmitter: this.fsw._emitRaw
@@ -76403,7 +76493,7 @@ var NodeFsHandler = class {
 		const parent = this.fsw._getWatchedDir(dirname);
 		let prevStats = stats;
 		if (parent.has(basename)) return;
-		const listener = async (path$44, newStats) => {
+		const listener = async (path$47, newStats) => {
 			if (!this.fsw._throttle(THROTTLE_MODE_WATCH, file, 5)) return;
 			if (!newStats || newStats.mtimeMs === 0) try {
 				const newStats = await (0, fs_promises.stat)(file);
@@ -76412,10 +76502,10 @@ var NodeFsHandler = class {
 				const mt = newStats.mtimeMs;
 				if (!at || at <= mt || mt !== prevStats.mtimeMs) this.fsw._emit(EV.CHANGE, file, newStats);
 				if ((isMacos || isLinux || isFreeBSD) && prevStats.ino !== newStats.ino) {
-					this.fsw._closeFile(path$44);
+					this.fsw._closeFile(path$47);
 					prevStats = newStats;
 					const closer = this._watchWithNodeFs(file, listener);
-					if (closer) this.fsw._addPathCloser(path$44, closer);
+					if (closer) this.fsw._addPathCloser(path$47, closer);
 				} else prevStats = newStats;
 			} catch (error) {
 				this.fsw._remove(dirname, basename);
@@ -76442,7 +76532,7 @@ var NodeFsHandler = class {
 	* @param item basename of this item
 	* @returns true if no more processing is needed for this entry.
 	*/
-	async _handleSymlink(entry, directory, path$45, item) {
+	async _handleSymlink(entry, directory, path$48, item) {
 		if (this.fsw.closed) return;
 		const full = entry.fullPath;
 		const dir = this.fsw._getWatchedDir(directory);
@@ -76450,7 +76540,7 @@ var NodeFsHandler = class {
 			this.fsw._incrReadyCount();
 			let linkPath;
 			try {
-				linkPath = await (0, fs_promises.realpath)(path$45);
+				linkPath = await (0, fs_promises.realpath)(path$48);
 			} catch (e) {
 				this.fsw._emitReady();
 				return true;
@@ -76459,12 +76549,12 @@ var NodeFsHandler = class {
 			if (dir.has(item)) {
 				if (this.fsw._symlinkPaths.get(full) !== linkPath) {
 					this.fsw._symlinkPaths.set(full, linkPath);
-					this.fsw._emit(EV.CHANGE, path$45, entry.stats);
+					this.fsw._emit(EV.CHANGE, path$48, entry.stats);
 				}
 			} else {
 				dir.add(item);
 				this.fsw._symlinkPaths.set(full, linkPath);
-				this.fsw._emit(EV.ADD, path$45, entry.stats);
+				this.fsw._emit(EV.ADD, path$48, entry.stats);
 			}
 			this.fsw._emitReady();
 			return true;
@@ -76489,17 +76579,17 @@ var NodeFsHandler = class {
 				return;
 			}
 			const item = entry.path;
-			let path$40 = path.join(directory, item);
+			let path$43 = path.join(directory, item);
 			current.add(item);
-			if (entry.stats.isSymbolicLink() && await this._handleSymlink(entry, directory, path$40, item)) return;
+			if (entry.stats.isSymbolicLink() && await this._handleSymlink(entry, directory, path$43, item)) return;
 			if (this.fsw.closed) {
 				stream = void 0;
 				return;
 			}
 			if (item === target || !target && !previous.has(item)) {
 				this.fsw._incrReadyCount();
-				path$40 = path.join(dir, path.relative(dir, path$40));
-				this._addToNodeFs(path$40, initialAdd, wh, depth + 1);
+				path$43 = path.join(dir, path.relative(dir, path$43));
+				this._addToNodeFs(path$43, initialAdd, wh, depth + 1);
 			}
 		}).on(EV.ERROR, this._boundHandleError);
 		return new Promise((resolve, reject) => {
@@ -76562,13 +76652,13 @@ var NodeFsHandler = class {
 	* @param depth Child path actually targeted for watch
 	* @param target Child path actually targeted for watch
 	*/
-	async _addToNodeFs(path$41, initialAdd, priorWh, depth, target) {
+	async _addToNodeFs(path$44, initialAdd, priorWh, depth, target) {
 		const ready = this.fsw._emitReady;
-		if (this.fsw._isIgnored(path$41) || this.fsw.closed) {
+		if (this.fsw._isIgnored(path$44) || this.fsw.closed) {
 			ready();
 			return false;
 		}
-		const wh = this.fsw._getWatchHelpers(path$41);
+		const wh = this.fsw._getWatchHelpers(path$44);
 		if (priorWh) {
 			wh.filterPath = (entry) => priorWh.filterPath(entry);
 			wh.filterDir = (entry) => priorWh.filterDir(entry);
@@ -76583,29 +76673,29 @@ var NodeFsHandler = class {
 			const follow = this.fsw.options.followSymlinks;
 			let closer;
 			if (stats.isDirectory()) {
-				const absPath = path.resolve(path$41);
-				const targetPath = follow ? await (0, fs_promises.realpath)(path$41) : path$41;
+				const absPath = path.resolve(path$44);
+				const targetPath = follow ? await (0, fs_promises.realpath)(path$44) : path$44;
 				if (this.fsw.closed) return;
 				closer = await this._handleDir(wh.watchPath, stats, initialAdd, depth, target, wh, targetPath);
 				if (this.fsw.closed) return;
 				if (absPath !== targetPath && targetPath !== void 0) this.fsw._symlinkPaths.set(absPath, targetPath);
 			} else if (stats.isSymbolicLink()) {
-				const targetPath = follow ? await (0, fs_promises.realpath)(path$41) : path$41;
+				const targetPath = follow ? await (0, fs_promises.realpath)(path$44) : path$44;
 				if (this.fsw.closed) return;
 				const parent = path.dirname(wh.watchPath);
 				this.fsw._getWatchedDir(parent).add(wh.watchPath);
 				this.fsw._emit(EV.ADD, wh.watchPath, stats);
-				closer = await this._handleDir(parent, stats, initialAdd, depth, path$41, wh, targetPath);
+				closer = await this._handleDir(parent, stats, initialAdd, depth, path$44, wh, targetPath);
 				if (this.fsw.closed) return;
-				if (targetPath !== void 0) this.fsw._symlinkPaths.set(path.resolve(path$41), targetPath);
+				if (targetPath !== void 0) this.fsw._symlinkPaths.set(path.resolve(path$44), targetPath);
 			} else closer = this._handleFile(wh.watchPath, stats, initialAdd);
 			ready();
-			if (closer) this.fsw._addPathCloser(path$41, closer);
+			if (closer) this.fsw._addPathCloser(path$44, closer);
 			return false;
 		} catch (error) {
 			if (this.fsw._handleError(error)) {
 				ready();
-				return path$41;
+				return path$44;
 			}
 		}
 	}
@@ -76642,22 +76732,22 @@ function createPattern(matcher) {
 	};
 	return () => false;
 }
-function normalizePath(path$17) {
-	if (typeof path$17 !== "string") throw new Error("string expected");
-	path$17 = path.normalize(path$17);
-	path$17 = path$17.replace(/\\/g, "/");
+function normalizePath(path$20) {
+	if (typeof path$20 !== "string") throw new Error("string expected");
+	path$20 = path.normalize(path$20);
+	path$20 = path$20.replace(/\\/g, "/");
 	let prepend = false;
-	if (path$17.startsWith("//")) prepend = true;
+	if (path$20.startsWith("//")) prepend = true;
 	const DOUBLE_SLASH_RE = /\/\//;
-	while (path$17.match(DOUBLE_SLASH_RE)) path$17 = path$17.replace(DOUBLE_SLASH_RE, "/");
-	if (prepend) path$17 = "/" + path$17;
-	return path$17;
+	while (path$20.match(DOUBLE_SLASH_RE)) path$20 = path$20.replace(DOUBLE_SLASH_RE, "/");
+	if (prepend) path$20 = "/" + path$20;
+	return path$20;
 }
 function matchPatterns(patterns, testString, stats) {
-	const path$27 = normalizePath(testString);
+	const path$30 = normalizePath(testString);
 	for (let index = 0; index < patterns.length; index++) {
 		const pattern = patterns[index];
-		if (pattern(path$27, stats)) return true;
+		if (pattern(path$30, stats)) return true;
 	}
 	return false;
 }
@@ -76682,14 +76772,14 @@ const toUnix = (string) => {
 	if (prepend) str = SLASH + str;
 	return str;
 };
-const normalizePathToUnix = (path$18) => toUnix(path.normalize(toUnix(path$18)));
-const normalizeIgnored = (cwd = "") => (path$19) => {
-	if (typeof path$19 === "string") return normalizePathToUnix(path.isAbsolute(path$19) ? path$19 : path.join(cwd, path$19));
-	else return path$19;
+const normalizePathToUnix = (path$21) => toUnix(path.normalize(toUnix(path$21)));
+const normalizeIgnored = (cwd = "") => (path$22) => {
+	if (typeof path$22 === "string") return normalizePathToUnix(path.isAbsolute(path$22) ? path$22 : path.join(cwd, path$22));
+	else return path$22;
 };
-const getAbsolutePath = (path$20, cwd) => {
-	if (path.isAbsolute(path$20)) return path$20;
-	return path.join(cwd, path$20);
+const getAbsolutePath = (path$23, cwd) => {
+	if (path.isAbsolute(path$23)) return path$23;
+	return path.join(cwd, path$23);
 };
 const EMPTY_SET = Object.freeze(/* @__PURE__ */ new Set());
 /**
@@ -76739,10 +76829,10 @@ var DirEntry = class {
 const STAT_METHOD_F = "stat";
 const STAT_METHOD_L = "lstat";
 var WatchHelper = class {
-	constructor(path$21, follow, fsw) {
+	constructor(path$24, follow, fsw) {
 		this.fsw = fsw;
-		const watchPath = path$21;
-		this.path = path$21 = path$21.replace(REPLACER_RE, "");
+		const watchPath = path$24;
+		this.path = path$24 = path$24.replace(REPLACER_RE, "");
 		this.watchPath = watchPath;
 		this.fullWatchPath = path.resolve(watchPath);
 		this.dirParts = [];
@@ -76855,17 +76945,17 @@ var FSWatcher = class extends events.EventEmitter {
 		this.closed = false;
 		this._closePromise = void 0;
 		let paths = unifyPaths(paths_);
-		if (cwd) paths = paths.map((path$28) => {
-			return getAbsolutePath(path$28, cwd);
+		if (cwd) paths = paths.map((path$31) => {
+			return getAbsolutePath(path$31, cwd);
 		});
-		paths.forEach((path$29) => {
-			this._removeIgnoredPath(path$29);
+		paths.forEach((path$32) => {
+			this._removeIgnoredPath(path$32);
 		});
 		this._userIgnored = void 0;
 		if (!this._readyCount) this._readyCount = 0;
 		this._readyCount += paths.length;
-		Promise.all(paths.map(async (path$30) => {
-			const res = await this._nodeFsHandler._addToNodeFs(path$30, !_internal, void 0, 0, _origAdd);
+		Promise.all(paths.map(async (path$33) => {
+			const res = await this._nodeFsHandler._addToNodeFs(path$33, !_internal, void 0, 0, _origAdd);
 			if (res) this._emitReady();
 			return res;
 		})).then((results) => {
@@ -76883,15 +76973,15 @@ var FSWatcher = class extends events.EventEmitter {
 		if (this.closed) return this;
 		const paths = unifyPaths(paths_);
 		const { cwd } = this.options;
-		paths.forEach((path$22) => {
-			if (!path.isAbsolute(path$22) && !this._closers.has(path$22)) {
-				if (cwd) path$22 = path.join(cwd, path$22);
-				path$22 = path.resolve(path$22);
+		paths.forEach((path$25) => {
+			if (!path.isAbsolute(path$25) && !this._closers.has(path$25)) {
+				if (cwd) path$25 = path.join(cwd, path$25);
+				path$25 = path.resolve(path$25);
 			}
-			this._closePath(path$22);
-			this._addIgnoredPath(path$22);
-			if (this._watched.has(path$22)) this._addIgnoredPath({
-				path: path$22,
+			this._closePath(path$25);
+			this._addIgnoredPath(path$25);
+			if (this._watched.has(path$25)) this._addIgnoredPath({
+				path: path$25,
 				recursive: true
 			});
 			this._userIgnored = void 0;
@@ -76947,34 +77037,34 @@ var FSWatcher = class extends events.EventEmitter {
 	* @param stats arguments to be passed with event
 	* @returns the error if defined, otherwise the value of the FSWatcher instance's `closed` flag
 	*/
-	async _emit(event, path$23, stats) {
+	async _emit(event, path$26, stats) {
 		if (this.closed) return;
 		const opts = this.options;
-		if (isWindows) path$23 = path.normalize(path$23);
-		if (opts.cwd) path$23 = path.relative(opts.cwd, path$23);
-		const args = [path$23];
+		if (isWindows) path$26 = path.normalize(path$26);
+		if (opts.cwd) path$26 = path.relative(opts.cwd, path$26);
+		const args = [path$26];
 		if (stats != null) args.push(stats);
 		const awf = opts.awaitWriteFinish;
 		let pw;
-		if (awf && (pw = this._pendingWrites.get(path$23))) {
+		if (awf && (pw = this._pendingWrites.get(path$26))) {
 			pw.lastChange = /* @__PURE__ */ new Date();
 			return this;
 		}
 		if (opts.atomic) {
 			if (event === EVENTS.UNLINK) {
-				this._pendingUnlinks.set(path$23, [event, ...args]);
+				this._pendingUnlinks.set(path$26, [event, ...args]);
 				setTimeout(() => {
-					this._pendingUnlinks.forEach((entry, path$31) => {
+					this._pendingUnlinks.forEach((entry, path$34) => {
 						this.emit(...entry);
 						this.emit(EVENTS.ALL, ...entry);
-						this._pendingUnlinks.delete(path$31);
+						this._pendingUnlinks.delete(path$34);
 					});
 				}, typeof opts.atomic === "number" ? opts.atomic : 100);
 				return this;
 			}
-			if (event === EVENTS.ADD && this._pendingUnlinks.has(path$23)) {
+			if (event === EVENTS.ADD && this._pendingUnlinks.has(path$26)) {
 				event = EVENTS.CHANGE;
-				this._pendingUnlinks.delete(path$23);
+				this._pendingUnlinks.delete(path$26);
 			}
 		}
 		if (awf && (event === EVENTS.ADD || event === EVENTS.CHANGE) && this._readyEmitted) {
@@ -76989,14 +77079,14 @@ var FSWatcher = class extends events.EventEmitter {
 					this.emitWithAll(event, args);
 				}
 			};
-			this._awaitWriteFinish(path$23, awf.stabilityThreshold, event, awfEmit);
+			this._awaitWriteFinish(path$26, awf.stabilityThreshold, event, awfEmit);
 			return this;
 		}
 		if (event === EVENTS.CHANGE) {
-			if (!this._throttle(EVENTS.CHANGE, path$23, 50)) return this;
+			if (!this._throttle(EVENTS.CHANGE, path$26, 50)) return this;
 		}
 		if (opts.alwaysStat && stats === void 0 && (event === EVENTS.ADD || event === EVENTS.ADD_DIR || event === EVENTS.CHANGE)) {
-			const fullPath = opts.cwd ? path.join(opts.cwd, path$23) : path$23;
+			const fullPath = opts.cwd ? path.join(opts.cwd, path$26) : path$26;
 			let stats;
 			try {
 				stats = await (0, fs_promises.stat)(fullPath);
@@ -77023,20 +77113,20 @@ var FSWatcher = class extends events.EventEmitter {
 	* @param timeout duration of time to suppress duplicate actions
 	* @returns tracking object or false if action should be suppressed
 	*/
-	_throttle(actionType, path$32, timeout) {
+	_throttle(actionType, path$35, timeout) {
 		if (!this._throttled.has(actionType)) this._throttled.set(actionType, /* @__PURE__ */ new Map());
 		const action = this._throttled.get(actionType);
 		if (!action) throw new Error("invalid throttle");
-		const actionPath = action.get(path$32);
+		const actionPath = action.get(path$35);
 		if (actionPath) {
 			actionPath.count++;
 			return false;
 		}
 		let timeoutObject;
 		const clear = () => {
-			const item = action.get(path$32);
+			const item = action.get(path$35);
 			const count = item ? item.count : 0;
-			action.delete(path$32);
+			action.delete(path$35);
 			clearTimeout(timeoutObject);
 			if (item) clearTimeout(item.timeoutObject);
 			return count;
@@ -77047,7 +77137,7 @@ var FSWatcher = class extends events.EventEmitter {
 			clear,
 			count: 0
 		};
-		action.set(path$32, thr);
+		action.set(path$35, thr);
 		return thr;
 	}
 	_incrReadyCount() {
@@ -77061,34 +77151,34 @@ var FSWatcher = class extends events.EventEmitter {
 	* @param event
 	* @param awfEmit Callback to be called when ready for event to be emitted.
 	*/
-	_awaitWriteFinish(path$24, threshold, event, awfEmit) {
+	_awaitWriteFinish(path$27, threshold, event, awfEmit) {
 		const awf = this.options.awaitWriteFinish;
 		if (typeof awf !== "object") return;
 		const pollInterval = awf.pollInterval;
 		let timeoutHandler;
-		let fullPath = path$24;
-		if (this.options.cwd && !path.isAbsolute(path$24)) fullPath = path.join(this.options.cwd, path$24);
+		let fullPath = path$27;
+		if (this.options.cwd && !path.isAbsolute(path$27)) fullPath = path.join(this.options.cwd, path$27);
 		const now = /* @__PURE__ */ new Date();
 		const writes = this._pendingWrites;
 		function awaitWriteFinishFn(prevStat) {
 			(0, fs.stat)(fullPath, (err, curStat) => {
-				if (err || !writes.has(path$24)) {
+				if (err || !writes.has(path$27)) {
 					if (err && err.code !== "ENOENT") awfEmit(err);
 					return;
 				}
 				const now = Number(/* @__PURE__ */ new Date());
-				if (prevStat && curStat.size !== prevStat.size) writes.get(path$24).lastChange = now;
-				if (now - writes.get(path$24).lastChange >= threshold) {
-					writes.delete(path$24);
+				if (prevStat && curStat.size !== prevStat.size) writes.get(path$27).lastChange = now;
+				if (now - writes.get(path$27).lastChange >= threshold) {
+					writes.delete(path$27);
 					awfEmit(void 0, curStat);
 				} else timeoutHandler = setTimeout(awaitWriteFinishFn, pollInterval, curStat);
 			});
 		}
-		if (!writes.has(path$24)) {
-			writes.set(path$24, {
+		if (!writes.has(path$27)) {
+			writes.set(path$27, {
 				lastChange: now,
 				cancelWait: () => {
-					writes.delete(path$24);
+					writes.delete(path$27);
 					clearTimeout(timeoutHandler);
 					return event;
 				}
@@ -77099,24 +77189,24 @@ var FSWatcher = class extends events.EventEmitter {
 	/**
 	* Determines whether user has asked to ignore this path.
 	*/
-	_isIgnored(path$33, stats) {
-		if (this.options.atomic && DOT_RE.test(path$33)) return true;
+	_isIgnored(path$36, stats) {
+		if (this.options.atomic && DOT_RE.test(path$36)) return true;
 		if (!this._userIgnored) {
 			const { cwd } = this.options;
 			const ignored = (this.options.ignored || []).map(normalizeIgnored(cwd));
 			this._userIgnored = anymatch([...[...this._ignoredPaths].map(normalizeIgnored(cwd)), ...ignored], void 0);
 		}
-		return this._userIgnored(path$33, stats);
+		return this._userIgnored(path$36, stats);
 	}
-	_isntIgnored(path$34, stat) {
-		return !this._isIgnored(path$34, stat);
+	_isntIgnored(path$37, stat) {
+		return !this._isIgnored(path$37, stat);
 	}
 	/**
 	* Provides a set of common helpers and properties relating to symlink handling.
 	* @param path file or directory pattern being watched
 	*/
-	_getWatchHelpers(path$35) {
-		return new WatchHelper(path$35, this.options.followSymlinks, this);
+	_getWatchHelpers(path$38) {
+		return new WatchHelper(path$38, this.options.followSymlinks, this);
 	}
 	/**
 	* Provides directory tracking objects
@@ -77142,50 +77232,50 @@ var FSWatcher = class extends events.EventEmitter {
 	* @param item      base path of item/directory
 	*/
 	_remove(directory, item, isDirectory) {
-		const path$25 = path.join(directory, item);
-		const fullPath = path.resolve(path$25);
-		isDirectory = isDirectory != null ? isDirectory : this._watched.has(path$25) || this._watched.has(fullPath);
-		if (!this._throttle("remove", path$25, 100)) return;
+		const path$28 = path.join(directory, item);
+		const fullPath = path.resolve(path$28);
+		isDirectory = isDirectory != null ? isDirectory : this._watched.has(path$28) || this._watched.has(fullPath);
+		if (!this._throttle("remove", path$28, 100)) return;
 		if (!isDirectory && this._watched.size === 1) this.add(directory, item, true);
-		this._getWatchedDir(path$25).getChildren().forEach((nested) => this._remove(path$25, nested));
+		this._getWatchedDir(path$28).getChildren().forEach((nested) => this._remove(path$28, nested));
 		const parent = this._getWatchedDir(directory);
 		const wasTracked = parent.has(item);
 		parent.remove(item);
 		if (this._symlinkPaths.has(fullPath)) this._symlinkPaths.delete(fullPath);
-		let relPath = path$25;
-		if (this.options.cwd) relPath = path.relative(this.options.cwd, path$25);
+		let relPath = path$28;
+		if (this.options.cwd) relPath = path.relative(this.options.cwd, path$28);
 		if (this.options.awaitWriteFinish && this._pendingWrites.has(relPath)) {
 			if (this._pendingWrites.get(relPath).cancelWait() === EVENTS.ADD) return;
 		}
-		this._watched.delete(path$25);
+		this._watched.delete(path$28);
 		this._watched.delete(fullPath);
 		const eventName = isDirectory ? EVENTS.UNLINK_DIR : EVENTS.UNLINK;
-		if (wasTracked && !this._isIgnored(path$25)) this._emit(eventName, path$25);
-		this._closePath(path$25);
+		if (wasTracked && !this._isIgnored(path$28)) this._emit(eventName, path$28);
+		this._closePath(path$28);
 	}
 	/**
 	* Closes all watchers for a path
 	*/
-	_closePath(path$26) {
-		this._closeFile(path$26);
-		const dir = path.dirname(path$26);
-		this._getWatchedDir(dir).remove(path.basename(path$26));
+	_closePath(path$29) {
+		this._closeFile(path$29);
+		const dir = path.dirname(path$29);
+		this._getWatchedDir(dir).remove(path.basename(path$29));
 	}
 	/**
 	* Closes only file-specific watchers
 	*/
-	_closeFile(path$36) {
-		const closers = this._closers.get(path$36);
+	_closeFile(path$39) {
+		const closers = this._closers.get(path$39);
 		if (!closers) return;
 		closers.forEach((closer) => closer());
-		this._closers.delete(path$36);
+		this._closers.delete(path$39);
 	}
-	_addPathCloser(path$37, closer) {
+	_addPathCloser(path$40, closer) {
 		if (!closer) return;
-		let list = this._closers.get(path$37);
+		let list = this._closers.get(path$40);
 		if (!list) {
 			list = [];
-			this._closers.set(path$37, list);
+			this._closers.set(path$40, list);
 		}
 		list.push(closer);
 	}
@@ -77726,6 +77816,31 @@ function log(level, tag, ...args) {
 const projectCwd = process.env.MAXSIM_PROJECT_CWD || process.cwd();
 const networkMode = process.env.MAXSIM_NETWORK_MODE === "1";
 let resolvedPort = 3333;
+/**
+* Derive a deterministic port for a project path (range 3100-3199).
+* Simple djb2 hash mapped to 100-port range.
+*/
+function projectPort(projectPath) {
+	let hash = 5381;
+	for (let i = 0; i < projectPath.length; i++) hash = (hash << 5) + hash + projectPath.charCodeAt(i) >>> 0;
+	return 3100 + hash % 100;
+}
+/**
+* List running MAXSIM dashboard instances by scanning the port range.
+*/
+async function listRunningDashboards() {
+	const results = [];
+	const checks = [];
+	for (let port = 3100; port <= 3199; port++) checks.push(fetch(`http://localhost:${port}/api/health`, { signal: AbortSignal.timeout(500) }).then((r) => r.json()).then((data) => {
+		if (data.status === "ok" && data.cwd) results.push({
+			port,
+			cwd: data.cwd,
+			uptime: data.uptime ?? 0
+		});
+	}).catch(() => {}));
+	await Promise.all(checks);
+	return results.sort((a, b) => a.port - b.port);
+}
 function getTailscaleIp() {
 	const ifaces = node_os.networkInterfaces();
 	for (const [name, iface] of Object.entries(ifaces)) {
@@ -77785,6 +77900,7 @@ let clientCount = 0;
 const questionQueue = [];
 const pendingAnswers = /* @__PURE__ */ new Map();
 const currentLifecycleState = { value: null };
+const conversations = /* @__PURE__ */ new Map();
 function createWSS(onClientCountChange) {
 	const wss = new import_websocket_server.default({ noServer: true });
 	wss.on("connection", (ws) => {
@@ -77839,7 +77955,7 @@ function setupWatcher(cwd, wss) {
 				timestamp: Date.now()
 			});
 		}
-	}, 200);
+	}, 500);
 	function onFileChange(filePath) {
 		const normalized = normalizeFsPath(filePath);
 		if (isSuppressed(normalized)) {
@@ -78113,12 +78229,25 @@ function parseProject(cwd) {
 }
 const app = (0, import_express.default)();
 app.use(import_express.json());
+let serverReady = false;
 app.get("/api/health", (_req, res) => {
 	res.json({
 		status: "ok",
-		port: process.env.PORT || 3333,
+		ready: serverReady,
+		port: resolvedPort,
 		cwd: projectCwd,
 		uptime: process.uptime()
+	});
+});
+app.get("/api/ready", (_req, res) => {
+	if (serverReady) return res.json({
+		ready: true,
+		port: resolvedPort,
+		cwd: projectCwd
+	});
+	return res.status(503).json({
+		ready: false,
+		message: "Server is starting up"
 	});
 });
 app.get("/api/roadmap", (_req, res) => {
@@ -78374,6 +78503,21 @@ app.post("/api/simple-mode-config", (req, res) => {
 		default_mode
 	});
 });
+app.get("/api/conversations", (_req, res) => {
+	const list = Array.from(conversations.values()).map((c) => ({
+		id: c.id,
+		topic: c.topic,
+		messageCount: c.messages.length,
+		createdAt: c.createdAt,
+		updatedAt: c.updatedAt
+	}));
+	return res.json(list);
+});
+app.get("/api/conversations/:id", (req, res) => {
+	const conv = conversations.get(req.params.id);
+	if (!conv) return res.status(404).json({ error: "Conversation not found" });
+	return res.json(conv);
+});
 if (node_fs.existsSync(clientDir)) app.use(build_default(clientDir, { single: true }));
 else app.get("/", (_req, res) => {
 	res.send("<html><body><p>Dashboard client not found. Run <code>pnpm run build</code> first.</p></body></html>");
@@ -78416,6 +78560,15 @@ function unregisterMcpServerFromClaudeJson(projectPath) {
 	} catch {}
 }
 async function main() {
+	if (process.argv.includes("--list")) {
+		const dashboards = await listRunningDashboards();
+		if (dashboards.length === 0) console.log("No running MAXSIM dashboards found.");
+		else {
+			console.log("Running MAXSIM dashboards:");
+			for (const d of dashboards) console.log(`  Port ${d.port} → ${d.cwd} (uptime: ${Math.round(d.uptime)}s)`);
+		}
+		process.exit(0);
+	}
 	let autoShutdownTimer = null;
 	const wss = createWSS((count) => {
 		if (count > 0) {
@@ -78439,6 +78592,7 @@ async function main() {
 		questionQueue,
 		pendingAnswers,
 		currentLifecycleState,
+		conversations,
 		broadcast
 	});
 	app.post("/mcp", async (req, res) => {
@@ -78553,11 +78707,12 @@ async function main() {
 	} catch (err) {
 		console.error("[server] Failed to start file watcher:", err.message);
 	}
-	const port = await esm_default(3333);
+	const port = await esm_default(projectPort(projectCwd));
 	resolvedPort = port;
 	const localUrl = `http://localhost:${port}`;
 	const bindHost = networkMode || tailscaleIp !== null ? "0.0.0.0" : "127.0.0.1";
 	server.listen(port, bindHost, () => {
+		serverReady = true;
 		log("INFO", "server", `Dashboard ready at ${localUrl}, log file: ${logFile}`);
 		console.error(`Dashboard ready at ${localUrl}`);
 		if (localNetworkIp) console.error(`LAN URL:          http://${localNetworkIp}:${port}`);

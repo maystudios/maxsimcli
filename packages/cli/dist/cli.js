@@ -314,6 +314,12 @@ const COMMANDS = {
             freshness: f.freshness ?? undefined,
         }, raw);
     },
+    'artefakte-read': (args, cwd, raw) => (0, index_js_1.cmdArtefakteRead)(cwd, args[1], getFlag(args, '--phase') ?? undefined, raw),
+    'artefakte-write': (args, cwd, raw) => (0, index_js_1.cmdArtefakteWrite)(cwd, args[1], getFlag(args, '--content') ?? undefined, getFlag(args, '--phase') ?? undefined, raw),
+    'artefakte-append': (args, cwd, raw) => (0, index_js_1.cmdArtefakteAppend)(cwd, args[1], getFlag(args, '--entry') ?? undefined, getFlag(args, '--phase') ?? undefined, raw),
+    'artefakte-list': (args, cwd, raw) => (0, index_js_1.cmdArtefakteList)(cwd, getFlag(args, '--phase') ?? undefined, raw),
+    'context-load': (args, cwd, raw) => (0, index_js_1.cmdContextLoad)(cwd, getFlag(args, '--phase') ?? undefined, getFlag(args, '--topic') ?? undefined, hasFlag(args, 'include-history'), raw),
+    'start': async (args, cwd, raw) => (0, index_js_1.cmdStart)(cwd, { noBrowser: hasFlag(args, 'no-browser'), networkMode: hasFlag(args, 'network') }, raw),
     'dashboard': (args) => handleDashboard(args.slice(1)),
     'start-server': async () => {
         const serverPath = path.join(__dirname, 'mcp-server.cjs');

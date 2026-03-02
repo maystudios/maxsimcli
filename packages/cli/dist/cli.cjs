@@ -4785,7 +4785,7 @@ function listSubDirs(dir, sortByPhase = false) {
 }
 /** Extract a human-readable message from an unknown thrown value. */
 function errorMsg(e) {
-	return errorMsg(e);
+	return e instanceof Error ? e.message : String(e);
 }
 /** Log only when MAXSIM_DEBUG is set. Accepts an optional context label. */
 function debugLog(contextOrError, error) {
@@ -15258,6 +15258,232 @@ function cmdTemplateFill(cwd, templateType, options, raw) {
 }
 
 //#endregion
+//#region src/core/artefakte.ts
+/**
+* Artefakte — CRUD operations for project-level artefakte files
+*
+* Manages DECISIONS.md, ACCEPTANCE-CRITERIA.md, and NO-GOS.md
+* at both project level (.planning/) and phase level (.planning/phases/<phase>/).
+*/
+const ARTEFAKT_FILES = {
+	"decisions": "DECISIONS.md",
+	"acceptance-criteria": "ACCEPTANCE-CRITERIA.md",
+	"no-gos": "NO-GOS.md"
+};
+function resolveArtefaktPath(cwd, type, phase) {
+	const filename = ARTEFAKT_FILES[type];
+	if (phase) {
+		const phaseInfo = findPhaseInternal(cwd, phase);
+		if (!phaseInfo?.directory) error(`Phase ${phase} not found`);
+		return node_path.default.join(cwd, phaseInfo.directory, filename);
+	}
+	return planningPath(cwd, filename);
+}
+function validateType(type) {
+	if (!type || !(type in ARTEFAKT_FILES)) error(`Invalid artefakt type: ${type}. Available: ${Object.keys(ARTEFAKT_FILES).join(", ")}`);
+	return type;
+}
+function getTemplate(type) {
+	const today = todayISO();
+	switch (type) {
+		case "decisions": return `# Decisions\n\n> Architectural and design decisions for this project.\n\n**Created:** ${today}\n\n## Decision Log\n\n| # | Decision | Rationale | Date | Phase |\n|---|----------|-----------|------|-------|\n`;
+		case "acceptance-criteria": return `# Acceptance Criteria\n\n> Conditions that must be met for deliverables to be accepted.\n\n**Created:** ${today}\n\n## Criteria\n\n| # | Criterion | Status | Verified |\n|---|-----------|--------|----------|\n`;
+		case "no-gos": return `# No-Gos\n\n> Things explicitly out of scope or forbidden.\n\n**Created:** ${today}\n\n## Boundaries\n\n- _No entries yet._\n`;
+	}
+}
+function cmdArtefakteRead(cwd, type, phase, raw) {
+	const artefaktType = validateType(type);
+	const content = safeReadFile(resolveArtefaktPath(cwd, artefaktType, phase));
+	if (content === null) {
+		output({
+			exists: false,
+			type: artefaktType,
+			phase: phase ?? null,
+			content: null
+		}, raw, "");
+		return;
+	}
+	output({
+		exists: true,
+		type: artefaktType,
+		phase: phase ?? null,
+		content
+	}, raw, content);
+}
+function cmdArtefakteWrite(cwd, type, content, phase, raw) {
+	const artefaktType = validateType(type);
+	const fileContent = content ?? getTemplate(artefaktType);
+	const filePath = resolveArtefaktPath(cwd, artefaktType, phase);
+	const dir = node_path.default.dirname(filePath);
+	node_fs.default.mkdirSync(dir, { recursive: true });
+	node_fs.default.writeFileSync(filePath, fileContent, "utf-8");
+	const relPath = node_path.default.relative(cwd, filePath);
+	output({
+		written: true,
+		type: artefaktType,
+		phase: phase ?? null,
+		path: relPath
+	}, raw, relPath);
+}
+function cmdArtefakteAppend(cwd, type, entry, phase, raw) {
+	if (!entry) error("entry required for artefakte append");
+	const artefaktType = validateType(type);
+	const filePath = resolveArtefaktPath(cwd, artefaktType, phase);
+	let content = safeReadFile(filePath);
+	if (content === null) content = getTemplate(artefaktType);
+	content = content.replace(/^-\s*_No entries yet\._\s*$/m, "");
+	const today = todayISO();
+	let appendLine;
+	if (artefaktType === "decisions") appendLine = `| ${(content.match(/^\|\s*\d+/gm) || []).length + 1} | ${entry} | - | ${today} | - |`;
+	else if (artefaktType === "acceptance-criteria") appendLine = `| ${(content.match(/^\|\s*\d+/gm) || []).length + 1} | ${entry} | pending | - |`;
+	else appendLine = `- ${entry}`;
+	content = content.trimEnd() + "\n" + appendLine + "\n";
+	node_fs.default.writeFileSync(filePath, content, "utf-8");
+	const relPath = node_path.default.relative(cwd, filePath);
+	output({
+		appended: true,
+		type: artefaktType,
+		phase: phase ?? null,
+		entry: appendLine,
+		path: relPath
+	}, raw, "true");
+}
+function cmdArtefakteList(cwd, phase, raw) {
+	const results = [];
+	for (const [type, filename] of Object.entries(ARTEFAKT_FILES)) {
+		let filePath;
+		if (phase) {
+			const phaseInfo = findPhaseInternal(cwd, phase);
+			if (!phaseInfo?.directory) {
+				output({ error: `Phase ${phase} not found` }, raw);
+				return;
+			}
+			filePath = node_path.default.join(cwd, phaseInfo.directory, filename);
+		} else filePath = planningPath(cwd, filename);
+		results.push({
+			type,
+			exists: node_fs.default.existsSync(filePath),
+			path: node_path.default.relative(cwd, filePath)
+		});
+	}
+	output({
+		phase: phase ?? null,
+		artefakte: results
+	}, raw);
+}
+
+//#endregion
+//#region src/core/context-loader.ts
+/**
+* Context Loader — Intelligent file selection for workflow context assembly
+*
+* Selects relevant planning files based on the current task/phase domain,
+* preventing context overload by loading only what matters.
+*/
+function fileEntry(cwd, relPath, role) {
+	const fullPath = node_path.default.join(cwd, relPath);
+	try {
+		return {
+			path: relPath,
+			role,
+			size: node_fs.default.statSync(fullPath).size
+		};
+	} catch {
+		return null;
+	}
+}
+function addIfExists(files, cwd, relPath, role) {
+	const entry = fileEntry(cwd, relPath, role);
+	if (entry) files.push(entry);
+}
+function loadProjectContext(cwd) {
+	const files = [];
+	addIfExists(files, cwd, ".planning/PROJECT.md", "project-vision");
+	addIfExists(files, cwd, ".planning/REQUIREMENTS.md", "requirements");
+	addIfExists(files, cwd, ".planning/STATE.md", "state");
+	addIfExists(files, cwd, ".planning/config.json", "config");
+	return files;
+}
+function loadRoadmapContext(cwd) {
+	const files = [];
+	addIfExists(files, cwd, ".planning/ROADMAP.md", "roadmap");
+	return files;
+}
+function loadPhaseContext(cwd, phase) {
+	const files = [];
+	const phaseInfo = findPhaseInternal(cwd, phase);
+	if (!phaseInfo?.directory) return files;
+	const phaseDir = phaseInfo.directory;
+	try {
+		const phaseFiles = node_fs.default.readdirSync(node_path.default.join(cwd, phaseDir));
+		for (const f of phaseFiles) {
+			const relPath = node_path.default.join(phaseDir, f);
+			if (f.endsWith("-CONTEXT.md") || f === "CONTEXT.md") addIfExists(files, cwd, relPath, "phase-context");
+			else if (f.endsWith("-RESEARCH.md") || f === "RESEARCH.md") addIfExists(files, cwd, relPath, "phase-research");
+			else if (f.endsWith("-PLAN.md")) addIfExists(files, cwd, relPath, "phase-plan");
+			else if (f.endsWith("-SUMMARY.md")) addIfExists(files, cwd, relPath, "phase-summary");
+			else if (f.endsWith("-VERIFICATION.md") || f === "VERIFICATION.md") addIfExists(files, cwd, relPath, "phase-verification");
+		}
+	} catch (e) {
+		debugLog("context-loader-phase-files-failed", e);
+	}
+	return files;
+}
+function loadArtefakteContext(cwd, phase) {
+	const files = [];
+	for (const filename of [
+		"DECISIONS.md",
+		"ACCEPTANCE-CRITERIA.md",
+		"NO-GOS.md"
+	]) {
+		if (phase) {
+			const phaseInfo = findPhaseInternal(cwd, phase);
+			if (phaseInfo?.directory) addIfExists(files, cwd, node_path.default.join(phaseInfo.directory, filename), `artefakt-${filename.toLowerCase()}`);
+		}
+		addIfExists(files, cwd, `.planning/${filename}`, `artefakt-${filename.toLowerCase()}`);
+	}
+	return files;
+}
+function loadHistoryContext(cwd, currentPhase) {
+	const files = [];
+	const pd = phasesPath(cwd);
+	try {
+		const dirs = listSubDirs(pd, true);
+		for (const dir of dirs) {
+			if (currentPhase) {
+				if (dir.match(/^(\d+[A-Z]?(?:\.\d+)?)/i)?.[1] === currentPhase) continue;
+			}
+			const dirPath = node_path.default.join(pd, dir);
+			const summaries = node_fs.default.readdirSync(dirPath).filter((f) => isSummaryFile(f));
+			for (const s of summaries) addIfExists(files, cwd, node_path.default.join(".planning", "phases", dir, s), "history-summary");
+		}
+	} catch (e) {
+		debugLog("context-loader-history-failed", e);
+	}
+	return files;
+}
+function cmdContextLoad(cwd, phase, topic, includeHistory, raw) {
+	const allFiles = [];
+	allFiles.push(...loadProjectContext(cwd));
+	allFiles.push(...loadRoadmapContext(cwd));
+	allFiles.push(...loadArtefakteContext(cwd, phase));
+	if (phase) allFiles.push(...loadPhaseContext(cwd, phase));
+	if (includeHistory) allFiles.push(...loadHistoryContext(cwd, phase));
+	const seen = /* @__PURE__ */ new Set();
+	const deduped = allFiles.filter((f) => {
+		if (seen.has(f.path)) return false;
+		seen.add(f.path);
+		return true;
+	});
+	output({
+		files: deduped,
+		total_size: deduped.reduce((sum, f) => sum + f.size, 0),
+		phase: phase ?? null,
+		topic: topic ?? null
+	}, raw);
+}
+
+//#endregion
 //#region src/core/dashboard-launcher.ts
 /**
 * Dashboard Launcher — Shared dashboard lifecycle utilities
@@ -15445,6 +15671,79 @@ function spawnDashboard(options) {
 	});
 	child.unref();
 	return child.pid ?? null;
+}
+/**
+* Poll the port range until a dashboard health endpoint responds.
+* Returns the URL if found within the timeout, null otherwise.
+*/
+async function waitForDashboard(pollIntervalMs = 500, pollTimeoutMs = 2e4, healthTimeoutMs = 1e3) {
+	const deadline = Date.now() + pollTimeoutMs;
+	while (Date.now() < deadline) {
+		await new Promise((r) => setTimeout(r, pollIntervalMs));
+		for (let p = DEFAULT_PORT; p <= PORT_RANGE_END; p++) if (await checkHealth(p, healthTimeoutMs)) return `http://localhost:${p}`;
+	}
+	return null;
+}
+
+//#endregion
+//#region src/core/start.ts
+/**
+* Start — Orchestrates Dashboard launch + browser open
+*
+* Provides a unified `maxsimcli start` entry point that:
+* 1. Checks for a running dashboard
+* 2. Starts the dashboard if needed
+* 3. Opens the browser
+* 4. Reports status
+*/
+function openBrowser(url) {
+	(0, node_child_process.exec)(process.platform === "win32" ? `start "" "${url}"` : process.platform === "darwin" ? `open "${url}"` : `xdg-open "${url}"`, (err) => {
+		if (err) debugLog("open-browser-failed", err);
+	});
+}
+async function cmdStart(cwd, options, raw) {
+	const existingPort = await findRunningDashboard();
+	if (existingPort) {
+		const url = `http://localhost:${existingPort}`;
+		if (!options.noBrowser) openBrowser(url);
+		output({
+			started: true,
+			url,
+			already_running: true,
+			port: existingPort
+		}, raw, url);
+		return;
+	}
+	const serverPath = resolveDashboardServer();
+	if (!serverPath) error("Dashboard server not found. Run `npx maxsimcli` to install first.");
+	const serverDir = node_path.default.dirname(serverPath);
+	const dashConfig = readDashboardConfig(serverPath);
+	ensureNodePty(serverDir);
+	const pid = spawnDashboard({
+		serverPath,
+		projectCwd: dashConfig.projectCwd,
+		networkMode: options.networkMode
+	});
+	if (!pid) error("Failed to spawn dashboard process.");
+	const url = await waitForDashboard();
+	if (url) {
+		if (!options.noBrowser) openBrowser(url);
+		output({
+			started: true,
+			url,
+			already_running: false,
+			pid
+		}, raw, url);
+	} else {
+		const fallbackUrl = `http://localhost:${DEFAULT_PORT}`;
+		output({
+			started: true,
+			url: fallbackUrl,
+			already_running: false,
+			pid,
+			warning: "Dashboard spawned but health check timed out. It may still be starting."
+		}, raw, fallbackUrl);
+	}
 }
 
 //#endregion
@@ -16206,6 +16505,15 @@ const COMMANDS = {
 			freshness: f.freshness ?? void 0
 		}, raw);
 	},
+	"artefakte-read": (args, cwd, raw) => cmdArtefakteRead(cwd, args[1], getFlag(args, "--phase") ?? void 0, raw),
+	"artefakte-write": (args, cwd, raw) => cmdArtefakteWrite(cwd, args[1], getFlag(args, "--content") ?? void 0, getFlag(args, "--phase") ?? void 0, raw),
+	"artefakte-append": (args, cwd, raw) => cmdArtefakteAppend(cwd, args[1], getFlag(args, "--entry") ?? void 0, getFlag(args, "--phase") ?? void 0, raw),
+	"artefakte-list": (args, cwd, raw) => cmdArtefakteList(cwd, getFlag(args, "--phase") ?? void 0, raw),
+	"context-load": (args, cwd, raw) => cmdContextLoad(cwd, getFlag(args, "--phase") ?? void 0, getFlag(args, "--topic") ?? void 0, hasFlag(args, "include-history"), raw),
+	"start": async (args, cwd, raw) => cmdStart(cwd, {
+		noBrowser: hasFlag(args, "no-browser"),
+		networkMode: hasFlag(args, "network")
+	}, raw),
 	"dashboard": (args) => handleDashboard(args.slice(1)),
 	"start-server": async () => {
 		const serverPath = node_path.join(__dirname, "mcp-server.cjs");

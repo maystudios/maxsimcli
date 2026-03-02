@@ -24,6 +24,9 @@ Initialize MAXSIM in an existing codebase through scan-first flow: codebase anal
 - `.planning/REQUIREMENTS.md` — stage-aware requirements
 - `.planning/ROADMAP.md` — milestone + suggested phases
 - `.planning/STATE.md` — pre-populated project memory
+- `.planning/DECISIONS.md` — key decisions with rationale (artefakte)
+- `.planning/ACCEPTANCE-CRITERIA.md` — measurable success criteria (artefakte)
+- `.planning/NO-GOS.md` — explicit exclusions and anti-patterns (artefakte)
 
 **After this command:** Run `/maxsim:plan-phase 1` to start execution.
 </objective>
@@ -31,6 +34,7 @@ Initialize MAXSIM in an existing codebase through scan-first flow: codebase anal
 <execution_context>
 @./workflows/init-existing.md
 @./references/questioning.md
+@./references/thinking-partner.md
 @./references/ui-brand.md
 @./templates/project.md
 @./templates/requirements.md

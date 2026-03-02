@@ -141,7 +141,7 @@ function listSubDirs(dir, sortByPhase = false) {
 }
 /** Extract a human-readable message from an unknown thrown value. */
 function errorMsg(e) {
-    return errorMsg(e);
+    return e instanceof Error ? e.message : String(e);
 }
 /** Log only when MAXSIM_DEBUG is set. Accepts an optional context label. */
 function debugLog(contextOrError, error) {

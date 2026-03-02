@@ -15,6 +15,10 @@ export { cmdVerifySummary, cmdVerifyPlanStructure, cmdVerifyPhaseCompleteness, c
 export { cmdPhasesList, cmdPhaseNextDecimal, cmdFindPhase, cmdPhasePlanIndex, cmdPhaseAdd, cmdPhaseInsert, cmdPhaseRemove, cmdPhaseComplete, } from './phase.js';
 export type { TemplateSelectResult, TemplateFillOptions, TemplateFillResult, } from './template.js';
 export { cmdTemplateSelect, cmdTemplateFill, } from './template.js';
+export { cmdArtefakteRead, cmdArtefakteWrite, cmdArtefakteAppend, cmdArtefakteList, } from './artefakte.js';
+export type { ContextFile, ContextLoadResult, } from './context-loader.js';
+export { cmdContextLoad, } from './context-loader.js';
+export { cmdStart, } from './start.js';
 export { checkHealth, findRunningDashboard, killProcessOnPort, resolveDashboardServer, readDashboardConfig, ensureNodePty, spawnDashboard, waitForDashboard, DEFAULT_PORT, PORT_RANGE_END, HEALTH_TIMEOUT_MS, } from './dashboard-launcher.js';
 export type { DashboardConfig, SpawnDashboardOptions, } from './dashboard-launcher.js';
 export type { WorkflowType, InitContext, ExecutePhaseContext, PlanPhaseContext, NewProjectContext, NewMilestoneContext, QuickContext, ResumeContext, VerifyWorkContext, PhaseOpContext, TodosContext, MilestoneOpContext, MapCodebaseContext, InitExistingContext, ProgressContext, } from './init.js';

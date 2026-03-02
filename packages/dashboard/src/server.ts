@@ -9,7 +9,7 @@ import express, { type Request, type Response, type NextFunction } from 'express
 import sirv from 'sirv';
 import { WebSocketServer, WebSocket } from 'ws';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { createMcpServer, type PendingQuestion } from './mcp-server';
+import { createMcpServer, type PendingQuestion, type Conversation } from './mcp-server';
 import detectPort from 'detect-port';
 import open from 'open';
 
@@ -58,6 +58,40 @@ const projectCwd = process.env.MAXSIM_PROJECT_CWD || process.cwd();
 const networkMode = process.env.MAXSIM_NETWORK_MODE === '1';
 // Port is resolved in main() and set here so /api/server-info can read it before listen completes
 let resolvedPort = 3333;
+
+/**
+ * Derive a deterministic port for a project path (range 3100-3199).
+ * Simple djb2 hash mapped to 100-port range.
+ */
+function projectPort(projectPath: string): number {
+  let hash = 5381;
+  for (let i = 0; i < projectPath.length; i++) {
+    hash = ((hash << 5) + hash + projectPath.charCodeAt(i)) >>> 0;
+  }
+  return 3100 + (hash % 100);
+}
+
+/**
+ * List running MAXSIM dashboard instances by scanning the port range.
+ */
+async function listRunningDashboards(): Promise<Array<{ port: number; cwd: string; uptime: number }>> {
+  const results: Array<{ port: number; cwd: string; uptime: number }> = [];
+  const checks = [];
+  for (let port = 3100; port <= 3199; port++) {
+    checks.push(
+      fetch(`http://localhost:${port}/api/health`, { signal: AbortSignal.timeout(500) })
+        .then(r => r.json())
+        .then((data: { status?: string; cwd?: string; uptime?: number }) => {
+          if (data.status === 'ok' && data.cwd) {
+            results.push({ port, cwd: data.cwd, uptime: data.uptime ?? 0 });
+          }
+        })
+        .catch(() => { /* not running on this port */ })
+    );
+  }
+  await Promise.all(checks);
+  return results.sort((a, b) => a.port - b.port);
+}
 
 function getLocalNetworkIp(): string | null {
   const ifaces = os.networkInterfaces();
@@ -206,6 +240,7 @@ let clientCount = 0;
 const questionQueue: PendingQuestion[] = [];
 const pendingAnswers = new Map<string, (answer: string) => void>();
 const currentLifecycleState: { value: Record<string, unknown> | null } = { value: null };
+const conversations = new Map<string, Conversation>();
 
 function createWSS(onClientCountChange?: (count: number) => void): WebSocketServer {
   const wss = new WebSocketServer({ noServer: true });
@@ -267,7 +302,7 @@ function setupWatcher(cwd: string, wss: WebSocketServer): FSWatcher {
       console.error(`[watcher] Broadcasting ${changes.length} change(s)`);
       broadcast(wss, { type: 'file-changes', changes, timestamp: Date.now() });
     }
-  }, 200);
+  }, 500);
 
   function onFileChange(filePath: string): void {
     const normalized = normalizeFsPath(filePath);
@@ -618,13 +653,23 @@ const app = express();
 app.use(express.json());
 
 // ── Health ──
+let serverReady = false;
+
 app.get('/api/health', (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
-    port: process.env.PORT || 3333,
+    ready: serverReady,
+    port: resolvedPort,
     cwd: projectCwd,
     uptime: process.uptime(),
   });
+});
+
+app.get('/api/ready', (_req: Request, res: Response) => {
+  if (serverReady) {
+    return res.json({ ready: true, port: resolvedPort, cwd: projectCwd });
+  }
+  return res.status(503).json({ ready: false, message: 'Server is starting up' });
 });
 
 // ── Roadmap ──
@@ -959,6 +1004,24 @@ app.post('/api/simple-mode-config', (req: Request, res: Response) => {
   return res.json({ written: true, default_mode });
 });
 
+// ── Conversations ──
+app.get('/api/conversations', (_req: Request, res: Response) => {
+  const list = Array.from(conversations.values()).map(c => ({
+    id: c.id,
+    topic: c.topic,
+    messageCount: c.messages.length,
+    createdAt: c.createdAt,
+    updatedAt: c.updatedAt,
+  }));
+  return res.json(list);
+});
+
+app.get('/api/conversations/:id', (req: Request, res: Response) => {
+  const conv = conversations.get(req.params.id);
+  if (!conv) return res.status(404).json({ error: 'Conversation not found' });
+  return res.json(conv);
+});
+
 // ── Static client (Vite build) ──
 if (fs.existsSync(clientDir)) {
   app.use(sirv(clientDir, { single: true }));
@@ -1024,6 +1087,20 @@ function unregisterMcpServerFromClaudeJson(projectPath: string): void {
 }
 
 async function main(): Promise<void> {
+  // Handle --list flag: show running dashboards and exit
+  if (process.argv.includes('--list')) {
+    const dashboards = await listRunningDashboards();
+    if (dashboards.length === 0) {
+      console.log('No running MAXSIM dashboards found.');
+    } else {
+      console.log('Running MAXSIM dashboards:');
+      for (const d of dashboards) {
+        console.log(`  Port ${d.port} → ${d.cwd} (uptime: ${Math.round(d.uptime)}s)`);
+      }
+    }
+    process.exit(0);
+  }
+
   let autoShutdownTimer: NodeJS.Timeout | null = null;
 
   const wss = createWSS((count) => {
@@ -1049,6 +1126,7 @@ async function main(): Promise<void> {
     questionQueue,
     pendingAnswers,
     currentLifecycleState,
+    conversations,
     broadcast,
   });
 
@@ -1187,13 +1265,16 @@ async function main(): Promise<void> {
     console.error('[server] Failed to start file watcher:', (err as Error).message);
   }
 
-  const port = await detectPort(3333);
+  // Use project-hashed port (3100-3199), fallback to detect if busy
+  const preferredPort = projectPort(projectCwd);
+  const port = await detectPort(preferredPort);
   resolvedPort = port;
   const localUrl = `http://localhost:${port}`;
   // Bind to all interfaces when network mode or Tailscale is active
   const bindHost = (networkMode || tailscaleIp !== null) ? '0.0.0.0' : '127.0.0.1';
 
   server.listen(port, bindHost, () => {
+    serverReady = true;
     log('INFO', 'server', `Dashboard ready at ${localUrl}, log file: ${logFile}`);
     console.error(`Dashboard ready at ${localUrl}`);
     if (localNetworkIp) {

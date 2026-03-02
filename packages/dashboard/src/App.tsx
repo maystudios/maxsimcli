@@ -3,7 +3,6 @@ import { WebSocketProvider } from "@/components/providers/websocket-provider";
 import { SimpleModeProvider } from "@/components/providers/simple-mode-provider";
 import { DiscussionProvider } from "@/components/providers/discussion-provider";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
-import { useDashboardMode } from "@/hooks/use-dashboard-mode";
 import { StatsHeader } from "@/components/dashboard/stats-header";
 import { PhaseList } from "@/components/dashboard/phase-list";
 import { PhaseDetail } from "@/components/dashboard/phase-detail";
@@ -13,13 +12,11 @@ import { AppShell } from "@/components/layout/app-shell";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Terminal } from "@/components/terminal/Terminal";
 import { TerminalToggle, useTerminalLayout } from "@/components/terminal/TerminalTab";
-import { ModeToggleButton } from "@/components/simple-mode/mode-toggle-button";
-import { FirstRunCard } from "@/components/simple-mode/first-run-card";
 import { SimpleModeView } from "@/components/simple-mode/simple-mode-view";
 import { ConnectionBanner } from "@/components/dashboard/connection-banner";
 import type { DashboardPhase } from "@/lib/types";
 
-export type ActiveView = "overview" | "phase" | "todos" | "blockers" | "terminal";
+export type ActiveView = "overview" | "phase" | "todos" | "blockers" | "discussion";
 
 /** Skeleton placeholder for loading state */
 function LoadingSkeleton() {
@@ -76,30 +73,17 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
   );
 }
 
-/** Inner app that depends on WebSocket context being available */
+/** Unified dashboard — no more simple/advanced mode split */
 function DashboardApp() {
   const { roadmap, state, todos, loading, error } = useDashboardData();
-  const { mode, setMode, initialized } = useDashboardMode();
-  const [activeView, setActiveView] = useState<ActiveView>("overview");
+  const [activeView, setActiveView] = useState<ActiveView>("discussion");
   const [activePhaseId, setActivePhaseId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [terminalOpen, setTerminalOpen] = useState(false);
   const { splitMode, toggleSplit } = useTerminalLayout();
   const terminalWriteRef = useRef<((data: string) => void) | null>(null);
 
-  const toggleMode = useCallback(() => {
-    setMode(mode === "simple" ? "advanced" : "simple");
-  }, [mode, setMode]);
-
-  const modeToggle = initialized ? (
-    <ModeToggleButton mode={mode} onToggle={toggleMode} />
-  ) : null;
-  /** Track the last non-terminal view for split mode dashboard content */
-  const lastDashboardViewRef = useRef<{ view: ActiveView; phaseId: string | null }>({ view: "overview", phaseId: null });
-
   const handleNavigate = useCallback((view: ActiveView, id?: string) => {
-    if (view !== "terminal") {
-      lastDashboardViewRef.current = { view, phaseId: view === "phase" && id ? id : null };
-    }
     setActiveView(view);
     if (view === "phase" && id) {
       setActivePhaseId(id);
@@ -113,11 +97,10 @@ function DashboardApp() {
     if (terminalWriteRef.current) {
       terminalWriteRef.current(cmd + "\r");
     } else {
-      // Terminal not ready yet — queue for when it connects
       pendingCommandRef.current = cmd;
     }
-    handleNavigate("terminal");
-  }, [handleNavigate]);
+    setTerminalOpen(true);
+  }, []);
 
   // Flush pending command once terminal writeInput becomes available
   useEffect(() => {
@@ -156,7 +139,7 @@ function DashboardApp() {
     }
   }, []);
 
-  // Build phases array from roadmap data (camelCase mapping)
+  // Build phases array from roadmap data
   const phases: DashboardPhase[] = (roadmap?.phases ?? []).map((p) => ({
     number: p.number,
     name: p.name,
@@ -222,79 +205,85 @@ function DashboardApp() {
           </div>
         );
 
-      case "terminal":
-        // Terminal content is rendered persistently below, not here
-        return null;
+      case "discussion":
+        return (
+          <div className="flex flex-col flex-1 min-h-0">
+            <SimpleModeView onExecute={executeInTerminal} />
+          </div>
+        );
 
       default:
         return null;
     }
   }
 
-  const isTerminalView = activeView === "terminal";
-  const isSimple = mode === "simple";
+  const toggleTerminal = useCallback(() => {
+    setTerminalOpen((prev) => !prev);
+  }, []);
 
   return (
     <AppShell
       mobileMenuOpen={mobileMenuOpen}
       onMobileMenuToggle={() => setMobileMenuOpen((v) => !v)}
       onMobileMenuClose={() => setMobileMenuOpen(false)}
-      headerRight={modeToggle}
-      simpleMode={isSimple}
       sidebar={
-        <div style={{ display: isSimple ? "none" : "contents" }}>
-          <Sidebar
-            activeView={activeView}
-            activePhaseId={activePhaseId}
-            onNavigate={handleNavigate}
-            logoAction={modeToggle}
-          />
-        </div>
+        <Sidebar
+          activeView={activeView}
+          activePhaseId={activePhaseId}
+          onNavigate={handleNavigate}
+          terminalOpen={terminalOpen}
+          onTerminalToggle={toggleTerminal}
+        />
       }
     >
-      {/* Connection status banner — shows when server is unreachable */}
+      {/* Connection status banner */}
       <ConnectionBanner />
 
-      {/* First-run card — shown above everything when mode is not yet chosen */}
-      {initialized && mode === null && <FirstRunCard onChoose={setMode} />}
-
-      {/* Simple Mode content area */}
-      {isSimple && initialized && (
-        <div className="flex flex-col flex-1 min-h-0">
-          <SimpleModeView onExecute={executeInTerminal} />
-        </div>
-      )}
-
-      {/* Advanced Mode content — always mounted, hidden when in Simple Mode */}
-      <div style={{ display: isSimple ? "none" : "contents" }}>
-        {/* Dashboard content: hidden when terminal is full-height, visible in split top half */}
-        <div
-          style={{ display: isTerminalView && !splitMode ? "none" : "block" }}
-          className={
-            isTerminalView && splitMode
-              ? "h-1/2 min-h-0 overflow-auto border-b border-border p-4 sm:p-6"
+      {/* Main content area */}
+      <div
+        className={
+          terminalOpen && splitMode
+            ? "h-1/2 min-h-0 overflow-auto p-4 sm:p-6"
+            : terminalOpen
+              ? "hidden"
               : "flex-1 overflow-y-auto p-4 sm:p-6"
-          }
-        >
-          {renderContent()}
-        </div>
+        }
+      >
+        {renderContent()}
+      </div>
 
-        {/* Terminal: always mounted, visibility toggled via CSS */}
+      {/* Terminal: collapsible bottom panel */}
+      {terminalOpen && (
         <div
-          style={{ display: isTerminalView ? "flex" : "none" }}
-          className={`relative min-h-0 flex-col overflow-hidden ${isTerminalView && splitMode ? "h-1/2" : "flex-1"}`}
+          className={`relative min-h-0 flex flex-col overflow-hidden border-t border-border ${
+            splitMode ? "h-1/2" : "flex-1"
+          }`}
         >
-          <TerminalToggle splitMode={splitMode} onToggle={toggleSplit} />
+          <div className="flex items-center justify-between px-3 py-1 bg-card border-b border-border">
+            <span className="text-xs font-mono text-muted-foreground">Terminal</span>
+            <div className="flex items-center gap-1">
+              <TerminalToggle splitMode={splitMode} onToggle={toggleSplit} />
+              <button
+                type="button"
+                onClick={toggleTerminal}
+                title="Close terminal"
+                className="flex h-6 w-6 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M2 2l8 8M10 2L2 10" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+          </div>
           <Terminal writeInputRef={terminalWriteRef} />
         </div>
-      </div>
+      )}
     </AppShell>
   );
 }
 
 /**
- * Root application component. Wraps everything in WebSocketProvider so all
- * child components can access the WebSocket context.
+ * Root application component.
  */
 export function App() {
   return (
