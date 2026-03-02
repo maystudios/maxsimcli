@@ -111,6 +111,30 @@ Execute all plans in a phase.
 
 Usage: `/maxsim:execute-phase 5`
 
+**`/maxsim:sdd <phase-number>`**
+Execute a phase using Spec-Driven Dispatch — fresh agent per task with 2-stage review.
+
+- Each task dispatched to a fresh subagent with minimal context
+- Mandatory two-stage review (spec compliance + code quality) between every task
+- No task starts until the previous passes both review stages
+- Fix agents spawned for failed reviews (up to 3 attempts)
+
+Use when context rot is a concern or for sequential tasks requiring strict quality gates.
+
+Usage: `/maxsim:sdd 3`
+
+**`/maxsim:batch <task description>`**
+Decompose a large task into independent units and execute each in an isolated git worktree.
+
+- Spawns planner to decompose task into 5-30 independent units
+- Validates no file overlap between units
+- Each unit runs in its own worktree with its own branch and PR
+- Tracks progress via status table, handles failures with retries
+
+Use for large parallelizable changes where each unit can be independently merged.
+
+Usage: `/maxsim:batch "Migrate all API endpoints to new auth middleware"`
+
 ### Quick Mode
 
 **`/maxsim:quick`**

@@ -36,6 +36,7 @@ export interface ContextLoadResult {
   total_size: number;
   phase: string | null;
   topic: string | null;
+  codebase_docs_selected: string[];
 }
 
 // ─── Internal helpers ────────────────────────────────────────────────────────
@@ -53,6 +54,48 @@ function fileEntry(cwd: string, relPath: string, role: string): ContextFile | nu
 function addIfExists(files: ContextFile[], cwd: string, relPath: string, role: string): void {
   const entry = fileEntry(cwd, relPath, role);
   if (entry) files.push(entry);
+}
+
+// ─── Topic-based codebase doc selection ──────────────────────────────────────
+
+const TOPIC_TO_CODEBASE_DOCS: Record<string, string[]> = {
+  ui: ['CONVENTIONS.md', 'STRUCTURE.md'],
+  frontend: ['CONVENTIONS.md', 'STRUCTURE.md'],
+  component: ['CONVENTIONS.md', 'STRUCTURE.md'],
+  api: ['ARCHITECTURE.md', 'CONVENTIONS.md'],
+  backend: ['ARCHITECTURE.md', 'CONVENTIONS.md'],
+  server: ['ARCHITECTURE.md', 'CONVENTIONS.md'],
+  database: ['ARCHITECTURE.md', 'STACK.md'],
+  schema: ['ARCHITECTURE.md', 'STACK.md'],
+  data: ['ARCHITECTURE.md', 'STACK.md'],
+  testing: ['TESTING.md', 'CONVENTIONS.md'],
+  test: ['TESTING.md', 'CONVENTIONS.md'],
+  integration: ['INTEGRATIONS.md', 'STACK.md'],
+  deploy: ['INTEGRATIONS.md', 'STACK.md'],
+  refactor: ['CONCERNS.md', 'ARCHITECTURE.md'],
+  cleanup: ['CONCERNS.md', 'ARCHITECTURE.md'],
+  setup: ['STACK.md', 'STRUCTURE.md'],
+  config: ['STACK.md', 'STRUCTURE.md'],
+  auth: ['ARCHITECTURE.md', 'INTEGRATIONS.md'],
+  performance: ['ARCHITECTURE.md', 'STACK.md'],
+  install: ['STACK.md', 'STRUCTURE.md'],
+};
+
+const DEFAULT_CODEBASE_DOCS = ['STACK.md', 'ARCHITECTURE.md'];
+
+function selectCodebaseDocs(topic: string | undefined): string[] {
+  if (!topic) return DEFAULT_CODEBASE_DOCS;
+
+  const topicLower = topic.toLowerCase();
+  const matched = new Set<string>();
+
+  for (const [keyword, docs] of Object.entries(TOPIC_TO_CODEBASE_DOCS)) {
+    if (topicLower.includes(keyword)) {
+      for (const doc of docs) matched.add(doc);
+    }
+  }
+
+  return matched.size > 0 ? Array.from(matched) : DEFAULT_CODEBASE_DOCS;
 }
 
 // ─── Context loading strategies ──────────────────────────────────────────────
@@ -121,6 +164,26 @@ function loadArtefakteContext(cwd: string, phase?: string): ContextFile[] {
   return files;
 }
 
+function loadCodebaseContext(cwd: string, topic?: string): ContextFile[] {
+  const files: ContextFile[] = [];
+  const codebaseDir = planningPath(cwd, 'codebase');
+
+  try {
+    const existing = fs.readdirSync(codebaseDir).filter(f => f.endsWith('.md'));
+    const selected = selectCodebaseDocs(topic);
+
+    for (const filename of selected) {
+      if (existing.includes(filename)) {
+        addIfExists(files, cwd, `.planning/codebase/${filename}`, `codebase-${filename.replace('.md', '').toLowerCase()}`);
+      }
+    }
+  } catch {
+    // No codebase directory — skip silently
+  }
+
+  return files;
+}
+
 function loadHistoryContext(cwd: string, currentPhase?: string): ContextFile[] {
   const files: ContextFile[] = [];
   const pd = phasesPath(cwd);
@@ -166,6 +229,10 @@ export function cmdContextLoad(
   // Load artefakte
   allFiles.push(...loadArtefakteContext(cwd, phase));
 
+  // Load relevant codebase docs based on topic
+  const selectedDocs = selectCodebaseDocs(topic);
+  allFiles.push(...loadCodebaseContext(cwd, topic));
+
   // Phase-specific context
   if (phase) {
     allFiles.push(...loadPhaseContext(cwd, phase));
@@ -191,6 +258,7 @@ export function cmdContextLoad(
     total_size: totalSize,
     phase: phase ?? null,
     topic: topic ?? null,
+    codebase_docs_selected: selectedDocs,
   };
 
   return cmdOk(result);

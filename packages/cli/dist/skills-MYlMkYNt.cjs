@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const require_install = require('./install.cjs');
-const require_core = require('./core-Cqn3M3eD.cjs');
+const require_core = require('./core-RRjCSt0G.cjs');
 let node_fs = require("node:fs");
 node_fs = require_install.__toESM(node_fs);
 let node_path = require("node:path");
@@ -6821,4 +6821,4 @@ function listAvailableTemplates() {
 exports.cmdSkillInstall = cmdSkillInstall;
 exports.cmdSkillList = cmdSkillList;
 exports.cmdSkillUpdate = cmdSkillUpdate;
-//# sourceMappingURL=skills-DYictYGI.cjs.map
+//# sourceMappingURL=skills-MYlMkYNt.cjs.map

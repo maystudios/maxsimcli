@@ -1,76 +1,32 @@
 # AGENTS.md — Agent-Skill Registry
 
-This file maps MAXSIM agents to the skills they should auto-load and enforce during execution.
-
-## How This Registry Works
-
-When a MAXSIM agent is spawned, it checks this registry to determine which skills apply. Skills are behavioral rules that constrain agent actions — they are not optional guidelines.
-
-Agents load skills by reading `SKILL.md` from each skill directory listed in their entry below. Skills are loaded once at agent startup and enforced throughout the session.
+Maps MAXSIM agents to the skills they auto-load and enforce during execution. Skills are behavioral rules loaded once at agent startup from `SKILL.md` in each skill directory.
 
 ### Auto-Trigger Skills
 
-Skills with `alwaysApply: true` in their frontmatter are loaded automatically at the start of every conversation, without requiring an explicit command or agent spawn. This ensures foundational workflow rules are always active.
+Skills with `alwaysApply: true` load automatically at conversation start:
 
 | Skill | Purpose |
 |-------|---------|
-| `using-maxsim` | Routes all work through MAXSIM commands — prevents ad-hoc coding without plans |
+| `using-maxsim` | Routes all work through MAXSIM commands |
 
 ## Registry
 
-### maxsim-executor
-
-**Skills:** `tdd`, `verification-before-completion`, `using-maxsim`
-
-The executor implements plan tasks. TDD ensures tests are written before code. Verification ensures completion claims have evidence. Using-maxsim ensures work stays within the plan structure.
-
-### maxsim-debugger
-
-**Skills:** `systematic-debugging`, `verification-before-completion`
-
-The debugger investigates bugs. Systematic-debugging enforces the reproduce-hypothesize-isolate-verify-fix cycle. Verification ensures the fix is confirmed with evidence before claiming resolution.
-
-### maxsim-verifier
-
-**Skills:** `verification-before-completion`
-
-The verifier checks phase goal achievement. Verification-before-completion is its core purpose — every claim must have fresh evidence.
-
-### maxsim-planner
-
-**Skills:** `using-maxsim`
-
-The planner creates PLAN.md files. Using-maxsim ensures plans reference the correct workflow structure and available skills.
-
-### maxsim-code-reviewer
-
-**Skills:** `verification-before-completion`
-
-The code reviewer checks implementation quality. Verification ensures review findings are backed by evidence from the codebase, not assumptions.
-
-### maxsim-roadmapper
-
-**Skills:** `using-maxsim`
-
-The roadmapper creates project roadmaps. Using-maxsim ensures roadmaps align with the MAXSIM phase structure.
-
-### maxsim-phase-researcher
-
-**Skills:** `memory-management`
-
-The phase researcher gathers context for planning. Memory-management ensures valuable research findings are persisted for future sessions.
-
-### maxsim-project-researcher
-
-**Skills:** `memory-management`
-
-The project researcher analyzes project structure during init. Memory-management ensures architectural patterns and conventions are saved.
-
-### maxsim-integration-checker
-
-**Skills:** `verification-before-completion`
-
-The integration checker validates cross-component wiring. Verification ensures integration claims are tested, not assumed.
+| Agent | Skills | Role |
+|-------|--------|------|
+| `maxsim-executor` | `tdd`, `verification-before-completion`, `using-maxsim` | Implements plan tasks with TDD and verified completion |
+| `maxsim-debugger` | `systematic-debugging`, `verification-before-completion` | Investigates bugs via reproduce-hypothesize-isolate-verify-fix cycle |
+| `maxsim-verifier` | `verification-before-completion` | Checks phase goal achievement with fresh evidence |
+| `maxsim-planner` | `using-maxsim` | Creates executable PLAN.md files for phases |
+| `maxsim-plan-checker` | `verification-before-completion` | Verifies plans achieve phase goal before execution |
+| `maxsim-code-reviewer` | `verification-before-completion` | Reviews implementation for code quality with evidence |
+| `maxsim-spec-reviewer` | `verification-before-completion` | Reviews implementation for spec compliance |
+| `maxsim-roadmapper` | `using-maxsim` | Creates project roadmaps with phase breakdown and requirement mapping |
+| `maxsim-phase-researcher` | `memory-management` | Researches phase implementation domain for planning context |
+| `maxsim-project-researcher` | `memory-management` | Researches project domain ecosystem during init |
+| `maxsim-research-synthesizer` | `memory-management` | Synthesizes parallel research outputs into unified findings |
+| `maxsim-codebase-mapper` | `memory-management` | Maps codebase structure, patterns, and conventions |
+| `maxsim-integration-checker` | `verification-before-completion` | Validates cross-component integration with tested evidence |
 
 ## Skill Reference
 
@@ -85,10 +41,3 @@ The integration checker validates cross-component wiring. Verification ensures i
 | `roadmap-writing` | `skills/roadmap-writing/` | Phased planning with success criteria |
 | `simplify` | `skills/simplify/` | Code simplification and cleanup |
 | `code-review` | `skills/code-review/` | Implementation quality review |
-
-## Adding New Skills
-
-1. Create a directory under `skills/` with a `SKILL.md` file
-2. Follow the existing skill format (frontmatter + Iron Law + Gate Function + Red Flags)
-3. Add the skill to the relevant agent entries in this registry
-4. Add the skill to the reference table above

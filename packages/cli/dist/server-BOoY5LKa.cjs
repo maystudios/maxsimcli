@@ -435,6 +435,227 @@ function registerStateTools(server) {
 }
 
 //#endregion
+//#region src/mcp/context-tools.ts
+/**
+* Context Query MCP Tools — Project context exposed as MCP tools
+*
+* CRITICAL: Never import output() or error() from core — they call process.exit().
+* CRITICAL: Never write to stdout — it is reserved for MCP JSON-RPC protocol.
+* CRITICAL: Never call process.exit() — the server must stay alive after every tool call.
+*/
+/**
+* Register all context query tools on the MCP server.
+*/
+function registerContextTools(server) {
+	server.tool("mcp_get_active_phase", "Get the currently active phase and next phase from roadmap analysis and STATE.md.", {}, async () => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			const roadmapResult = await require_cli.cmdRoadmapAnalyze(cwd);
+			let current_phase = null;
+			let next_phase = null;
+			let phase_name = null;
+			let status = null;
+			if (roadmapResult.ok) {
+				const data = roadmapResult.result;
+				current_phase = data.current_phase ?? null;
+				next_phase = data.next_phase ?? null;
+			}
+			const stateContent = require_cli.safeReadFile(require_cli.planningPath(cwd, "STATE.md"));
+			if (stateContent) {
+				const statePhase = require_cli.stateExtractField(stateContent, "Current Phase");
+				if (statePhase) phase_name = statePhase;
+				const stateStatus = require_cli.stateExtractField(stateContent, "Status");
+				if (stateStatus) status = stateStatus;
+			}
+			return mcpSuccess({
+				current_phase,
+				next_phase,
+				phase_name,
+				status
+			}, `Active phase: ${phase_name ?? current_phase ?? "unknown"}`);
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+	server.tool("mcp_get_guidelines", "Get project guidelines: PROJECT.md vision, config, and optionally phase-specific context.", { phase: zod.z.string().optional().describe("Optional phase number to include phase-specific context") }, async ({ phase }) => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			const project_vision = require_cli.safeReadFile(require_cli.planningPath(cwd, "PROJECT.md"));
+			const config = require_cli.loadConfig(cwd);
+			let phase_context = null;
+			if (phase) {
+				const phaseInfo = require_cli.findPhaseInternal(cwd, phase);
+				if (phaseInfo) phase_context = require_cli.safeReadFile(node_path.default.join(phaseInfo.directory, `${phaseInfo.phase_number}-CONTEXT.md`));
+			}
+			return mcpSuccess({
+				project_vision,
+				config,
+				phase_context
+			}, `Guidelines loaded${phase ? ` with phase ${phase} context` : ""}`);
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+	server.tool("mcp_get_context_for_task", "Load context files for a task. Includes project context, roadmap, artefakte, and codebase docs filtered by topic. Topic keywords select relevant codebase docs: \"ui/frontend\" loads CONVENTIONS+STRUCTURE, \"api/backend\" loads ARCHITECTURE+CONVENTIONS, \"testing\" loads TESTING+CONVENTIONS, \"database\" loads ARCHITECTURE+STACK, \"refactor\" loads CONCERNS+ARCHITECTURE. Without topic, defaults to STACK+ARCHITECTURE.", {
+		phase: zod.z.string().optional().describe("Phase number to scope context to"),
+		topic: zod.z.string().optional().describe("Topic keywords to filter codebase docs (e.g. \"frontend\", \"api\", \"testing\", \"database\", \"refactor\")")
+	}, async ({ phase, topic }) => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			const result = require_cli.cmdContextLoad(cwd, phase, topic, true);
+			if (!result.ok) return mcpError(result.error, "Context load failed");
+			return mcpSuccess({ context: result.result }, `Context loaded${phase ? ` for phase ${phase}` : ""}${topic ? ` topic "${topic}"` : ""}`);
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+	server.tool("mcp_get_project_overview", "Get a high-level project overview: PROJECT.md, REQUIREMENTS.md, and STATE.md contents.", {}, async () => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			return mcpSuccess({
+				project: require_cli.safeReadFile(require_cli.planningPath(cwd, "PROJECT.md")),
+				requirements: require_cli.safeReadFile(require_cli.planningPath(cwd, "REQUIREMENTS.md")),
+				state: require_cli.safeReadFile(require_cli.planningPath(cwd, "STATE.md"))
+			}, "Project overview loaded");
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+	server.tool("mcp_get_phase_detail", "Get detailed information about a specific phase including all its files (plans, summaries, context, research, verification).", { phase: zod.z.string().describe("Phase number or name (e.g. \"01\", \"1\", \"01A\")") }, async ({ phase }) => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			const phaseInfo = require_cli.findPhaseInternal(cwd, phase);
+			if (!phaseInfo) return mcpError(`Phase ${phase} not found`, "Phase not found");
+			const files = [];
+			try {
+				const entries = node_fs.default.readdirSync(phaseInfo.directory);
+				for (const entry of entries) {
+					const fullPath = node_path.default.join(phaseInfo.directory, entry);
+					if (node_fs.default.statSync(fullPath).isFile()) files.push({
+						name: entry,
+						content: require_cli.safeReadFile(fullPath)
+					});
+				}
+			} catch {}
+			return mcpSuccess({
+				phase_number: phaseInfo.phase_number,
+				phase_name: phaseInfo.phase_name,
+				directory: phaseInfo.directory,
+				files
+			}, `Phase ${phaseInfo.phase_number} detail: ${files.length} file(s)`);
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+}
+
+//#endregion
+//#region src/mcp/roadmap-tools.ts
+/**
+* Register all roadmap query tools on the MCP server.
+*/
+function registerRoadmapTools(server) {
+	server.tool("mcp_get_roadmap", "Get the full roadmap analysis including all phases, their status, and progress.", {}, async () => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			const result = await require_cli.cmdRoadmapAnalyze(cwd);
+			if (!result.ok) return mcpError(result.error, "Roadmap analysis failed");
+			return mcpSuccess({ roadmap: result.result }, "Roadmap analysis complete");
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+	server.tool("mcp_get_roadmap_progress", "Get a focused progress summary: total phases, completed, in-progress, not started, and progress percentage.", {}, async () => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			const result = await require_cli.cmdRoadmapAnalyze(cwd);
+			if (!result.ok) return mcpError(result.error, "Roadmap analysis failed");
+			const data = result.result;
+			const phases = data.phases ?? [];
+			const total_phases = phases.length;
+			let completed = 0;
+			let in_progress = 0;
+			let not_started = 0;
+			for (const p of phases) {
+				const status = String(p.status ?? "").toLowerCase();
+				if (status === "completed" || status === "done") completed++;
+				else if (status === "in-progress" || status === "in_progress" || status === "active") in_progress++;
+				else not_started++;
+			}
+			const progress_percent = total_phases > 0 ? Math.round(completed / total_phases * 100) : 0;
+			return mcpSuccess({
+				total_phases,
+				completed,
+				in_progress,
+				not_started,
+				progress_percent,
+				current_phase: data.current_phase ?? null,
+				next_phase: data.next_phase ?? null
+			}, `Progress: ${completed}/${total_phases} phases complete (${progress_percent}%)`);
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+}
+
+//#endregion
+//#region src/mcp/config-tools.ts
+/**
+* Config Query MCP Tools — Project configuration exposed as MCP tools
+*
+* CRITICAL: Never import output() or error() from core — they call process.exit().
+* CRITICAL: Never write to stdout — it is reserved for MCP JSON-RPC protocol.
+* CRITICAL: Never call process.exit() — the server must stay alive after every tool call.
+*/
+/**
+* Register all config query tools on the MCP server.
+*/
+function registerConfigTools(server) {
+	server.tool("mcp_get_config", "Get project configuration. Optionally provide a key path to get a specific value.", { key: zod.z.string().optional().describe("Optional dot-separated key path (e.g. \"model_profile\", \"branching.strategy\")") }, async ({ key }) => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			if (key) {
+				const result = require_cli.cmdConfigGet(cwd, key, true);
+				if (!result.ok) return mcpError(result.error, "Config get failed");
+				return mcpSuccess({
+					key,
+					value: result.rawValue ?? result.result
+				}, `Config value for "${key}"`);
+			}
+			return mcpSuccess({ config: require_cli.loadConfig(cwd) }, "Full configuration loaded");
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+	server.tool("mcp_update_config", "Update a project configuration value by key path.", {
+		key: zod.z.string().describe("Dot-separated key path (e.g. \"model_profile\", \"branching.strategy\")"),
+		value: zod.z.string().describe("New value to set")
+	}, async ({ key, value }) => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			const result = require_cli.cmdConfigSet(cwd, key, value, true);
+			if (!result.ok) return mcpError(result.error, "Config update failed");
+			return mcpSuccess({
+				updated: true,
+				key,
+				value
+			}, `Config "${key}" updated to "${value}"`);
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+}
+
+//#endregion
 //#region src/mcp/index.ts
 /**
 * Register all MCP tools on the given server instance.
@@ -443,10 +664,13 @@ function registerAllTools(server) {
 	registerPhaseTools(server);
 	registerTodoTools(server);
 	registerStateTools(server);
+	registerContextTools(server);
+	registerRoadmapTools(server);
+	registerConfigTools(server);
 }
 
 //#endregion
-//#region ../../../../../node_modules/node-pty/lib/utils.js
+//#region ../../node_modules/node-pty/lib/utils.js
 var require_utils = /* @__PURE__ */ require_cli.__commonJSMin(((exports) => {
 	/**
 	* Copyright (c) 2017, Daniel Imms (MIT License).
@@ -493,7 +717,7 @@ var require_utils = /* @__PURE__ */ require_cli.__commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../../../../node_modules/node-pty/lib/eventEmitter2.js
+//#region ../../node_modules/node-pty/lib/eventEmitter2.js
 var require_eventEmitter2 = /* @__PURE__ */ require_cli.__commonJSMin(((exports) => {
 	/**
 	* Copyright (c) 2019, Microsoft Corporation (MIT License).
@@ -532,7 +756,7 @@ var require_eventEmitter2 = /* @__PURE__ */ require_cli.__commonJSMin(((exports)
 }));
 
 //#endregion
-//#region ../../../../../node_modules/node-pty/lib/terminal.js
+//#region ../../node_modules/node-pty/lib/terminal.js
 var require_terminal = /* @__PURE__ */ require_cli.__commonJSMin(((exports) => {
 	/**
 	* Copyright (c) 2012-2015, Christopher Jeffrey (MIT License)
@@ -720,7 +944,7 @@ var require_terminal = /* @__PURE__ */ require_cli.__commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../../../../node_modules/node-pty/lib/shared/conout.js
+//#region ../../node_modules/node-pty/lib/shared/conout.js
 var require_conout = /* @__PURE__ */ require_cli.__commonJSMin(((exports) => {
 	/**
 	* Copyright (c) 2020, Microsoft Corporation (MIT License).
@@ -734,7 +958,7 @@ var require_conout = /* @__PURE__ */ require_cli.__commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../../../../node_modules/node-pty/lib/windowsConoutConnection.js
+//#region ../../node_modules/node-pty/lib/windowsConoutConnection.js
 var require_windowsConoutConnection = /* @__PURE__ */ require_cli.__commonJSMin(((exports) => {
 	/**
 	* Copyright (c) 2020, Microsoft Corporation (MIT License).
@@ -933,7 +1157,7 @@ var require_windowsConoutConnection = /* @__PURE__ */ require_cli.__commonJSMin(
 }));
 
 //#endregion
-//#region ../../../../../node_modules/node-pty/lib/windowsPtyAgent.js
+//#region ../../node_modules/node-pty/lib/windowsPtyAgent.js
 var require_windowsPtyAgent = /* @__PURE__ */ require_cli.__commonJSMin(((exports) => {
 	/**
 	* Copyright (c) 2012-2015, Christopher Jeffrey, Peter Sunde (MIT License)
@@ -1196,7 +1420,7 @@ var require_windowsPtyAgent = /* @__PURE__ */ require_cli.__commonJSMin(((export
 }));
 
 //#endregion
-//#region ../../../../../node_modules/node-pty/lib/windowsTerminal.js
+//#region ../../node_modules/node-pty/lib/windowsTerminal.js
 var require_windowsTerminal = /* @__PURE__ */ require_cli.__commonJSMin(((exports) => {
 	/**
 	* Copyright (c) 2012-2015, Christopher Jeffrey, Peter Sunde (MIT License)
@@ -1370,7 +1594,7 @@ var require_windowsTerminal = /* @__PURE__ */ require_cli.__commonJSMin(((export
 }));
 
 //#endregion
-//#region ../../../../../node_modules/node-pty/lib/unixTerminal.js
+//#region ../../node_modules/node-pty/lib/unixTerminal.js
 var require_unixTerminal = /* @__PURE__ */ require_cli.__commonJSMin(((exports) => {
 	var __extends = exports && exports.__extends || (function() {
 		var extendStatics = function(d, b) {
@@ -1651,7 +1875,7 @@ var require_unixTerminal = /* @__PURE__ */ require_cli.__commonJSMin(((exports) 
 }));
 
 //#endregion
-//#region ../../../../../node_modules/node-pty/lib/index.js
+//#region ../../node_modules/node-pty/lib/index.js
 var require_lib = /* @__PURE__ */ require_cli.__commonJSMin(((exports) => {
 	/**
 	* Copyright (c) 2012-2015, Christopher Jeffrey, Peter Sunde (MIT License)
@@ -2753,4 +2977,4 @@ function getLocalNetworkIp() {
 
 //#endregion
 exports.createBackendServer = createBackendServer;
-//# sourceMappingURL=server-BFjpYgFI.cjs.map
+//# sourceMappingURL=server-BOoY5LKa.cjs.map

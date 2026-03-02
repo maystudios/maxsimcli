@@ -331,18 +331,15 @@ Check `.skills/` directory — read `SKILL.md` for each skill (not full AGENTS.m
 </step>
 
 <step name="load_codebase_context">
-Check for codebase map (`ls .planning/codebase/*.md`). Load relevant docs by phase type:
+Load relevant codebase docs using the context loader with the phase name as topic:
 
-| Phase Keywords | Load |
-|----------------|------|
-| UI, frontend | CONVENTIONS.md, STRUCTURE.md |
-| API, backend | ARCHITECTURE.md, CONVENTIONS.md |
-| database, schema | ARCHITECTURE.md, STACK.md |
-| testing | TESTING.md, CONVENTIONS.md |
-| integration | INTEGRATIONS.md, STACK.md |
-| refactor | CONCERNS.md, ARCHITECTURE.md |
-| setup, config | STACK.md, STRUCTURE.md |
-| (default) | STACK.md, ARCHITECTURE.md |
+```bash
+CONTEXT=$(node ~/.claude/maxsim/bin/maxsim-tools.cjs context-load --phase "${PHASE}" --topic "${PHASE_NAME}")
+```
+
+This automatically selects relevant codebase docs (STACK.md, ARCHITECTURE.md, CONVENTIONS.md, etc.) based on keywords in the phase name. Read the files listed in the `files` array where `role` starts with `codebase-`.
+
+If no `.planning/codebase/` directory exists, skip this step.
 </step>
 
 <step name="identify_phase">

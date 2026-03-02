@@ -411,45 +411,114 @@ Task(
 
 **Stage 3: Simplify** — Spawn 3 parallel reviewers to catch reuse opportunities, quality issues, and inefficiencies.
 
+**Reviewer 1 — Code Reuse:**
+
+```
+Task(
+  subagent_type="maxsim-code-reviewer",
+  prompt="
+    <objective>
+    Review plan {phase}-{plan} for code reuse opportunities.
+    </objective>
+
+    <files_to_review>
+    {List all files created/modified during execution from SUMMARY.md key-files}
+    </files_to_review>
+
+    <instructions>
+    1. Scan all changed files for duplicated patterns
+    2. Cross-reference against existing shared utilities and helpers
+    3. Flag any logic that appears 3+ times without extraction
+    4. Check if existing utilities could replace new code
+    5. Output: list of reuse opportunities with file paths and line ranges
+    6. Verdict: CLEAN (no issues) or ISSUES_FOUND (list)
+    </instructions>
+  "
+)
+```
+
+**Reviewer 2 — Code Quality:**
+
+```
+Task(
+  subagent_type="maxsim-code-reviewer",
+  prompt="
+    <objective>
+    Review plan {phase}-{plan} for code quality issues.
+    </objective>
+
+    <files_to_review>
+    {List all files created/modified during execution from SUMMARY.md key-files}
+    </files_to_review>
+
+    <instructions>
+    1. Check naming consistency with codebase conventions
+    2. Verify error handling covers all external calls
+    3. Look for dead code: unused imports, unreachable branches, commented-out code
+    4. Check for unnecessary abstractions or premature generalizations
+    5. Output: list of quality issues categorized by severity (BLOCKER/HIGH/MEDIUM)
+    6. Verdict: CLEAN (no issues) or ISSUES_FOUND (list)
+    </instructions>
+  "
+)
+```
+
+**Reviewer 3 — Efficiency:**
+
+```
+Task(
+  subagent_type="maxsim-code-reviewer",
+  prompt="
+    <objective>
+    Review plan {phase}-{plan} for efficiency issues.
+    </objective>
+
+    <files_to_review>
+    {List all files created/modified during execution from SUMMARY.md key-files}
+    </files_to_review>
+
+    <instructions>
+    1. Find over-engineered solutions (parametrization serving one case, generic interfaces with one implementor)
+    2. Identify repeated computations that could be cached or hoisted
+    3. Check for unnecessary allocations in hot paths
+    4. Look for redundant data transformations
+    5. Output: list of efficiency issues with suggested removals
+    6. Verdict: CLEAN (no issues) or ISSUES_FOUND (list)
+    </instructions>
+  "
+)
+```
+
+**Consolidation (after all 3 reviewers complete):**
+
+After all three reviewers report:
+- If ALL returned CLEAN: report CLEAN immediately, skip to next stage
+- If ANY returned ISSUES_FOUND:
+  1. Merge findings into deduplicated list
+  2. Spawn single executor to apply fixes:
+
 ```
 Task(
   subagent_type="maxsim-executor",
   prompt="
     <objective>
-    Run simplification review on plan {phase}-{plan} with 3 parallel reviewers.
+    Apply simplification fixes for plan {phase}-{plan} based on reviewer findings.
     </objective>
 
-    <instructions>
-    Spawn 3 parallel review agents for the files modified in this plan:
-
-    Agent 1 — Code Reuse:
-    - Find duplicated logic across the codebase
-    - Identify copy-paste from other files that should be extracted
-    - Suggest shared helpers for patterns appearing 3+ times
-    - Check if existing utilities could replace new code
-
-    Agent 2 — Code Quality:
-    - Check naming consistency with codebase conventions
-    - Verify error handling covers all external calls
-    - Look for dead code: unused imports, unreachable branches, commented-out code
-    - Check for unnecessary abstractions or premature generalizations
-
-    Agent 3 — Efficiency:
-    - Find O(n^2) operations where O(n) is straightforward
-    - Identify repeated computations that could be cached or hoisted
-    - Check for unnecessary allocations in hot paths
-    - Look for redundant data transformations
-
-    After all 3 agents report:
-    1. Consolidate findings into a single list
-    2. Apply fixes for all actionable items (skip speculative optimizations)
-    3. Run tests to confirm fixes do not break anything
-    4. Report: CLEAN (no issues found), FIXED (issues found and resolved), or BLOCKED (issues found but cannot fix without architectural change)
-    </instructions>
+    <findings>
+    {Merged deduplicated list of ISSUES_FOUND from all reviewers — BLOCKER and HIGH first, skip speculative optimizations}
+    </findings>
 
     <files_to_review>
     {List all files created/modified during execution from SUMMARY.md key-files}
     </files_to_review>
+
+    <instructions>
+    1. Apply fixes for all actionable items (BLOCKER and HIGH severity first)
+    2. Skip speculative optimizations that lack clear evidence
+    3. Run tests to confirm fixes do not break anything
+    4. Report: FIXED (issues found and resolved) or BLOCKED (cannot fix without architectural change)
+    </instructions>
   "
 )
 ```

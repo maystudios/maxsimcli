@@ -594,7 +594,7 @@ var require_browser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../../../../node_modules/has-flag/index.js
+//#region ../../node_modules/has-flag/index.js
 var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = (flag, argv = process.argv) => {
 		const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
@@ -605,7 +605,7 @@ var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../../../../node_modules/supports-color/index.js
+//#region ../../node_modules/supports-color/index.js
 var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const os$5 = require("os");
 	const tty$2 = require("tty");
@@ -15248,6 +15248,36 @@ function addIfExists(files, cwd, relPath, role) {
 	const entry = fileEntry(cwd, relPath, role);
 	if (entry) files.push(entry);
 }
+const TOPIC_TO_CODEBASE_DOCS = {
+	ui: ["CONVENTIONS.md", "STRUCTURE.md"],
+	frontend: ["CONVENTIONS.md", "STRUCTURE.md"],
+	component: ["CONVENTIONS.md", "STRUCTURE.md"],
+	api: ["ARCHITECTURE.md", "CONVENTIONS.md"],
+	backend: ["ARCHITECTURE.md", "CONVENTIONS.md"],
+	server: ["ARCHITECTURE.md", "CONVENTIONS.md"],
+	database: ["ARCHITECTURE.md", "STACK.md"],
+	schema: ["ARCHITECTURE.md", "STACK.md"],
+	data: ["ARCHITECTURE.md", "STACK.md"],
+	testing: ["TESTING.md", "CONVENTIONS.md"],
+	test: ["TESTING.md", "CONVENTIONS.md"],
+	integration: ["INTEGRATIONS.md", "STACK.md"],
+	deploy: ["INTEGRATIONS.md", "STACK.md"],
+	refactor: ["CONCERNS.md", "ARCHITECTURE.md"],
+	cleanup: ["CONCERNS.md", "ARCHITECTURE.md"],
+	setup: ["STACK.md", "STRUCTURE.md"],
+	config: ["STACK.md", "STRUCTURE.md"],
+	auth: ["ARCHITECTURE.md", "INTEGRATIONS.md"],
+	performance: ["ARCHITECTURE.md", "STACK.md"],
+	install: ["STACK.md", "STRUCTURE.md"]
+};
+const DEFAULT_CODEBASE_DOCS = ["STACK.md", "ARCHITECTURE.md"];
+function selectCodebaseDocs(topic) {
+	if (!topic) return DEFAULT_CODEBASE_DOCS;
+	const topicLower = topic.toLowerCase();
+	const matched = /* @__PURE__ */ new Set();
+	for (const [keyword, docs] of Object.entries(TOPIC_TO_CODEBASE_DOCS)) if (topicLower.includes(keyword)) for (const doc of docs) matched.add(doc);
+	return matched.size > 0 ? Array.from(matched) : DEFAULT_CODEBASE_DOCS;
+}
 function loadProjectContext(cwd) {
 	const files = [];
 	addIfExists(files, cwd, ".planning/PROJECT.md", "project-vision");
@@ -15296,6 +15326,16 @@ function loadArtefakteContext(cwd, phase) {
 	}
 	return files;
 }
+function loadCodebaseContext(cwd, topic) {
+	const files = [];
+	const codebaseDir = planningPath(cwd, "codebase");
+	try {
+		const existing = node_fs.default.readdirSync(codebaseDir).filter((f) => f.endsWith(".md"));
+		const selected = selectCodebaseDocs(topic);
+		for (const filename of selected) if (existing.includes(filename)) addIfExists(files, cwd, `.planning/codebase/${filename}`, `codebase-${filename.replace(".md", "").toLowerCase()}`);
+	} catch {}
+	return files;
+}
 function loadHistoryContext(cwd, currentPhase) {
 	const files = [];
 	const pd = phasesPath(cwd);
@@ -15319,6 +15359,8 @@ function cmdContextLoad(cwd, phase, topic, includeHistory) {
 	allFiles.push(...loadProjectContext(cwd));
 	allFiles.push(...loadRoadmapContext(cwd));
 	allFiles.push(...loadArtefakteContext(cwd, phase));
+	const selectedDocs = selectCodebaseDocs(topic);
+	allFiles.push(...loadCodebaseContext(cwd, topic));
 	if (phase) allFiles.push(...loadPhaseContext(cwd, phase));
 	if (includeHistory) allFiles.push(...loadHistoryContext(cwd, phase));
 	const seen = /* @__PURE__ */ new Set();
@@ -15331,7 +15373,8 @@ function cmdContextLoad(cwd, phase, topic, includeHistory) {
 		files: deduped,
 		total_size: deduped.reduce((sum, f) => sum + f.size, 0),
 		phase: phase ?? null,
-		topic: topic ?? null
+		topic: topic ?? null,
+		codebase_docs_selected: selectedDocs
 	});
 }
 
@@ -16511,7 +16554,7 @@ const COMMANDS = {
 		(0, node_child_process.spawn)(process.execPath, [serverPath], { stdio: "inherit" }).on("exit", (code) => process.exit(code ?? 0));
 	},
 	"backend-start": async (args, cwd, raw) => {
-		const { startBackend } = await Promise.resolve().then(() => require("./lifecycle-B6gdn2NV.cjs"));
+		const { startBackend } = await Promise.resolve().then(() => require("./lifecycle-Beld0prj.cjs"));
 		const portFlag = args.find((a) => a.startsWith("--port="))?.split("=")[1];
 		const background = !args.includes("--foreground");
 		output(await startBackend(cwd, {
@@ -16520,11 +16563,11 @@ const COMMANDS = {
 		}), raw);
 	},
 	"backend-stop": async (_args, cwd, raw) => {
-		const { stopBackend } = await Promise.resolve().then(() => require("./lifecycle-B6gdn2NV.cjs"));
+		const { stopBackend } = await Promise.resolve().then(() => require("./lifecycle-Beld0prj.cjs"));
 		output({ stopped: await stopBackend(cwd) }, raw);
 	},
 	"backend-status": async (_args, cwd, raw) => {
-		const { getBackendStatus } = await Promise.resolve().then(() => require("./lifecycle-B6gdn2NV.cjs"));
+		const { getBackendStatus } = await Promise.resolve().then(() => require("./lifecycle-Beld0prj.cjs"));
 		output(await getBackendStatus(cwd) || { running: false }, raw);
 	}
 };
@@ -16621,6 +16664,10 @@ main();
 exports.__commonJSMin = __commonJSMin;
 exports.__toESM = __toESM;
 exports.appendToStateSection = appendToStateSection;
+exports.cmdConfigGet = cmdConfigGet;
+exports.cmdConfigSet = cmdConfigSet;
+exports.cmdContextLoad = cmdContextLoad;
+exports.cmdRoadmapAnalyze = cmdRoadmapAnalyze;
 exports.comparePhaseNum = comparePhaseNum;
 exports.escapeStringRegexp = escapeStringRegexp;
 exports.extractFrontmatter = extractFrontmatter;
@@ -16629,6 +16676,7 @@ exports.generateSlugInternal = generateSlugInternal;
 exports.getArchivedPhaseDirs = getArchivedPhaseDirs;
 exports.getPhasePattern = getPhasePattern;
 exports.listSubDirs = listSubDirs;
+exports.loadConfig = loadConfig;
 exports.normalizePhaseName = normalizePhaseName;
 exports.parseTodoFrontmatter = parseTodoFrontmatter;
 exports.phaseAddCore = phaseAddCore;
@@ -16636,6 +16684,7 @@ exports.phaseCompleteCore = phaseCompleteCore;
 exports.phaseInsertCore = phaseInsertCore;
 exports.phasesPath = phasesPath;
 exports.planningPath = planningPath;
+exports.safeReadFile = safeReadFile;
 exports.stateExtractField = stateExtractField;
 exports.statePath = statePath;
 exports.stateReplaceField = stateReplaceField;

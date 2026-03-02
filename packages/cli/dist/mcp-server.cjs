@@ -23015,7 +23015,7 @@ var require_browser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../../../../node_modules/has-flag/index.js
+//#region ../../node_modules/has-flag/index.js
 var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = (flag, argv = process.argv) => {
 		const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
@@ -23026,9 +23026,9 @@ var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../../../../node_modules/supports-color/index.js
+//#region ../../node_modules/supports-color/index.js
 var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	const os$1 = require("os");
+	const os$2 = require("os");
 	const tty$1 = require("tty");
 	const hasFlag = require_has_flag();
 	const { env } = process;
@@ -23055,7 +23055,7 @@ var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 		const min = forceColor || 0;
 		if (env.TERM === "dumb") return min;
 		if (process.platform === "win32") {
-			const osRelease = os$1.release().split(".");
+			const osRelease = os$2.release().split(".");
 			if (Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) return Number(osRelease[2]) >= 14931 ? 3 : 2;
 			return 1;
 		}
@@ -26756,6 +26756,9 @@ function statePath(cwd) {
 function roadmapPath(cwd) {
 	return planningPath(cwd, "ROADMAP.md");
 }
+function configPath(cwd) {
+	return planningPath(cwd, "config.json");
+}
 function phasesPath(cwd) {
 	return planningPath(cwd, "phases");
 }
@@ -26770,6 +26773,19 @@ function listSubDirs(dir, sortByPhase = false) {
 	const dirs = node_fs.default.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
 	return sortByPhase ? dirs.sort((a, b) => comparePhaseNum(a, b)) : dirs;
 }
+/** Async version of listSubDirs using fs.promises. */
+async function listSubDirsAsync(dir, sortByPhase = false) {
+	const dirs = (await node_fs.promises.readdir(dir, { withFileTypes: true })).filter((e) => e.isDirectory()).map((e) => e.name);
+	return sortByPhase ? dirs.sort((a, b) => comparePhaseNum(a, b)) : dirs;
+}
+/** Async version of safeReadFile using fs.promises. */
+async function safeReadFileAsync(filePath) {
+	try {
+		return await node_fs.promises.readFile(filePath, "utf-8");
+	} catch {
+		return null;
+	}
+}
 /** Extract a human-readable message from an unknown thrown value. */
 function errorMsg(e) {
 	return e instanceof Error ? e.message : String(e);
@@ -26783,6 +26799,104 @@ function debugLog(contextOrError, error) {
 /** Escape a phase number for use in regex. */
 function escapePhaseNum(phase) {
 	return String(phase).replace(/\./g, "\\.");
+}
+function safeReadFile(filePath) {
+	try {
+		return node_fs.default.readFileSync(filePath, "utf-8");
+	} catch {
+		return null;
+	}
+}
+let _configCache = null;
+function loadConfig(cwd) {
+	if (_configCache && _configCache.cwd === cwd) return _configCache.config;
+	const cfgPath = configPath(cwd);
+	const defaults = {
+		model_profile: "balanced",
+		commit_docs: true,
+		search_gitignored: false,
+		branching_strategy: "none",
+		phase_branch_template: "maxsim/phase-{phase}-{slug}",
+		milestone_branch_template: "maxsim/{milestone}-{slug}",
+		research: true,
+		plan_checker: true,
+		verifier: true,
+		parallelization: true,
+		brave_search: false
+	};
+	try {
+		const raw = node_fs.default.readFileSync(cfgPath, "utf-8");
+		const parsed = JSON.parse(raw);
+		const get = (key, nested) => {
+			if (parsed[key] !== void 0) return parsed[key];
+			if (nested) {
+				const section = parsed[nested.section];
+				if (section && typeof section === "object" && section !== null && nested.field in section) return section[nested.field];
+			}
+		};
+		const parallelization = (() => {
+			const val = get("parallelization");
+			if (typeof val === "boolean") return val;
+			if (typeof val === "object" && val !== null && "enabled" in val) return val.enabled;
+			return defaults.parallelization;
+		})();
+		const result = {
+			model_profile: get("model_profile") ?? defaults.model_profile,
+			commit_docs: get("commit_docs", {
+				section: "planning",
+				field: "commit_docs"
+			}) ?? defaults.commit_docs,
+			search_gitignored: get("search_gitignored", {
+				section: "planning",
+				field: "search_gitignored"
+			}) ?? defaults.search_gitignored,
+			branching_strategy: get("branching_strategy", {
+				section: "git",
+				field: "branching_strategy"
+			}) ?? defaults.branching_strategy,
+			phase_branch_template: get("phase_branch_template", {
+				section: "git",
+				field: "phase_branch_template"
+			}) ?? defaults.phase_branch_template,
+			milestone_branch_template: get("milestone_branch_template", {
+				section: "git",
+				field: "milestone_branch_template"
+			}) ?? defaults.milestone_branch_template,
+			research: get("research", {
+				section: "workflow",
+				field: "research"
+			}) ?? defaults.research,
+			plan_checker: get("plan_checker", {
+				section: "workflow",
+				field: "plan_checker"
+			}) ?? get("plan_checker", {
+				section: "workflow",
+				field: "plan_check"
+			}) ?? defaults.plan_checker,
+			verifier: get("verifier", {
+				section: "workflow",
+				field: "verifier"
+			}) ?? defaults.verifier,
+			parallelization,
+			brave_search: get("brave_search") ?? defaults.brave_search,
+			model_overrides: parsed["model_overrides"]
+		};
+		_configCache = {
+			cwd,
+			config: result
+		};
+		return result;
+	} catch (e) {
+		if (node_fs.default.existsSync(cfgPath)) {
+			console.warn(`[maxsim] Warning: config.json exists but could not be parsed — using defaults.`);
+			debugLog("config-load-failed", e);
+		}
+		_configCache = {
+			cwd,
+			config: defaults
+		};
+		return defaults;
+	}
 }
 function normalizePhaseName(phase) {
 	const match = phase.match(/^(\d+)([A-Z])?(\.\d+)?/i);
@@ -33575,13 +33689,29 @@ var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+//#region src/core/types.ts
+var import_dist = /* @__PURE__ */ __toESM(require_dist());
+function cmdOk(result, rawValue) {
+	return {
+		ok: true,
+		result,
+		rawValue
+	};
+}
+function cmdErr(error) {
+	return {
+		ok: false,
+		error
+	};
+}
+
+//#endregion
 //#region src/core/frontmatter.ts
 /**
 * Frontmatter — YAML frontmatter parsing, serialization, and CRUD commands
 *
 * Uses the `yaml` npm package instead of a hand-rolled parser.
 */
-var import_dist = /* @__PURE__ */ __toESM(require_dist());
 
 //#endregion
 //#region src/core/phase.ts
@@ -34246,6 +34376,554 @@ function registerStateTools(server) {
 }
 
 //#endregion
+//#region src/core/roadmap.ts
+/**
+* Roadmap — Roadmap parsing and update operations
+*
+* Ported from maxsim/bin/lib/roadmap.cjs
+*/
+async function cmdRoadmapAnalyze(cwd) {
+	const content = await safeReadFileAsync(roadmapPath(cwd));
+	if (!content) return cmdOk({
+		error: "ROADMAP.md not found",
+		milestones: [],
+		phases: [],
+		current_phase: null
+	});
+	const phasesDir = phasesPath(cwd);
+	const phasePattern = getPhasePattern();
+	const parsedPhases = [];
+	let match;
+	while ((match = phasePattern.exec(content)) !== null) {
+		const phaseNum = match[1];
+		const phaseName = match[2].replace(/\(INSERTED\)/i, "").trim();
+		const sectionStart = match.index;
+		const nextHeader = content.slice(sectionStart).match(/\n#{2,4}\s+Phase\s+\d/i);
+		const sectionEnd = nextHeader ? sectionStart + nextHeader.index : content.length;
+		const section = content.slice(sectionStart, sectionEnd);
+		const goalMatch = section.match(/\*\*Goal(?::\*\*|\*\*:)\s*([^\n]+)/i);
+		const goal = goalMatch ? goalMatch[1].trim() : null;
+		const dependsMatch = section.match(/\*\*Depends on:\*\*\s*([^\n]+)/i);
+		const depends_on = dependsMatch ? dependsMatch[1].trim() : null;
+		parsedPhases.push({
+			phaseNum,
+			phaseName,
+			goal,
+			depends_on,
+			normalized: normalizePhaseName(phaseNum),
+			checkboxPattern: new RegExp(`-\\s*\\[(x| )\\]\\s*.*Phase\\s+${phaseNum.replace(".", "\\.")}`, "i")
+		});
+	}
+	let allDirs = [];
+	try {
+		allDirs = await listSubDirsAsync(phasesDir);
+	} catch {}
+	const phases = await Promise.all(parsedPhases.map(async (p) => {
+		let diskStatus = "no_directory";
+		let planCount = 0;
+		let summaryCount = 0;
+		let hasContext = false;
+		let hasResearch = false;
+		try {
+			const dirMatch = allDirs.find((d) => d.startsWith(p.normalized + "-") || d === p.normalized);
+			if (dirMatch) {
+				const phaseFiles = await node_fs.default.promises.readdir(node_path.default.join(phasesDir, dirMatch));
+				planCount = phaseFiles.filter((f) => isPlanFile(f)).length;
+				summaryCount = phaseFiles.filter((f) => isSummaryFile(f)).length;
+				hasContext = phaseFiles.some((f) => f.endsWith("-CONTEXT.md") || f === "CONTEXT.md");
+				hasResearch = phaseFiles.some((f) => f.endsWith("-RESEARCH.md") || f === "RESEARCH.md");
+				if (summaryCount >= planCount && planCount > 0) diskStatus = "complete";
+				else if (summaryCount > 0) diskStatus = "partial";
+				else if (planCount > 0) diskStatus = "planned";
+				else if (hasResearch) diskStatus = "researched";
+				else if (hasContext) diskStatus = "discussed";
+				else diskStatus = "empty";
+			}
+		} catch (e) {
+			debugLog(e);
+		}
+		const checkboxMatch = content.match(p.checkboxPattern);
+		const roadmapComplete = checkboxMatch ? checkboxMatch[1] === "x" : false;
+		return {
+			number: p.phaseNum,
+			name: p.phaseName,
+			goal: p.goal,
+			depends_on: p.depends_on,
+			plan_count: planCount,
+			summary_count: summaryCount,
+			has_context: hasContext,
+			has_research: hasResearch,
+			disk_status: diskStatus,
+			roadmap_complete: roadmapComplete
+		};
+	}));
+	const milestones = [];
+	const milestonePattern = /##\s*(.*v(\d+\.\d+)[^(\n]*)/gi;
+	let mMatch;
+	while ((mMatch = milestonePattern.exec(content)) !== null) milestones.push({
+		heading: mMatch[1].trim(),
+		version: "v" + mMatch[2]
+	});
+	const currentPhase = phases.find((p) => p.disk_status === "planned" || p.disk_status === "partial") || null;
+	const nextPhase = phases.find((p) => p.disk_status === "empty" || p.disk_status === "no_directory" || p.disk_status === "discussed" || p.disk_status === "researched") || null;
+	const totalPlans = phases.reduce((sum, p) => sum + p.plan_count, 0);
+	const totalSummaries = phases.reduce((sum, p) => sum + p.summary_count, 0);
+	const completedPhases = phases.filter((p) => p.disk_status === "complete").length;
+	const checklistPattern = /-\s*\[[ x]\]\s*\*\*Phase\s+(\d+[A-Z]?(?:\.\d+)?)/gi;
+	const checklistPhases = /* @__PURE__ */ new Set();
+	let checklistMatch;
+	while ((checklistMatch = checklistPattern.exec(content)) !== null) checklistPhases.add(checklistMatch[1]);
+	const detailPhases = new Set(phases.map((p) => p.number));
+	const missingDetails = [...checklistPhases].filter((p) => !detailPhases.has(p));
+	return cmdOk({
+		milestones,
+		phases,
+		phase_count: phases.length,
+		completed_phases: completedPhases,
+		total_plans: totalPlans,
+		total_summaries: totalSummaries,
+		progress_percent: totalPlans > 0 ? Math.min(100, Math.round(totalSummaries / totalPlans * 100)) : 0,
+		current_phase: currentPhase ? currentPhase.number : null,
+		next_phase: nextPhase ? nextPhase.number : null,
+		missing_phase_details: missingDetails.length > 0 ? missingDetails : null
+	});
+}
+
+//#endregion
+//#region src/core/context-loader.ts
+/**
+* Context Loader — Intelligent file selection for workflow context assembly
+*
+* Selects relevant planning files based on the current task/phase domain,
+* preventing context overload by loading only what matters.
+*/
+function fileEntry(cwd, relPath, role) {
+	const fullPath = node_path.default.join(cwd, relPath);
+	try {
+		return {
+			path: relPath,
+			role,
+			size: node_fs.default.statSync(fullPath).size
+		};
+	} catch {
+		return null;
+	}
+}
+function addIfExists(files, cwd, relPath, role) {
+	const entry = fileEntry(cwd, relPath, role);
+	if (entry) files.push(entry);
+}
+const TOPIC_TO_CODEBASE_DOCS = {
+	ui: ["CONVENTIONS.md", "STRUCTURE.md"],
+	frontend: ["CONVENTIONS.md", "STRUCTURE.md"],
+	component: ["CONVENTIONS.md", "STRUCTURE.md"],
+	api: ["ARCHITECTURE.md", "CONVENTIONS.md"],
+	backend: ["ARCHITECTURE.md", "CONVENTIONS.md"],
+	server: ["ARCHITECTURE.md", "CONVENTIONS.md"],
+	database: ["ARCHITECTURE.md", "STACK.md"],
+	schema: ["ARCHITECTURE.md", "STACK.md"],
+	data: ["ARCHITECTURE.md", "STACK.md"],
+	testing: ["TESTING.md", "CONVENTIONS.md"],
+	test: ["TESTING.md", "CONVENTIONS.md"],
+	integration: ["INTEGRATIONS.md", "STACK.md"],
+	deploy: ["INTEGRATIONS.md", "STACK.md"],
+	refactor: ["CONCERNS.md", "ARCHITECTURE.md"],
+	cleanup: ["CONCERNS.md", "ARCHITECTURE.md"],
+	setup: ["STACK.md", "STRUCTURE.md"],
+	config: ["STACK.md", "STRUCTURE.md"],
+	auth: ["ARCHITECTURE.md", "INTEGRATIONS.md"],
+	performance: ["ARCHITECTURE.md", "STACK.md"],
+	install: ["STACK.md", "STRUCTURE.md"]
+};
+const DEFAULT_CODEBASE_DOCS = ["STACK.md", "ARCHITECTURE.md"];
+function selectCodebaseDocs(topic) {
+	if (!topic) return DEFAULT_CODEBASE_DOCS;
+	const topicLower = topic.toLowerCase();
+	const matched = /* @__PURE__ */ new Set();
+	for (const [keyword, docs] of Object.entries(TOPIC_TO_CODEBASE_DOCS)) if (topicLower.includes(keyword)) for (const doc of docs) matched.add(doc);
+	return matched.size > 0 ? Array.from(matched) : DEFAULT_CODEBASE_DOCS;
+}
+function loadProjectContext(cwd) {
+	const files = [];
+	addIfExists(files, cwd, ".planning/PROJECT.md", "project-vision");
+	addIfExists(files, cwd, ".planning/REQUIREMENTS.md", "requirements");
+	addIfExists(files, cwd, ".planning/STATE.md", "state");
+	addIfExists(files, cwd, ".planning/config.json", "config");
+	return files;
+}
+function loadRoadmapContext(cwd) {
+	const files = [];
+	addIfExists(files, cwd, ".planning/ROADMAP.md", "roadmap");
+	return files;
+}
+function loadPhaseContext(cwd, phase) {
+	const files = [];
+	const phaseInfo = findPhaseInternal(cwd, phase);
+	if (!phaseInfo?.directory) return files;
+	const phaseDir = phaseInfo.directory;
+	try {
+		const phaseFiles = node_fs.default.readdirSync(node_path.default.join(cwd, phaseDir));
+		for (const f of phaseFiles) {
+			const relPath = node_path.default.join(phaseDir, f);
+			if (f.endsWith("-CONTEXT.md") || f === "CONTEXT.md") addIfExists(files, cwd, relPath, "phase-context");
+			else if (f.endsWith("-RESEARCH.md") || f === "RESEARCH.md") addIfExists(files, cwd, relPath, "phase-research");
+			else if (f.endsWith("-PLAN.md")) addIfExists(files, cwd, relPath, "phase-plan");
+			else if (f.endsWith("-SUMMARY.md")) addIfExists(files, cwd, relPath, "phase-summary");
+			else if (f.endsWith("-VERIFICATION.md") || f === "VERIFICATION.md") addIfExists(files, cwd, relPath, "phase-verification");
+		}
+	} catch (e) {
+		debugLog("context-loader-phase-files-failed", e);
+	}
+	return files;
+}
+function loadArtefakteContext(cwd, phase) {
+	const files = [];
+	for (const filename of [
+		"DECISIONS.md",
+		"ACCEPTANCE-CRITERIA.md",
+		"NO-GOS.md"
+	]) {
+		if (phase) {
+			const phaseInfo = findPhaseInternal(cwd, phase);
+			if (phaseInfo?.directory) addIfExists(files, cwd, node_path.default.join(phaseInfo.directory, filename), `artefakt-${filename.toLowerCase()}`);
+		}
+		addIfExists(files, cwd, `.planning/${filename}`, `artefakt-${filename.toLowerCase()}`);
+	}
+	return files;
+}
+function loadCodebaseContext(cwd, topic) {
+	const files = [];
+	const codebaseDir = planningPath(cwd, "codebase");
+	try {
+		const existing = node_fs.default.readdirSync(codebaseDir).filter((f) => f.endsWith(".md"));
+		const selected = selectCodebaseDocs(topic);
+		for (const filename of selected) if (existing.includes(filename)) addIfExists(files, cwd, `.planning/codebase/${filename}`, `codebase-${filename.replace(".md", "").toLowerCase()}`);
+	} catch {}
+	return files;
+}
+function loadHistoryContext(cwd, currentPhase) {
+	const files = [];
+	const pd = phasesPath(cwd);
+	try {
+		const dirs = listSubDirs(pd, true);
+		for (const dir of dirs) {
+			if (currentPhase) {
+				if (dir.match(/^(\d+[A-Z]?(?:\.\d+)?)/i)?.[1] === currentPhase) continue;
+			}
+			const dirPath = node_path.default.join(pd, dir);
+			const summaries = node_fs.default.readdirSync(dirPath).filter((f) => isSummaryFile(f));
+			for (const s of summaries) addIfExists(files, cwd, node_path.default.join(".planning", "phases", dir, s), "history-summary");
+		}
+	} catch (e) {
+		debugLog("context-loader-history-failed", e);
+	}
+	return files;
+}
+function cmdContextLoad(cwd, phase, topic, includeHistory) {
+	const allFiles = [];
+	allFiles.push(...loadProjectContext(cwd));
+	allFiles.push(...loadRoadmapContext(cwd));
+	allFiles.push(...loadArtefakteContext(cwd, phase));
+	const selectedDocs = selectCodebaseDocs(topic);
+	allFiles.push(...loadCodebaseContext(cwd, topic));
+	if (phase) allFiles.push(...loadPhaseContext(cwd, phase));
+	if (includeHistory) allFiles.push(...loadHistoryContext(cwd, phase));
+	const seen = /* @__PURE__ */ new Set();
+	const deduped = allFiles.filter((f) => {
+		if (seen.has(f.path)) return false;
+		seen.add(f.path);
+		return true;
+	});
+	return cmdOk({
+		files: deduped,
+		total_size: deduped.reduce((sum, f) => sum + f.size, 0),
+		phase: phase ?? null,
+		topic: topic ?? null,
+		codebase_docs_selected: selectedDocs
+	});
+}
+
+//#endregion
+//#region src/mcp/context-tools.ts
+/**
+* Context Query MCP Tools — Project context exposed as MCP tools
+*
+* CRITICAL: Never import output() or error() from core — they call process.exit().
+* CRITICAL: Never write to stdout — it is reserved for MCP JSON-RPC protocol.
+* CRITICAL: Never call process.exit() — the server must stay alive after every tool call.
+*/
+/**
+* Register all context query tools on the MCP server.
+*/
+function registerContextTools(server) {
+	server.tool("mcp_get_active_phase", "Get the currently active phase and next phase from roadmap analysis and STATE.md.", {}, async () => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			const roadmapResult = await cmdRoadmapAnalyze(cwd);
+			let current_phase = null;
+			let next_phase = null;
+			let phase_name = null;
+			let status = null;
+			if (roadmapResult.ok) {
+				const data = roadmapResult.result;
+				current_phase = data.current_phase ?? null;
+				next_phase = data.next_phase ?? null;
+			}
+			const stateContent = safeReadFile(planningPath(cwd, "STATE.md"));
+			if (stateContent) {
+				const statePhase = stateExtractField(stateContent, "Current Phase");
+				if (statePhase) phase_name = statePhase;
+				const stateStatus = stateExtractField(stateContent, "Status");
+				if (stateStatus) status = stateStatus;
+			}
+			return mcpSuccess({
+				current_phase,
+				next_phase,
+				phase_name,
+				status
+			}, `Active phase: ${phase_name ?? current_phase ?? "unknown"}`);
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+	server.tool("mcp_get_guidelines", "Get project guidelines: PROJECT.md vision, config, and optionally phase-specific context.", { phase: stringType().optional().describe("Optional phase number to include phase-specific context") }, async ({ phase }) => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			const project_vision = safeReadFile(planningPath(cwd, "PROJECT.md"));
+			const config = loadConfig(cwd);
+			let phase_context = null;
+			if (phase) {
+				const phaseInfo = findPhaseInternal(cwd, phase);
+				if (phaseInfo) phase_context = safeReadFile(node_path.default.join(phaseInfo.directory, `${phaseInfo.phase_number}-CONTEXT.md`));
+			}
+			return mcpSuccess({
+				project_vision,
+				config,
+				phase_context
+			}, `Guidelines loaded${phase ? ` with phase ${phase} context` : ""}`);
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+	server.tool("mcp_get_context_for_task", "Load context files for a task. Includes project context, roadmap, artefakte, and codebase docs filtered by topic. Topic keywords select relevant codebase docs: \"ui/frontend\" loads CONVENTIONS+STRUCTURE, \"api/backend\" loads ARCHITECTURE+CONVENTIONS, \"testing\" loads TESTING+CONVENTIONS, \"database\" loads ARCHITECTURE+STACK, \"refactor\" loads CONCERNS+ARCHITECTURE. Without topic, defaults to STACK+ARCHITECTURE.", {
+		phase: stringType().optional().describe("Phase number to scope context to"),
+		topic: stringType().optional().describe("Topic keywords to filter codebase docs (e.g. \"frontend\", \"api\", \"testing\", \"database\", \"refactor\")")
+	}, async ({ phase, topic }) => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			const result = cmdContextLoad(cwd, phase, topic, true);
+			if (!result.ok) return mcpError(result.error, "Context load failed");
+			return mcpSuccess({ context: result.result }, `Context loaded${phase ? ` for phase ${phase}` : ""}${topic ? ` topic "${topic}"` : ""}`);
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+	server.tool("mcp_get_project_overview", "Get a high-level project overview: PROJECT.md, REQUIREMENTS.md, and STATE.md contents.", {}, async () => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			return mcpSuccess({
+				project: safeReadFile(planningPath(cwd, "PROJECT.md")),
+				requirements: safeReadFile(planningPath(cwd, "REQUIREMENTS.md")),
+				state: safeReadFile(planningPath(cwd, "STATE.md"))
+			}, "Project overview loaded");
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+	server.tool("mcp_get_phase_detail", "Get detailed information about a specific phase including all its files (plans, summaries, context, research, verification).", { phase: stringType().describe("Phase number or name (e.g. \"01\", \"1\", \"01A\")") }, async ({ phase }) => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			const phaseInfo = findPhaseInternal(cwd, phase);
+			if (!phaseInfo) return mcpError(`Phase ${phase} not found`, "Phase not found");
+			const files = [];
+			try {
+				const entries = node_fs.default.readdirSync(phaseInfo.directory);
+				for (const entry of entries) {
+					const fullPath = node_path.default.join(phaseInfo.directory, entry);
+					if (node_fs.default.statSync(fullPath).isFile()) files.push({
+						name: entry,
+						content: safeReadFile(fullPath)
+					});
+				}
+			} catch {}
+			return mcpSuccess({
+				phase_number: phaseInfo.phase_number,
+				phase_name: phaseInfo.phase_name,
+				directory: phaseInfo.directory,
+				files
+			}, `Phase ${phaseInfo.phase_number} detail: ${files.length} file(s)`);
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+}
+
+//#endregion
+//#region src/mcp/roadmap-tools.ts
+/**
+* Register all roadmap query tools on the MCP server.
+*/
+function registerRoadmapTools(server) {
+	server.tool("mcp_get_roadmap", "Get the full roadmap analysis including all phases, their status, and progress.", {}, async () => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			const result = await cmdRoadmapAnalyze(cwd);
+			if (!result.ok) return mcpError(result.error, "Roadmap analysis failed");
+			return mcpSuccess({ roadmap: result.result }, "Roadmap analysis complete");
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+	server.tool("mcp_get_roadmap_progress", "Get a focused progress summary: total phases, completed, in-progress, not started, and progress percentage.", {}, async () => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			const result = await cmdRoadmapAnalyze(cwd);
+			if (!result.ok) return mcpError(result.error, "Roadmap analysis failed");
+			const data = result.result;
+			const phases = data.phases ?? [];
+			const total_phases = phases.length;
+			let completed = 0;
+			let in_progress = 0;
+			let not_started = 0;
+			for (const p of phases) {
+				const status = String(p.status ?? "").toLowerCase();
+				if (status === "completed" || status === "done") completed++;
+				else if (status === "in-progress" || status === "in_progress" || status === "active") in_progress++;
+				else not_started++;
+			}
+			const progress_percent = total_phases > 0 ? Math.round(completed / total_phases * 100) : 0;
+			return mcpSuccess({
+				total_phases,
+				completed,
+				in_progress,
+				not_started,
+				progress_percent,
+				current_phase: data.current_phase ?? null,
+				next_phase: data.next_phase ?? null
+			}, `Progress: ${completed}/${total_phases} phases complete (${progress_percent}%)`);
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+}
+
+//#endregion
+//#region src/core/config.ts
+/**
+* Config — Planning config CRUD operations
+*
+* Ported from maxsim/bin/lib/config.cjs
+*/
+function cmdConfigSet(cwd, keyPath, value, raw) {
+	const configPath = node_path.default.join(cwd, ".planning", "config.json");
+	if (!keyPath) return cmdErr("Usage: config-set <key.path> <value>");
+	let parsedValue = value;
+	if (value === "true") parsedValue = true;
+	else if (value === "false") parsedValue = false;
+	else if (value !== void 0 && !isNaN(Number(value)) && value !== "") parsedValue = Number(value);
+	let config = {};
+	try {
+		if (node_fs.default.existsSync(configPath)) config = JSON.parse(node_fs.default.readFileSync(configPath, "utf-8"));
+	} catch (err) {
+		return cmdErr("Failed to read config.json: " + err.message);
+	}
+	const keys = keyPath.split(".");
+	let current = config;
+	for (let i = 0; i < keys.length - 1; i++) {
+		const key = keys[i];
+		if (current[key] === void 0 || typeof current[key] !== "object") current[key] = {};
+		current = current[key];
+	}
+	current[keys[keys.length - 1]] = parsedValue;
+	try {
+		node_fs.default.writeFileSync(configPath, JSON.stringify(config, null, 2), "utf-8");
+		return cmdOk({
+			updated: true,
+			key: keyPath,
+			value: parsedValue
+		}, raw ? `${keyPath}=${parsedValue}` : void 0);
+	} catch (err) {
+		return cmdErr("Failed to write config.json: " + err.message);
+	}
+}
+function cmdConfigGet(cwd, keyPath, raw) {
+	const configPath = node_path.default.join(cwd, ".planning", "config.json");
+	if (!keyPath) return cmdErr("Usage: config-get <key.path>");
+	let config = {};
+	try {
+		if (node_fs.default.existsSync(configPath)) config = JSON.parse(node_fs.default.readFileSync(configPath, "utf-8"));
+		else return cmdErr("No config.json found at " + configPath);
+	} catch (err) {
+		return cmdErr("Failed to read config.json: " + err.message);
+	}
+	const keys = keyPath.split(".");
+	let current = config;
+	for (const key of keys) {
+		if (current === void 0 || current === null || typeof current !== "object") return cmdErr(`Key not found: ${keyPath}`);
+		current = current[key];
+	}
+	if (current === void 0) return cmdErr(`Key not found: ${keyPath}`);
+	return cmdOk(current, raw ? String(current) : void 0);
+}
+
+//#endregion
+//#region src/mcp/config-tools.ts
+/**
+* Config Query MCP Tools — Project configuration exposed as MCP tools
+*
+* CRITICAL: Never import output() or error() from core — they call process.exit().
+* CRITICAL: Never write to stdout — it is reserved for MCP JSON-RPC protocol.
+* CRITICAL: Never call process.exit() — the server must stay alive after every tool call.
+*/
+/**
+* Register all config query tools on the MCP server.
+*/
+function registerConfigTools(server) {
+	server.tool("mcp_get_config", "Get project configuration. Optionally provide a key path to get a specific value.", { key: stringType().optional().describe("Optional dot-separated key path (e.g. \"model_profile\", \"branching.strategy\")") }, async ({ key }) => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			if (key) {
+				const result = cmdConfigGet(cwd, key, true);
+				if (!result.ok) return mcpError(result.error, "Config get failed");
+				return mcpSuccess({
+					key,
+					value: result.rawValue ?? result.result
+				}, `Config value for "${key}"`);
+			}
+			return mcpSuccess({ config: loadConfig(cwd) }, "Full configuration loaded");
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+	server.tool("mcp_update_config", "Update a project configuration value by key path.", {
+		key: stringType().describe("Dot-separated key path (e.g. \"model_profile\", \"branching.strategy\")"),
+		value: stringType().describe("New value to set")
+	}, async ({ key, value }) => {
+		try {
+			const cwd = detectProjectRoot();
+			if (!cwd) return mcpError("No .planning/ directory found", "Project not detected");
+			const result = cmdConfigSet(cwd, key, value, true);
+			if (!result.ok) return mcpError(result.error, "Config update failed");
+			return mcpSuccess({
+				updated: true,
+				key,
+				value
+			}, `Config "${key}" updated to "${value}"`);
+		} catch (e) {
+			return mcpError("Failed: " + e.message, "Error occurred");
+		}
+	});
+}
+
+//#endregion
 //#region src/mcp/index.ts
 /**
 * Register all MCP tools on the given server instance.
@@ -34254,6 +34932,9 @@ function registerAllTools(server) {
 	registerPhaseTools(server);
 	registerTodoTools(server);
 	registerStateTools(server);
+	registerContextTools(server);
+	registerRoadmapTools(server);
+	registerConfigTools(server);
 }
 
 //#endregion

@@ -15,6 +15,7 @@ export interface ContextLoadResult {
     total_size: number;
     phase: string | null;
     topic: string | null;
+    codebase_docs_selected: string[];
 }
 export declare function cmdContextLoad(cwd: string, phase: string | undefined, topic: string | undefined, includeHistory: boolean): CmdResult;
 //# sourceMappingURL=context-loader.d.ts.map

@@ -124,7 +124,11 @@ Header: `# Phase [X]: [Name] - Research` with Researched date, Domain, Confidenc
    ```
    Read CONTEXT.md if exists (`$phase_dir/*-CONTEXT.md`). Read `.planning/config.json` for `workflow.nyquist_validation`.
 
-2. **Discover project context** — Read `./CLAUDE.md` if exists. Check `.skills/` for project skills (read SKILL.md indices, not full AGENTS.md).
+2. **Discover project context** — Read `./CLAUDE.md` if exists. Check `.skills/` for project skills (read SKILL.md indices, not full AGENTS.md). Load relevant codebase docs:
+   ```bash
+   node ~/.claude/maxsim/bin/maxsim-tools.cjs context-load --phase "${PHASE}" --topic "${PHASE_NAME}"
+   ```
+   Read files where `role` starts with `codebase-` for project architecture and conventions.
 
 3. **Identify research domains** — Core technology, ecosystem/stack, patterns, pitfalls, don't-hand-roll items.
 

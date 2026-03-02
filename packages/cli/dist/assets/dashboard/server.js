@@ -39892,7 +39892,7 @@ var require_express = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../../../../node_modules/totalist/sync/index.mjs
+//#region ../../node_modules/totalist/sync/index.mjs
 var import_express = /* @__PURE__ */ __toESM(require_express());
 function totalist(dir, callback, pre = "") {
 	dir = (0, path.resolve)(".", dir);
@@ -39906,7 +39906,7 @@ function totalist(dir, callback, pre = "") {
 }
 
 //#endregion
-//#region ../../../../../node_modules/@polka/url/build.mjs
+//#region ../../node_modules/@polka/url/build.mjs
 /**
 * @typedef ParsedURL
 * @type {import('.').ParsedURL}
@@ -39949,7 +39949,7 @@ function parse$2(req) {
 }
 
 //#endregion
-//#region ../../../../../node_modules/mrmime/index.mjs
+//#region ../../node_modules/mrmime/index.mjs
 const mimes = {
 	"3g2": "video/3gpp2",
 	"3gp": "video/3gpp",
@@ -40397,7 +40397,7 @@ function lookup(extn) {
 }
 
 //#endregion
-//#region ../../../../../node_modules/sirv/build.mjs
+//#region ../../node_modules/sirv/build.mjs
 const noop = () => {};
 function isMatch(uri, arr) {
 	for (let i = 0; i < arr.length; i++) if (arr[i].test(uri)) return true;
@@ -64326,7 +64326,7 @@ const debug$1 = (0, node_util.debuglog)("detect-port:wait-port");
 var esm_default = detectPort;
 
 //#endregion
-//#region ../../../../../node_modules/is-docker/index.js
+//#region ../../node_modules/is-docker/index.js
 let isDockerCached;
 function hasDockerEnv() {
 	try {
@@ -64349,7 +64349,7 @@ function isDocker() {
 }
 
 //#endregion
-//#region ../../../../../node_modules/is-inside-container/index.js
+//#region ../../node_modules/is-inside-container/index.js
 let cachedResult;
 const hasContainerEnv = () => {
 	try {
@@ -64365,7 +64365,7 @@ function isInsideContainer() {
 }
 
 //#endregion
-//#region ../../../../../node_modules/is-wsl/index.js
+//#region ../../node_modules/is-wsl/index.js
 const isWsl = () => {
 	if (node_process.default.platform !== "linux") return false;
 	if (node_os.default.release().toLowerCase().includes("microsoft")) {
@@ -64381,7 +64381,7 @@ const isWsl = () => {
 var is_wsl_default = node_process.default.env.__IS_WSL_TEST__ ? isWsl : isWsl();
 
 //#endregion
-//#region ../../../../../node_modules/wsl-utils/index.js
+//#region ../../node_modules/wsl-utils/index.js
 const wslDrivesMountPoint = (() => {
 	const defaultMountPoint = "/mnt/";
 	let mountPoint;
@@ -64411,7 +64411,7 @@ const powerShellPath = async () => {
 };
 
 //#endregion
-//#region ../../../../../node_modules/define-lazy-prop/index.js
+//#region ../../node_modules/define-lazy-prop/index.js
 function defineLazyProperty(object, propertyName, valueGetter) {
 	const define = (value) => Object.defineProperty(object, propertyName, {
 		value,
@@ -64434,7 +64434,7 @@ function defineLazyProperty(object, propertyName, valueGetter) {
 }
 
 //#endregion
-//#region ../../../../../node_modules/default-browser-id/index.js
+//#region ../../node_modules/default-browser-id/index.js
 const execFileAsync$3 = (0, node_util.promisify)(node_child_process.execFile);
 async function defaultBrowserId() {
 	if (node_process.default.platform !== "darwin") throw new Error("macOS only");
@@ -64449,7 +64449,7 @@ async function defaultBrowserId() {
 }
 
 //#endregion
-//#region ../../../../../node_modules/run-applescript/index.js
+//#region ../../node_modules/run-applescript/index.js
 const execFileAsync$2 = (0, node_util.promisify)(node_child_process.execFile);
 async function runAppleScript(script, { humanReadableOutput = true, signal } = {}) {
 	if (node_process.default.platform !== "darwin") throw new Error("macOS only");
@@ -64465,13 +64465,13 @@ async function runAppleScript(script, { humanReadableOutput = true, signal } = {
 }
 
 //#endregion
-//#region ../../../../../node_modules/bundle-name/index.js
+//#region ../../node_modules/bundle-name/index.js
 async function bundleName(bundleId) {
 	return runAppleScript(`tell application "Finder" to set app_path to application file id "${bundleId}" as string\ntell application "System Events" to get value of property list item "CFBundleName" of property list file (app_path & ":Contents:Info.plist")`);
 }
 
 //#endregion
-//#region ../../../../../node_modules/default-browser/windows.js
+//#region ../../node_modules/default-browser/windows.js
 const execFileAsync$1 = (0, node_util.promisify)(node_child_process.execFile);
 const windowsBrowserProgIds = {
 	MSEdgeHTM: {
@@ -64562,7 +64562,7 @@ async function defaultBrowser$1(_execFileAsync = execFileAsync$1) {
 }
 
 //#endregion
-//#region ../../../../../node_modules/default-browser/index.js
+//#region ../../node_modules/default-browser/index.js
 const execFileAsync = (0, node_util.promisify)(node_child_process.execFile);
 const titleize = (string) => string.toLowerCase().replaceAll(/(?:^|\s|-)\S/g, (x) => x.toUpperCase());
 async function defaultBrowser() {
@@ -64590,7 +64590,7 @@ async function defaultBrowser() {
 }
 
 //#endregion
-//#region ../../../../../node_modules/open/index.js
+//#region ../../node_modules/open/index.js
 const execFile = (0, node_util.promisify)(node_child_process.default.execFile);
 const __dirname$1 = node_path.default.dirname((0, node_url.fileURLToPath)(require("url").pathToFileURL(__filename).href));
 const localXdgOpenPath = node_path.default.join(__dirname$1, "xdg-open");
@@ -65192,7 +65192,7 @@ var require_browser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../../../../node_modules/has-flag/index.js
+//#region ../../node_modules/has-flag/index.js
 var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = (flag, argv = process.argv) => {
 		const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
@@ -65203,7 +65203,7 @@ var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../../../../node_modules/supports-color/index.js
+//#region ../../node_modules/supports-color/index.js
 var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const os$4 = require("os");
 	const tty$1 = require("tty");
@@ -77318,7 +77318,7 @@ function watch(paths, options = {}) {
 }
 
 //#endregion
-//#region ../../../../../node_modules/lodash.debounce/index.js
+//#region ../../node_modules/lodash.debounce/index.js
 var require_lodash_debounce = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* lodash (Custom Build) <https://lodash.com/>

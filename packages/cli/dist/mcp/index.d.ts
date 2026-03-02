@@ -2,7 +2,6 @@
  * MCP Tool Registration — Orchestrates all tool registrations
  *
  * This is the single entry point for registering MCP tools on the server.
- * Later plans will add registerTodoTools, registerStateTools, etc.
  */
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 /**

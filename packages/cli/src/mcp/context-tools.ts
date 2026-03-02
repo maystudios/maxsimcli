@@ -118,16 +118,20 @@ export function registerContextTools(server: McpServer): void {
 
   server.tool(
     'mcp_get_context_for_task',
-    'Load context files for a task, including project context, roadmap, and optionally phase-specific and topic-specific files.',
+    'Load context files for a task. Includes project context, roadmap, artefakte, and codebase docs filtered by topic. ' +
+    'Topic keywords select relevant codebase docs: "ui/frontend" loads CONVENTIONS+STRUCTURE, ' +
+    '"api/backend" loads ARCHITECTURE+CONVENTIONS, "testing" loads TESTING+CONVENTIONS, ' +
+    '"database" loads ARCHITECTURE+STACK, "refactor" loads CONCERNS+ARCHITECTURE. ' +
+    'Without topic, defaults to STACK+ARCHITECTURE.',
     {
       phase: z
         .string()
         .optional()
-        .describe('Optional phase number to scope context to'),
+        .describe('Phase number to scope context to'),
       topic: z
         .string()
         .optional()
-        .describe('Optional topic to filter context by'),
+        .describe('Topic keywords to filter codebase docs (e.g. "frontend", "api", "testing", "database", "refactor")'),
     },
     async ({ phase, topic }) => {
       try {
