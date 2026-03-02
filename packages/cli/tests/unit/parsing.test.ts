@@ -236,11 +236,20 @@ describe('stateExtractField', () => {
     expect(stateExtractField(stateContent, 'Progress')).toBeNull();
   });
 
-  it('does NOT match non-bold "Key: value" format', () => {
-    // STATE.md sometimes has plain "Phase: 01" lines — stateExtractField should NOT match these
+  it('falls back to plain "Key: value" format when bold markers are missing', () => {
     const plainContent = 'Phase: 01\nStatus: plain value\n';
-    expect(stateExtractField(plainContent, 'Phase')).toBeNull();
-    expect(stateExtractField(plainContent, 'Status')).toBeNull();
+    expect(stateExtractField(plainContent, 'Phase')).toBe('01');
+    expect(stateExtractField(plainContent, 'Status')).toBe('plain value');
+  });
+
+  it('prefers bold format over plain when both exist', () => {
+    const mixedContent = '**Phase:** 02\nPhase: 01\n';
+    expect(stateExtractField(mixedContent, 'Phase')).toBe('02');
+  });
+
+  it('tolerates extra whitespace in bold field markers', () => {
+    const spaceyContent = '**  Current Phase :  ** 03\n';
+    expect(stateExtractField(spaceyContent, 'Current Phase')).toBe('03');
   });
 
   it('extracts value including special characters and dashes', () => {
