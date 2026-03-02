@@ -8,7 +8,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { spawn } from 'node:child_process';
 
-import type { TimestampFormat } from './core/index.js';
+import type { TimestampFormat, CmdResult } from './core/index.js';
 
 import {
   error,
@@ -90,6 +90,22 @@ import {
   cmdContextLoad,
   cmdStart,
 } from './core/index.js';
+
+// ─── Result handler ──────────────────────────────────────────────────────────
+
+/** Convert a CmdResult into the output()/error() signal expected by main(). */
+function handleResult(r: CmdResult, raw: boolean): never {
+  if (r.ok) {
+    // Re-use the existing CliOutput signal mechanism
+    throw new CliOutput(r.result, raw, r.rawValue);
+  }
+  throw new CliError(r.error);
+}
+
+/** Async variant for promise-returning commands. */
+async function handleResultAsync(p: Promise<CmdResult>, raw: boolean): Promise<never> {
+  return handleResult(await p, raw);
+}
 
 // ─── Arg parsing utilities ───────────────────────────────────────────────────
 
@@ -173,14 +189,14 @@ const handleState: Handler = async (args, cwd, raw) => {
 const handleTemplate: Handler = (args, cwd, raw) => {
   const sub = args[1];
   if (sub === 'select') {
-    cmdTemplateSelect(cwd, args[2], raw);
+    handleResult(cmdTemplateSelect(cwd, args[2]), raw);
   } else if (sub === 'fill') {
     const f = getFlags(args, 'phase', 'plan', 'name', 'type', 'wave', 'fields');
-    cmdTemplateFill(cwd, args[2], {
+    handleResult(cmdTemplateFill(cwd, args[2], {
       phase: f.phase ?? '', plan: f.plan ?? undefined, name: f.name ?? undefined,
       type: f.type ?? 'execute', wave: f.wave ?? '1',
       fields: f.fields ? JSON.parse(f.fields) : {},
-    }, raw);
+    }), raw);
   } else {
     error('Unknown template subcommand. Available: select, fill');
   }
@@ -190,10 +206,10 @@ const handleFrontmatter: Handler = (args, cwd, raw) => {
   const sub = args[1];
   const file = args[2];
   const handlers: Record<string, () => void> = {
-    'get': () => cmdFrontmatterGet(cwd, file, getFlag(args, '--field'), raw),
-    'set': () => cmdFrontmatterSet(cwd, file, getFlag(args, '--field'), getFlag(args, '--value') ?? undefined, raw),
-    'merge': () => cmdFrontmatterMerge(cwd, file, getFlag(args, '--data'), raw),
-    'validate': () => cmdFrontmatterValidate(cwd, file, getFlag(args, '--schema'), raw),
+    'get': () => handleResult(cmdFrontmatterGet(cwd, file, getFlag(args, '--field')), raw),
+    'set': () => handleResult(cmdFrontmatterSet(cwd, file, getFlag(args, '--field'), getFlag(args, '--value') ?? undefined), raw),
+    'merge': () => handleResult(cmdFrontmatterMerge(cwd, file, getFlag(args, '--data')), raw),
+    'validate': () => handleResult(cmdFrontmatterValidate(cwd, file, getFlag(args, '--schema')), raw),
   };
   const handler = sub ? handlers[sub] : undefined;
   if (handler) return handler();
@@ -203,12 +219,12 @@ const handleFrontmatter: Handler = (args, cwd, raw) => {
 const handleVerify: Handler = async (args, cwd, raw) => {
   const sub = args[1];
   const handlers: Record<string, () => void | Promise<void>> = {
-    'plan-structure': () => cmdVerifyPlanStructure(cwd, args[2], raw),
-    'phase-completeness': () => cmdVerifyPhaseCompleteness(cwd, args[2], raw),
-    'references': () => cmdVerifyReferences(cwd, args[2], raw),
-    'commits': () => cmdVerifyCommits(cwd, args.slice(2), raw),
-    'artifacts': () => cmdVerifyArtifacts(cwd, args[2], raw),
-    'key-links': () => cmdVerifyKeyLinks(cwd, args[2], raw),
+    'plan-structure': () => handleResult(cmdVerifyPlanStructure(cwd, args[2]), raw),
+    'phase-completeness': () => handleResult(cmdVerifyPhaseCompleteness(cwd, args[2]), raw),
+    'references': () => handleResult(cmdVerifyReferences(cwd, args[2]), raw),
+    'commits': async () => handleResultAsync(cmdVerifyCommits(cwd, args.slice(2)), raw),
+    'artifacts': () => handleResult(cmdVerifyArtifacts(cwd, args[2]), raw),
+    'key-links': () => handleResult(cmdVerifyKeyLinks(cwd, args[2]), raw),
   };
   const handler = sub ? handlers[sub] : undefined;
   if (handler) return handler();
@@ -270,10 +286,10 @@ const handleMilestone: Handler = (args, cwd, raw) => {
       }
       milestoneName = nameArgs.join(' ') || null;
     }
-    cmdMilestoneComplete(cwd, args[2], {
+    handleResult(cmdMilestoneComplete(cwd, args[2], {
       name: milestoneName ?? undefined,
       archivePhases: hasFlag(args, 'archive-phases'),
-    }, raw);
+    }), raw);
   } else {
     error('Unknown milestone subcommand. Available: complete');
   }
@@ -282,8 +298,8 @@ const handleMilestone: Handler = (args, cwd, raw) => {
 const handleValidate: Handler = (args, cwd, raw) => {
   const sub = args[1];
   const handlers: Record<string, () => void> = {
-    'consistency': () => cmdValidateConsistency(cwd, raw),
-    'health': () => cmdValidateHealth(cwd, { repair: hasFlag(args, 'repair') }, raw),
+    'consistency': () => handleResult(cmdValidateConsistency(cwd), raw),
+    'health': () => handleResult(cmdValidateHealth(cwd, { repair: hasFlag(args, 'repair') }), raw),
   };
   const handler = sub ? handlers[sub] : undefined;
   if (handler) return handler();
@@ -327,7 +343,7 @@ const COMMANDS: Record<string, Handler> = {
   'verify-summary': async (args, cwd, raw) => {
     const countIndex = args.indexOf('--check-count');
     const checkCount = countIndex !== -1 ? parseInt(args[countIndex + 1], 10) : 2;
-    await cmdVerifySummary(cwd, args[1], checkCount, raw);
+    await handleResultAsync(cmdVerifySummary(cwd, args[1], checkCount), raw);
   },
   'template': handleTemplate,
   'frontmatter': handleFrontmatter,
@@ -343,7 +359,7 @@ const COMMANDS: Record<string, Handler> = {
   'phases': handlePhases,
   'roadmap': handleRoadmap,
   'requirements': (args, cwd, raw) => {
-    if (args[1] === 'mark-complete') cmdRequirementsMarkComplete(cwd, args.slice(2), raw);
+    if (args[1] === 'mark-complete') handleResult(cmdRequirementsMarkComplete(cwd, args.slice(2)), raw);
     else error('Unknown requirements subcommand. Available: mark-complete');
   },
   'phase': handlePhase,
@@ -377,7 +393,7 @@ const COMMANDS: Record<string, Handler> = {
   'artefakte-write': (args, cwd, raw) => cmdArtefakteWrite(cwd, args[1], getFlag(args, '--content') ?? undefined, getFlag(args, '--phase') ?? undefined, raw),
   'artefakte-append': (args, cwd, raw) => cmdArtefakteAppend(cwd, args[1], getFlag(args, '--entry') ?? undefined, getFlag(args, '--phase') ?? undefined, raw),
   'artefakte-list': (args, cwd, raw) => cmdArtefakteList(cwd, getFlag(args, '--phase') ?? undefined, raw),
-  'context-load': (args, cwd, raw) => cmdContextLoad(cwd, getFlag(args, '--phase') ?? undefined, getFlag(args, '--topic') ?? undefined, hasFlag(args, 'include-history'), raw),
+  'context-load': (args, cwd, raw) => handleResult(cmdContextLoad(cwd, getFlag(args, '--phase') ?? undefined, getFlag(args, '--topic') ?? undefined, hasFlag(args, 'include-history')), raw),
   'start': async (args, cwd, raw) => cmdStart(cwd, { noBrowser: hasFlag(args, 'no-browser'), networkMode: hasFlag(args, 'network') }, raw),
   'dashboard': (args) => handleDashboard(args.slice(1)),
   'start-server': async () => {

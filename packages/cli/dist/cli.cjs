@@ -59,9 +59,22 @@ const PLANNING_CONFIG_DEFAULTS = {
 	parallelization: true,
 	brave_search: false
 };
+function cmdOk(result, rawValue) {
+	return {
+		ok: true,
+		result,
+		rawValue
+	};
+}
+function cmdErr(error) {
+	return {
+		ok: false,
+		error
+	};
+}
 
 //#endregion
-//#region ../../node_modules/ms/index.js
+//#region ../../../../../node_modules/ms/index.js
 var require_ms = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Helpers.
@@ -180,7 +193,7 @@ var require_ms = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/debug/src/common.js
+//#region ../../../../../node_modules/debug/src/common.js
 var require_common = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* This is the common logic for both the Node.js and web browser
@@ -383,7 +396,7 @@ var require_common = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/debug/src/browser.js
+//#region ../../../../../node_modules/debug/src/browser.js
 var require_browser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* This is the web browser implementation of `debug()`.
@@ -580,7 +593,7 @@ var require_browser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/has-flag/index.js
+//#region ../../../../../node_modules/has-flag/index.js
 var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = (flag, argv = process.argv) => {
 		const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
@@ -591,7 +604,7 @@ var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/supports-color/index.js
+//#region ../../../../../node_modules/supports-color/index.js
 var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const os$5 = require("os");
 	const tty$2 = require("tty");
@@ -660,7 +673,7 @@ var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 }));
 
 //#endregion
-//#region ../../node_modules/debug/src/node.js
+//#region ../../../../../node_modules/debug/src/node.js
 var require_node = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Module dependencies.
@@ -868,7 +881,7 @@ var require_node = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/debug/src/index.js
+//#region ../../../../../node_modules/debug/src/index.js
 var require_src$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Detect Electron renderer / nwjs process, which is node, but we should
@@ -879,7 +892,7 @@ var require_src$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/@kwsites/file-exists/dist/src/index.js
+//#region ../../../../../node_modules/@kwsites/file-exists/dist/src/index.js
 var require_src = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var __importDefault = exports && exports.__importDefault || function(mod) {
 		return mod && mod.__esModule ? mod : { "default": mod };
@@ -935,7 +948,7 @@ var require_src = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/@kwsites/file-exists/dist/index.js
+//#region ../../../../../node_modules/@kwsites/file-exists/dist/index.js
 var require_dist$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function __export(m) {
 		for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -945,7 +958,7 @@ var require_dist$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/@kwsites/promise-deferred/dist/index.js
+//#region ../../../../../node_modules/@kwsites/promise-deferred/dist/index.js
 var require_dist$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.createDeferred = exports.deferred = void 0;
@@ -998,7 +1011,7 @@ var require_dist$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/simple-git/dist/esm/index.js
+//#region ../../../../../node_modules/simple-git/dist/esm/index.js
 var import_dist$1 = require_dist$2();
 var import_src = /* @__PURE__ */ __toESM(require_src$1(), 1);
 var import_dist$2 = require_dist$1();
@@ -4597,7 +4610,7 @@ init_git_response_error();
 var simpleGit = gitInstanceFactory;
 
 //#endregion
-//#region ../../node_modules/slugify/slugify.js
+//#region ../../../../../node_modules/slugify/slugify.js
 var require_slugify = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	(function(name, root, factory) {
 		if (typeof exports === "object") {
@@ -4782,6 +4795,19 @@ const summaryId = (f) => f.replace("-SUMMARY.md", "").replace("SUMMARY.md", "");
 function listSubDirs(dir, sortByPhase = false) {
 	const dirs = node_fs.default.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
 	return sortByPhase ? dirs.sort((a, b) => comparePhaseNum(a, b)) : dirs;
+}
+/** Async version of listSubDirs using fs.promises. */
+async function listSubDirsAsync(dir, sortByPhase = false) {
+	const dirs = (await node_fs.promises.readdir(dir, { withFileTypes: true })).filter((e) => e.isDirectory()).map((e) => e.name);
+	return sortByPhase ? dirs.sort((a, b) => comparePhaseNum(a, b)) : dirs;
+}
+/** Async version of safeReadFile using fs.promises. */
+async function safeReadFileAsync(filePath) {
+	try {
+		return await node_fs.promises.readFile(filePath, "utf-8");
+	} catch {
+		return null;
+	}
 }
 /** Extract a human-readable message from an unknown thrown value. */
 function errorMsg(e) {
@@ -5128,7 +5154,7 @@ function getMilestoneInfo(cwd) {
 }
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/identity.js
+//#region ../../../../../node_modules/yaml/dist/nodes/identity.js
 var require_identity = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const ALIAS = Symbol.for("yaml.alias");
 	const DOC = Symbol.for("yaml.document");
@@ -5179,7 +5205,7 @@ var require_identity = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/visit.js
+//#region ../../../../../node_modules/yaml/dist/visit.js
 var require_visit = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	const BREAK = Symbol("break visit");
@@ -5370,7 +5396,7 @@ var require_visit = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/doc/directives.js
+//#region ../../../../../node_modules/yaml/dist/doc/directives.js
 var require_directives = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var visit = require_visit();
@@ -5536,7 +5562,7 @@ var require_directives = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/doc/anchors.js
+//#region ../../../../../node_modules/yaml/dist/doc/anchors.js
 var require_anchors = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var visit = require_visit();
@@ -5599,7 +5625,7 @@ var require_anchors = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/doc/applyReviver.js
+//#region ../../../../../node_modules/yaml/dist/doc/applyReviver.js
 var require_applyReviver = /* @__PURE__ */ __commonJSMin(((exports) => {
 	/**
 	* Applies the JSON.parse reviver algorithm as defined in the ECMA-262 spec,
@@ -5640,7 +5666,7 @@ var require_applyReviver = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/toJS.js
+//#region ../../../../../node_modules/yaml/dist/nodes/toJS.js
 var require_toJS = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	/**
@@ -5678,7 +5704,7 @@ var require_toJS = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/Node.js
+//#region ../../../../../node_modules/yaml/dist/nodes/Node.js
 var require_Node = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var applyReviver = require_applyReviver();
 	var identity = require_identity();
@@ -5713,7 +5739,7 @@ var require_Node = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/Alias.js
+//#region ../../../../../node_modules/yaml/dist/nodes/Alias.js
 var require_Alias = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var anchors = require_anchors();
 	var visit = require_visit();
@@ -5807,7 +5833,7 @@ var require_Alias = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/Scalar.js
+//#region ../../../../../node_modules/yaml/dist/nodes/Scalar.js
 var require_Scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Node = require_Node();
@@ -5835,7 +5861,7 @@ var require_Scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/doc/createNode.js
+//#region ../../../../../node_modules/yaml/dist/doc/createNode.js
 var require_createNode = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Alias = require_Alias();
 	var identity = require_identity();
@@ -5899,7 +5925,7 @@ var require_createNode = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/Collection.js
+//#region ../../../../../node_modules/yaml/dist/nodes/Collection.js
 var require_Collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var createNode = require_createNode();
 	var identity = require_identity();
@@ -6021,7 +6047,7 @@ var require_Collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/stringifyComment.js
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyComment.js
 var require_stringifyComment = /* @__PURE__ */ __commonJSMin(((exports) => {
 	/**
 	* Stringifies a comment.
@@ -6042,7 +6068,7 @@ var require_stringifyComment = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/foldFlowLines.js
+//#region ../../../../../node_modules/yaml/dist/stringify/foldFlowLines.js
 var require_foldFlowLines = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const FOLD_FLOW = "flow";
 	const FOLD_BLOCK = "block";
@@ -6159,7 +6185,7 @@ var require_foldFlowLines = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/stringifyString.js
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyString.js
 var require_stringifyString = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var foldFlowLines = require_foldFlowLines();
@@ -6384,7 +6410,7 @@ var require_stringifyString = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/stringify.js
+//#region ../../../../../node_modules/yaml/dist/stringify/stringify.js
 var require_stringify = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var anchors = require_anchors();
 	var identity = require_identity();
@@ -6492,7 +6518,7 @@ var require_stringify = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/stringifyPair.js
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyPair.js
 var require_stringifyPair = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Scalar = require_Scalar();
@@ -6590,7 +6616,7 @@ var require_stringifyPair = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/log.js
+//#region ../../../../../node_modules/yaml/dist/log.js
 var require_log = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var node_process$3 = require("process");
 	function debug(logLevel, ...messages) {
@@ -6605,7 +6631,7 @@ var require_log = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/merge.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/merge.js
 var require_merge = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Scalar = require_Scalar();
@@ -6646,7 +6672,7 @@ var require_merge = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/addPairToJSMap.js
+//#region ../../../../../node_modules/yaml/dist/nodes/addPairToJSMap.js
 var require_addPairToJSMap = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var log = require_log();
 	var merge = require_merge();
@@ -6698,7 +6724,7 @@ var require_addPairToJSMap = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/Pair.js
+//#region ../../../../../node_modules/yaml/dist/nodes/Pair.js
 var require_Pair = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var createNode = require_createNode();
 	var stringifyPair = require_stringifyPair();
@@ -6732,7 +6758,7 @@ var require_Pair = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/stringifyCollection.js
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyCollection.js
 var require_stringifyCollection = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var stringify = require_stringify();
@@ -6847,7 +6873,7 @@ var require_stringifyCollection = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/YAMLMap.js
+//#region ../../../../../node_modules/yaml/dist/nodes/YAMLMap.js
 var require_YAMLMap = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyCollection = require_stringifyCollection();
 	var addPairToJSMap = require_addPairToJSMap();
@@ -6957,7 +6983,7 @@ var require_YAMLMap = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/common/map.js
+//#region ../../../../../node_modules/yaml/dist/schema/common/map.js
 var require_map = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var YAMLMap = require_YAMLMap();
@@ -6976,7 +7002,7 @@ var require_map = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/nodes/YAMLSeq.js
+//#region ../../../../../node_modules/yaml/dist/nodes/YAMLSeq.js
 var require_YAMLSeq = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var createNode = require_createNode();
 	var stringifyCollection = require_stringifyCollection();
@@ -7083,7 +7109,7 @@ var require_YAMLSeq = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/common/seq.js
+//#region ../../../../../node_modules/yaml/dist/schema/common/seq.js
 var require_seq = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var YAMLSeq = require_YAMLSeq();
@@ -7102,7 +7128,7 @@ var require_seq = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/common/string.js
+//#region ../../../../../node_modules/yaml/dist/schema/common/string.js
 var require_string = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyString = require_stringifyString();
 	const string = {
@@ -7119,7 +7145,7 @@ var require_string = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/common/null.js
+//#region ../../../../../node_modules/yaml/dist/schema/common/null.js
 var require_null = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	const nullTag = {
@@ -7135,7 +7161,7 @@ var require_null = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/core/bool.js
+//#region ../../../../../node_modules/yaml/dist/schema/core/bool.js
 var require_bool$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	const boolTag = {
@@ -7155,7 +7181,7 @@ var require_bool$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/stringifyNumber.js
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyNumber.js
 var require_stringifyNumber = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function stringifyNumber({ format, minFractionDigits, tag, value }) {
 		if (typeof value === "bigint") return String(value);
@@ -7177,7 +7203,7 @@ var require_stringifyNumber = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/core/float.js
+//#region ../../../../../node_modules/yaml/dist/schema/core/float.js
 var require_float$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var stringifyNumber = require_stringifyNumber();
@@ -7220,7 +7246,7 @@ var require_float$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/core/int.js
+//#region ../../../../../node_modules/yaml/dist/schema/core/int.js
 var require_int$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyNumber = require_stringifyNumber();
 	const intIdentify = (value) => typeof value === "bigint" || Number.isInteger(value);
@@ -7262,7 +7288,7 @@ var require_int$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/core/schema.js
+//#region ../../../../../node_modules/yaml/dist/schema/core/schema.js
 var require_schema$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var map = require_map();
 	var _null = require_null();
@@ -7288,7 +7314,7 @@ var require_schema$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/json/schema.js
+//#region ../../../../../node_modules/yaml/dist/schema/json/schema.js
 var require_schema$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var map = require_map();
@@ -7352,7 +7378,7 @@ var require_schema$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/binary.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/binary.js
 var require_binary = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var node_buffer$1 = require("buffer");
 	var Scalar = require_Scalar();
@@ -7402,7 +7428,7 @@ var require_binary = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/pairs.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/pairs.js
 var require_pairs = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Pair = require_Pair();
@@ -7463,7 +7489,7 @@ var require_pairs = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/omap.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/omap.js
 var require_omap = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var toJS = require_toJS();
@@ -7527,7 +7553,7 @@ var require_omap = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/bool.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/bool.js
 var require_bool = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	function boolStringify({ value, source }, ctx) {
@@ -7555,7 +7581,7 @@ var require_bool = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/float.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/float.js
 var require_float = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var stringifyNumber = require_stringifyNumber();
@@ -7601,7 +7627,7 @@ var require_float = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/int.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/int.js
 var require_int = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyNumber = require_stringifyNumber();
 	const intIdentify = (value) => typeof value === "bigint" || Number.isInteger(value);
@@ -7677,7 +7703,7 @@ var require_int = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/set.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/set.js
 var require_set = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Pair = require_Pair();
@@ -7746,7 +7772,7 @@ var require_set = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/timestamp.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/timestamp.js
 var require_timestamp = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyNumber = require_stringifyNumber();
 	/** Internal types handle bigint as number, because TS can't figure it out. */
@@ -7830,7 +7856,7 @@ var require_timestamp = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/yaml-1.1/schema.js
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/schema.js
 var require_schema = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var map = require_map();
 	var _null = require_null();
@@ -7872,7 +7898,7 @@ var require_schema = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/tags.js
+//#region ../../../../../node_modules/yaml/dist/schema/tags.js
 var require_tags = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var map = require_map();
 	var _null = require_null();
@@ -7957,7 +7983,7 @@ var require_tags = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/schema/Schema.js
+//#region ../../../../../node_modules/yaml/dist/schema/Schema.js
 var require_Schema = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var map = require_map();
@@ -7987,7 +8013,7 @@ var require_Schema = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/stringify/stringifyDocument.js
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyDocument.js
 var require_stringifyDocument = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var stringify = require_stringify();
@@ -8049,7 +8075,7 @@ var require_stringifyDocument = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/doc/Document.js
+//#region ../../../../../node_modules/yaml/dist/doc/Document.js
 var require_Document = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Alias = require_Alias();
 	var Collection = require_Collection();
@@ -8331,7 +8357,7 @@ var require_Document = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/errors.js
+//#region ../../../../../node_modules/yaml/dist/errors.js
 var require_errors = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var YAMLError = class extends Error {
 		constructor(name, pos, code, message) {
@@ -8385,7 +8411,7 @@ var require_errors = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/resolve-props.js
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-props.js
 var require_resolve_props = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function resolveProps(tokens, { flow, indicator, next, offset, onError, parentIndent, startOnNewline }) {
 		let spaceBefore = false;
@@ -8493,7 +8519,7 @@ var require_resolve_props = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/util-contains-newline.js
+//#region ../../../../../node_modules/yaml/dist/compose/util-contains-newline.js
 var require_util_contains_newline = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function containsNewline(key) {
 		if (!key) return null;
@@ -8523,7 +8549,7 @@ var require_util_contains_newline = /* @__PURE__ */ __commonJSMin(((exports) => 
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/util-flow-indent-check.js
+//#region ../../../../../node_modules/yaml/dist/compose/util-flow-indent-check.js
 var require_util_flow_indent_check = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var utilContainsNewline = require_util_contains_newline();
 	function flowIndentCheck(indent, fc, onError) {
@@ -8536,7 +8562,7 @@ var require_util_flow_indent_check = /* @__PURE__ */ __commonJSMin(((exports) =>
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/util-map-includes.js
+//#region ../../../../../node_modules/yaml/dist/compose/util-map-includes.js
 var require_util_map_includes = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	function mapIncludes(ctx, items, search) {
@@ -8549,7 +8575,7 @@ var require_util_map_includes = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/resolve-block-map.js
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-block-map.js
 var require_resolve_block_map = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Pair = require_Pair();
 	var YAMLMap = require_YAMLMap();
@@ -8634,7 +8660,7 @@ var require_resolve_block_map = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/resolve-block-seq.js
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-block-seq.js
 var require_resolve_block_seq = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var YAMLSeq = require_YAMLSeq();
 	var resolveProps = require_resolve_props();
@@ -8677,7 +8703,7 @@ var require_resolve_block_seq = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/resolve-end.js
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-end.js
 var require_resolve_end = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function resolveEnd(end, offset, reqSpace, onError) {
 		let comment = "";
@@ -8716,7 +8742,7 @@ var require_resolve_end = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/resolve-flow-collection.js
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-flow-collection.js
 var require_resolve_flow_collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Pair = require_Pair();
@@ -8872,7 +8898,7 @@ var require_resolve_flow_collection = /* @__PURE__ */ __commonJSMin(((exports) =
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/compose-collection.js
+//#region ../../../../../node_modules/yaml/dist/compose/compose-collection.js
 var require_compose_collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Scalar = require_Scalar();
@@ -8925,7 +8951,7 @@ var require_compose_collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/resolve-block-scalar.js
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-block-scalar.js
 var require_resolve_block_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	function resolveBlockScalar(ctx, scalar, onError) {
@@ -9101,7 +9127,7 @@ var require_resolve_block_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/resolve-flow-scalar.js
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-flow-scalar.js
 var require_resolve_flow_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var resolveEnd = require_resolve_end();
@@ -9308,7 +9334,7 @@ var require_resolve_flow_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/compose-scalar.js
+//#region ../../../../../node_modules/yaml/dist/compose/compose-scalar.js
 var require_compose_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Scalar = require_Scalar();
@@ -9368,7 +9394,7 @@ var require_compose_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/util-empty-scalar-position.js
+//#region ../../../../../node_modules/yaml/dist/compose/util-empty-scalar-position.js
 var require_util_empty_scalar_position = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function emptyScalarPosition(offset, before, pos) {
 		if (before) {
@@ -9396,7 +9422,7 @@ var require_util_empty_scalar_position = /* @__PURE__ */ __commonJSMin(((exports
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/compose-node.js
+//#region ../../../../../node_modules/yaml/dist/compose/compose-node.js
 var require_compose_node = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Alias = require_Alias();
 	var identity = require_identity();
@@ -9482,7 +9508,7 @@ var require_compose_node = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/compose-doc.js
+//#region ../../../../../node_modules/yaml/dist/compose/compose-doc.js
 var require_compose_doc = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Document = require_Document();
 	var composeNode = require_compose_node();
@@ -9525,7 +9551,7 @@ var require_compose_doc = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/compose/composer.js
+//#region ../../../../../node_modules/yaml/dist/compose/composer.js
 var require_composer = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var node_process$2 = require("process");
 	var directives = require_directives();
@@ -9724,7 +9750,7 @@ var require_composer = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/parse/cst-scalar.js
+//#region ../../../../../node_modules/yaml/dist/parse/cst-scalar.js
 var require_cst_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var resolveBlockScalar = require_resolve_block_scalar();
 	var resolveFlowScalar = require_resolve_flow_scalar();
@@ -9992,7 +10018,7 @@ var require_cst_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/parse/cst-stringify.js
+//#region ../../../../../node_modules/yaml/dist/parse/cst-stringify.js
 var require_cst_stringify = /* @__PURE__ */ __commonJSMin(((exports) => {
 	/**
 	* Stringify a CST document, token, or collection item
@@ -10044,7 +10070,7 @@ var require_cst_stringify = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/parse/cst-visit.js
+//#region ../../../../../node_modules/yaml/dist/parse/cst-visit.js
 var require_cst_visit = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const BREAK = Symbol("break visit");
 	const SKIP = Symbol("skip children");
@@ -10136,7 +10162,7 @@ var require_cst_visit = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/parse/cst.js
+//#region ../../../../../node_modules/yaml/dist/parse/cst.js
 var require_cst = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var cstScalar = require_cst_scalar();
 	var cstStringify = require_cst_stringify();
@@ -10216,7 +10242,7 @@ var require_cst = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/parse/lexer.js
+//#region ../../../../../node_modules/yaml/dist/parse/lexer.js
 var require_lexer = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var cst = require_cst();
 	function isEmpty(ch) {
@@ -10736,7 +10762,7 @@ var require_lexer = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/parse/line-counter.js
+//#region ../../../../../node_modules/yaml/dist/parse/line-counter.js
 var require_line_counter = /* @__PURE__ */ __commonJSMin(((exports) => {
 	/**
 	* Tracks newlines during parsing in order to provide an efficient API for
@@ -10784,7 +10810,7 @@ var require_line_counter = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/parse/parser.js
+//#region ../../../../../node_modules/yaml/dist/parse/parser.js
 var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var node_process$1 = require("process");
 	var cst = require_cst();
@@ -11641,7 +11667,7 @@ var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/public-api.js
+//#region ../../../../../node_modules/yaml/dist/public-api.js
 var require_public_api = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var composer = require_composer();
 	var Document = require_Document();
@@ -11729,7 +11755,7 @@ var require_public_api = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/yaml/dist/index.js
+//#region ../../../../../node_modules/yaml/dist/index.js
 var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var composer = require_composer();
 	var Document = require_Document();
@@ -11856,39 +11882,30 @@ const FRONTMATTER_SCHEMAS = {
 		"score"
 	] }
 };
-function cmdFrontmatterGet(cwd, filePath, field, raw) {
-	if (!filePath) error("file path required");
+function cmdFrontmatterGet(cwd, filePath, field) {
+	if (!filePath) return cmdErr("file path required");
 	const content = safeReadFile(node_path.default.isAbsolute(filePath) ? filePath : node_path.default.join(cwd, filePath));
-	if (!content) {
-		output({
-			error: "File not found",
-			path: filePath
-		}, raw);
-		return;
-	}
+	if (!content) return cmdOk({
+		error: "File not found",
+		path: filePath
+	});
 	const fm = extractFrontmatter(content);
 	if (field) {
 		const value = fm[field];
-		if (value === void 0) {
-			output({
-				error: "Field not found",
-				field
-			}, raw);
-			return;
-		}
-		output({ [field]: value }, raw, JSON.stringify(value));
-	} else output(fm, raw);
+		if (value === void 0) return cmdOk({
+			error: "Field not found",
+			field
+		});
+		return cmdOk({ [field]: value }, JSON.stringify(value));
+	} else return cmdOk(fm);
 }
-function cmdFrontmatterSet(cwd, filePath, field, value, raw) {
-	if (!filePath || !field || value === void 0) error("file, field, and value required");
+function cmdFrontmatterSet(cwd, filePath, field, value) {
+	if (!filePath || !field || value === void 0) return cmdErr("file, field, and value required");
 	const fullPath = node_path.default.isAbsolute(filePath) ? filePath : node_path.default.join(cwd, filePath);
-	if (!node_fs.default.existsSync(fullPath)) {
-		output({
-			error: "File not found",
-			path: filePath
-		}, raw);
-		return;
-	}
+	if (!node_fs.default.existsSync(fullPath)) return cmdOk({
+		error: "File not found",
+		path: filePath
+	});
 	const content = node_fs.default.readFileSync(fullPath, "utf-8");
 	const fm = extractFrontmatter(content);
 	let parsedValue;
@@ -11900,60 +11917,53 @@ function cmdFrontmatterSet(cwd, filePath, field, value, raw) {
 	fm[field] = parsedValue;
 	const newContent = spliceFrontmatter(content, fm);
 	node_fs.default.writeFileSync(fullPath, newContent, "utf-8");
-	output({
+	return cmdOk({
 		updated: true,
 		field,
 		value: parsedValue
-	}, raw, "true");
+	}, "true");
 }
-function cmdFrontmatterMerge(cwd, filePath, data, raw) {
-	if (!filePath || !data) error("file and data required");
+function cmdFrontmatterMerge(cwd, filePath, data) {
+	if (!filePath || !data) return cmdErr("file and data required");
 	const fullPath = node_path.default.isAbsolute(filePath) ? filePath : node_path.default.join(cwd, filePath);
-	if (!node_fs.default.existsSync(fullPath)) {
-		output({
-			error: "File not found",
-			path: filePath
-		}, raw);
-		return;
-	}
+	if (!node_fs.default.existsSync(fullPath)) return cmdOk({
+		error: "File not found",
+		path: filePath
+	});
 	const content = node_fs.default.readFileSync(fullPath, "utf-8");
 	const fm = extractFrontmatter(content);
 	let mergeData;
 	try {
 		mergeData = JSON.parse(data);
 	} catch {
-		error("Invalid JSON for --data");
-		return;
+		return cmdErr("Invalid JSON for --data");
 	}
 	Object.assign(fm, mergeData);
 	const newContent = spliceFrontmatter(content, fm);
 	node_fs.default.writeFileSync(fullPath, newContent, "utf-8");
-	output({
+	return cmdOk({
 		merged: true,
 		fields: Object.keys(mergeData)
-	}, raw, "true");
+	}, "true");
 }
-function cmdFrontmatterValidate(cwd, filePath, schemaName, raw) {
-	if (!filePath || !schemaName) error("file and schema required");
+function cmdFrontmatterValidate(cwd, filePath, schemaName) {
+	if (!filePath || !schemaName) return cmdErr("file and schema required");
 	const schema = FRONTMATTER_SCHEMAS[schemaName];
-	if (!schema) error(`Unknown schema: ${schemaName}. Available: ${Object.keys(FRONTMATTER_SCHEMAS).join(", ")}`);
+	if (!schema) return cmdErr(`Unknown schema: ${schemaName}. Available: ${Object.keys(FRONTMATTER_SCHEMAS).join(", ")}`);
 	const content = safeReadFile(node_path.default.isAbsolute(filePath) ? filePath : node_path.default.join(cwd, filePath));
-	if (!content) {
-		output({
-			error: "File not found",
-			path: filePath
-		}, raw);
-		return;
-	}
+	if (!content) return cmdOk({
+		error: "File not found",
+		path: filePath
+	});
 	const fm = extractFrontmatter(content);
 	const missing = schema.required.filter((f) => fm[f] === void 0);
 	const present = schema.required.filter((f) => fm[f] !== void 0);
-	output({
+	return cmdOk({
 		valid: missing.length === 0,
 		missing,
 		present,
 		schema: schemaName
-	}, raw, missing.length === 0 ? "valid" : "invalid");
+	}, missing.length === 0 ? "valid" : "invalid");
 }
 
 //#endregion
@@ -12062,7 +12072,7 @@ function cmdConfigGet(cwd, keyPath, raw) {
 }
 
 //#endregion
-//#region ../../node_modules/escape-string-regexp/index.js
+//#region ../../../../../node_modules/escape-string-regexp/index.js
 function escapeStringRegexp(string) {
 	if (typeof string !== "string") throw new TypeError("Expected a string");
 	return string.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
@@ -12126,16 +12136,14 @@ function appendToStateSection(content, sectionPattern, entry, placeholderPattern
 	sectionBody = sectionBody.trimEnd() + "\n" + entry + "\n";
 	return content.replace(sectionPattern, (_m, header) => `${header}${sectionBody}`);
 }
-function cmdStateLoad(cwd, raw) {
+async function cmdStateLoad(cwd, raw) {
 	const config = loadConfig(cwd);
-	let stateRaw = "";
-	try {
-		stateRaw = node_fs.default.readFileSync(statePath(cwd), "utf-8");
-	} catch (e) {
-		debugLog("state-load-failed", e);
-	}
-	const configExists = node_fs.default.existsSync(configPath(cwd));
-	const roadmapExists = node_fs.default.existsSync(roadmapPath(cwd));
+	const [stateContent, configExists, roadmapExists] = await Promise.all([
+		safeReadFileAsync(statePath(cwd)),
+		node_fs.default.promises.access(configPath(cwd)).then(() => true, () => false),
+		node_fs.default.promises.access(roadmapPath(cwd)).then(() => true, () => false)
+	]);
+	const stateRaw = stateContent ?? "";
 	const stateExists = stateRaw.length > 0;
 	const result = {
 		config,
@@ -12615,9 +12623,9 @@ function cmdRoadmapGetPhase(cwd, phaseNum, raw) {
 		error("Failed to read ROADMAP.md: " + e.message);
 	}
 }
-function cmdRoadmapAnalyze(cwd, raw) {
-	const rmPath = roadmapPath(cwd);
-	if (!node_fs.default.existsSync(rmPath)) {
+async function cmdRoadmapAnalyze(cwd, raw) {
+	const content = await safeReadFileAsync(roadmapPath(cwd));
+	if (!content) {
 		output({
 			error: "ROADMAP.md not found",
 			milestones: [],
@@ -12626,10 +12634,9 @@ function cmdRoadmapAnalyze(cwd, raw) {
 		}, raw);
 		return;
 	}
-	const content = node_fs.default.readFileSync(rmPath, "utf-8");
 	const phasesDir = phasesPath(cwd);
 	const phasePattern = getPhasePattern();
-	const phases = [];
+	const parsedPhases = [];
 	let match;
 	while ((match = phasePattern.exec(content)) !== null) {
 		const phaseNum = match[1];
@@ -12642,16 +12649,29 @@ function cmdRoadmapAnalyze(cwd, raw) {
 		const goal = goalMatch ? goalMatch[1].trim() : null;
 		const dependsMatch = section.match(/\*\*Depends on:\*\*\s*([^\n]+)/i);
 		const depends_on = dependsMatch ? dependsMatch[1].trim() : null;
-		const normalized = normalizePhaseName(phaseNum);
+		parsedPhases.push({
+			phaseNum,
+			phaseName,
+			goal,
+			depends_on,
+			normalized: normalizePhaseName(phaseNum),
+			checkboxPattern: new RegExp(`-\\s*\\[(x| )\\]\\s*.*Phase\\s+${phaseNum.replace(".", "\\.")}`, "i")
+		});
+	}
+	let allDirs = [];
+	try {
+		allDirs = await listSubDirsAsync(phasesDir);
+	} catch {}
+	const phases = await Promise.all(parsedPhases.map(async (p) => {
 		let diskStatus = "no_directory";
 		let planCount = 0;
 		let summaryCount = 0;
 		let hasContext = false;
 		let hasResearch = false;
 		try {
-			const dirMatch = listSubDirs(phasesDir).find((d) => d.startsWith(normalized + "-") || d === normalized);
+			const dirMatch = allDirs.find((d) => d.startsWith(p.normalized + "-") || d === p.normalized);
 			if (dirMatch) {
-				const phaseFiles = node_fs.default.readdirSync(node_path.default.join(phasesDir, dirMatch));
+				const phaseFiles = await node_fs.default.promises.readdir(node_path.default.join(phasesDir, dirMatch));
 				planCount = phaseFiles.filter((f) => isPlanFile(f)).length;
 				summaryCount = phaseFiles.filter((f) => isSummaryFile(f)).length;
 				hasContext = phaseFiles.some((f) => f.endsWith("-CONTEXT.md") || f === "CONTEXT.md");
@@ -12666,22 +12686,21 @@ function cmdRoadmapAnalyze(cwd, raw) {
 		} catch (e) {
 			debugLog(e);
 		}
-		const checkboxPattern = new RegExp(`-\\s*\\[(x| )\\]\\s*.*Phase\\s+${phaseNum.replace(".", "\\.")}`, "i");
-		const checkboxMatch = content.match(checkboxPattern);
+		const checkboxMatch = content.match(p.checkboxPattern);
 		const roadmapComplete = checkboxMatch ? checkboxMatch[1] === "x" : false;
-		phases.push({
-			number: phaseNum,
-			name: phaseName,
-			goal,
-			depends_on,
+		return {
+			number: p.phaseNum,
+			name: p.phaseName,
+			goal: p.goal,
+			depends_on: p.depends_on,
 			plan_count: planCount,
 			summary_count: summaryCount,
 			has_context: hasContext,
 			has_research: hasResearch,
 			disk_status: diskStatus,
 			roadmap_complete: roadmapComplete
-		});
-	}
+		};
+	}));
 	const milestones = [];
 	const milestonePattern = /##\s*(.*v(\d+\.\d+)[^(\n]*)/gi;
 	let mMatch;
@@ -12771,19 +12790,16 @@ function cmdRoadmapUpdatePlanProgress(cwd, phaseNum, raw) {
 *
 * Ported from maxsim/bin/lib/milestone.cjs
 */
-function cmdRequirementsMarkComplete(cwd, reqIdsRaw, raw) {
-	if (!reqIdsRaw || reqIdsRaw.length === 0) error("requirement IDs required. Usage: requirements mark-complete REQ-01,REQ-02 or REQ-01 REQ-02");
+function cmdRequirementsMarkComplete(cwd, reqIdsRaw) {
+	if (!reqIdsRaw || reqIdsRaw.length === 0) return cmdErr("requirement IDs required. Usage: requirements mark-complete REQ-01,REQ-02 or REQ-01 REQ-02");
 	const reqIds = reqIdsRaw.join(" ").replace(/[\[\]]/g, "").split(/[,\s]+/).map((r) => r.trim()).filter(Boolean);
-	if (reqIds.length === 0) error("no valid requirement IDs found");
+	if (reqIds.length === 0) return cmdErr("no valid requirement IDs found");
 	const reqPath = planningPath(cwd, "REQUIREMENTS.md");
-	if (!node_fs.default.existsSync(reqPath)) {
-		output({
-			updated: false,
-			reason: "REQUIREMENTS.md not found",
-			ids: reqIds
-		}, raw, "no requirements file");
-		return;
-	}
+	if (!node_fs.default.existsSync(reqPath)) return cmdOk({
+		updated: false,
+		reason: "REQUIREMENTS.md not found",
+		ids: reqIds
+	}, "no requirements file");
 	let reqContent = node_fs.default.readFileSync(reqPath, "utf-8");
 	const updated = [];
 	const notFound = [];
@@ -12802,15 +12818,15 @@ function cmdRequirementsMarkComplete(cwd, reqIdsRaw, raw) {
 		else notFound.push(reqId);
 	}
 	if (updated.length > 0) node_fs.default.writeFileSync(reqPath, reqContent, "utf-8");
-	output({
+	return cmdOk({
 		updated: updated.length > 0,
 		marked_complete: updated,
 		not_found: notFound,
 		total: reqIds.length
-	}, raw, `${updated.length}/${reqIds.length} requirements marked complete`);
+	}, `${updated.length}/${reqIds.length} requirements marked complete`);
 }
-function cmdMilestoneComplete(cwd, version, options, raw) {
-	if (!version) error("version required for milestone complete (e.g., v1.0)");
+function cmdMilestoneComplete(cwd, version, options) {
+	if (!version) return cmdErr("version required for milestone complete (e.g., v1.0)");
 	const roadmapPath$1 = roadmapPath(cwd);
 	const reqPath = planningPath(cwd, "REQUIREMENTS.md");
 	const statePath$1 = statePath(cwd);
@@ -12879,7 +12895,7 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
 	} catch (e) {
 		debugLog(e);
 	}
-	output({
+	return cmdOk({
 		version,
 		name: milestoneName,
 		date: today,
@@ -12895,11 +12911,11 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
 		},
 		milestones_updated: true,
 		state_updated: node_fs.default.existsSync(statePath$1)
-	}, raw);
+	});
 }
 
 //#endregion
-//#region ../../node_modules/chalk/source/vendor/ansi-styles/index.js
+//#region ../../../../../node_modules/chalk/source/vendor/ansi-styles/index.js
 const ANSI_BACKGROUND_OFFSET = 10;
 const wrapAnsi16 = (offset = 0) => (code) => `\u001B[${code + offset}m`;
 const wrapAnsi256 = (offset = 0) => (code) => `\u001B[${38 + offset};5;${code}m`;
@@ -13064,7 +13080,7 @@ function assembleStyles() {
 const ansiStyles = assembleStyles();
 
 //#endregion
-//#region ../../node_modules/chalk/source/vendor/supports-color/index.js
+//#region ../../../../../node_modules/chalk/source/vendor/supports-color/index.js
 function hasFlag$1(flag, argv = globalThis.Deno ? globalThis.Deno.args : node_process.default.argv) {
 	const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
 	const position = argv.indexOf(prefix + flag);
@@ -13153,7 +13169,7 @@ const supportsColor = {
 };
 
 //#endregion
-//#region ../../node_modules/chalk/source/utilities.js
+//#region ../../../../../node_modules/chalk/source/utilities.js
 function stringReplaceAll(string, substring, replacer) {
 	let index = string.indexOf(substring);
 	if (index === -1) return string;
@@ -13182,7 +13198,7 @@ function stringEncaseCRLFWithFirstIndex(string, prefix, postfix, index) {
 }
 
 //#endregion
-//#region ../../node_modules/chalk/source/index.js
+//#region ../../../../../node_modules/chalk/source/index.js
 const { stdout: stdoutColor, stderr: stderrColor } = supportsColor;
 const GENERATOR = Symbol("GENERATOR");
 const STYLER = Symbol("STYLER");
@@ -13818,27 +13834,24 @@ function cmdScaffold(cwd, type, options, raw) {
 *
 * Ported from maxsim/bin/lib/verify.cjs
 */
-async function cmdVerifySummary(cwd, summaryPath, checkFileCount, raw) {
-	if (!summaryPath) error("summary-path required");
+async function cmdVerifySummary(cwd, summaryPath, checkFileCount) {
+	if (!summaryPath) return cmdErr("summary-path required");
 	const fullPath = node_path.default.join(cwd, summaryPath);
 	const checkCount = checkFileCount || 2;
-	if (!node_fs.default.existsSync(fullPath)) {
-		output({
-			passed: false,
-			checks: {
-				summary_exists: false,
-				files_created: {
-					checked: 0,
-					found: 0,
-					missing: []
-				},
-				commits_exist: false,
-				self_check: "not_found"
+	if (!node_fs.default.existsSync(fullPath)) return cmdOk({
+		passed: false,
+		checks: {
+			summary_exists: false,
+			files_created: {
+				checked: 0,
+				found: 0,
+				missing: []
 			},
-			errors: ["SUMMARY.md not found"]
-		}, raw, "failed");
-		return;
-	}
+			commits_exist: false,
+			self_check: "not_found"
+		},
+		errors: ["SUMMARY.md not found"]
+	}, "failed");
 	const content = node_fs.default.readFileSync(fullPath, "utf-8");
 	const errors = [];
 	const mentionedFiles = /* @__PURE__ */ new Set();
@@ -13888,22 +13901,19 @@ async function cmdVerifySummary(cwd, summaryPath, checkFileCount, raw) {
 		self_check: selfCheck
 	};
 	const passed = missing.length === 0 && selfCheck !== "failed";
-	output({
+	return cmdOk({
 		passed,
 		checks,
 		errors
-	}, raw, passed ? "passed" : "failed");
+	}, passed ? "passed" : "failed");
 }
-function cmdVerifyPlanStructure(cwd, filePath, raw) {
-	if (!filePath) error("file path required");
+function cmdVerifyPlanStructure(cwd, filePath) {
+	if (!filePath) return cmdErr("file path required");
 	const content = safeReadFile(node_path.default.isAbsolute(filePath) ? filePath : node_path.default.join(cwd, filePath));
-	if (!content) {
-		output({
-			error: "File not found",
-			path: filePath
-		}, raw);
-		return;
-	}
+	if (!content) return cmdOk({
+		error: "File not found",
+		path: filePath
+	});
 	const fm = extractFrontmatter(content);
 	const errors = [];
 	const warnings = [];
@@ -13944,25 +13954,22 @@ function cmdVerifyPlanStructure(cwd, filePath, raw) {
 	if (tasks.length === 0) warnings.push("No <task> elements found");
 	if (fm.wave && parseInt(String(fm.wave)) > 1 && (!fm.depends_on || Array.isArray(fm.depends_on) && fm.depends_on.length === 0)) warnings.push("Wave > 1 but depends_on is empty");
 	if (/<task\s+type=["']?checkpoint/.test(content) && fm.autonomous !== "false" && fm.autonomous !== false) errors.push("Has checkpoint tasks but autonomous is not false");
-	output({
+	return cmdOk({
 		valid: errors.length === 0,
 		errors,
 		warnings,
 		task_count: tasks.length,
 		tasks,
 		frontmatter_fields: Object.keys(fm)
-	}, raw, errors.length === 0 ? "valid" : "invalid");
+	}, errors.length === 0 ? "valid" : "invalid");
 }
-function cmdVerifyPhaseCompleteness(cwd, phase, raw) {
-	if (!phase) error("phase required");
+function cmdVerifyPhaseCompleteness(cwd, phase) {
+	if (!phase) return cmdErr("phase required");
 	const phaseInfo = findPhaseInternal(cwd, phase);
-	if (!phaseInfo) {
-		output({
-			error: "Phase not found",
-			phase
-		}, raw);
-		return;
-	}
+	if (!phaseInfo) return cmdOk({
+		error: "Phase not found",
+		phase
+	});
 	const errors = [];
 	const warnings = [];
 	const phaseDir = node_path.default.join(cwd, phaseInfo.directory);
@@ -13970,8 +13977,7 @@ function cmdVerifyPhaseCompleteness(cwd, phase, raw) {
 	try {
 		files = node_fs.default.readdirSync(phaseDir);
 	} catch {
-		output({ error: "Cannot read phase directory" }, raw);
-		return;
+		return cmdOk({ error: "Cannot read phase directory" });
 	}
 	const plans = files.filter((f) => isPlanFile(f));
 	const summaries = files.filter((f) => isSummaryFile(f));
@@ -13981,7 +13987,7 @@ function cmdVerifyPhaseCompleteness(cwd, phase, raw) {
 	if (incompletePlans.length > 0) errors.push(`Plans without summaries: ${incompletePlans.join(", ")}`);
 	const orphanSummaries = [...summaryIds].filter((id) => !planIds.has(id));
 	if (orphanSummaries.length > 0) warnings.push(`Summaries without plans: ${orphanSummaries.join(", ")}`);
-	output({
+	return cmdOk({
 		complete: errors.length === 0,
 		phase: phaseInfo.phase_number,
 		plan_count: plans.length,
@@ -13990,18 +13996,15 @@ function cmdVerifyPhaseCompleteness(cwd, phase, raw) {
 		orphan_summaries: orphanSummaries,
 		errors,
 		warnings
-	}, raw, errors.length === 0 ? "complete" : "incomplete");
+	}, errors.length === 0 ? "complete" : "incomplete");
 }
-function cmdVerifyReferences(cwd, filePath, raw) {
-	if (!filePath) error("file path required");
+function cmdVerifyReferences(cwd, filePath) {
+	if (!filePath) return cmdErr("file path required");
 	const content = safeReadFile(node_path.default.isAbsolute(filePath) ? filePath : node_path.default.join(cwd, filePath));
-	if (!content) {
-		output({
-			error: "File not found",
-			path: filePath
-		}, raw);
-		return;
-	}
+	if (!content) return cmdOk({
+		error: "File not found",
+		path: filePath
+	});
 	const found = [];
 	const missing = [];
 	const atRefs = content.match(/@([^\s\n,)]+\/[^\s\n,)]+)/g) || [];
@@ -14020,15 +14023,15 @@ function cmdVerifyReferences(cwd, filePath, raw) {
 		if (node_fs.default.existsSync(resolved)) found.push(cleanRef);
 		else missing.push(cleanRef);
 	}
-	output({
+	return cmdOk({
 		valid: missing.length === 0,
 		found: found.length,
 		missing,
 		total: found.length + missing.length
-	}, raw, missing.length === 0 ? "valid" : "invalid");
+	}, missing.length === 0 ? "valid" : "invalid");
 }
-async function cmdVerifyCommits(cwd, hashes, raw) {
-	if (!hashes || hashes.length === 0) error("At least one commit hash required");
+async function cmdVerifyCommits(cwd, hashes) {
+	if (!hashes || hashes.length === 0) return cmdErr("At least one commit hash required");
 	const valid = [];
 	const invalid = [];
 	for (const hash of hashes) {
@@ -14040,31 +14043,25 @@ async function cmdVerifyCommits(cwd, hashes, raw) {
 		if (result.exitCode === 0 && result.stdout.trim() === "commit") valid.push(hash);
 		else invalid.push(hash);
 	}
-	output({
+	return cmdOk({
 		all_valid: invalid.length === 0,
 		valid,
 		invalid,
 		total: hashes.length
-	}, raw, invalid.length === 0 ? "valid" : "invalid");
+	}, invalid.length === 0 ? "valid" : "invalid");
 }
-function cmdVerifyArtifacts(cwd, planFilePath, raw) {
-	if (!planFilePath) error("plan file path required");
+function cmdVerifyArtifacts(cwd, planFilePath) {
+	if (!planFilePath) return cmdErr("plan file path required");
 	const content = safeReadFile(node_path.default.isAbsolute(planFilePath) ? planFilePath : node_path.default.join(cwd, planFilePath));
-	if (!content) {
-		output({
-			error: "File not found",
-			path: planFilePath
-		}, raw);
-		return;
-	}
+	if (!content) return cmdOk({
+		error: "File not found",
+		path: planFilePath
+	});
 	const artifacts = parseMustHavesBlock(content, "artifacts");
-	if (artifacts.length === 0) {
-		output({
-			error: "No must_haves.artifacts found in frontmatter",
-			path: planFilePath
-		}, raw);
-		return;
-	}
+	if (artifacts.length === 0) return cmdOk({
+		error: "No must_haves.artifacts found in frontmatter",
+		path: planFilePath
+	});
 	const results = [];
 	for (const artifact of artifacts) {
 		if (typeof artifact === "string") continue;
@@ -14093,31 +14090,25 @@ function cmdVerifyArtifacts(cwd, planFilePath, raw) {
 		results.push(check);
 	}
 	const passed = results.filter((r) => r.passed).length;
-	output({
+	return cmdOk({
 		all_passed: passed === results.length,
 		passed,
 		total: results.length,
 		artifacts: results
-	}, raw, passed === results.length ? "valid" : "invalid");
+	}, passed === results.length ? "valid" : "invalid");
 }
-function cmdVerifyKeyLinks(cwd, planFilePath, raw) {
-	if (!planFilePath) error("plan file path required");
+function cmdVerifyKeyLinks(cwd, planFilePath) {
+	if (!planFilePath) return cmdErr("plan file path required");
 	const content = safeReadFile(node_path.default.isAbsolute(planFilePath) ? planFilePath : node_path.default.join(cwd, planFilePath));
-	if (!content) {
-		output({
-			error: "File not found",
-			path: planFilePath
-		}, raw);
-		return;
-	}
+	if (!content) return cmdOk({
+		error: "File not found",
+		path: planFilePath
+	});
 	const keyLinks = parseMustHavesBlock(content, "key_links");
-	if (keyLinks.length === 0) {
-		output({
-			error: "No must_haves.key_links found in frontmatter",
-			path: planFilePath
-		}, raw);
-		return;
-	}
+	if (keyLinks.length === 0) return cmdOk({
+		error: "No must_haves.key_links found in frontmatter",
+		path: planFilePath
+	});
 	const results = [];
 	for (const link of keyLinks) {
 		if (typeof link === "string") continue;
@@ -14153,26 +14144,25 @@ function cmdVerifyKeyLinks(cwd, planFilePath, raw) {
 		results.push(check);
 	}
 	const verified = results.filter((r) => r.verified).length;
-	output({
+	return cmdOk({
 		all_verified: verified === results.length,
 		verified,
 		total: results.length,
 		links: results
-	}, raw, verified === results.length ? "valid" : "invalid");
+	}, verified === results.length ? "valid" : "invalid");
 }
-function cmdValidateConsistency(cwd, raw) {
+function cmdValidateConsistency(cwd) {
 	const rmPath = roadmapPath(cwd);
 	const phasesDir = phasesPath(cwd);
 	const errors = [];
 	const warnings = [];
 	if (!node_fs.default.existsSync(rmPath)) {
 		errors.push("ROADMAP.md not found");
-		output({
+		return cmdOk({
 			passed: false,
 			errors,
 			warnings
-		}, raw, "failed");
-		return;
+		}, "failed");
 	}
 	const roadmapContent = node_fs.default.readFileSync(rmPath, "utf-8");
 	const roadmapPhases = /* @__PURE__ */ new Set();
@@ -14224,14 +14214,14 @@ function cmdValidateConsistency(cwd, raw) {
 		debugLog(e);
 	}
 	const passed = errors.length === 0;
-	output({
+	return cmdOk({
 		passed,
 		errors,
 		warnings,
 		warning_count: warnings.length
-	}, raw, passed ? "passed" : "failed");
+	}, passed ? "passed" : "failed");
 }
-function cmdValidateHealth(cwd, options, raw) {
+function cmdValidateHealth(cwd, options) {
 	const planningDir = planningPath(cwd);
 	const projectPath = planningPath(cwd, "PROJECT.md");
 	const rmPath = roadmapPath(cwd);
@@ -14255,14 +14245,13 @@ function cmdValidateHealth(cwd, options, raw) {
 	};
 	if (!node_fs.default.existsSync(planningDir)) {
 		addIssue("error", "E001", ".planning/ directory not found", "Run /maxsim:new-project to initialize");
-		output({
+		return cmdOk({
 			status: "broken",
 			errors,
 			warnings,
 			info,
 			repairable_count: 0
-		}, raw);
-		return;
+		});
 	}
 	if (!node_fs.default.existsSync(projectPath)) addIssue("error", "E002", "PROJECT.md not found", "Run /maxsim:new-project to create");
 	else {
@@ -14422,14 +14411,14 @@ function cmdValidateHealth(cwd, options, raw) {
 	else if (warnings.length > 0) status = "degraded";
 	else status = "healthy";
 	const repairableCount = errors.filter((e) => e.repairable).length + warnings.filter((w) => w.repairable).length;
-	output({
+	return cmdOk({
 		status,
 		errors,
 		warnings,
 		info,
 		repairable_count: repairableCount,
 		repairs_performed: repairActions.length > 0 ? repairActions : void 0
-	}, raw);
+	});
 }
 
 //#endregion
@@ -14605,22 +14594,24 @@ function phaseCompleteCore(cwd, phaseNum) {
 		requirements_updated: requirementsUpdated
 	};
 }
-function cmdPhasesList(cwd, options, raw) {
+async function cmdPhasesList(cwd, options, raw) {
 	const phasesDirPath = phasesPath(cwd);
-	const { type, phase, includeArchived } = options;
+	const { type, phase, includeArchived, offset, limit } = options;
 	if (!node_fs.default.existsSync(phasesDirPath)) {
 		if (type) output({
 			files: [],
-			count: 0
+			count: 0,
+			total: 0
 		}, raw, "");
 		else output({
 			directories: [],
-			count: 0
+			count: 0,
+			total: 0
 		}, raw, "");
 		return;
 	}
 	try {
-		let dirs = listSubDirs(phasesDirPath);
+		let dirs = await listSubDirsAsync(phasesDirPath);
 		if (includeArchived) {
 			const archived = getArchivedPhaseDirs(cwd);
 			for (const a of archived) dirs.push(`${a.name} [${a.milestone}]`);
@@ -14633,6 +14624,7 @@ function cmdPhasesList(cwd, options, raw) {
 				output({
 					files: [],
 					count: 0,
+					total: 0,
 					phase_dir: null,
 					error: "Phase not found"
 				}, raw, "");
@@ -14641,27 +14633,31 @@ function cmdPhasesList(cwd, options, raw) {
 			dirs = [match];
 		}
 		if (type) {
-			const files = [];
-			for (const dir of dirs) {
+			const files = (await Promise.all(dirs.map(async (dir) => {
 				const dirPath = node_path.default.join(phasesDirPath, dir);
-				const dirFiles = node_fs.default.readdirSync(dirPath);
+				const dirFiles = await node_fs.default.promises.readdir(dirPath);
 				let filtered;
 				if (type === "plans") filtered = dirFiles.filter(isPlanFile);
 				else if (type === "summaries") filtered = dirFiles.filter(isSummaryFile);
 				else filtered = dirFiles;
-				files.push(...filtered.sort());
-			}
+				return filtered.sort();
+			}))).flat();
 			output({
 				files,
 				count: files.length,
+				total: files.length,
 				phase_dir: phase ? dirs[0].replace(/^\d+(?:\.\d+)?-?/, "") : null
 			}, raw, files.join("\n"));
 			return;
 		}
+		const total = dirs.length;
+		const start = offset ?? 0;
+		const paginated = limit !== void 0 ? dirs.slice(start, start + limit) : dirs.slice(start);
 		output({
-			directories: dirs,
-			count: dirs.length
-		}, raw, dirs.join("\n"));
+			directories: paginated,
+			count: paginated.length,
+			total
+		}, raw, paginated.join("\n"));
 	} catch (e) {
 		rethrowCliSignals(e);
 		error("Failed to list phases: " + e.message);
@@ -15043,8 +15039,8 @@ function cmdPhaseComplete(cwd, phaseNum, raw) {
 *
 * Ported from maxsim/bin/lib/template.cjs
 */
-function cmdTemplateSelect(cwd, planPath, raw) {
-	if (!planPath) error("plan-path required");
+function cmdTemplateSelect(cwd, planPath) {
+	if (!planPath) return cmdErr("plan-path required");
 	try {
 		const fullPath = node_path.default.join(cwd, planPath);
 		const content = node_fs.default.readFileSync(fullPath, "utf-8");
@@ -15064,32 +15060,29 @@ function cmdTemplateSelect(cwd, planPath, raw) {
 			template = "templates/summary-complex.md";
 			type = "complex";
 		}
-		output({
+		return cmdOk({
 			template,
 			type,
 			taskCount,
 			fileCount,
 			hasDecisions
-		}, raw, template);
+		}, template);
 	} catch (thrown) {
-		output({
+		return cmdOk({
 			template: "templates/summary-standard.md",
 			type: "standard",
 			error: thrown.message
-		}, raw, "templates/summary-standard.md");
+		}, "templates/summary-standard.md");
 	}
 }
-function cmdTemplateFill(cwd, templateType, options, raw) {
-	if (!templateType) error("template type required: summary, plan, or verification");
-	if (!options.phase) error("--phase required");
+function cmdTemplateFill(cwd, templateType, options) {
+	if (!templateType) return cmdErr("template type required: summary, plan, or verification");
+	if (!options.phase) return cmdErr("--phase required");
 	const phaseInfo = findPhaseInternal(cwd, options.phase);
-	if (!phaseInfo) {
-		output({
-			error: "Phase not found",
-			phase: options.phase
-		}, raw);
-		return;
-	}
+	if (!phaseInfo) return cmdOk({
+		error: "Phase not found",
+		phase: options.phase
+	});
 	const padded = normalizePhaseName(options.phase);
 	const today = todayISO();
 	const phaseName = options.name || phaseInfo.phase_name || "Unnamed";
@@ -15235,26 +15228,21 @@ function cmdTemplateFill(cwd, templateType, options, raw) {
 			].join("\n");
 			fileName = `${padded}-VERIFICATION.md`;
 			break;
-		default:
-			error(`Unknown template type: ${templateType}. Available: summary, plan, verification`);
-			return;
+		default: return cmdErr(`Unknown template type: ${templateType}. Available: summary, plan, verification`);
 	}
 	const fullContent = `---\n${reconstructFrontmatter(frontmatter)}\n---\n\n${body}\n`;
 	const outPath = node_path.default.join(cwd, phaseInfo.directory, fileName);
-	if (node_fs.default.existsSync(outPath)) {
-		output({
-			error: "File already exists",
-			path: node_path.default.relative(cwd, outPath)
-		}, raw);
-		return;
-	}
+	if (node_fs.default.existsSync(outPath)) return cmdOk({
+		error: "File already exists",
+		path: node_path.default.relative(cwd, outPath)
+	});
 	node_fs.default.writeFileSync(outPath, fullContent, "utf-8");
 	const relPath = node_path.default.relative(cwd, outPath);
-	output({
+	return cmdOk({
 		created: true,
 		path: relPath,
 		template: templateType
-	}, raw, relPath);
+	}, relPath);
 }
 
 //#endregion
@@ -15462,7 +15450,7 @@ function loadHistoryContext(cwd, currentPhase) {
 	}
 	return files;
 }
-function cmdContextLoad(cwd, phase, topic, includeHistory, raw) {
+function cmdContextLoad(cwd, phase, topic, includeHistory) {
 	const allFiles = [];
 	allFiles.push(...loadProjectContext(cwd));
 	allFiles.push(...loadRoadmapContext(cwd));
@@ -15475,12 +15463,12 @@ function cmdContextLoad(cwd, phase, topic, includeHistory, raw) {
 		seen.add(f.path);
 		return true;
 	});
-	output({
+	return cmdOk({
 		files: deduped,
 		total_size: deduped.reduce((sum, f) => sum + f.size, 0),
 		phase: phase ?? null,
 		topic: topic ?? null
-	}, raw);
+	});
 }
 
 //#endregion
@@ -16253,6 +16241,15 @@ function cmdInitProgress(cwd, raw) {
 *
 * Usage: node maxsim-tools.cjs <command> [args] [--raw]
 */
+/** Convert a CmdResult into the output()/error() signal expected by main(). */
+function handleResult(r, raw) {
+	if (r.ok) throw new CliOutput(r.result, raw, r.rawValue);
+	throw new CliError(r.error);
+}
+/** Async variant for promise-returning commands. */
+async function handleResultAsync(p, raw) {
+	return handleResult(await p, raw);
+}
 /** Extract a single named flag's value from args */
 function getFlag(args, flag) {
 	const idx = args.indexOf(flag);
@@ -16271,7 +16268,7 @@ function getFlags(args, ...flags) {
 function hasFlag(args, flag) {
 	return args.includes(`--${flag}`);
 }
-const handleState = (args, cwd, raw) => {
+const handleState = async (args, cwd, raw) => {
 	const sub = args[1];
 	const handler = sub ? {
 		"update": () => cmdStateUpdate(cwd, args[2], args[3]),
@@ -16324,31 +16321,31 @@ const handleState = (args, cwd, raw) => {
 		}
 	}[sub] : void 0;
 	if (handler) return handler();
-	cmdStateLoad(cwd, raw);
+	return cmdStateLoad(cwd, raw);
 };
 const handleTemplate = (args, cwd, raw) => {
 	const sub = args[1];
-	if (sub === "select") cmdTemplateSelect(cwd, args[2], raw);
+	if (sub === "select") handleResult(cmdTemplateSelect(cwd, args[2]), raw);
 	else if (sub === "fill") {
 		const f = getFlags(args, "phase", "plan", "name", "type", "wave", "fields");
-		cmdTemplateFill(cwd, args[2], {
+		handleResult(cmdTemplateFill(cwd, args[2], {
 			phase: f.phase ?? "",
 			plan: f.plan ?? void 0,
 			name: f.name ?? void 0,
 			type: f.type ?? "execute",
 			wave: f.wave ?? "1",
 			fields: f.fields ? JSON.parse(f.fields) : {}
-		}, raw);
+		}), raw);
 	} else error("Unknown template subcommand. Available: select, fill");
 };
 const handleFrontmatter = (args, cwd, raw) => {
 	const sub = args[1];
 	const file = args[2];
 	const handler = sub ? {
-		"get": () => cmdFrontmatterGet(cwd, file, getFlag(args, "--field"), raw),
-		"set": () => cmdFrontmatterSet(cwd, file, getFlag(args, "--field"), getFlag(args, "--value") ?? void 0, raw),
-		"merge": () => cmdFrontmatterMerge(cwd, file, getFlag(args, "--data"), raw),
-		"validate": () => cmdFrontmatterValidate(cwd, file, getFlag(args, "--schema"), raw)
+		"get": () => handleResult(cmdFrontmatterGet(cwd, file, getFlag(args, "--field")), raw),
+		"set": () => handleResult(cmdFrontmatterSet(cwd, file, getFlag(args, "--field"), getFlag(args, "--value") ?? void 0), raw),
+		"merge": () => handleResult(cmdFrontmatterMerge(cwd, file, getFlag(args, "--data")), raw),
+		"validate": () => handleResult(cmdFrontmatterValidate(cwd, file, getFlag(args, "--schema")), raw)
 	}[sub] : void 0;
 	if (handler) return handler();
 	error("Unknown frontmatter subcommand. Available: get, set, merge, validate");
@@ -16356,27 +16353,29 @@ const handleFrontmatter = (args, cwd, raw) => {
 const handleVerify = async (args, cwd, raw) => {
 	const sub = args[1];
 	const handler = sub ? {
-		"plan-structure": () => cmdVerifyPlanStructure(cwd, args[2], raw),
-		"phase-completeness": () => cmdVerifyPhaseCompleteness(cwd, args[2], raw),
-		"references": () => cmdVerifyReferences(cwd, args[2], raw),
-		"commits": () => cmdVerifyCommits(cwd, args.slice(2), raw),
-		"artifacts": () => cmdVerifyArtifacts(cwd, args[2], raw),
-		"key-links": () => cmdVerifyKeyLinks(cwd, args[2], raw)
+		"plan-structure": () => handleResult(cmdVerifyPlanStructure(cwd, args[2]), raw),
+		"phase-completeness": () => handleResult(cmdVerifyPhaseCompleteness(cwd, args[2]), raw),
+		"references": () => handleResult(cmdVerifyReferences(cwd, args[2]), raw),
+		"commits": async () => handleResultAsync(cmdVerifyCommits(cwd, args.slice(2)), raw),
+		"artifacts": () => handleResult(cmdVerifyArtifacts(cwd, args[2]), raw),
+		"key-links": () => handleResult(cmdVerifyKeyLinks(cwd, args[2]), raw)
 	}[sub] : void 0;
 	if (handler) return handler();
 	error("Unknown verify subcommand. Available: plan-structure, phase-completeness, references, commits, artifacts, key-links");
 };
-const handlePhases = (args, cwd, raw) => {
+const handlePhases = async (args, cwd, raw) => {
 	if (args[1] === "list") {
-		const f = getFlags(args, "type", "phase");
-		cmdPhasesList(cwd, {
+		const f = getFlags(args, "type", "phase", "offset", "limit");
+		await cmdPhasesList(cwd, {
 			type: f.type,
 			phase: f.phase,
-			includeArchived: hasFlag(args, "include-archived")
+			includeArchived: hasFlag(args, "include-archived"),
+			offset: f.offset !== null ? parseInt(f.offset, 10) : void 0,
+			limit: f.limit !== null ? parseInt(f.limit, 10) : void 0
 		}, raw);
 	} else error("Unknown phases subcommand. Available: list");
 };
-const handleRoadmap = (args, cwd, raw) => {
+const handleRoadmap = async (args, cwd, raw) => {
 	const sub = args[1];
 	const handler = sub ? {
 		"get-phase": () => cmdRoadmapGetPhase(cwd, args[2], raw),
@@ -16410,17 +16409,17 @@ const handleMilestone = (args, cwd, raw) => {
 			}
 			milestoneName = nameArgs.join(" ") || null;
 		}
-		cmdMilestoneComplete(cwd, args[2], {
+		handleResult(cmdMilestoneComplete(cwd, args[2], {
 			name: milestoneName ?? void 0,
 			archivePhases: hasFlag(args, "archive-phases")
-		}, raw);
+		}), raw);
 	} else error("Unknown milestone subcommand. Available: complete");
 };
 const handleValidate = (args, cwd, raw) => {
 	const sub = args[1];
 	const handler = sub ? {
-		"consistency": () => cmdValidateConsistency(cwd, raw),
-		"health": () => cmdValidateHealth(cwd, { repair: hasFlag(args, "repair") }, raw)
+		"consistency": () => handleResult(cmdValidateConsistency(cwd), raw),
+		"health": () => handleResult(cmdValidateHealth(cwd, { repair: hasFlag(args, "repair") }), raw)
 	}[sub] : void 0;
 	if (handler) return handler();
 	error("Unknown validate subcommand. Available: consistency, health");
@@ -16456,7 +16455,7 @@ const COMMANDS = {
 	"verify-summary": async (args, cwd, raw) => {
 		const countIndex = args.indexOf("--check-count");
 		const checkCount = countIndex !== -1 ? parseInt(args[countIndex + 1], 10) : 2;
-		await cmdVerifySummary(cwd, args[1], checkCount, raw);
+		await handleResultAsync(cmdVerifySummary(cwd, args[1], checkCount), raw);
 	},
 	"template": handleTemplate,
 	"frontmatter": handleFrontmatter,
@@ -16472,7 +16471,7 @@ const COMMANDS = {
 	"phases": handlePhases,
 	"roadmap": handleRoadmap,
 	"requirements": (args, cwd, raw) => {
-		if (args[1] === "mark-complete") cmdRequirementsMarkComplete(cwd, args.slice(2), raw);
+		if (args[1] === "mark-complete") handleResult(cmdRequirementsMarkComplete(cwd, args.slice(2)), raw);
 		else error("Unknown requirements subcommand. Available: mark-complete");
 	},
 	"phase": handlePhase,
@@ -16509,7 +16508,7 @@ const COMMANDS = {
 	"artefakte-write": (args, cwd, raw) => cmdArtefakteWrite(cwd, args[1], getFlag(args, "--content") ?? void 0, getFlag(args, "--phase") ?? void 0, raw),
 	"artefakte-append": (args, cwd, raw) => cmdArtefakteAppend(cwd, args[1], getFlag(args, "--entry") ?? void 0, getFlag(args, "--phase") ?? void 0, raw),
 	"artefakte-list": (args, cwd, raw) => cmdArtefakteList(cwd, getFlag(args, "--phase") ?? void 0, raw),
-	"context-load": (args, cwd, raw) => cmdContextLoad(cwd, getFlag(args, "--phase") ?? void 0, getFlag(args, "--topic") ?? void 0, hasFlag(args, "include-history"), raw),
+	"context-load": (args, cwd, raw) => handleResult(cmdContextLoad(cwd, getFlag(args, "--phase") ?? void 0, getFlag(args, "--topic") ?? void 0, hasFlag(args, "include-history")), raw),
 	"start": async (args, cwd, raw) => cmdStart(cwd, {
 		noBrowser: hasFlag(args, "no-browser"),
 		networkMode: hasFlag(args, "network")

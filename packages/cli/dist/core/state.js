@@ -90,17 +90,14 @@ function appendToStateSection(content, sectionPattern, entry, placeholderPattern
     return content.replace(sectionPattern, (_m, header) => `${header}${sectionBody}`);
 }
 // ─── State commands ──────────────────────────────────────────────────────────
-function cmdStateLoad(cwd, raw) {
+async function cmdStateLoad(cwd, raw) {
     const config = (0, core_js_1.loadConfig)(cwd);
-    let stateRaw = '';
-    try {
-        stateRaw = node_fs_1.default.readFileSync((0, core_js_1.statePath)(cwd), 'utf-8');
-    }
-    catch (e) {
-        (0, core_js_1.debugLog)('state-load-failed', e);
-    }
-    const configExists = node_fs_1.default.existsSync((0, core_js_1.configPath)(cwd));
-    const roadmapExists = node_fs_1.default.existsSync((0, core_js_1.roadmapPath)(cwd));
+    const [stateContent, configExists, roadmapExists] = await Promise.all([
+        (0, core_js_1.safeReadFileAsync)((0, core_js_1.statePath)(cwd)),
+        node_fs_1.default.promises.access((0, core_js_1.configPath)(cwd)).then(() => true, () => false),
+        node_fs_1.default.promises.access((0, core_js_1.roadmapPath)(cwd)).then(() => true, () => false),
+    ]);
+    const stateRaw = stateContent ?? '';
     const stateExists = stateRaw.length > 0;
     const result = {
         config,

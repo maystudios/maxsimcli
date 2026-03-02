@@ -11,12 +11,11 @@ import {
   normalizePhaseName,
   findPhaseInternal,
   generateSlugInternal,
-  output,
-  error,
   todayISO,
 } from './core.js';
 import { reconstructFrontmatter } from './frontmatter.js';
-import type { FrontmatterData } from './types.js';
+import type { FrontmatterData, CmdResult } from './types.js';
+import { cmdOk, cmdErr } from './types.js';
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -46,9 +45,9 @@ export interface TemplateFillResult {
 
 // ─── Template Select ─────────────────────────────────────────────────────────
 
-export function cmdTemplateSelect(cwd: string, planPath: string | null, raw: boolean): void {
+export function cmdTemplateSelect(cwd: string, planPath: string | null): CmdResult {
   if (!planPath) {
-    error('plan-path required');
+    return cmdErr('plan-path required');
   }
 
   try {
@@ -83,12 +82,11 @@ export function cmdTemplateSelect(cwd: string, planPath: string | null, raw: boo
     }
 
     const result: TemplateSelectResult = { template, type, taskCount, fileCount, hasDecisions };
-    output(result, raw, template);
+    return cmdOk(result, template);
   } catch (thrown: unknown) {
     const selectErr = thrown as Error;
-    output(
+    return cmdOk(
       { template: 'templates/summary-standard.md', type: 'standard', error: selectErr.message } as TemplateSelectResult,
-      raw,
       'templates/summary-standard.md',
     );
   }
@@ -100,19 +98,17 @@ export function cmdTemplateFill(
   cwd: string,
   templateType: string | null,
   options: TemplateFillOptions,
-  raw: boolean,
-): void {
+): CmdResult {
   if (!templateType) {
-    error('template type required: summary, plan, or verification');
+    return cmdErr('template type required: summary, plan, or verification');
   }
   if (!options.phase) {
-    error('--phase required');
+    return cmdErr('--phase required');
   }
 
   const phaseInfo = findPhaseInternal(cwd, options.phase);
   if (!phaseInfo) {
-    output({ error: 'Phase not found', phase: options.phase }, raw);
-    return;
+    return cmdOk({ error: 'Phase not found', phase: options.phase });
   }
 
   const padded = normalizePhaseName(options.phase);
@@ -259,20 +255,18 @@ export function cmdTemplateFill(
       break;
     }
     default:
-      error(`Unknown template type: ${templateType}. Available: summary, plan, verification`);
-      return;
+      return cmdErr(`Unknown template type: ${templateType}. Available: summary, plan, verification`);
   }
 
   const fullContent = `---\n${reconstructFrontmatter(frontmatter)}\n---\n\n${body}\n`;
   const outPath = path.join(cwd, phaseInfo.directory, fileName);
 
   if (fs.existsSync(outPath)) {
-    output({ error: 'File already exists', path: path.relative(cwd, outPath) }, raw);
-    return;
+    return cmdOk({ error: 'File already exists', path: path.relative(cwd, outPath) });
   }
 
   fs.writeFileSync(outPath, fullContent, 'utf-8');
   const relPath = path.relative(cwd, outPath);
   const result: TemplateFillResult = { created: true, path: relPath, template: templateType };
-  output(result, raw, relPath);
+  return cmdOk(result, relPath);
 }

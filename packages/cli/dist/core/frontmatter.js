@@ -21,6 +21,7 @@ const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
 const yaml_1 = __importDefault(require("yaml"));
 const core_js_1 = require("./core.js");
+const types_js_1 = require("./types.js");
 // ─── Parsing engine ───────────────────────────────────────────────────────────
 /**
  * Extract YAML frontmatter from markdown content into a typed object.
@@ -94,37 +95,34 @@ exports.FRONTMATTER_SCHEMAS = {
     },
 };
 // ─── Frontmatter CRUD commands ──────────────────────────────────────────────
-function cmdFrontmatterGet(cwd, filePath, field, raw) {
+function cmdFrontmatterGet(cwd, filePath, field) {
     if (!filePath) {
-        (0, core_js_1.error)('file path required');
+        return (0, types_js_1.cmdErr)('file path required');
     }
     const fullPath = node_path_1.default.isAbsolute(filePath) ? filePath : node_path_1.default.join(cwd, filePath);
     const content = (0, core_js_1.safeReadFile)(fullPath);
     if (!content) {
-        (0, core_js_1.output)({ error: 'File not found', path: filePath }, raw);
-        return;
+        return (0, types_js_1.cmdOk)({ error: 'File not found', path: filePath });
     }
     const fm = extractFrontmatter(content);
     if (field) {
         const value = fm[field];
         if (value === undefined) {
-            (0, core_js_1.output)({ error: 'Field not found', field }, raw);
-            return;
+            return (0, types_js_1.cmdOk)({ error: 'Field not found', field });
         }
-        (0, core_js_1.output)({ [field]: value }, raw, JSON.stringify(value));
+        return (0, types_js_1.cmdOk)({ [field]: value }, JSON.stringify(value));
     }
     else {
-        (0, core_js_1.output)(fm, raw);
+        return (0, types_js_1.cmdOk)(fm);
     }
 }
-function cmdFrontmatterSet(cwd, filePath, field, value, raw) {
+function cmdFrontmatterSet(cwd, filePath, field, value) {
     if (!filePath || !field || value === undefined) {
-        (0, core_js_1.error)('file, field, and value required');
+        return (0, types_js_1.cmdErr)('file, field, and value required');
     }
     const fullPath = node_path_1.default.isAbsolute(filePath) ? filePath : node_path_1.default.join(cwd, filePath);
     if (!node_fs_1.default.existsSync(fullPath)) {
-        (0, core_js_1.output)({ error: 'File not found', path: filePath }, raw);
-        return;
+        return (0, types_js_1.cmdOk)({ error: 'File not found', path: filePath });
     }
     const content = node_fs_1.default.readFileSync(fullPath, 'utf-8');
     const fm = extractFrontmatter(content);
@@ -138,16 +136,15 @@ function cmdFrontmatterSet(cwd, filePath, field, value, raw) {
     fm[field] = parsedValue;
     const newContent = spliceFrontmatter(content, fm);
     node_fs_1.default.writeFileSync(fullPath, newContent, 'utf-8');
-    (0, core_js_1.output)({ updated: true, field, value: parsedValue }, raw, 'true');
+    return (0, types_js_1.cmdOk)({ updated: true, field, value: parsedValue }, 'true');
 }
-function cmdFrontmatterMerge(cwd, filePath, data, raw) {
+function cmdFrontmatterMerge(cwd, filePath, data) {
     if (!filePath || !data) {
-        (0, core_js_1.error)('file and data required');
+        return (0, types_js_1.cmdErr)('file and data required');
     }
     const fullPath = node_path_1.default.isAbsolute(filePath) ? filePath : node_path_1.default.join(cwd, filePath);
     if (!node_fs_1.default.existsSync(fullPath)) {
-        (0, core_js_1.output)({ error: 'File not found', path: filePath }, raw);
-        return;
+        return (0, types_js_1.cmdOk)({ error: 'File not found', path: filePath });
     }
     const content = node_fs_1.default.readFileSync(fullPath, 'utf-8');
     const fm = extractFrontmatter(content);
@@ -156,27 +153,25 @@ function cmdFrontmatterMerge(cwd, filePath, data, raw) {
         mergeData = JSON.parse(data);
     }
     catch {
-        (0, core_js_1.error)('Invalid JSON for --data');
-        return;
+        return (0, types_js_1.cmdErr)('Invalid JSON for --data');
     }
     Object.assign(fm, mergeData);
     const newContent = spliceFrontmatter(content, fm);
     node_fs_1.default.writeFileSync(fullPath, newContent, 'utf-8');
-    (0, core_js_1.output)({ merged: true, fields: Object.keys(mergeData) }, raw, 'true');
+    return (0, types_js_1.cmdOk)({ merged: true, fields: Object.keys(mergeData) }, 'true');
 }
-function cmdFrontmatterValidate(cwd, filePath, schemaName, raw) {
+function cmdFrontmatterValidate(cwd, filePath, schemaName) {
     if (!filePath || !schemaName) {
-        (0, core_js_1.error)('file and schema required');
+        return (0, types_js_1.cmdErr)('file and schema required');
     }
     const schema = exports.FRONTMATTER_SCHEMAS[schemaName];
     if (!schema) {
-        (0, core_js_1.error)(`Unknown schema: ${schemaName}. Available: ${Object.keys(exports.FRONTMATTER_SCHEMAS).join(', ')}`);
+        return (0, types_js_1.cmdErr)(`Unknown schema: ${schemaName}. Available: ${Object.keys(exports.FRONTMATTER_SCHEMAS).join(', ')}`);
     }
     const fullPath = node_path_1.default.isAbsolute(filePath) ? filePath : node_path_1.default.join(cwd, filePath);
     const content = (0, core_js_1.safeReadFile)(fullPath);
     if (!content) {
-        (0, core_js_1.output)({ error: 'File not found', path: filePath }, raw);
-        return;
+        return (0, types_js_1.cmdOk)({ error: 'File not found', path: filePath });
     }
     const fm = extractFrontmatter(content);
     const missing = schema.required.filter(f => fm[f] === undefined);
@@ -187,6 +182,6 @@ function cmdFrontmatterValidate(cwd, filePath, schemaName, raw) {
         present,
         schema: schemaName,
     };
-    (0, core_js_1.output)(result, raw, missing.length === 0 ? 'valid' : 'invalid');
+    return (0, types_js_1.cmdOk)(result, missing.length === 0 ? 'valid' : 'invalid');
 }
 //# sourceMappingURL=frontmatter.js.map

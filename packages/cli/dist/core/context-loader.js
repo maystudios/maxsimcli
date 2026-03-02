@@ -13,6 +13,7 @@ exports.cmdContextLoad = cmdContextLoad;
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
 const core_js_1 = require("./core.js");
+const types_js_1 = require("./types.js");
 // ─── Internal helpers ────────────────────────────────────────────────────────
 function fileEntry(cwd, relPath, role) {
     const fullPath = node_path_1.default.join(cwd, relPath);
@@ -118,7 +119,7 @@ function loadHistoryContext(cwd, currentPhase) {
     return files;
 }
 // ─── Commands ────────────────────────────────────────────────────────────────
-function cmdContextLoad(cwd, phase, topic, includeHistory, raw) {
+function cmdContextLoad(cwd, phase, topic, includeHistory) {
     const allFiles = [];
     // Always load core project context
     allFiles.push(...loadProjectContext(cwd));
@@ -148,6 +149,6 @@ function cmdContextLoad(cwd, phase, topic, includeHistory, raw) {
         phase: phase ?? null,
         topic: topic ?? null,
     };
-    (0, core_js_1.output)(result, raw);
+    return (0, types_js_1.cmdOk)(result);
 }
 //# sourceMappingURL=context-loader.js.map

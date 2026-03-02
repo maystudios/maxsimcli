@@ -4,6 +4,7 @@
  * Selects relevant planning files based on the current task/phase domain,
  * preventing context overload by loading only what matters.
  */
+import type { CmdResult } from './types.js';
 export interface ContextFile {
     path: string;
     role: string;
@@ -15,5 +16,5 @@ export interface ContextLoadResult {
     phase: string | null;
     topic: string | null;
 }
-export declare function cmdContextLoad(cwd: string, phase: string | undefined, topic: string | undefined, includeHistory: boolean, raw: boolean): void;
+export declare function cmdContextLoad(cwd: string, phase: string | undefined, topic: string | undefined, includeHistory: boolean): CmdResult;
 //# sourceMappingURL=context-loader.d.ts.map

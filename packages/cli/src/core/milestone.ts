@@ -7,19 +7,21 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { output, error, planningPath, roadmapPath as roadmapPathUtil, statePath as statePathUtil, phasesPath, todayISO, listSubDirs, isPlanFile, isSummaryFile, debugLog } from './core.js';
+import { planningPath, roadmapPath as roadmapPathUtil, statePath as statePathUtil, phasesPath, todayISO, listSubDirs, isPlanFile, isSummaryFile, debugLog } from './core.js';
 import { extractFrontmatter } from './frontmatter.js';
 import type {
+  CmdResult,
   MilestoneCompleteOptions,
   MilestoneResult,
   ArchiveResult,
 } from './types.js';
+import { cmdOk, cmdErr } from './types.js';
 
 // ─── Requirements commands ───────────────────────────────────────────────────
 
-export function cmdRequirementsMarkComplete(cwd: string, reqIdsRaw: string[], raw: boolean): void {
+export function cmdRequirementsMarkComplete(cwd: string, reqIdsRaw: string[]): CmdResult {
   if (!reqIdsRaw || reqIdsRaw.length === 0) {
-    error('requirement IDs required. Usage: requirements mark-complete REQ-01,REQ-02 or REQ-01 REQ-02');
+    return cmdErr('requirement IDs required. Usage: requirements mark-complete REQ-01,REQ-02 or REQ-01 REQ-02');
   }
 
   const reqIds = reqIdsRaw
@@ -30,13 +32,12 @@ export function cmdRequirementsMarkComplete(cwd: string, reqIdsRaw: string[], ra
     .filter(Boolean);
 
   if (reqIds.length === 0) {
-    error('no valid requirement IDs found');
+    return cmdErr('no valid requirement IDs found');
   }
 
   const reqPath = planningPath(cwd, 'REQUIREMENTS.md');
   if (!fs.existsSync(reqPath)) {
-    output({ updated: false, reason: 'REQUIREMENTS.md not found', ids: reqIds }, raw, 'no requirements file');
-    return;
+    return cmdOk({ updated: false, reason: 'REQUIREMENTS.md not found', ids: reqIds }, 'no requirements file');
   }
 
   let reqContent = fs.readFileSync(reqPath, 'utf-8');
@@ -79,7 +80,7 @@ export function cmdRequirementsMarkComplete(cwd: string, reqIdsRaw: string[], ra
     total: reqIds.length,
   };
 
-  output(result, raw, `${updated.length}/${reqIds.length} requirements marked complete`);
+  return cmdOk(result, `${updated.length}/${reqIds.length} requirements marked complete`);
 }
 
 // ─── Milestone commands ──────────────────────────────────────────────────────
@@ -88,10 +89,9 @@ export function cmdMilestoneComplete(
   cwd: string,
   version: string | undefined,
   options: MilestoneCompleteOptions,
-  raw: boolean,
-): void {
+): CmdResult {
   if (!version) {
-    error('version required for milestone complete (e.g., v1.0)');
+    return cmdErr('version required for milestone complete (e.g., v1.0)');
   }
 
   const roadmapPath = roadmapPathUtil(cwd);
@@ -224,5 +224,5 @@ export function cmdMilestoneComplete(
     state_updated: fs.existsSync(statePath),
   };
 
-  output(result, raw);
+  return cmdOk(result);
 }

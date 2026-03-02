@@ -3,6 +3,7 @@
  *
  * Ported from maxsim/bin/lib/verify.cjs
  */
+import type { CmdResult } from './types.js';
 export interface ValidationError {
     code?: string;
     message: string;
@@ -114,14 +115,14 @@ interface RepairAction {
 interface HealthOptions {
     repair?: boolean;
 }
-export declare function cmdVerifySummary(cwd: string, summaryPath: string | null, checkFileCount: number | null, raw: boolean): Promise<void>;
-export declare function cmdVerifyPlanStructure(cwd: string, filePath: string | null, raw: boolean): void;
-export declare function cmdVerifyPhaseCompleteness(cwd: string, phase: string | null, raw: boolean): void;
-export declare function cmdVerifyReferences(cwd: string, filePath: string | null, raw: boolean): void;
-export declare function cmdVerifyCommits(cwd: string, hashes: string[], raw: boolean): Promise<void>;
-export declare function cmdVerifyArtifacts(cwd: string, planFilePath: string | null, raw: boolean): void;
-export declare function cmdVerifyKeyLinks(cwd: string, planFilePath: string | null, raw: boolean): void;
-export declare function cmdValidateConsistency(cwd: string, raw: boolean): void;
-export declare function cmdValidateHealth(cwd: string, options: HealthOptions, raw: boolean): void;
+export declare function cmdVerifySummary(cwd: string, summaryPath: string | null, checkFileCount: number | null): Promise<CmdResult>;
+export declare function cmdVerifyPlanStructure(cwd: string, filePath: string | null): CmdResult;
+export declare function cmdVerifyPhaseCompleteness(cwd: string, phase: string | null): CmdResult;
+export declare function cmdVerifyReferences(cwd: string, filePath: string | null): CmdResult;
+export declare function cmdVerifyCommits(cwd: string, hashes: string[]): Promise<CmdResult>;
+export declare function cmdVerifyArtifacts(cwd: string, planFilePath: string | null): CmdResult;
+export declare function cmdVerifyKeyLinks(cwd: string, planFilePath: string | null): CmdResult;
+export declare function cmdValidateConsistency(cwd: string): CmdResult;
+export declare function cmdValidateHealth(cwd: string, options: HealthOptions): CmdResult;
 export {};
 //# sourceMappingURL=verify.d.ts.map

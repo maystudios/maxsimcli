@@ -14,10 +14,11 @@ const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
 const core_js_1 = require("./core.js");
 const frontmatter_js_1 = require("./frontmatter.js");
+const types_js_1 = require("./types.js");
 // ─── Requirements commands ───────────────────────────────────────────────────
-function cmdRequirementsMarkComplete(cwd, reqIdsRaw, raw) {
+function cmdRequirementsMarkComplete(cwd, reqIdsRaw) {
     if (!reqIdsRaw || reqIdsRaw.length === 0) {
-        (0, core_js_1.error)('requirement IDs required. Usage: requirements mark-complete REQ-01,REQ-02 or REQ-01 REQ-02');
+        return (0, types_js_1.cmdErr)('requirement IDs required. Usage: requirements mark-complete REQ-01,REQ-02 or REQ-01 REQ-02');
     }
     const reqIds = reqIdsRaw
         .join(' ')
@@ -26,12 +27,11 @@ function cmdRequirementsMarkComplete(cwd, reqIdsRaw, raw) {
         .map(r => r.trim())
         .filter(Boolean);
     if (reqIds.length === 0) {
-        (0, core_js_1.error)('no valid requirement IDs found');
+        return (0, types_js_1.cmdErr)('no valid requirement IDs found');
     }
     const reqPath = (0, core_js_1.planningPath)(cwd, 'REQUIREMENTS.md');
     if (!node_fs_1.default.existsSync(reqPath)) {
-        (0, core_js_1.output)({ updated: false, reason: 'REQUIREMENTS.md not found', ids: reqIds }, raw, 'no requirements file');
-        return;
+        return (0, types_js_1.cmdOk)({ updated: false, reason: 'REQUIREMENTS.md not found', ids: reqIds }, 'no requirements file');
     }
     let reqContent = node_fs_1.default.readFileSync(reqPath, 'utf-8');
     const updated = [];
@@ -64,12 +64,12 @@ function cmdRequirementsMarkComplete(cwd, reqIdsRaw, raw) {
         not_found: notFound,
         total: reqIds.length,
     };
-    (0, core_js_1.output)(result, raw, `${updated.length}/${reqIds.length} requirements marked complete`);
+    return (0, types_js_1.cmdOk)(result, `${updated.length}/${reqIds.length} requirements marked complete`);
 }
 // ─── Milestone commands ──────────────────────────────────────────────────────
-function cmdMilestoneComplete(cwd, version, options, raw) {
+function cmdMilestoneComplete(cwd, version, options) {
     if (!version) {
-        (0, core_js_1.error)('version required for milestone complete (e.g., v1.0)');
+        return (0, types_js_1.cmdErr)('version required for milestone complete (e.g., v1.0)');
     }
     const roadmapPath = (0, core_js_1.roadmapPath)(cwd);
     const reqPath = (0, core_js_1.planningPath)(cwd, 'REQUIREMENTS.md');
@@ -181,6 +181,6 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
         milestones_updated: true,
         state_updated: node_fs_1.default.existsSync(statePath),
     };
-    (0, core_js_1.output)(result, raw);
+    return (0, types_js_1.cmdOk)(result);
 }
 //# sourceMappingURL=milestone.js.map

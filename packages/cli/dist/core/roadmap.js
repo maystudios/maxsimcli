@@ -70,16 +70,17 @@ function cmdRoadmapGetPhase(cwd, phaseNum, raw) {
         (0, core_js_1.error)('Failed to read ROADMAP.md: ' + e.message);
     }
 }
-function cmdRoadmapAnalyze(cwd, raw) {
+async function cmdRoadmapAnalyze(cwd, raw) {
     const rmPath = (0, core_js_1.roadmapPath)(cwd);
-    if (!node_fs_1.default.existsSync(rmPath)) {
+    const content = await (0, core_js_1.safeReadFileAsync)(rmPath);
+    if (!content) {
         (0, core_js_1.output)({ error: 'ROADMAP.md not found', milestones: [], phases: [], current_phase: null }, raw);
         return;
     }
-    const content = node_fs_1.default.readFileSync(rmPath, 'utf-8');
     const phasesDir = (0, core_js_1.phasesPath)(cwd);
+    // Parse all phase headers from roadmap
     const phasePattern = (0, core_js_1.getPhasePattern)();
-    const phases = [];
+    const parsedPhases = [];
     let match;
     while ((match = phasePattern.exec(content)) !== null) {
         const phaseNum = match[1];
@@ -93,17 +94,34 @@ function cmdRoadmapAnalyze(cwd, raw) {
         const goal = goalMatch ? goalMatch[1].trim() : null;
         const dependsMatch = section.match(/\*\*Depends on:\*\*\s*([^\n]+)/i);
         const depends_on = dependsMatch ? dependsMatch[1].trim() : null;
-        const normalized = (0, core_js_1.normalizePhaseName)(phaseNum);
+        parsedPhases.push({
+            phaseNum,
+            phaseName,
+            goal,
+            depends_on,
+            normalized: (0, core_js_1.normalizePhaseName)(phaseNum),
+            checkboxPattern: new RegExp(`-\\s*\\[(x| )\\]\\s*.*Phase\\s+${phaseNum.replace('.', '\\.')}`, 'i'),
+        });
+    }
+    // Read all phase directories in parallel
+    let allDirs = [];
+    try {
+        allDirs = await (0, core_js_1.listSubDirsAsync)(phasesDir);
+    }
+    catch {
+        // phases dir may not exist
+    }
+    // Scan each phase's disk status in parallel
+    const phases = await Promise.all(parsedPhases.map(async (p) => {
         let diskStatus = 'no_directory';
         let planCount = 0;
         let summaryCount = 0;
         let hasContext = false;
         let hasResearch = false;
         try {
-            const dirs = (0, core_js_1.listSubDirs)(phasesDir);
-            const dirMatch = dirs.find(d => d.startsWith(normalized + '-') || d === normalized);
+            const dirMatch = allDirs.find(d => d.startsWith(p.normalized + '-') || d === p.normalized);
             if (dirMatch) {
-                const phaseFiles = node_fs_1.default.readdirSync(node_path_1.default.join(phasesDir, dirMatch));
+                const phaseFiles = await node_fs_1.default.promises.readdir(node_path_1.default.join(phasesDir, dirMatch));
                 planCount = phaseFiles.filter(f => (0, core_js_1.isPlanFile)(f)).length;
                 summaryCount = phaseFiles.filter(f => (0, core_js_1.isSummaryFile)(f)).length;
                 hasContext = phaseFiles.some(f => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
@@ -123,25 +141,23 @@ function cmdRoadmapAnalyze(cwd, raw) {
             }
         }
         catch (e) {
-            /* optional op, ignore */
             (0, core_js_1.debugLog)(e);
         }
-        const checkboxPattern = new RegExp(`-\\s*\\[(x| )\\]\\s*.*Phase\\s+${phaseNum.replace('.', '\\.')}`, 'i');
-        const checkboxMatch = content.match(checkboxPattern);
+        const checkboxMatch = content.match(p.checkboxPattern);
         const roadmapComplete = checkboxMatch ? checkboxMatch[1] === 'x' : false;
-        phases.push({
-            number: phaseNum,
-            name: phaseName,
-            goal,
-            depends_on,
+        return {
+            number: p.phaseNum,
+            name: p.phaseName,
+            goal: p.goal,
+            depends_on: p.depends_on,
             plan_count: planCount,
             summary_count: summaryCount,
             has_context: hasContext,
             has_research: hasResearch,
             disk_status: diskStatus,
             roadmap_complete: roadmapComplete,
-        });
-    }
+        };
+    }));
     const milestones = [];
     const milestonePattern = /##\s*(.*v(\d+\.\d+)[^(\n]*)/gi;
     let mMatch;

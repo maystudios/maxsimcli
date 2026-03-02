@@ -229,20 +229,20 @@ function phaseCompleteCore(cwd, phaseNum) {
     };
 }
 // ─── Phase list ─────────────────────────────────────────────────────────────
-function cmdPhasesList(cwd, options, raw) {
+async function cmdPhasesList(cwd, options, raw) {
     const phasesDirPath = (0, core_js_1.phasesPath)(cwd);
-    const { type, phase, includeArchived } = options;
+    const { type, phase, includeArchived, offset, limit } = options;
     if (!node_fs_1.default.existsSync(phasesDirPath)) {
         if (type) {
-            (0, core_js_1.output)({ files: [], count: 0 }, raw, '');
+            (0, core_js_1.output)({ files: [], count: 0, total: 0 }, raw, '');
         }
         else {
-            (0, core_js_1.output)({ directories: [], count: 0 }, raw, '');
+            (0, core_js_1.output)({ directories: [], count: 0, total: 0 }, raw, '');
         }
         return;
     }
     try {
-        let dirs = (0, core_js_1.listSubDirs)(phasesDirPath);
+        let dirs = await (0, core_js_1.listSubDirsAsync)(phasesDirPath);
         if (includeArchived) {
             const archived = (0, core_js_1.getArchivedPhaseDirs)(cwd);
             for (const a of archived) {
@@ -254,16 +254,15 @@ function cmdPhasesList(cwd, options, raw) {
             const normalized = (0, core_js_1.normalizePhaseName)(phase);
             const match = dirs.find(d => d.startsWith(normalized));
             if (!match) {
-                (0, core_js_1.output)({ files: [], count: 0, phase_dir: null, error: 'Phase not found' }, raw, '');
+                (0, core_js_1.output)({ files: [], count: 0, total: 0, phase_dir: null, error: 'Phase not found' }, raw, '');
                 return;
             }
             dirs = [match];
         }
         if (type) {
-            const files = [];
-            for (const dir of dirs) {
+            const fileResults = await Promise.all(dirs.map(async (dir) => {
                 const dirPath = node_path_1.default.join(phasesDirPath, dir);
-                const dirFiles = node_fs_1.default.readdirSync(dirPath);
+                const dirFiles = await node_fs_1.default.promises.readdir(dirPath);
                 let filtered;
                 if (type === 'plans') {
                     filtered = dirFiles.filter(core_js_1.isPlanFile);
@@ -274,17 +273,23 @@ function cmdPhasesList(cwd, options, raw) {
                 else {
                     filtered = dirFiles;
                 }
-                files.push(...filtered.sort());
-            }
+                return filtered.sort();
+            }));
+            const files = fileResults.flat();
             const result = {
                 files,
                 count: files.length,
+                total: files.length,
                 phase_dir: phase ? dirs[0].replace(/^\d+(?:\.\d+)?-?/, '') : null,
             };
             (0, core_js_1.output)(result, raw, files.join('\n'));
             return;
         }
-        (0, core_js_1.output)({ directories: dirs, count: dirs.length }, raw, dirs.join('\n'));
+        // Apply pagination
+        const total = dirs.length;
+        const start = offset ?? 0;
+        const paginated = limit !== undefined ? dirs.slice(start, start + limit) : dirs.slice(start);
+        (0, core_js_1.output)({ directories: paginated, count: paginated.length, total }, raw, paginated.join('\n'));
     }
     catch (e) {
         (0, core_js_1.rethrowCliSignals)(e);

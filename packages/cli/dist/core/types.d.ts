@@ -360,7 +360,19 @@ export interface PhasesListOptions {
     type: string | null;
     phase: string | null;
     includeArchived: boolean;
+    offset?: number;
+    limit?: number;
 }
+export type CmdResult = {
+    ok: true;
+    result: unknown;
+    rawValue?: unknown;
+} | {
+    ok: false;
+    error: string;
+};
+export declare function cmdOk(result: unknown, rawValue?: unknown): CmdResult;
+export declare function cmdErr(error: string): CmdResult;
 export type RuntimeName = 'claude';
 export interface AdapterConfig {
     runtime: RuntimeName;

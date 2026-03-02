@@ -63,6 +63,7 @@ export type {
   PhaseCompleteResult,
   PhasePlanIndexResult,
   PhasesListOptions,
+  CmdResult,
   RuntimeName,
   AdapterConfig,
 } from './types.js';
@@ -74,6 +75,8 @@ export {
   phaseSlug,
   ok,
   err,
+  cmdOk,
+  cmdErr,
   PLANNING_CONFIG_DEFAULTS,
 } from './types.js';
 
