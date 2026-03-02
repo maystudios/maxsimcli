@@ -6,7 +6,7 @@ import chalk from 'chalk';
 
 import type { RuntimeName } from '../adapters/index.js';
 import { readSettings, writeSettings } from '../adapters/index.js';
-import { getDirName, getGlobalDir, getOpencodeGlobalDir } from './shared.js';
+import { getDirName, getGlobalDir, getOpencodeGlobalDir, builtInSkills } from './shared.js';
 
 /**
  * Uninstall MAXSIM from the specified directory for a specific runtime
@@ -82,6 +82,36 @@ export function uninstall(isGlobal: boolean, runtime: RuntimeName = 'claude', ex
       fs.rmSync(maxsimCommandsDir, { recursive: true });
       removedCount++;
       console.log(`  ${chalk.green('\u2713')} Removed commands/maxsim/`);
+    }
+  }
+
+  // 1b. Remove MAXSIM skills (skills/ directory for Claude/Gemini/OpenCode)
+  if (!isCodex) {
+    const skillsDir = path.join(targetDir, 'skills');
+    if (fs.existsSync(skillsDir)) {
+      let skillCount = 0;
+      for (const skill of builtInSkills) {
+        const skillDir = path.join(skillsDir, skill);
+        if (fs.existsSync(skillDir)) {
+          fs.rmSync(skillDir, { recursive: true });
+          skillCount++;
+        }
+      }
+      if (skillCount > 0) {
+        removedCount++;
+        console.log(
+          `  ${chalk.green('\u2713')} Removed ${skillCount} MAXSIM skills`,
+        );
+      }
+    }
+
+    // Also clean up legacy agents/skills/ location
+    const legacySkillsDir = path.join(targetDir, 'agents', 'skills');
+    if (fs.existsSync(legacySkillsDir)) {
+      fs.rmSync(legacySkillsDir, { recursive: true });
+      console.log(
+        `  ${chalk.green('\u2713')} Removed legacy agents/skills/ directory`,
+      );
     }
   }
 

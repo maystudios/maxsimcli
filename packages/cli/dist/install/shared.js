@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.templatesRoot = exports.pkg = void 0;
+exports.builtInSkills = exports.templatesRoot = exports.pkg = void 0;
 exports.getAdapter = getAdapter;
 exports.getGlobalDir = getGlobalDir;
 exports.getConfigDirFromHome = getConfigDirFromHome;
@@ -55,6 +55,8 @@ const index_js_1 = require("../adapters/index.js");
 exports.pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'package.json'), 'utf-8'));
 // Resolve template asset root — bundled into dist/assets/templates at publish time
 exports.templatesRoot = path.resolve(__dirname, 'assets', 'templates');
+// Built-in skill names shipped with MAXSIM — used for cleanup during install/uninstall
+exports.builtInSkills = ['tdd', 'systematic-debugging', 'verification-before-completion', 'simplify', 'code-review', 'memory-management', 'using-maxsim'];
 /**
  * Adapter registry keyed by runtime name
  */

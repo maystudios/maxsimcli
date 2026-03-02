@@ -121,12 +121,12 @@ function writeManifest(configDir, runtime = 'claude') {
             }
         }
     }
-    // Include skills in manifest (agents/skills/<skill-name>/*)
-    const skillsManifestDir = path.join(agentsDir, 'skills');
-    if (fs.existsSync(skillsManifestDir)) {
+    // Include skills in manifest (skills/<skill-name>/*)
+    const skillsManifestDir = path.join(configDir, 'skills');
+    if (!isCodex && fs.existsSync(skillsManifestDir)) {
         const skillHashes = generateManifest(skillsManifestDir);
         for (const [rel, hash] of Object.entries(skillHashes)) {
-            manifest.files['agents/skills/' + rel] = hash;
+            manifest.files['skills/' + rel] = hash;
         }
     }
     fs.writeFileSync(path.join(configDir, exports.MANIFEST_NAME), JSON.stringify(manifest, null, 2));

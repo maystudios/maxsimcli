@@ -34,7 +34,7 @@ describe('install file structure (E2E-03)', () => {
 
   it('installs skills directory with skill files', () => {
     const installDir = inject('installDir');
-    const skillsDir = join(installDir, '.claude', 'agents', 'skills');
+    const skillsDir = join(installDir, '.claude', 'skills');
     expect(existsSync(skillsDir)).toBe(true);
     const dirs = readdirSync(skillsDir);
     expect(dirs.length).toBeGreaterThanOrEqual(3);

@@ -1273,8 +1273,8 @@ When any trigger condition below applies, read the full skill file via the Read 
 
 | Skill | Read | Trigger |
 |-------|------|---------|
-| Systematic Debugging | `.agents/skills/systematic-debugging/SKILL.md` | Always — you are a debugger, this is your primary skill |
-| Verification Before Completion | `.agents/skills/verification-before-completion/SKILL.md` | Before claiming a bug is fixed or a debug session is complete |
+| Systematic Debugging | `.skills/systematic-debugging/SKILL.md` | Always — you are a debugger, this is your primary skill |
+| Verification Before Completion | `.skills/verification-before-completion/SKILL.md` | Before claiming a bug is fixed or a debug session is complete |
 
 **Project skills override built-in skills.**
 

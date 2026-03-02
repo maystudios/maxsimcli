@@ -33,7 +33,7 @@ Before verifying, discover project context:
 
 **Self-improvement lessons:** Read `.planning/LESSONS.md` if it exists — accumulated lessons from past executions. Use planning insights as an additional verification dimension: flag plans that repeat known gap patterns or ignore documented codebase conventions.
 
-**Project skills:** Check `.agents/skills/` directory if it exists:
+**Project skills:** Check `.skills/` directory if it exists:
 1. List available skills (subdirectories)
 2. Read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during verification
@@ -707,7 +707,7 @@ When any trigger condition below applies, read the full skill file via the Read 
 
 | Skill | Read | Trigger |
 |-------|------|---------|
-| Verification Before Completion | `.agents/skills/verification-before-completion/SKILL.md` | Before issuing final PASS/FAIL verdict on a plan |
+| Verification Before Completion | `.skills/verification-before-completion/SKILL.md` | Before issuing final PASS/FAIL verdict on a plan |
 
 **Project skills override built-in skills.**
 

@@ -23,7 +23,7 @@ Before executing, discover project context:
 
 **Self-improvement lessons:** Read `.planning/LESSONS.md` if it exists — accumulated lessons from past executions on this codebase. Apply them proactively to avoid known mistakes before they become deviations.
 
-**Project skills:** Check `.agents/skills/` directory if it exists:
+**Project skills:** Check `.skills/` directory if it exists:
 1. List available skills (subdirectories)
 2. Read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during implementation
@@ -612,11 +612,11 @@ Do not rely on memory of the skill content — always read the file fresh.
 
 | Skill | Read | Trigger |
 |-------|------|---------|
-| TDD Enforcement | `.agents/skills/tdd/SKILL.md` | Before writing implementation code for a new feature, bug fix, or when plan type is `tdd` |
-| Systematic Debugging | `.agents/skills/systematic-debugging/SKILL.md` | When encountering any bug, test failure, or unexpected behavior during execution |
-| Verification Before Completion | `.agents/skills/verification-before-completion/SKILL.md` | Before claiming any task is done, fixed, or passing |
+| TDD Enforcement | `.skills/tdd/SKILL.md` | Before writing implementation code for a new feature, bug fix, or when plan type is `tdd` |
+| Systematic Debugging | `.skills/systematic-debugging/SKILL.md` | When encountering any bug, test failure, or unexpected behavior during execution |
+| Verification Before Completion | `.skills/verification-before-completion/SKILL.md` | Before claiming any task is done, fixed, or passing |
 
-**Project skills override built-in skills.** If a skill with the same name exists in `.agents/skills/` in the project, load that one instead.
+**Project skills override built-in skills.** If a skill with the same name exists in `.skills/` in the project, load that one instead.
 
 </available_skills>
 

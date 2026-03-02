@@ -1,1 +1,1 @@
-{"version":3,"file":"uninstall.d.ts","sourceRoot":"","sources":["../../src/install/uninstall.ts"],"names":[],"mappings":"AAMA,OAAO,KAAK,EAAE,WAAW,EAAE,MAAM,sBAAsB,CAAC;AAIxD;;GAEG;AACH,wBAAgB,SAAS,CAAC,QAAQ,EAAE,OAAO,EAAE,OAAO,GAAE,WAAsB,EAAE,iBAAiB,GAAE,MAAM,GAAG,IAAW,GAAG,IAAI,CA2S3H"}
+{"version":3,"file":"uninstall.d.ts","sourceRoot":"","sources":["../../src/install/uninstall.ts"],"names":[],"mappings":"AAMA,OAAO,KAAK,EAAE,WAAW,EAAE,MAAM,sBAAsB,CAAC;AAIxD;;GAEG;AACH,wBAAgB,SAAS,CAAC,QAAQ,EAAE,OAAO,EAAE,OAAO,GAAE,WAAsB,EAAE,iBAAiB,GAAE,MAAM,GAAG,IAAW,GAAG,IAAI,CAyU3H"}
