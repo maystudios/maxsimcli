@@ -1,3 +1,11 @@
+# [4.1.0](https://github.com/maystudios/maxsimcli/compare/v4.0.2...v4.1.0) (2026-03-02)
+
+
+### Features
+
+* **backend:** add unified backend server package ([#49](https://github.com/maystudios/maxsimcli/issues/49)) ([abe4d38](https://github.com/maystudios/maxsimcli/commit/abe4d38decdb45660b6baec19e30c5e77a844fbb))
+* **mcp:** add context, roadmap, and config query tools ([#48](https://github.com/maystudios/maxsimcli/issues/48)) ([8828c68](https://github.com/maystudios/maxsimcli/commit/8828c6878354944817c11add6b96481991c088b9))
+
 ## [4.0.2](https://github.com/maystudios/maxsimcli/compare/v4.0.1...v4.0.2) (2026-03-02)
 
 
