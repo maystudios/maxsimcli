@@ -10,8 +10,6 @@ import path from 'node:path';
 
 import {
   loadConfig,
-  output,
-  error,
   safeReadFile,
   planningPath,
   phasesPath,
@@ -22,6 +20,8 @@ import {
   listSubDirs,
   isSummaryFile,
 } from './core.js';
+import type { CmdResult } from './types.js';
+import { cmdOk } from './types.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -156,8 +156,7 @@ export function cmdContextLoad(
   phase: string | undefined,
   topic: string | undefined,
   includeHistory: boolean,
-  raw: boolean,
-): void {
+): CmdResult {
   const allFiles: ContextFile[] = [];
 
   // Always load core project context
@@ -194,5 +193,5 @@ export function cmdContextLoad(
     topic: topic ?? null,
   };
 
-  output(result, raw);
+  return cmdOk(result);
 }

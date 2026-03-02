@@ -14,8 +14,6 @@ import {
   execGit,
   findPhaseInternal,
   getMilestoneInfo,
-  output,
-  error,
   isPlanFile,
   isSummaryFile,
   planId,
@@ -30,7 +28,8 @@ import {
   todayISO,
 } from './core.js';
 import { extractFrontmatter, parseMustHavesBlock } from './frontmatter.js';
-import type { FrontmatterData } from './types.js';
+import type { CmdResult, FrontmatterData } from './types.js';
+import { cmdOk, cmdErr } from './types.js';
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -163,10 +162,9 @@ export async function cmdVerifySummary(
   cwd: string,
   summaryPath: string | null,
   checkFileCount: number | null,
-  raw: boolean,
-): Promise<void> {
+): Promise<CmdResult> {
   if (!summaryPath) {
-    error('summary-path required');
+    return cmdErr('summary-path required');
   }
 
   const fullPath = path.join(cwd, summaryPath);
@@ -183,8 +181,7 @@ export async function cmdVerifySummary(
       },
       errors: ['SUMMARY.md not found'],
     };
-    output(result, raw, 'failed');
-    return;
+    return cmdOk(result, 'failed');
   }
 
   const content = fs.readFileSync(fullPath, 'utf-8');
@@ -256,20 +253,19 @@ export async function cmdVerifySummary(
 
   const passed = missing.length === 0 && selfCheck !== 'failed';
   const result: VerificationResult = { passed, checks, errors };
-  output(result, raw, passed ? 'passed' : 'failed');
+  return cmdOk(result, passed ? 'passed' : 'failed');
 }
 
 // ─── Verify Plan Structure ───────────────────────────────────────────────────
 
-export function cmdVerifyPlanStructure(cwd: string, filePath: string | null, raw: boolean): void {
+export function cmdVerifyPlanStructure(cwd: string, filePath: string | null): CmdResult {
   if (!filePath) {
-    error('file path required');
+    return cmdErr('file path required');
   }
   const fullPath = path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
   const content = safeReadFile(fullPath);
   if (!content) {
-    output({ error: 'File not found', path: filePath }, raw);
-    return;
+    return cmdOk({ error: 'File not found', path: filePath });
   }
 
   const fm = extractFrontmatter(content);
@@ -321,19 +317,18 @@ export function cmdVerifyPlanStructure(cwd: string, filePath: string | null, raw
     tasks,
     frontmatter_fields: Object.keys(fm),
   };
-  output(result, raw, errors.length === 0 ? 'valid' : 'invalid');
+  return cmdOk(result, errors.length === 0 ? 'valid' : 'invalid');
 }
 
 // ─── Verify Phase Completeness ───────────────────────────────────────────────
 
-export function cmdVerifyPhaseCompleteness(cwd: string, phase: string | null, raw: boolean): void {
+export function cmdVerifyPhaseCompleteness(cwd: string, phase: string | null): CmdResult {
   if (!phase) {
-    error('phase required');
+    return cmdErr('phase required');
   }
   const phaseInfo = findPhaseInternal(cwd, phase);
   if (!phaseInfo) {
-    output({ error: 'Phase not found', phase }, raw);
-    return;
+    return cmdOk({ error: 'Phase not found', phase });
   }
 
   const errors: string[] = [];
@@ -344,8 +339,7 @@ export function cmdVerifyPhaseCompleteness(cwd: string, phase: string | null, ra
   try {
     files = fs.readdirSync(phaseDir);
   } catch {
-    output({ error: 'Cannot read phase directory' }, raw);
-    return;
+    return cmdOk({ error: 'Cannot read phase directory' });
   }
 
   const plans = files.filter(f => isPlanFile(f));
@@ -374,20 +368,19 @@ export function cmdVerifyPhaseCompleteness(cwd: string, phase: string | null, ra
     errors,
     warnings,
   };
-  output(result, raw, errors.length === 0 ? 'complete' : 'incomplete');
+  return cmdOk(result, errors.length === 0 ? 'complete' : 'incomplete');
 }
 
 // ─── Verify References ───────────────────────────────────────────────────────
 
-export function cmdVerifyReferences(cwd: string, filePath: string | null, raw: boolean): void {
+export function cmdVerifyReferences(cwd: string, filePath: string | null): CmdResult {
   if (!filePath) {
-    error('file path required');
+    return cmdErr('file path required');
   }
   const fullPath = path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
   const content = safeReadFile(fullPath);
   if (!content) {
-    output({ error: 'File not found', path: filePath }, raw);
-    return;
+    return cmdOk({ error: 'File not found', path: filePath });
   }
 
   const found: string[] = [];
@@ -425,14 +418,14 @@ export function cmdVerifyReferences(cwd: string, filePath: string | null, raw: b
     missing,
     total: found.length + missing.length,
   };
-  output(result, raw, missing.length === 0 ? 'valid' : 'invalid');
+  return cmdOk(result, missing.length === 0 ? 'valid' : 'invalid');
 }
 
 // ─── Verify Commits ──────────────────────────────────────────────────────────
 
-export async function cmdVerifyCommits(cwd: string, hashes: string[], raw: boolean): Promise<void> {
+export async function cmdVerifyCommits(cwd: string, hashes: string[]): Promise<CmdResult> {
   if (!hashes || hashes.length === 0) {
-    error('At least one commit hash required');
+    return cmdErr('At least one commit hash required');
   }
 
   const valid: string[] = [];
@@ -452,7 +445,7 @@ export async function cmdVerifyCommits(cwd: string, hashes: string[], raw: boole
     invalid,
     total: hashes.length,
   };
-  output(commitResult, raw, invalid.length === 0 ? 'valid' : 'invalid');
+  return cmdOk(commitResult, invalid.length === 0 ? 'valid' : 'invalid');
 }
 
 // ─── Verify Artifacts ────────────────────────────────────────────────────────
@@ -465,21 +458,19 @@ interface MustHaveArtifact {
   [key: string]: string | number | string[] | undefined;
 }
 
-export function cmdVerifyArtifacts(cwd: string, planFilePath: string | null, raw: boolean): void {
+export function cmdVerifyArtifacts(cwd: string, planFilePath: string | null): CmdResult {
   if (!planFilePath) {
-    error('plan file path required');
+    return cmdErr('plan file path required');
   }
   const fullPath = path.isAbsolute(planFilePath) ? planFilePath : path.join(cwd, planFilePath);
   const content = safeReadFile(fullPath);
   if (!content) {
-    output({ error: 'File not found', path: planFilePath }, raw);
-    return;
+    return cmdOk({ error: 'File not found', path: planFilePath });
   }
 
   const artifacts = parseMustHavesBlock(content, 'artifacts');
   if (artifacts.length === 0) {
-    output({ error: 'No must_haves.artifacts found in frontmatter', path: planFilePath }, raw);
-    return;
+    return cmdOk({ error: 'No must_haves.artifacts found in frontmatter', path: planFilePath });
   }
 
   const results: ArtifactCheck[] = [];
@@ -524,7 +515,7 @@ export function cmdVerifyArtifacts(cwd: string, planFilePath: string | null, raw
     total: results.length,
     artifacts: results,
   };
-  output(artifactsResult, raw, passed === results.length ? 'valid' : 'invalid');
+  return cmdOk(artifactsResult, passed === results.length ? 'valid' : 'invalid');
 }
 
 // ─── Verify Key Links ────────────────────────────────────────────────────────
@@ -537,21 +528,19 @@ interface MustHaveKeyLink {
   [key: string]: string | number | string[] | undefined;
 }
 
-export function cmdVerifyKeyLinks(cwd: string, planFilePath: string | null, raw: boolean): void {
+export function cmdVerifyKeyLinks(cwd: string, planFilePath: string | null): CmdResult {
   if (!planFilePath) {
-    error('plan file path required');
+    return cmdErr('plan file path required');
   }
   const fullPath = path.isAbsolute(planFilePath) ? planFilePath : path.join(cwd, planFilePath);
   const content = safeReadFile(fullPath);
   if (!content) {
-    output({ error: 'File not found', path: planFilePath }, raw);
-    return;
+    return cmdOk({ error: 'File not found', path: planFilePath });
   }
 
   const keyLinks = parseMustHavesBlock(content, 'key_links');
   if (keyLinks.length === 0) {
-    output({ error: 'No must_haves.key_links found in frontmatter', path: planFilePath }, raw);
-    return;
+    return cmdOk({ error: 'No must_haves.key_links found in frontmatter', path: planFilePath });
   }
 
   const results: KeyLinkCheck[] = [];
@@ -606,12 +595,12 @@ export function cmdVerifyKeyLinks(cwd: string, planFilePath: string | null, raw:
     total: results.length,
     links: results,
   };
-  output(linksResult, raw, verified === results.length ? 'valid' : 'invalid');
+  return cmdOk(linksResult, verified === results.length ? 'valid' : 'invalid');
 }
 
 // ─── Validate Consistency ────────────────────────────────────────────────────
 
-export function cmdValidateConsistency(cwd: string, raw: boolean): void {
+export function cmdValidateConsistency(cwd: string): CmdResult {
   const rmPath = roadmapPathUtil(cwd);
   const phasesDir = phasesPath(cwd);
   const errors: string[] = [];
@@ -619,8 +608,7 @@ export function cmdValidateConsistency(cwd: string, raw: boolean): void {
 
   if (!fs.existsSync(rmPath)) {
     errors.push('ROADMAP.md not found');
-    output({ passed: false, errors, warnings }, raw, 'failed');
-    return;
+    return cmdOk({ passed: false, errors, warnings }, 'failed');
   }
 
   const roadmapContent = fs.readFileSync(rmPath, 'utf-8');
@@ -724,12 +712,12 @@ export function cmdValidateConsistency(cwd: string, raw: boolean): void {
 
   const passed = errors.length === 0;
   const result: ConsistencyResult = { passed, errors, warnings, warning_count: warnings.length };
-  output(result, raw, passed ? 'passed' : 'failed');
+  return cmdOk(result, passed ? 'passed' : 'failed');
 }
 
 // ─── Validate Health ─────────────────────────────────────────────────────────
 
-export function cmdValidateHealth(cwd: string, options: HealthOptions, raw: boolean): void {
+export function cmdValidateHealth(cwd: string, options: HealthOptions): CmdResult {
   const planningDir = planningPath(cwd);
   const projectPath = planningPath(cwd, 'PROJECT.md');
   const rmPath = roadmapPathUtil(cwd);
@@ -758,14 +746,13 @@ export function cmdValidateHealth(cwd: string, options: HealthOptions, raw: bool
   // Check 1: .planning/ exists
   if (!fs.existsSync(planningDir)) {
     addIssue('error', 'E001', '.planning/ directory not found', 'Run /maxsim:new-project to initialize');
-    output({
+    return cmdOk({
       status: 'broken',
       errors,
       warnings,
       info,
       repairable_count: 0,
-    }, raw);
-    return;
+    });
   }
 
   // Check 2: PROJECT.md
@@ -974,5 +961,5 @@ export function cmdValidateHealth(cwd: string, options: HealthOptions, raw: bool
     repairable_count: repairableCount,
     repairs_performed: repairActions.length > 0 ? repairActions : undefined,
   };
-  output(result, raw);
+  return cmdOk(result);
 }

@@ -3,7 +3,7 @@
  *
  * Uses the `yaml` npm package instead of a hand-rolled parser.
  */
-import type { FrontmatterData, FrontmatterSchema } from './types.js';
+import type { CmdResult, FrontmatterData, FrontmatterSchema } from './types.js';
 /**
  * Extract YAML frontmatter from markdown content into a typed object.
  */
@@ -25,9 +25,9 @@ interface MustHaveItem {
  */
 export declare function parseMustHavesBlock(content: string, blockName: string): (string | MustHaveItem)[];
 export declare const FRONTMATTER_SCHEMAS: Record<string, FrontmatterSchema>;
-export declare function cmdFrontmatterGet(cwd: string, filePath: string | null, field: string | null, raw: boolean): void;
-export declare function cmdFrontmatterSet(cwd: string, filePath: string | null, field: string | null, value: string | undefined, raw: boolean): void;
-export declare function cmdFrontmatterMerge(cwd: string, filePath: string | null, data: string | null, raw: boolean): void;
-export declare function cmdFrontmatterValidate(cwd: string, filePath: string | null, schemaName: string | null, raw: boolean): void;
+export declare function cmdFrontmatterGet(cwd: string, filePath: string | null, field: string | null): CmdResult;
+export declare function cmdFrontmatterSet(cwd: string, filePath: string | null, field: string | null, value: string | undefined): CmdResult;
+export declare function cmdFrontmatterMerge(cwd: string, filePath: string | null, data: string | null): CmdResult;
+export declare function cmdFrontmatterValidate(cwd: string, filePath: string | null, schemaName: string | null): CmdResult;
 export {};
 //# sourceMappingURL=frontmatter.d.ts.map

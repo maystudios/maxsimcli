@@ -11,7 +11,7 @@ export declare function stateReplaceField(content: string, fieldName: string, ne
  * Returns updated content or null if section not found.
  */
 export declare function appendToStateSection(content: string, sectionPattern: RegExp, entry: string, placeholderPatterns?: RegExp[]): string | null;
-export declare function cmdStateLoad(cwd: string, raw: boolean): void;
+export declare function cmdStateLoad(cwd: string, raw: boolean): Promise<void>;
 export declare function cmdStateGet(cwd: string, section: string | null, raw: boolean): void;
 export declare function cmdStatePatch(cwd: string, patches: Record<string, string>, raw: boolean): void;
 export declare function cmdStateUpdate(cwd: string, field: string | undefined, value: string | undefined): void;

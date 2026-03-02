@@ -42,6 +42,19 @@ const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
 const node_child_process_1 = require("node:child_process");
 const index_js_1 = require("./core/index.js");
+// ─── Result handler ──────────────────────────────────────────────────────────
+/** Convert a CmdResult into the output()/error() signal expected by main(). */
+function handleResult(r, raw) {
+    if (r.ok) {
+        // Re-use the existing CliOutput signal mechanism
+        throw new index_js_1.CliOutput(r.result, raw, r.rawValue);
+    }
+    throw new index_js_1.CliError(r.error);
+}
+/** Async variant for promise-returning commands. */
+async function handleResultAsync(p, raw) {
+    return handleResult(await p, raw);
+}
 // ─── Arg parsing utilities ───────────────────────────────────────────────────
 /** Extract a single named flag's value from args */
 function getFlag(args, flag) {
@@ -62,7 +75,7 @@ function hasFlag(args, flag) {
     return args.includes(`--${flag}`);
 }
 // ─── Subcommand handlers ─────────────────────────────────────────────────────
-const handleState = (args, cwd, raw) => {
+const handleState = async (args, cwd, raw) => {
     const sub = args[1];
     const handlers = {
         'update': () => (0, index_js_1.cmdStateUpdate)(cwd, args[2], args[3]),
@@ -110,20 +123,20 @@ const handleState = (args, cwd, raw) => {
     const handler = sub ? handlers[sub] : undefined;
     if (handler)
         return handler();
-    (0, index_js_1.cmdStateLoad)(cwd, raw);
+    return (0, index_js_1.cmdStateLoad)(cwd, raw);
 };
 const handleTemplate = (args, cwd, raw) => {
     const sub = args[1];
     if (sub === 'select') {
-        (0, index_js_1.cmdTemplateSelect)(cwd, args[2], raw);
+        handleResult((0, index_js_1.cmdTemplateSelect)(cwd, args[2]), raw);
     }
     else if (sub === 'fill') {
         const f = getFlags(args, 'phase', 'plan', 'name', 'type', 'wave', 'fields');
-        (0, index_js_1.cmdTemplateFill)(cwd, args[2], {
+        handleResult((0, index_js_1.cmdTemplateFill)(cwd, args[2], {
             phase: f.phase ?? '', plan: f.plan ?? undefined, name: f.name ?? undefined,
             type: f.type ?? 'execute', wave: f.wave ?? '1',
             fields: f.fields ? JSON.parse(f.fields) : {},
-        }, raw);
+        }), raw);
     }
     else {
         (0, index_js_1.error)('Unknown template subcommand. Available: select, fill');
@@ -133,10 +146,10 @@ const handleFrontmatter = (args, cwd, raw) => {
     const sub = args[1];
     const file = args[2];
     const handlers = {
-        'get': () => (0, index_js_1.cmdFrontmatterGet)(cwd, file, getFlag(args, '--field'), raw),
-        'set': () => (0, index_js_1.cmdFrontmatterSet)(cwd, file, getFlag(args, '--field'), getFlag(args, '--value') ?? undefined, raw),
-        'merge': () => (0, index_js_1.cmdFrontmatterMerge)(cwd, file, getFlag(args, '--data'), raw),
-        'validate': () => (0, index_js_1.cmdFrontmatterValidate)(cwd, file, getFlag(args, '--schema'), raw),
+        'get': () => handleResult((0, index_js_1.cmdFrontmatterGet)(cwd, file, getFlag(args, '--field')), raw),
+        'set': () => handleResult((0, index_js_1.cmdFrontmatterSet)(cwd, file, getFlag(args, '--field'), getFlag(args, '--value') ?? undefined), raw),
+        'merge': () => handleResult((0, index_js_1.cmdFrontmatterMerge)(cwd, file, getFlag(args, '--data')), raw),
+        'validate': () => handleResult((0, index_js_1.cmdFrontmatterValidate)(cwd, file, getFlag(args, '--schema')), raw),
     };
     const handler = sub ? handlers[sub] : undefined;
     if (handler)
@@ -146,29 +159,35 @@ const handleFrontmatter = (args, cwd, raw) => {
 const handleVerify = async (args, cwd, raw) => {
     const sub = args[1];
     const handlers = {
-        'plan-structure': () => (0, index_js_1.cmdVerifyPlanStructure)(cwd, args[2], raw),
-        'phase-completeness': () => (0, index_js_1.cmdVerifyPhaseCompleteness)(cwd, args[2], raw),
-        'references': () => (0, index_js_1.cmdVerifyReferences)(cwd, args[2], raw),
-        'commits': () => (0, index_js_1.cmdVerifyCommits)(cwd, args.slice(2), raw),
-        'artifacts': () => (0, index_js_1.cmdVerifyArtifacts)(cwd, args[2], raw),
-        'key-links': () => (0, index_js_1.cmdVerifyKeyLinks)(cwd, args[2], raw),
+        'plan-structure': () => handleResult((0, index_js_1.cmdVerifyPlanStructure)(cwd, args[2]), raw),
+        'phase-completeness': () => handleResult((0, index_js_1.cmdVerifyPhaseCompleteness)(cwd, args[2]), raw),
+        'references': () => handleResult((0, index_js_1.cmdVerifyReferences)(cwd, args[2]), raw),
+        'commits': async () => handleResultAsync((0, index_js_1.cmdVerifyCommits)(cwd, args.slice(2)), raw),
+        'artifacts': () => handleResult((0, index_js_1.cmdVerifyArtifacts)(cwd, args[2]), raw),
+        'key-links': () => handleResult((0, index_js_1.cmdVerifyKeyLinks)(cwd, args[2]), raw),
     };
     const handler = sub ? handlers[sub] : undefined;
     if (handler)
         return handler();
     (0, index_js_1.error)('Unknown verify subcommand. Available: plan-structure, phase-completeness, references, commits, artifacts, key-links');
 };
-const handlePhases = (args, cwd, raw) => {
+const handlePhases = async (args, cwd, raw) => {
     const sub = args[1];
     if (sub === 'list') {
-        const f = getFlags(args, 'type', 'phase');
-        (0, index_js_1.cmdPhasesList)(cwd, { type: f.type, phase: f.phase, includeArchived: hasFlag(args, 'include-archived') }, raw);
+        const f = getFlags(args, 'type', 'phase', 'offset', 'limit');
+        await (0, index_js_1.cmdPhasesList)(cwd, {
+            type: f.type,
+            phase: f.phase,
+            includeArchived: hasFlag(args, 'include-archived'),
+            offset: f.offset !== null ? parseInt(f.offset, 10) : undefined,
+            limit: f.limit !== null ? parseInt(f.limit, 10) : undefined,
+        }, raw);
     }
     else {
         (0, index_js_1.error)('Unknown phases subcommand. Available: list');
     }
 };
-const handleRoadmap = (args, cwd, raw) => {
+const handleRoadmap = async (args, cwd, raw) => {
     const sub = args[1];
     const handlers = {
         'get-phase': () => (0, index_js_1.cmdRoadmapGetPhase)(cwd, args[2], raw),
@@ -208,10 +227,10 @@ const handleMilestone = (args, cwd, raw) => {
             }
             milestoneName = nameArgs.join(' ') || null;
         }
-        (0, index_js_1.cmdMilestoneComplete)(cwd, args[2], {
+        handleResult((0, index_js_1.cmdMilestoneComplete)(cwd, args[2], {
             name: milestoneName ?? undefined,
             archivePhases: hasFlag(args, 'archive-phases'),
-        }, raw);
+        }), raw);
     }
     else {
         (0, index_js_1.error)('Unknown milestone subcommand. Available: complete');
@@ -220,8 +239,8 @@ const handleMilestone = (args, cwd, raw) => {
 const handleValidate = (args, cwd, raw) => {
     const sub = args[1];
     const handlers = {
-        'consistency': () => (0, index_js_1.cmdValidateConsistency)(cwd, raw),
-        'health': () => (0, index_js_1.cmdValidateHealth)(cwd, { repair: hasFlag(args, 'repair') }, raw),
+        'consistency': () => handleResult((0, index_js_1.cmdValidateConsistency)(cwd), raw),
+        'health': () => handleResult((0, index_js_1.cmdValidateHealth)(cwd, { repair: hasFlag(args, 'repair') }), raw),
     };
     const handler = sub ? handlers[sub] : undefined;
     if (handler)
@@ -264,7 +283,7 @@ const COMMANDS = {
     'verify-summary': async (args, cwd, raw) => {
         const countIndex = args.indexOf('--check-count');
         const checkCount = countIndex !== -1 ? parseInt(args[countIndex + 1], 10) : 2;
-        await (0, index_js_1.cmdVerifySummary)(cwd, args[1], checkCount, raw);
+        await handleResultAsync((0, index_js_1.cmdVerifySummary)(cwd, args[1], checkCount), raw);
     },
     'template': handleTemplate,
     'frontmatter': handleFrontmatter,
@@ -281,7 +300,7 @@ const COMMANDS = {
     'roadmap': handleRoadmap,
     'requirements': (args, cwd, raw) => {
         if (args[1] === 'mark-complete')
-            (0, index_js_1.cmdRequirementsMarkComplete)(cwd, args.slice(2), raw);
+            handleResult((0, index_js_1.cmdRequirementsMarkComplete)(cwd, args.slice(2)), raw);
         else
             (0, index_js_1.error)('Unknown requirements subcommand. Available: mark-complete');
     },
@@ -318,7 +337,7 @@ const COMMANDS = {
     'artefakte-write': (args, cwd, raw) => (0, index_js_1.cmdArtefakteWrite)(cwd, args[1], getFlag(args, '--content') ?? undefined, getFlag(args, '--phase') ?? undefined, raw),
     'artefakte-append': (args, cwd, raw) => (0, index_js_1.cmdArtefakteAppend)(cwd, args[1], getFlag(args, '--entry') ?? undefined, getFlag(args, '--phase') ?? undefined, raw),
     'artefakte-list': (args, cwd, raw) => (0, index_js_1.cmdArtefakteList)(cwd, getFlag(args, '--phase') ?? undefined, raw),
-    'context-load': (args, cwd, raw) => (0, index_js_1.cmdContextLoad)(cwd, getFlag(args, '--phase') ?? undefined, getFlag(args, '--topic') ?? undefined, hasFlag(args, 'include-history'), raw),
+    'context-load': (args, cwd, raw) => handleResult((0, index_js_1.cmdContextLoad)(cwd, getFlag(args, '--phase') ?? undefined, getFlag(args, '--topic') ?? undefined, hasFlag(args, 'include-history')), raw),
     'start': async (args, cwd, raw) => (0, index_js_1.cmdStart)(cwd, { noBrowser: hasFlag(args, 'no-browser'), networkMode: hasFlag(args, 'network') }, raw),
     'dashboard': (args) => handleDashboard(args.slice(1)),
     'start-server': async () => {

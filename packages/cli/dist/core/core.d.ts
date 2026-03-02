@@ -41,6 +41,10 @@ export declare const planId: (f: string) => string;
 export declare const summaryId: (f: string) => string;
 /** List subdirectory names, optionally sorted by phase number. */
 export declare function listSubDirs(dir: string, sortByPhase?: boolean): string[];
+/** Async version of listSubDirs using fs.promises. */
+export declare function listSubDirsAsync(dir: string, sortByPhase?: boolean): Promise<string[]>;
+/** Async version of safeReadFile using fs.promises. */
+export declare function safeReadFileAsync(filePath: string): Promise<string | null>;
 /** Extract a human-readable message from an unknown thrown value. */
 export declare function errorMsg(e: unknown): string;
 /** Log only when MAXSIM_DEBUG is set. Accepts an optional context label. */

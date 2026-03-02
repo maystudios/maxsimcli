@@ -3,7 +3,7 @@
  *
  * Ported from maxsim/bin/lib/template.cjs
  */
-import type { FrontmatterData } from './types.js';
+import type { FrontmatterData, CmdResult } from './types.js';
 export interface TemplateSelectResult {
     template: string;
     type: 'minimal' | 'standard' | 'complex';
@@ -25,6 +25,6 @@ export interface TemplateFillResult {
     path: string;
     template: string;
 }
-export declare function cmdTemplateSelect(cwd: string, planPath: string | null, raw: boolean): void;
-export declare function cmdTemplateFill(cwd: string, templateType: string | null, options: TemplateFillOptions, raw: boolean): void;
+export declare function cmdTemplateSelect(cwd: string, planPath: string | null): CmdResult;
+export declare function cmdTemplateFill(cwd: string, templateType: string | null, options: TemplateFillOptions): CmdResult;
 //# sourceMappingURL=template.d.ts.map

@@ -14,10 +14,11 @@ const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
 const core_js_1 = require("./core.js");
 const frontmatter_js_1 = require("./frontmatter.js");
+const types_js_1 = require("./types.js");
 // ─── Template Select ─────────────────────────────────────────────────────────
-function cmdTemplateSelect(cwd, planPath, raw) {
+function cmdTemplateSelect(cwd, planPath) {
     if (!planPath) {
-        (0, core_js_1.error)('plan-path required');
+        return (0, types_js_1.cmdErr)('plan-path required');
     }
     try {
         const fullPath = node_path_1.default.join(cwd, planPath);
@@ -46,25 +47,24 @@ function cmdTemplateSelect(cwd, planPath, raw) {
             type = 'complex';
         }
         const result = { template, type, taskCount, fileCount, hasDecisions };
-        (0, core_js_1.output)(result, raw, template);
+        return (0, types_js_1.cmdOk)(result, template);
     }
     catch (thrown) {
         const selectErr = thrown;
-        (0, core_js_1.output)({ template: 'templates/summary-standard.md', type: 'standard', error: selectErr.message }, raw, 'templates/summary-standard.md');
+        return (0, types_js_1.cmdOk)({ template: 'templates/summary-standard.md', type: 'standard', error: selectErr.message }, 'templates/summary-standard.md');
     }
 }
 // ─── Template Fill ───────────────────────────────────────────────────────────
-function cmdTemplateFill(cwd, templateType, options, raw) {
+function cmdTemplateFill(cwd, templateType, options) {
     if (!templateType) {
-        (0, core_js_1.error)('template type required: summary, plan, or verification');
+        return (0, types_js_1.cmdErr)('template type required: summary, plan, or verification');
     }
     if (!options.phase) {
-        (0, core_js_1.error)('--phase required');
+        return (0, types_js_1.cmdErr)('--phase required');
     }
     const phaseInfo = (0, core_js_1.findPhaseInternal)(cwd, options.phase);
     if (!phaseInfo) {
-        (0, core_js_1.output)({ error: 'Phase not found', phase: options.phase }, raw);
-        return;
+        return (0, types_js_1.cmdOk)({ error: 'Phase not found', phase: options.phase });
     }
     const padded = (0, core_js_1.normalizePhaseName)(options.phase);
     const today = (0, core_js_1.todayISO)();
@@ -208,18 +208,16 @@ function cmdTemplateFill(cwd, templateType, options, raw) {
             break;
         }
         default:
-            (0, core_js_1.error)(`Unknown template type: ${templateType}. Available: summary, plan, verification`);
-            return;
+            return (0, types_js_1.cmdErr)(`Unknown template type: ${templateType}. Available: summary, plan, verification`);
     }
     const fullContent = `---\n${(0, frontmatter_js_1.reconstructFrontmatter)(frontmatter)}\n---\n\n${body}\n`;
     const outPath = node_path_1.default.join(cwd, phaseInfo.directory, fileName);
     if (node_fs_1.default.existsSync(outPath)) {
-        (0, core_js_1.output)({ error: 'File already exists', path: node_path_1.default.relative(cwd, outPath) }, raw);
-        return;
+        return (0, types_js_1.cmdOk)({ error: 'File already exists', path: node_path_1.default.relative(cwd, outPath) });
     }
     node_fs_1.default.writeFileSync(outPath, fullContent, 'utf-8');
     const relPath = node_path_1.default.relative(cwd, outPath);
     const result = { created: true, path: relPath, template: templateType };
-    (0, core_js_1.output)(result, raw, relPath);
+    return (0, types_js_1.cmdOk)(result, relPath);
 }
 //# sourceMappingURL=template.js.map

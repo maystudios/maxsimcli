@@ -37,7 +37,7 @@ export declare function scaffoldPhaseStubs(dirPath: string, phaseId: string, nam
 export declare function phaseAddCore(cwd: string, description: string, options?: PhaseCreateOptions): PhaseAddResult;
 export declare function phaseInsertCore(cwd: string, afterPhase: string, description: string, options?: PhaseCreateOptions): PhaseInsertResult;
 export declare function phaseCompleteCore(cwd: string, phaseNum: string): PhaseCompleteResult;
-export declare function cmdPhasesList(cwd: string, options: PhasesListOptions, raw: boolean): void;
+export declare function cmdPhasesList(cwd: string, options: PhasesListOptions, raw: boolean): Promise<void>;
 export declare function cmdPhaseNextDecimal(cwd: string, basePhase: string, raw: boolean): void;
 export declare function cmdFindPhase(cwd: string, phase: string | undefined, raw: boolean): void;
 export declare function cmdPhasePlanIndex(cwd: string, phase: string | undefined, raw: boolean): void;

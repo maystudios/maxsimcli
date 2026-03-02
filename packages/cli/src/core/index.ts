@@ -64,6 +64,7 @@ export type {
   PhaseCompleteResult,
   PhasePlanIndexResult,
   PhasesListOptions,
+  CmdResult,
   RuntimeName,
   AdapterConfig,
 } from './types.js';

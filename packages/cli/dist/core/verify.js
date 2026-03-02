@@ -21,10 +21,11 @@ const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
 const core_js_1 = require("./core.js");
 const frontmatter_js_1 = require("./frontmatter.js");
+const types_js_1 = require("./types.js");
 // ─── Verify Summary ──────────────────────────────────────────────────────────
-async function cmdVerifySummary(cwd, summaryPath, checkFileCount, raw) {
+async function cmdVerifySummary(cwd, summaryPath, checkFileCount) {
     if (!summaryPath) {
-        (0, core_js_1.error)('summary-path required');
+        return (0, types_js_1.cmdErr)('summary-path required');
     }
     const fullPath = node_path_1.default.join(cwd, summaryPath);
     const checkCount = checkFileCount || 2;
@@ -39,8 +40,7 @@ async function cmdVerifySummary(cwd, summaryPath, checkFileCount, raw) {
             },
             errors: ['SUMMARY.md not found'],
         };
-        (0, core_js_1.output)(result, raw, 'failed');
-        return;
+        return (0, types_js_1.cmdOk)(result, 'failed');
     }
     const content = node_fs_1.default.readFileSync(fullPath, 'utf-8');
     const errors = [];
@@ -107,18 +107,17 @@ async function cmdVerifySummary(cwd, summaryPath, checkFileCount, raw) {
     };
     const passed = missing.length === 0 && selfCheck !== 'failed';
     const result = { passed, checks, errors };
-    (0, core_js_1.output)(result, raw, passed ? 'passed' : 'failed');
+    return (0, types_js_1.cmdOk)(result, passed ? 'passed' : 'failed');
 }
 // ─── Verify Plan Structure ───────────────────────────────────────────────────
-function cmdVerifyPlanStructure(cwd, filePath, raw) {
+function cmdVerifyPlanStructure(cwd, filePath) {
     if (!filePath) {
-        (0, core_js_1.error)('file path required');
+        return (0, types_js_1.cmdErr)('file path required');
     }
     const fullPath = node_path_1.default.isAbsolute(filePath) ? filePath : node_path_1.default.join(cwd, filePath);
     const content = (0, core_js_1.safeReadFile)(fullPath);
     if (!content) {
-        (0, core_js_1.output)({ error: 'File not found', path: filePath }, raw);
-        return;
+        return (0, types_js_1.cmdOk)({ error: 'File not found', path: filePath });
     }
     const fm = (0, frontmatter_js_1.extractFrontmatter)(content);
     const errors = [];
@@ -168,17 +167,16 @@ function cmdVerifyPlanStructure(cwd, filePath, raw) {
         tasks,
         frontmatter_fields: Object.keys(fm),
     };
-    (0, core_js_1.output)(result, raw, errors.length === 0 ? 'valid' : 'invalid');
+    return (0, types_js_1.cmdOk)(result, errors.length === 0 ? 'valid' : 'invalid');
 }
 // ─── Verify Phase Completeness ───────────────────────────────────────────────
-function cmdVerifyPhaseCompleteness(cwd, phase, raw) {
+function cmdVerifyPhaseCompleteness(cwd, phase) {
     if (!phase) {
-        (0, core_js_1.error)('phase required');
+        return (0, types_js_1.cmdErr)('phase required');
     }
     const phaseInfo = (0, core_js_1.findPhaseInternal)(cwd, phase);
     if (!phaseInfo) {
-        (0, core_js_1.output)({ error: 'Phase not found', phase }, raw);
-        return;
+        return (0, types_js_1.cmdOk)({ error: 'Phase not found', phase });
     }
     const errors = [];
     const warnings = [];
@@ -188,8 +186,7 @@ function cmdVerifyPhaseCompleteness(cwd, phase, raw) {
         files = node_fs_1.default.readdirSync(phaseDir);
     }
     catch {
-        (0, core_js_1.output)({ error: 'Cannot read phase directory' }, raw);
-        return;
+        return (0, types_js_1.cmdOk)({ error: 'Cannot read phase directory' });
     }
     const plans = files.filter(f => (0, core_js_1.isPlanFile)(f));
     const summaries = files.filter(f => (0, core_js_1.isSummaryFile)(f));
@@ -213,18 +210,17 @@ function cmdVerifyPhaseCompleteness(cwd, phase, raw) {
         errors,
         warnings,
     };
-    (0, core_js_1.output)(result, raw, errors.length === 0 ? 'complete' : 'incomplete');
+    return (0, types_js_1.cmdOk)(result, errors.length === 0 ? 'complete' : 'incomplete');
 }
 // ─── Verify References ───────────────────────────────────────────────────────
-function cmdVerifyReferences(cwd, filePath, raw) {
+function cmdVerifyReferences(cwd, filePath) {
     if (!filePath) {
-        (0, core_js_1.error)('file path required');
+        return (0, types_js_1.cmdErr)('file path required');
     }
     const fullPath = node_path_1.default.isAbsolute(filePath) ? filePath : node_path_1.default.join(cwd, filePath);
     const content = (0, core_js_1.safeReadFile)(fullPath);
     if (!content) {
-        (0, core_js_1.output)({ error: 'File not found', path: filePath }, raw);
-        return;
+        return (0, types_js_1.cmdOk)({ error: 'File not found', path: filePath });
     }
     const found = [];
     const missing = [];
@@ -262,12 +258,12 @@ function cmdVerifyReferences(cwd, filePath, raw) {
         missing,
         total: found.length + missing.length,
     };
-    (0, core_js_1.output)(result, raw, missing.length === 0 ? 'valid' : 'invalid');
+    return (0, types_js_1.cmdOk)(result, missing.length === 0 ? 'valid' : 'invalid');
 }
 // ─── Verify Commits ──────────────────────────────────────────────────────────
-async function cmdVerifyCommits(cwd, hashes, raw) {
+async function cmdVerifyCommits(cwd, hashes) {
     if (!hashes || hashes.length === 0) {
-        (0, core_js_1.error)('At least one commit hash required');
+        return (0, types_js_1.cmdErr)('At least one commit hash required');
     }
     const valid = [];
     const invalid = [];
@@ -286,22 +282,20 @@ async function cmdVerifyCommits(cwd, hashes, raw) {
         invalid,
         total: hashes.length,
     };
-    (0, core_js_1.output)(commitResult, raw, invalid.length === 0 ? 'valid' : 'invalid');
+    return (0, types_js_1.cmdOk)(commitResult, invalid.length === 0 ? 'valid' : 'invalid');
 }
-function cmdVerifyArtifacts(cwd, planFilePath, raw) {
+function cmdVerifyArtifacts(cwd, planFilePath) {
     if (!planFilePath) {
-        (0, core_js_1.error)('plan file path required');
+        return (0, types_js_1.cmdErr)('plan file path required');
     }
     const fullPath = node_path_1.default.isAbsolute(planFilePath) ? planFilePath : node_path_1.default.join(cwd, planFilePath);
     const content = (0, core_js_1.safeReadFile)(fullPath);
     if (!content) {
-        (0, core_js_1.output)({ error: 'File not found', path: planFilePath }, raw);
-        return;
+        return (0, types_js_1.cmdOk)({ error: 'File not found', path: planFilePath });
     }
     const artifacts = (0, frontmatter_js_1.parseMustHavesBlock)(content, 'artifacts');
     if (artifacts.length === 0) {
-        (0, core_js_1.output)({ error: 'No must_haves.artifacts found in frontmatter', path: planFilePath }, raw);
-        return;
+        return (0, types_js_1.cmdOk)({ error: 'No must_haves.artifacts found in frontmatter', path: planFilePath });
     }
     const results = [];
     for (const artifact of artifacts) {
@@ -344,22 +338,20 @@ function cmdVerifyArtifacts(cwd, planFilePath, raw) {
         total: results.length,
         artifacts: results,
     };
-    (0, core_js_1.output)(artifactsResult, raw, passed === results.length ? 'valid' : 'invalid');
+    return (0, types_js_1.cmdOk)(artifactsResult, passed === results.length ? 'valid' : 'invalid');
 }
-function cmdVerifyKeyLinks(cwd, planFilePath, raw) {
+function cmdVerifyKeyLinks(cwd, planFilePath) {
     if (!planFilePath) {
-        (0, core_js_1.error)('plan file path required');
+        return (0, types_js_1.cmdErr)('plan file path required');
     }
     const fullPath = node_path_1.default.isAbsolute(planFilePath) ? planFilePath : node_path_1.default.join(cwd, planFilePath);
     const content = (0, core_js_1.safeReadFile)(fullPath);
     if (!content) {
-        (0, core_js_1.output)({ error: 'File not found', path: planFilePath }, raw);
-        return;
+        return (0, types_js_1.cmdOk)({ error: 'File not found', path: planFilePath });
     }
     const keyLinks = (0, frontmatter_js_1.parseMustHavesBlock)(content, 'key_links');
     if (keyLinks.length === 0) {
-        (0, core_js_1.output)({ error: 'No must_haves.key_links found in frontmatter', path: planFilePath }, raw);
-        return;
+        return (0, types_js_1.cmdOk)({ error: 'No must_haves.key_links found in frontmatter', path: planFilePath });
     }
     const results = [];
     for (const link of keyLinks) {
@@ -417,18 +409,17 @@ function cmdVerifyKeyLinks(cwd, planFilePath, raw) {
         total: results.length,
         links: results,
     };
-    (0, core_js_1.output)(linksResult, raw, verified === results.length ? 'valid' : 'invalid');
+    return (0, types_js_1.cmdOk)(linksResult, verified === results.length ? 'valid' : 'invalid');
 }
 // ─── Validate Consistency ────────────────────────────────────────────────────
-function cmdValidateConsistency(cwd, raw) {
+function cmdValidateConsistency(cwd) {
     const rmPath = (0, core_js_1.roadmapPath)(cwd);
     const phasesDir = (0, core_js_1.phasesPath)(cwd);
     const errors = [];
     const warnings = [];
     if (!node_fs_1.default.existsSync(rmPath)) {
         errors.push('ROADMAP.md not found');
-        (0, core_js_1.output)({ passed: false, errors, warnings }, raw, 'failed');
-        return;
+        return (0, types_js_1.cmdOk)({ passed: false, errors, warnings }, 'failed');
     }
     const roadmapContent = node_fs_1.default.readFileSync(rmPath, 'utf-8');
     const roadmapPhases = new Set();
@@ -518,10 +509,10 @@ function cmdValidateConsistency(cwd, raw) {
     }
     const passed = errors.length === 0;
     const result = { passed, errors, warnings, warning_count: warnings.length };
-    (0, core_js_1.output)(result, raw, passed ? 'passed' : 'failed');
+    return (0, types_js_1.cmdOk)(result, passed ? 'passed' : 'failed');
 }
 // ─── Validate Health ─────────────────────────────────────────────────────────
-function cmdValidateHealth(cwd, options, raw) {
+function cmdValidateHealth(cwd, options) {
     const planningDir = (0, core_js_1.planningPath)(cwd);
     const projectPath = (0, core_js_1.planningPath)(cwd, 'PROJECT.md');
     const rmPath = (0, core_js_1.roadmapPath)(cwd);
@@ -544,14 +535,13 @@ function cmdValidateHealth(cwd, options, raw) {
     // Check 1: .planning/ exists
     if (!node_fs_1.default.existsSync(planningDir)) {
         addIssue('error', 'E001', '.planning/ directory not found', 'Run /maxsim:new-project to initialize');
-        (0, core_js_1.output)({
+        return (0, types_js_1.cmdOk)({
             status: 'broken',
             errors,
             warnings,
             info,
             repairable_count: 0,
-        }, raw);
-        return;
+        });
     }
     // Check 2: PROJECT.md
     if (!node_fs_1.default.existsSync(projectPath)) {
@@ -759,6 +749,6 @@ function cmdValidateHealth(cwd, options, raw) {
         repairable_count: repairableCount,
         repairs_performed: repairActions.length > 0 ? repairActions : undefined,
     };
-    (0, core_js_1.output)(result, raw);
+    return (0, types_js_1.cmdOk)(result);
 }
 //# sourceMappingURL=verify.js.map

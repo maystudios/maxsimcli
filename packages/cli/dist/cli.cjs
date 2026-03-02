@@ -59,6 +59,19 @@ const PLANNING_CONFIG_DEFAULTS = {
 	parallelization: true,
 	brave_search: false
 };
+function cmdOk(result, rawValue) {
+	return {
+		ok: true,
+		result,
+		rawValue
+	};
+}
+function cmdErr(error) {
+	return {
+		ok: false,
+		error
+	};
+}
 
 //#endregion
 //#region ../../../../../node_modules/ms/index.js
@@ -11869,39 +11882,30 @@ const FRONTMATTER_SCHEMAS = {
 		"score"
 	] }
 };
-function cmdFrontmatterGet(cwd, filePath, field, raw) {
-	if (!filePath) error("file path required");
+function cmdFrontmatterGet(cwd, filePath, field) {
+	if (!filePath) return cmdErr("file path required");
 	const content = safeReadFile(node_path.default.isAbsolute(filePath) ? filePath : node_path.default.join(cwd, filePath));
-	if (!content) {
-		output({
-			error: "File not found",
-			path: filePath
-		}, raw);
-		return;
-	}
+	if (!content) return cmdOk({
+		error: "File not found",
+		path: filePath
+	});
 	const fm = extractFrontmatter(content);
 	if (field) {
 		const value = fm[field];
-		if (value === void 0) {
-			output({
-				error: "Field not found",
-				field
-			}, raw);
-			return;
-		}
-		output({ [field]: value }, raw, JSON.stringify(value));
-	} else output(fm, raw);
+		if (value === void 0) return cmdOk({
+			error: "Field not found",
+			field
+		});
+		return cmdOk({ [field]: value }, JSON.stringify(value));
+	} else return cmdOk(fm);
 }
-function cmdFrontmatterSet(cwd, filePath, field, value, raw) {
-	if (!filePath || !field || value === void 0) error("file, field, and value required");
+function cmdFrontmatterSet(cwd, filePath, field, value) {
+	if (!filePath || !field || value === void 0) return cmdErr("file, field, and value required");
 	const fullPath = node_path.default.isAbsolute(filePath) ? filePath : node_path.default.join(cwd, filePath);
-	if (!node_fs.default.existsSync(fullPath)) {
-		output({
-			error: "File not found",
-			path: filePath
-		}, raw);
-		return;
-	}
+	if (!node_fs.default.existsSync(fullPath)) return cmdOk({
+		error: "File not found",
+		path: filePath
+	});
 	const content = node_fs.default.readFileSync(fullPath, "utf-8");
 	const fm = extractFrontmatter(content);
 	let parsedValue;
@@ -11913,60 +11917,53 @@ function cmdFrontmatterSet(cwd, filePath, field, value, raw) {
 	fm[field] = parsedValue;
 	const newContent = spliceFrontmatter(content, fm);
 	node_fs.default.writeFileSync(fullPath, newContent, "utf-8");
-	output({
+	return cmdOk({
 		updated: true,
 		field,
 		value: parsedValue
-	}, raw, "true");
+	}, "true");
 }
-function cmdFrontmatterMerge(cwd, filePath, data, raw) {
-	if (!filePath || !data) error("file and data required");
+function cmdFrontmatterMerge(cwd, filePath, data) {
+	if (!filePath || !data) return cmdErr("file and data required");
 	const fullPath = node_path.default.isAbsolute(filePath) ? filePath : node_path.default.join(cwd, filePath);
-	if (!node_fs.default.existsSync(fullPath)) {
-		output({
-			error: "File not found",
-			path: filePath
-		}, raw);
-		return;
-	}
+	if (!node_fs.default.existsSync(fullPath)) return cmdOk({
+		error: "File not found",
+		path: filePath
+	});
 	const content = node_fs.default.readFileSync(fullPath, "utf-8");
 	const fm = extractFrontmatter(content);
 	let mergeData;
 	try {
 		mergeData = JSON.parse(data);
 	} catch {
-		error("Invalid JSON for --data");
-		return;
+		return cmdErr("Invalid JSON for --data");
 	}
 	Object.assign(fm, mergeData);
 	const newContent = spliceFrontmatter(content, fm);
 	node_fs.default.writeFileSync(fullPath, newContent, "utf-8");
-	output({
+	return cmdOk({
 		merged: true,
 		fields: Object.keys(mergeData)
-	}, raw, "true");
+	}, "true");
 }
-function cmdFrontmatterValidate(cwd, filePath, schemaName, raw) {
-	if (!filePath || !schemaName) error("file and schema required");
+function cmdFrontmatterValidate(cwd, filePath, schemaName) {
+	if (!filePath || !schemaName) return cmdErr("file and schema required");
 	const schema = FRONTMATTER_SCHEMAS[schemaName];
-	if (!schema) error(`Unknown schema: ${schemaName}. Available: ${Object.keys(FRONTMATTER_SCHEMAS).join(", ")}`);
+	if (!schema) return cmdErr(`Unknown schema: ${schemaName}. Available: ${Object.keys(FRONTMATTER_SCHEMAS).join(", ")}`);
 	const content = safeReadFile(node_path.default.isAbsolute(filePath) ? filePath : node_path.default.join(cwd, filePath));
-	if (!content) {
-		output({
-			error: "File not found",
-			path: filePath
-		}, raw);
-		return;
-	}
+	if (!content) return cmdOk({
+		error: "File not found",
+		path: filePath
+	});
 	const fm = extractFrontmatter(content);
 	const missing = schema.required.filter((f) => fm[f] === void 0);
 	const present = schema.required.filter((f) => fm[f] !== void 0);
-	output({
+	return cmdOk({
 		valid: missing.length === 0,
 		missing,
 		present,
 		schema: schemaName
-	}, raw, missing.length === 0 ? "valid" : "invalid");
+	}, missing.length === 0 ? "valid" : "invalid");
 }
 
 //#endregion
@@ -12793,19 +12790,16 @@ function cmdRoadmapUpdatePlanProgress(cwd, phaseNum, raw) {
 *
 * Ported from maxsim/bin/lib/milestone.cjs
 */
-function cmdRequirementsMarkComplete(cwd, reqIdsRaw, raw) {
-	if (!reqIdsRaw || reqIdsRaw.length === 0) error("requirement IDs required. Usage: requirements mark-complete REQ-01,REQ-02 or REQ-01 REQ-02");
+function cmdRequirementsMarkComplete(cwd, reqIdsRaw) {
+	if (!reqIdsRaw || reqIdsRaw.length === 0) return cmdErr("requirement IDs required. Usage: requirements mark-complete REQ-01,REQ-02 or REQ-01 REQ-02");
 	const reqIds = reqIdsRaw.join(" ").replace(/[\[\]]/g, "").split(/[,\s]+/).map((r) => r.trim()).filter(Boolean);
-	if (reqIds.length === 0) error("no valid requirement IDs found");
+	if (reqIds.length === 0) return cmdErr("no valid requirement IDs found");
 	const reqPath = planningPath(cwd, "REQUIREMENTS.md");
-	if (!node_fs.default.existsSync(reqPath)) {
-		output({
-			updated: false,
-			reason: "REQUIREMENTS.md not found",
-			ids: reqIds
-		}, raw, "no requirements file");
-		return;
-	}
+	if (!node_fs.default.existsSync(reqPath)) return cmdOk({
+		updated: false,
+		reason: "REQUIREMENTS.md not found",
+		ids: reqIds
+	}, "no requirements file");
 	let reqContent = node_fs.default.readFileSync(reqPath, "utf-8");
 	const updated = [];
 	const notFound = [];
@@ -12824,15 +12818,15 @@ function cmdRequirementsMarkComplete(cwd, reqIdsRaw, raw) {
 		else notFound.push(reqId);
 	}
 	if (updated.length > 0) node_fs.default.writeFileSync(reqPath, reqContent, "utf-8");
-	output({
+	return cmdOk({
 		updated: updated.length > 0,
 		marked_complete: updated,
 		not_found: notFound,
 		total: reqIds.length
-	}, raw, `${updated.length}/${reqIds.length} requirements marked complete`);
+	}, `${updated.length}/${reqIds.length} requirements marked complete`);
 }
-function cmdMilestoneComplete(cwd, version, options, raw) {
-	if (!version) error("version required for milestone complete (e.g., v1.0)");
+function cmdMilestoneComplete(cwd, version, options) {
+	if (!version) return cmdErr("version required for milestone complete (e.g., v1.0)");
 	const roadmapPath$1 = roadmapPath(cwd);
 	const reqPath = planningPath(cwd, "REQUIREMENTS.md");
 	const statePath$1 = statePath(cwd);
@@ -12901,7 +12895,7 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
 	} catch (e) {
 		debugLog(e);
 	}
-	output({
+	return cmdOk({
 		version,
 		name: milestoneName,
 		date: today,
@@ -12917,7 +12911,7 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
 		},
 		milestones_updated: true,
 		state_updated: node_fs.default.existsSync(statePath$1)
-	}, raw);
+	});
 }
 
 //#endregion
@@ -13840,27 +13834,24 @@ function cmdScaffold(cwd, type, options, raw) {
 *
 * Ported from maxsim/bin/lib/verify.cjs
 */
-async function cmdVerifySummary(cwd, summaryPath, checkFileCount, raw) {
-	if (!summaryPath) error("summary-path required");
+async function cmdVerifySummary(cwd, summaryPath, checkFileCount) {
+	if (!summaryPath) return cmdErr("summary-path required");
 	const fullPath = node_path.default.join(cwd, summaryPath);
 	const checkCount = checkFileCount || 2;
-	if (!node_fs.default.existsSync(fullPath)) {
-		output({
-			passed: false,
-			checks: {
-				summary_exists: false,
-				files_created: {
-					checked: 0,
-					found: 0,
-					missing: []
-				},
-				commits_exist: false,
-				self_check: "not_found"
+	if (!node_fs.default.existsSync(fullPath)) return cmdOk({
+		passed: false,
+		checks: {
+			summary_exists: false,
+			files_created: {
+				checked: 0,
+				found: 0,
+				missing: []
 			},
-			errors: ["SUMMARY.md not found"]
-		}, raw, "failed");
-		return;
-	}
+			commits_exist: false,
+			self_check: "not_found"
+		},
+		errors: ["SUMMARY.md not found"]
+	}, "failed");
 	const content = node_fs.default.readFileSync(fullPath, "utf-8");
 	const errors = [];
 	const mentionedFiles = /* @__PURE__ */ new Set();
@@ -13910,22 +13901,19 @@ async function cmdVerifySummary(cwd, summaryPath, checkFileCount, raw) {
 		self_check: selfCheck
 	};
 	const passed = missing.length === 0 && selfCheck !== "failed";
-	output({
+	return cmdOk({
 		passed,
 		checks,
 		errors
-	}, raw, passed ? "passed" : "failed");
+	}, passed ? "passed" : "failed");
 }
-function cmdVerifyPlanStructure(cwd, filePath, raw) {
-	if (!filePath) error("file path required");
+function cmdVerifyPlanStructure(cwd, filePath) {
+	if (!filePath) return cmdErr("file path required");
 	const content = safeReadFile(node_path.default.isAbsolute(filePath) ? filePath : node_path.default.join(cwd, filePath));
-	if (!content) {
-		output({
-			error: "File not found",
-			path: filePath
-		}, raw);
-		return;
-	}
+	if (!content) return cmdOk({
+		error: "File not found",
+		path: filePath
+	});
 	const fm = extractFrontmatter(content);
 	const errors = [];
 	const warnings = [];
@@ -13966,25 +13954,22 @@ function cmdVerifyPlanStructure(cwd, filePath, raw) {
 	if (tasks.length === 0) warnings.push("No <task> elements found");
 	if (fm.wave && parseInt(String(fm.wave)) > 1 && (!fm.depends_on || Array.isArray(fm.depends_on) && fm.depends_on.length === 0)) warnings.push("Wave > 1 but depends_on is empty");
 	if (/<task\s+type=["']?checkpoint/.test(content) && fm.autonomous !== "false" && fm.autonomous !== false) errors.push("Has checkpoint tasks but autonomous is not false");
-	output({
+	return cmdOk({
 		valid: errors.length === 0,
 		errors,
 		warnings,
 		task_count: tasks.length,
 		tasks,
 		frontmatter_fields: Object.keys(fm)
-	}, raw, errors.length === 0 ? "valid" : "invalid");
+	}, errors.length === 0 ? "valid" : "invalid");
 }
-function cmdVerifyPhaseCompleteness(cwd, phase, raw) {
-	if (!phase) error("phase required");
+function cmdVerifyPhaseCompleteness(cwd, phase) {
+	if (!phase) return cmdErr("phase required");
 	const phaseInfo = findPhaseInternal(cwd, phase);
-	if (!phaseInfo) {
-		output({
-			error: "Phase not found",
-			phase
-		}, raw);
-		return;
-	}
+	if (!phaseInfo) return cmdOk({
+		error: "Phase not found",
+		phase
+	});
 	const errors = [];
 	const warnings = [];
 	const phaseDir = node_path.default.join(cwd, phaseInfo.directory);
@@ -13992,8 +13977,7 @@ function cmdVerifyPhaseCompleteness(cwd, phase, raw) {
 	try {
 		files = node_fs.default.readdirSync(phaseDir);
 	} catch {
-		output({ error: "Cannot read phase directory" }, raw);
-		return;
+		return cmdOk({ error: "Cannot read phase directory" });
 	}
 	const plans = files.filter((f) => isPlanFile(f));
 	const summaries = files.filter((f) => isSummaryFile(f));
@@ -14003,7 +13987,7 @@ function cmdVerifyPhaseCompleteness(cwd, phase, raw) {
 	if (incompletePlans.length > 0) errors.push(`Plans without summaries: ${incompletePlans.join(", ")}`);
 	const orphanSummaries = [...summaryIds].filter((id) => !planIds.has(id));
 	if (orphanSummaries.length > 0) warnings.push(`Summaries without plans: ${orphanSummaries.join(", ")}`);
-	output({
+	return cmdOk({
 		complete: errors.length === 0,
 		phase: phaseInfo.phase_number,
 		plan_count: plans.length,
@@ -14012,18 +13996,15 @@ function cmdVerifyPhaseCompleteness(cwd, phase, raw) {
 		orphan_summaries: orphanSummaries,
 		errors,
 		warnings
-	}, raw, errors.length === 0 ? "complete" : "incomplete");
+	}, errors.length === 0 ? "complete" : "incomplete");
 }
-function cmdVerifyReferences(cwd, filePath, raw) {
-	if (!filePath) error("file path required");
+function cmdVerifyReferences(cwd, filePath) {
+	if (!filePath) return cmdErr("file path required");
 	const content = safeReadFile(node_path.default.isAbsolute(filePath) ? filePath : node_path.default.join(cwd, filePath));
-	if (!content) {
-		output({
-			error: "File not found",
-			path: filePath
-		}, raw);
-		return;
-	}
+	if (!content) return cmdOk({
+		error: "File not found",
+		path: filePath
+	});
 	const found = [];
 	const missing = [];
 	const atRefs = content.match(/@([^\s\n,)]+\/[^\s\n,)]+)/g) || [];
@@ -14042,15 +14023,15 @@ function cmdVerifyReferences(cwd, filePath, raw) {
 		if (node_fs.default.existsSync(resolved)) found.push(cleanRef);
 		else missing.push(cleanRef);
 	}
-	output({
+	return cmdOk({
 		valid: missing.length === 0,
 		found: found.length,
 		missing,
 		total: found.length + missing.length
-	}, raw, missing.length === 0 ? "valid" : "invalid");
+	}, missing.length === 0 ? "valid" : "invalid");
 }
-async function cmdVerifyCommits(cwd, hashes, raw) {
-	if (!hashes || hashes.length === 0) error("At least one commit hash required");
+async function cmdVerifyCommits(cwd, hashes) {
+	if (!hashes || hashes.length === 0) return cmdErr("At least one commit hash required");
 	const valid = [];
 	const invalid = [];
 	for (const hash of hashes) {
@@ -14062,31 +14043,25 @@ async function cmdVerifyCommits(cwd, hashes, raw) {
 		if (result.exitCode === 0 && result.stdout.trim() === "commit") valid.push(hash);
 		else invalid.push(hash);
 	}
-	output({
+	return cmdOk({
 		all_valid: invalid.length === 0,
 		valid,
 		invalid,
 		total: hashes.length
-	}, raw, invalid.length === 0 ? "valid" : "invalid");
+	}, invalid.length === 0 ? "valid" : "invalid");
 }
-function cmdVerifyArtifacts(cwd, planFilePath, raw) {
-	if (!planFilePath) error("plan file path required");
+function cmdVerifyArtifacts(cwd, planFilePath) {
+	if (!planFilePath) return cmdErr("plan file path required");
 	const content = safeReadFile(node_path.default.isAbsolute(planFilePath) ? planFilePath : node_path.default.join(cwd, planFilePath));
-	if (!content) {
-		output({
-			error: "File not found",
-			path: planFilePath
-		}, raw);
-		return;
-	}
+	if (!content) return cmdOk({
+		error: "File not found",
+		path: planFilePath
+	});
 	const artifacts = parseMustHavesBlock(content, "artifacts");
-	if (artifacts.length === 0) {
-		output({
-			error: "No must_haves.artifacts found in frontmatter",
-			path: planFilePath
-		}, raw);
-		return;
-	}
+	if (artifacts.length === 0) return cmdOk({
+		error: "No must_haves.artifacts found in frontmatter",
+		path: planFilePath
+	});
 	const results = [];
 	for (const artifact of artifacts) {
 		if (typeof artifact === "string") continue;
@@ -14115,31 +14090,25 @@ function cmdVerifyArtifacts(cwd, planFilePath, raw) {
 		results.push(check);
 	}
 	const passed = results.filter((r) => r.passed).length;
-	output({
+	return cmdOk({
 		all_passed: passed === results.length,
 		passed,
 		total: results.length,
 		artifacts: results
-	}, raw, passed === results.length ? "valid" : "invalid");
+	}, passed === results.length ? "valid" : "invalid");
 }
-function cmdVerifyKeyLinks(cwd, planFilePath, raw) {
-	if (!planFilePath) error("plan file path required");
+function cmdVerifyKeyLinks(cwd, planFilePath) {
+	if (!planFilePath) return cmdErr("plan file path required");
 	const content = safeReadFile(node_path.default.isAbsolute(planFilePath) ? planFilePath : node_path.default.join(cwd, planFilePath));
-	if (!content) {
-		output({
-			error: "File not found",
-			path: planFilePath
-		}, raw);
-		return;
-	}
+	if (!content) return cmdOk({
+		error: "File not found",
+		path: planFilePath
+	});
 	const keyLinks = parseMustHavesBlock(content, "key_links");
-	if (keyLinks.length === 0) {
-		output({
-			error: "No must_haves.key_links found in frontmatter",
-			path: planFilePath
-		}, raw);
-		return;
-	}
+	if (keyLinks.length === 0) return cmdOk({
+		error: "No must_haves.key_links found in frontmatter",
+		path: planFilePath
+	});
 	const results = [];
 	for (const link of keyLinks) {
 		if (typeof link === "string") continue;
@@ -14175,26 +14144,25 @@ function cmdVerifyKeyLinks(cwd, planFilePath, raw) {
 		results.push(check);
 	}
 	const verified = results.filter((r) => r.verified).length;
-	output({
+	return cmdOk({
 		all_verified: verified === results.length,
 		verified,
 		total: results.length,
 		links: results
-	}, raw, verified === results.length ? "valid" : "invalid");
+	}, verified === results.length ? "valid" : "invalid");
 }
-function cmdValidateConsistency(cwd, raw) {
+function cmdValidateConsistency(cwd) {
 	const rmPath = roadmapPath(cwd);
 	const phasesDir = phasesPath(cwd);
 	const errors = [];
 	const warnings = [];
 	if (!node_fs.default.existsSync(rmPath)) {
 		errors.push("ROADMAP.md not found");
-		output({
+		return cmdOk({
 			passed: false,
 			errors,
 			warnings
-		}, raw, "failed");
-		return;
+		}, "failed");
 	}
 	const roadmapContent = node_fs.default.readFileSync(rmPath, "utf-8");
 	const roadmapPhases = /* @__PURE__ */ new Set();
@@ -14246,14 +14214,14 @@ function cmdValidateConsistency(cwd, raw) {
 		debugLog(e);
 	}
 	const passed = errors.length === 0;
-	output({
+	return cmdOk({
 		passed,
 		errors,
 		warnings,
 		warning_count: warnings.length
-	}, raw, passed ? "passed" : "failed");
+	}, passed ? "passed" : "failed");
 }
-function cmdValidateHealth(cwd, options, raw) {
+function cmdValidateHealth(cwd, options) {
 	const planningDir = planningPath(cwd);
 	const projectPath = planningPath(cwd, "PROJECT.md");
 	const rmPath = roadmapPath(cwd);
@@ -14277,14 +14245,13 @@ function cmdValidateHealth(cwd, options, raw) {
 	};
 	if (!node_fs.default.existsSync(planningDir)) {
 		addIssue("error", "E001", ".planning/ directory not found", "Run /maxsim:new-project to initialize");
-		output({
+		return cmdOk({
 			status: "broken",
 			errors,
 			warnings,
 			info,
 			repairable_count: 0
-		}, raw);
-		return;
+		});
 	}
 	if (!node_fs.default.existsSync(projectPath)) addIssue("error", "E002", "PROJECT.md not found", "Run /maxsim:new-project to create");
 	else {
@@ -14444,14 +14411,14 @@ function cmdValidateHealth(cwd, options, raw) {
 	else if (warnings.length > 0) status = "degraded";
 	else status = "healthy";
 	const repairableCount = errors.filter((e) => e.repairable).length + warnings.filter((w) => w.repairable).length;
-	output({
+	return cmdOk({
 		status,
 		errors,
 		warnings,
 		info,
 		repairable_count: repairableCount,
 		repairs_performed: repairActions.length > 0 ? repairActions : void 0
-	}, raw);
+	});
 }
 
 //#endregion
@@ -15072,8 +15039,8 @@ function cmdPhaseComplete(cwd, phaseNum, raw) {
 *
 * Ported from maxsim/bin/lib/template.cjs
 */
-function cmdTemplateSelect(cwd, planPath, raw) {
-	if (!planPath) error("plan-path required");
+function cmdTemplateSelect(cwd, planPath) {
+	if (!planPath) return cmdErr("plan-path required");
 	try {
 		const fullPath = node_path.default.join(cwd, planPath);
 		const content = node_fs.default.readFileSync(fullPath, "utf-8");
@@ -15093,32 +15060,29 @@ function cmdTemplateSelect(cwd, planPath, raw) {
 			template = "templates/summary-complex.md";
 			type = "complex";
 		}
-		output({
+		return cmdOk({
 			template,
 			type,
 			taskCount,
 			fileCount,
 			hasDecisions
-		}, raw, template);
+		}, template);
 	} catch (thrown) {
-		output({
+		return cmdOk({
 			template: "templates/summary-standard.md",
 			type: "standard",
 			error: thrown.message
-		}, raw, "templates/summary-standard.md");
+		}, "templates/summary-standard.md");
 	}
 }
-function cmdTemplateFill(cwd, templateType, options, raw) {
-	if (!templateType) error("template type required: summary, plan, or verification");
-	if (!options.phase) error("--phase required");
+function cmdTemplateFill(cwd, templateType, options) {
+	if (!templateType) return cmdErr("template type required: summary, plan, or verification");
+	if (!options.phase) return cmdErr("--phase required");
 	const phaseInfo = findPhaseInternal(cwd, options.phase);
-	if (!phaseInfo) {
-		output({
-			error: "Phase not found",
-			phase: options.phase
-		}, raw);
-		return;
-	}
+	if (!phaseInfo) return cmdOk({
+		error: "Phase not found",
+		phase: options.phase
+	});
 	const padded = normalizePhaseName(options.phase);
 	const today = todayISO();
 	const phaseName = options.name || phaseInfo.phase_name || "Unnamed";
@@ -15264,26 +15228,21 @@ function cmdTemplateFill(cwd, templateType, options, raw) {
 			].join("\n");
 			fileName = `${padded}-VERIFICATION.md`;
 			break;
-		default:
-			error(`Unknown template type: ${templateType}. Available: summary, plan, verification`);
-			return;
+		default: return cmdErr(`Unknown template type: ${templateType}. Available: summary, plan, verification`);
 	}
 	const fullContent = `---\n${reconstructFrontmatter(frontmatter)}\n---\n\n${body}\n`;
 	const outPath = node_path.default.join(cwd, phaseInfo.directory, fileName);
-	if (node_fs.default.existsSync(outPath)) {
-		output({
-			error: "File already exists",
-			path: node_path.default.relative(cwd, outPath)
-		}, raw);
-		return;
-	}
+	if (node_fs.default.existsSync(outPath)) return cmdOk({
+		error: "File already exists",
+		path: node_path.default.relative(cwd, outPath)
+	});
 	node_fs.default.writeFileSync(outPath, fullContent, "utf-8");
 	const relPath = node_path.default.relative(cwd, outPath);
-	output({
+	return cmdOk({
 		created: true,
 		path: relPath,
 		template: templateType
-	}, raw, relPath);
+	}, relPath);
 }
 
 //#endregion
@@ -15491,7 +15450,7 @@ function loadHistoryContext(cwd, currentPhase) {
 	}
 	return files;
 }
-function cmdContextLoad(cwd, phase, topic, includeHistory, raw) {
+function cmdContextLoad(cwd, phase, topic, includeHistory) {
 	const allFiles = [];
 	allFiles.push(...loadProjectContext(cwd));
 	allFiles.push(...loadRoadmapContext(cwd));
@@ -15504,12 +15463,12 @@ function cmdContextLoad(cwd, phase, topic, includeHistory, raw) {
 		seen.add(f.path);
 		return true;
 	});
-	output({
+	return cmdOk({
 		files: deduped,
 		total_size: deduped.reduce((sum, f) => sum + f.size, 0),
 		phase: phase ?? null,
 		topic: topic ?? null
-	}, raw);
+	});
 }
 
 //#endregion
@@ -16282,6 +16241,15 @@ function cmdInitProgress(cwd, raw) {
 *
 * Usage: node maxsim-tools.cjs <command> [args] [--raw]
 */
+/** Convert a CmdResult into the output()/error() signal expected by main(). */
+function handleResult(r, raw) {
+	if (r.ok) throw new CliOutput(r.result, raw, r.rawValue);
+	throw new CliError(r.error);
+}
+/** Async variant for promise-returning commands. */
+async function handleResultAsync(p, raw) {
+	return handleResult(await p, raw);
+}
 /** Extract a single named flag's value from args */
 function getFlag(args, flag) {
 	const idx = args.indexOf(flag);
@@ -16357,27 +16325,27 @@ const handleState = async (args, cwd, raw) => {
 };
 const handleTemplate = (args, cwd, raw) => {
 	const sub = args[1];
-	if (sub === "select") cmdTemplateSelect(cwd, args[2], raw);
+	if (sub === "select") handleResult(cmdTemplateSelect(cwd, args[2]), raw);
 	else if (sub === "fill") {
 		const f = getFlags(args, "phase", "plan", "name", "type", "wave", "fields");
-		cmdTemplateFill(cwd, args[2], {
+		handleResult(cmdTemplateFill(cwd, args[2], {
 			phase: f.phase ?? "",
 			plan: f.plan ?? void 0,
 			name: f.name ?? void 0,
 			type: f.type ?? "execute",
 			wave: f.wave ?? "1",
 			fields: f.fields ? JSON.parse(f.fields) : {}
-		}, raw);
+		}), raw);
 	} else error("Unknown template subcommand. Available: select, fill");
 };
 const handleFrontmatter = (args, cwd, raw) => {
 	const sub = args[1];
 	const file = args[2];
 	const handler = sub ? {
-		"get": () => cmdFrontmatterGet(cwd, file, getFlag(args, "--field"), raw),
-		"set": () => cmdFrontmatterSet(cwd, file, getFlag(args, "--field"), getFlag(args, "--value") ?? void 0, raw),
-		"merge": () => cmdFrontmatterMerge(cwd, file, getFlag(args, "--data"), raw),
-		"validate": () => cmdFrontmatterValidate(cwd, file, getFlag(args, "--schema"), raw)
+		"get": () => handleResult(cmdFrontmatterGet(cwd, file, getFlag(args, "--field")), raw),
+		"set": () => handleResult(cmdFrontmatterSet(cwd, file, getFlag(args, "--field"), getFlag(args, "--value") ?? void 0), raw),
+		"merge": () => handleResult(cmdFrontmatterMerge(cwd, file, getFlag(args, "--data")), raw),
+		"validate": () => handleResult(cmdFrontmatterValidate(cwd, file, getFlag(args, "--schema")), raw)
 	}[sub] : void 0;
 	if (handler) return handler();
 	error("Unknown frontmatter subcommand. Available: get, set, merge, validate");
@@ -16385,12 +16353,12 @@ const handleFrontmatter = (args, cwd, raw) => {
 const handleVerify = async (args, cwd, raw) => {
 	const sub = args[1];
 	const handler = sub ? {
-		"plan-structure": () => cmdVerifyPlanStructure(cwd, args[2], raw),
-		"phase-completeness": () => cmdVerifyPhaseCompleteness(cwd, args[2], raw),
-		"references": () => cmdVerifyReferences(cwd, args[2], raw),
-		"commits": () => cmdVerifyCommits(cwd, args.slice(2), raw),
-		"artifacts": () => cmdVerifyArtifacts(cwd, args[2], raw),
-		"key-links": () => cmdVerifyKeyLinks(cwd, args[2], raw)
+		"plan-structure": () => handleResult(cmdVerifyPlanStructure(cwd, args[2]), raw),
+		"phase-completeness": () => handleResult(cmdVerifyPhaseCompleteness(cwd, args[2]), raw),
+		"references": () => handleResult(cmdVerifyReferences(cwd, args[2]), raw),
+		"commits": async () => handleResultAsync(cmdVerifyCommits(cwd, args.slice(2)), raw),
+		"artifacts": () => handleResult(cmdVerifyArtifacts(cwd, args[2]), raw),
+		"key-links": () => handleResult(cmdVerifyKeyLinks(cwd, args[2]), raw)
 	}[sub] : void 0;
 	if (handler) return handler();
 	error("Unknown verify subcommand. Available: plan-structure, phase-completeness, references, commits, artifacts, key-links");
@@ -16441,17 +16409,17 @@ const handleMilestone = (args, cwd, raw) => {
 			}
 			milestoneName = nameArgs.join(" ") || null;
 		}
-		cmdMilestoneComplete(cwd, args[2], {
+		handleResult(cmdMilestoneComplete(cwd, args[2], {
 			name: milestoneName ?? void 0,
 			archivePhases: hasFlag(args, "archive-phases")
-		}, raw);
+		}), raw);
 	} else error("Unknown milestone subcommand. Available: complete");
 };
 const handleValidate = (args, cwd, raw) => {
 	const sub = args[1];
 	const handler = sub ? {
-		"consistency": () => cmdValidateConsistency(cwd, raw),
-		"health": () => cmdValidateHealth(cwd, { repair: hasFlag(args, "repair") }, raw)
+		"consistency": () => handleResult(cmdValidateConsistency(cwd), raw),
+		"health": () => handleResult(cmdValidateHealth(cwd, { repair: hasFlag(args, "repair") }), raw)
 	}[sub] : void 0;
 	if (handler) return handler();
 	error("Unknown validate subcommand. Available: consistency, health");
@@ -16487,7 +16455,7 @@ const COMMANDS = {
 	"verify-summary": async (args, cwd, raw) => {
 		const countIndex = args.indexOf("--check-count");
 		const checkCount = countIndex !== -1 ? parseInt(args[countIndex + 1], 10) : 2;
-		await cmdVerifySummary(cwd, args[1], checkCount, raw);
+		await handleResultAsync(cmdVerifySummary(cwd, args[1], checkCount), raw);
 	},
 	"template": handleTemplate,
 	"frontmatter": handleFrontmatter,
@@ -16503,7 +16471,7 @@ const COMMANDS = {
 	"phases": handlePhases,
 	"roadmap": handleRoadmap,
 	"requirements": (args, cwd, raw) => {
-		if (args[1] === "mark-complete") cmdRequirementsMarkComplete(cwd, args.slice(2), raw);
+		if (args[1] === "mark-complete") handleResult(cmdRequirementsMarkComplete(cwd, args.slice(2)), raw);
 		else error("Unknown requirements subcommand. Available: mark-complete");
 	},
 	"phase": handlePhase,
@@ -16540,7 +16508,7 @@ const COMMANDS = {
 	"artefakte-write": (args, cwd, raw) => cmdArtefakteWrite(cwd, args[1], getFlag(args, "--content") ?? void 0, getFlag(args, "--phase") ?? void 0, raw),
 	"artefakte-append": (args, cwd, raw) => cmdArtefakteAppend(cwd, args[1], getFlag(args, "--entry") ?? void 0, getFlag(args, "--phase") ?? void 0, raw),
 	"artefakte-list": (args, cwd, raw) => cmdArtefakteList(cwd, getFlag(args, "--phase") ?? void 0, raw),
-	"context-load": (args, cwd, raw) => cmdContextLoad(cwd, getFlag(args, "--phase") ?? void 0, getFlag(args, "--topic") ?? void 0, hasFlag(args, "include-history"), raw),
+	"context-load": (args, cwd, raw) => handleResult(cmdContextLoad(cwd, getFlag(args, "--phase") ?? void 0, getFlag(args, "--topic") ?? void 0, hasFlag(args, "include-history")), raw),
 	"start": async (args, cwd, raw) => cmdStart(cwd, {
 		noBrowser: hasFlag(args, "no-browser"),
 		networkMode: hasFlag(args, "network")

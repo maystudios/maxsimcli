@@ -20,6 +20,8 @@ exports.roadmapPath = roadmapPath;
 exports.configPath = configPath;
 exports.phasesPath = phasesPath;
 exports.listSubDirs = listSubDirs;
+exports.listSubDirsAsync = listSubDirsAsync;
+exports.safeReadFileAsync = safeReadFileAsync;
 exports.errorMsg = errorMsg;
 exports.debugLog = debugLog;
 exports.escapePhaseNum = escapePhaseNum;
@@ -38,6 +40,7 @@ exports.pathExistsInternal = pathExistsInternal;
 exports.generateSlugInternal = generateSlugInternal;
 exports.getMilestoneInfo = getMilestoneInfo;
 const node_fs_1 = __importDefault(require("node:fs"));
+const node_fs_2 = require("node:fs");
 const node_path_1 = __importDefault(require("node:path"));
 const node_os_1 = __importDefault(require("node:os"));
 const simple_git_1 = require("simple-git");
@@ -138,6 +141,21 @@ function listSubDirs(dir, sortByPhase = false) {
         .filter(e => e.isDirectory())
         .map(e => e.name);
     return sortByPhase ? dirs.sort((a, b) => comparePhaseNum(a, b)) : dirs;
+}
+/** Async version of listSubDirs using fs.promises. */
+async function listSubDirsAsync(dir, sortByPhase = false) {
+    const entries = await node_fs_2.promises.readdir(dir, { withFileTypes: true });
+    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+    return sortByPhase ? dirs.sort((a, b) => comparePhaseNum(a, b)) : dirs;
+}
+/** Async version of safeReadFile using fs.promises. */
+async function safeReadFileAsync(filePath) {
+    try {
+        return await node_fs_2.promises.readFile(filePath, 'utf-8');
+    }
+    catch {
+        return null;
+    }
 }
 /** Extract a human-readable message from an unknown thrown value. */
 function errorMsg(e) {

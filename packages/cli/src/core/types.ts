@@ -500,6 +500,20 @@ export interface PhasesListOptions {
 
 // ─── Adapter interfaces ─────────────────────────────────────────────────────
 
+// ─── CmdResult type ──────────────────────────────────────────────────────────
+
+export type CmdResult =
+  | { ok: true; result: unknown; rawValue?: unknown }
+  | { ok: false; error: string };
+
+export function cmdOk(result: unknown, rawValue?: unknown): CmdResult {
+  return { ok: true, result, rawValue };
+}
+
+export function cmdErr(error: string): CmdResult {
+  return { ok: false, error };
+}
+
 export type RuntimeName = 'claude';
 
 export interface AdapterConfig {

@@ -9,6 +9,8 @@ exports.phasePath = phasePath;
 exports.phaseSlug = phaseSlug;
 exports.ok = ok;
 exports.err = err;
+exports.cmdOk = cmdOk;
+exports.cmdErr = cmdErr;
 function phaseNumber(value) {
     const match = value.match(/^\d+[A-Z]?(\.\d+)?$/i);
     if (!match) {
@@ -49,4 +51,10 @@ exports.PLANNING_CONFIG_DEFAULTS = {
     parallelization: true,
     brave_search: false,
 };
+function cmdOk(result, rawValue) {
+    return { ok: true, result, rawValue };
+}
+function cmdErr(error) {
+    return { ok: false, error };
+}
 //# sourceMappingURL=types.js.map
