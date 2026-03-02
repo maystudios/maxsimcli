@@ -267,6 +267,7 @@ Capture idea or task as todo from current conversation.
 
 Usage: `/maxsim:add-todo` (infers from conversation)
 Usage: `/maxsim:add-todo Add auth token refresh`
+Usage: `/maxsim:add-todo --discuss Refactor auth module` (collaborative discussion before filing)
 
 **`/maxsim:check-todos [area]`**
 List pending todos and select one to work on.
@@ -279,6 +280,25 @@ List pending todos and select one to work on.
 
 Usage: `/maxsim:check-todos`
 Usage: `/maxsim:check-todos api`
+
+### Artefakte Management
+
+**`/maxsim:artefakte [type] [--phase <N>]`**
+View and manage project decisions, acceptance criteria, and no-gos.
+
+- No arguments: lists all artefakte documents with status
+- With type (`decisions`, `acceptance-criteria`, `no-gos`): view specific document
+- With `--phase N`: scope to phase-level artefakte
+- Interactive: add entries, view documents, switch between types
+
+Artefakte documents:
+- `DECISIONS.md` — Architectural and design decisions with rationale
+- `ACCEPTANCE-CRITERIA.md` — Conditions that must be met for deliverables
+- `NO-GOS.md` — Things explicitly out of scope or forbidden
+
+Usage: `/maxsim:artefakte`
+Usage: `/maxsim:artefakte decisions`
+Usage: `/maxsim:artefakte no-gos --phase 3`
 
 ### User Acceptance Testing
 
@@ -367,6 +387,9 @@ Usage: `/maxsim:update`
 ├── PROJECT.md            # Project vision
 ├── ROADMAP.md            # Current phase breakdown
 ├── STATE.md              # Project memory & context
+├── DECISIONS.md          # Architectural decisions with rationale
+├── ACCEPTANCE-CRITERIA.md # Success conditions for deliverables
+├── NO-GOS.md             # Explicit exclusions and boundaries
 ├── config.json           # Workflow mode & gates
 ├── todos/                # Captured ideas and tasks
 │   ├── pending/          # Todos waiting to be worked on
