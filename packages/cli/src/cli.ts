@@ -86,6 +86,7 @@ import {
   cmdSkillList,
   cmdSkillInstall,
   cmdSkillUpdate,
+  cmdSkillContext,
 } from './core/index.js';
 
 // ─── Arg parsing utilities ───────────────────────────────────────────────────
@@ -363,6 +364,7 @@ const COMMANDS: Record<string, Handler> = {
   },
   'skill': handleSkill,
   'init': handleInit,
+  'skill-context': (args, cwd, raw) => cmdSkillContext(cwd, args[1] || 'unknown', raw),
   'phase-plan-index': (args, cwd, raw) => cmdPhasePlanIndex(cwd, args[1], raw),
   'state-snapshot': (_args, cwd, raw) => cmdStateSnapshot(cwd, raw),
   'summary-extract': (args, cwd, raw) => {
