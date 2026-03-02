@@ -17,4 +17,8 @@ export interface Manifest {
  * Write file manifest after installation for future modification detection
  */
 export declare function writeManifest(configDir: string, runtime?: RuntimeName): Manifest;
+/**
+ * Read an existing manifest from the config directory, or return null if none exists / is invalid
+ */
+export declare function readManifest(configDir: string): Manifest | null;
 //# sourceMappingURL=manifest.d.ts.map

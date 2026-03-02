@@ -48,16 +48,9 @@ exports.PATCHES_DIR_NAME = 'maxsim-local-patches';
  * Detect user-modified MAXSIM files by comparing against install manifest.
  */
 function saveLocalPatches(configDir) {
-    const manifestPath = path.join(configDir, manifest_js_1.MANIFEST_NAME);
-    if (!fs.existsSync(manifestPath))
+    const manifest = (0, manifest_js_1.readManifest)(configDir);
+    if (!manifest)
         return [];
-    let manifest;
-    try {
-        manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    }
-    catch {
-        return [];
-    }
     const patchesDir = path.join(configDir, exports.PATCHES_DIR_NAME);
     const modified = [];
     for (const [relPath, originalHash] of Object.entries(manifest.files || {})) {

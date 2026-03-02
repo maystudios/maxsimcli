@@ -46,6 +46,7 @@ exports.copyDirRecursive = copyDirRecursive;
 exports.getOpencodeGlobalDir = getOpencodeGlobalDir;
 exports.verifyInstalled = verifyInstalled;
 exports.verifyFileInstalled = verifyFileInstalled;
+exports.verifyInstallComplete = verifyInstallComplete;
 const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
@@ -109,9 +110,10 @@ function getOpencodeGlobalDir() {
     return index_js_1.opencodeAdapter.getGlobalDir();
 }
 /**
- * Verify a directory exists and contains files
+ * Verify a directory exists and contains files.
+ * If expectedFiles is provided, also checks that those specific files exist inside the directory.
  */
-function verifyInstalled(dirPath, description) {
+function verifyInstalled(dirPath, description, expectedFiles) {
     if (!fs.existsSync(dirPath)) {
         console.error(`  \u2717 Failed to install ${description}: directory not created`);
         return false;
@@ -127,6 +129,13 @@ function verifyInstalled(dirPath, description) {
         console.error(`  \u2717 Failed to install ${description}: ${e.message}`);
         return false;
     }
+    if (expectedFiles && expectedFiles.length > 0) {
+        const missing = expectedFiles.filter(f => !fs.existsSync(path.join(dirPath, f)));
+        if (missing.length > 0) {
+            console.error(`  \u2717 Failed to install ${description}: missing files: ${missing.join(', ')}`);
+            return false;
+        }
+    }
     return true;
 }
 /**
@@ -138,5 +147,60 @@ function verifyFileInstalled(filePath, description) {
         return false;
     }
     return true;
+}
+/**
+ * Verify that all major install components are present. Uses the manifest
+ * (if available) to check individual files; otherwise falls back to
+ * directory-level checks.
+ *
+ * Returns an object with `complete` (boolean) and `missing` (list of
+ * component names that are absent or incomplete).
+ */
+function verifyInstallComplete(configDir, runtime, manifest = null) {
+    const isOpencode = runtime === 'opencode';
+    const isCodex = runtime === 'codex';
+    const missing = [];
+    // If a manifest exists, verify every file in it is still present
+    if (manifest && manifest.files) {
+        for (const relPath of Object.keys(manifest.files)) {
+            if (!fs.existsSync(path.join(configDir, relPath))) {
+                missing.push(relPath);
+            }
+        }
+        return { complete: missing.length === 0, missing };
+    }
+    // Fallback: directory-level checks for major components
+    const components = [
+        { dir: path.join(configDir, 'maxsim'), label: 'maxsim (workflows/templates)' },
+        { dir: path.join(configDir, 'agents'), label: 'agents' },
+    ];
+    if (isOpencode) {
+        components.push({ dir: path.join(configDir, 'command'), label: 'commands' });
+    }
+    else if (isCodex) {
+        components.push({ dir: path.join(configDir, 'skills'), label: 'skills' });
+    }
+    else {
+        components.push({ dir: path.join(configDir, 'commands', 'maxsim'), label: 'commands' });
+    }
+    if (!isCodex) {
+        components.push({ dir: path.join(configDir, 'hooks'), label: 'hooks' });
+    }
+    for (const { dir, label } of components) {
+        if (!fs.existsSync(dir)) {
+            missing.push(label);
+        }
+        else {
+            try {
+                const entries = fs.readdirSync(dir);
+                if (entries.length === 0)
+                    missing.push(label);
+            }
+            catch {
+                missing.push(label);
+            }
+        }
+    }
+    return { complete: missing.length === 0, missing };
 }
 //# sourceMappingURL=shared.js.map

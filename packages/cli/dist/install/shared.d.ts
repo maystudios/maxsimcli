@@ -1,4 +1,5 @@
 import type { RuntimeName, AdapterConfig } from '../adapters/index.js';
+import type { Manifest } from './manifest.js';
 export declare const pkg: {
     version: string;
 };
@@ -34,9 +35,10 @@ export declare function copyDirRecursive(src: string, dest: string): void;
  */
 export declare function getOpencodeGlobalDir(): string;
 /**
- * Verify a directory exists and contains files
+ * Verify a directory exists and contains files.
+ * If expectedFiles is provided, also checks that those specific files exist inside the directory.
  */
-export declare function verifyInstalled(dirPath: string, description: string): boolean;
+export declare function verifyInstalled(dirPath: string, description: string, expectedFiles?: string[]): boolean;
 /**
  * Verify a file exists
  */
@@ -47,4 +49,16 @@ export interface InstallResult {
     statuslineCommand: string | null;
     runtime: RuntimeName;
 }
+/**
+ * Verify that all major install components are present. Uses the manifest
+ * (if available) to check individual files; otherwise falls back to
+ * directory-level checks.
+ *
+ * Returns an object with `complete` (boolean) and `missing` (list of
+ * component names that are absent or incomplete).
+ */
+export declare function verifyInstallComplete(configDir: string, runtime: RuntimeName, manifest?: Manifest | null): {
+    complete: boolean;
+    missing: string[];
+};
 //# sourceMappingURL=shared.d.ts.map

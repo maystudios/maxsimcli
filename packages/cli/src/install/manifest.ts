@@ -117,3 +117,16 @@ export function writeManifest(
   );
   return manifest;
 }
+
+/**
+ * Read an existing manifest from the config directory, or return null if none exists / is invalid
+ */
+export function readManifest(configDir: string): Manifest | null {
+  const manifestPath = path.join(configDir, MANIFEST_NAME);
+  if (!fs.existsSync(manifestPath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(manifestPath, 'utf8')) as Manifest;
+  } catch {
+    return null;
+  }
+}

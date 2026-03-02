@@ -4,8 +4,7 @@ import * as path from 'node:path';
 import chalk from 'chalk';
 
 import type { RuntimeName } from '../adapters/index.js';
-import { MANIFEST_NAME, fileHash } from './manifest.js';
-import type { Manifest } from './manifest.js';
+import { readManifest, fileHash } from './manifest.js';
 
 export const PATCHES_DIR_NAME = 'maxsim-local-patches';
 
@@ -19,17 +18,8 @@ interface BackupMeta {
  * Detect user-modified MAXSIM files by comparing against install manifest.
  */
 export function saveLocalPatches(configDir: string): string[] {
-  const manifestPath = path.join(configDir, MANIFEST_NAME);
-  if (!fs.existsSync(manifestPath)) return [];
-
-  let manifest: Manifest;
-  try {
-    manifest = JSON.parse(
-      fs.readFileSync(manifestPath, 'utf8'),
-    ) as Manifest;
-  } catch {
-    return [];
-  }
+  const manifest = readManifest(configDir);
+  if (!manifest) return [];
 
   const patchesDir = path.join(configDir, PATCHES_DIR_NAME);
   const modified: string[] = [];
