@@ -23,19 +23,39 @@ import type {
 
 // ─── Internal helpers ────────────────────────────────────────────────────────
 
+/**
+ * Parse a markdown table row into cells, handling escaped pipes (`\|`) within cell content.
+ * Strips leading/trailing pipe characters and trims each cell.
+ */
+function parseTableRow(row: string): string[] {
+  // Replace escaped pipes with a placeholder, split, then restore
+  const placeholder = '\x00PIPE\x00';
+  const safe = row.replace(/\\\|/g, placeholder);
+  return safe.split('|').map(c => c.replaceAll(placeholder, '|').trim()).filter(Boolean);
+}
+
 export function stateExtractField(content: string, fieldName: string): string | null {
-  const pattern = new RegExp(`\\*\\*${fieldName}:\\*\\*\\s*(.+)`, 'i');
-  const match = content.match(pattern);
-  return match ? match[1].trim() : null;
+  const escaped = escapeStringRegexp(fieldName);
+  // Match **fieldName:** with optional extra whitespace around the name and colon
+  const boldPattern = new RegExp(`\\*\\*\\s*${escaped}\\s*:\\s*\\*\\*\\s*(.+)`, 'i');
+  const boldMatch = content.match(boldPattern);
+  if (boldMatch) return boldMatch[1].trim();
+  // Fallback: match plain "fieldName: value" (no bold markers)
+  const plainPattern = new RegExp(`^\\s*${escaped}\\s*:\\s*(.+)`, 'im');
+  const plainMatch = content.match(plainPattern);
+  return plainMatch ? plainMatch[1].trim() : null;
 }
 
 export function stateReplaceField(content: string, fieldName: string, newValue: string): string | null {
   const escaped = escapeStringRegexp(fieldName);
-  const pattern = new RegExp(`(\\*\\*${escaped}:\\*\\*\\s*)(.*)`, 'i');
-  if (pattern.test(content)) {
-    return content.replace(pattern, (_match, prefix: string) => `${prefix}${newValue}`);
-  }
-  return null;
+  // Match **fieldName:** with optional extra whitespace
+  const boldPattern = new RegExp(`(\\*\\*\\s*${escaped}\\s*:\\s*\\*\\*\\s*)(.*)`, 'i');
+  let replaced = content.replace(boldPattern, (_match, prefix: string) => `${prefix}${newValue}`);
+  if (replaced !== content) return replaced;
+  // Fallback: plain "fieldName: value"
+  const plainPattern = new RegExp(`(^[ \\t]*${escaped}\\s*:\\s*)(.*)`, 'im');
+  replaced = content.replace(plainPattern, (_match, prefix: string) => `${prefix}${newValue}`);
+  return replaced !== content ? replaced : null;
 }
 
 function readTextArgOrFile(cwd: string, value: string | undefined, filePath: string | undefined, label: string): string | undefined {
@@ -127,18 +147,16 @@ export function cmdStateGet(cwd: string, section: string | null, raw: boolean): 
       return;
     }
 
-    const fieldEscaped = escapeStringRegexp(section);
-
-    // Check for **field:** value
-    const fieldPattern = new RegExp(`\\*\\*${fieldEscaped}:\\*\\*\\s*(.*)`, 'i');
-    const fieldMatch = content.match(fieldPattern);
-    if (fieldMatch) {
-      output({ [section]: fieldMatch[1].trim() }, raw, fieldMatch[1].trim());
+    // Check for **field:** value (reuse stateExtractField for format tolerance)
+    const fieldValue = stateExtractField(content, section);
+    if (fieldValue !== null) {
+      output({ [section]: fieldValue }, raw, fieldValue);
       return;
     }
 
-    // Check for ## Section
-    const sectionPattern = new RegExp(`##\\s*${fieldEscaped}\\s*\n([\\s\\S]*?)(?=\\n##|$)`, 'i');
+    // Check for ## or ### Section, tolerating extra blank lines after header
+    const fieldEscaped = escapeStringRegexp(section);
+    const sectionPattern = new RegExp(`#{2,3}\\s*${fieldEscaped}\\s*\\n\\s*\\n?([\\s\\S]*?)(?=\\n#{2,3}\\s|$)`, 'i');
     const sectionMatch = content.match(sectionPattern);
     if (sectionMatch) {
       output({ [section]: sectionMatch[1].trim() }, raw, sectionMatch[1].trim());
@@ -159,11 +177,9 @@ export function cmdStatePatch(cwd: string, patches: Record<string, string>, raw:
     const results: StatePatchResult = { updated: [], failed: [] };
 
     for (const [field, value] of Object.entries(patches)) {
-      const fieldEscaped = escapeStringRegexp(field);
-      const pattern = new RegExp(`(\\*\\*${fieldEscaped}:\\*\\*\\s*)(.*)`, 'i');
-
-      if (pattern.test(content)) {
-        content = content.replace(pattern, (_match, prefix: string) => `${prefix}${value}`);
+      const result = stateReplaceField(content, field, value);
+      if (result) {
+        content = result;
         results.updated.push(field);
       } else {
         results.failed.push(field);
@@ -188,12 +204,10 @@ export function cmdStateUpdate(cwd: string, field: string | undefined, value: st
 
   const statePath = statePathUtil(cwd);
   try {
-    let content = fs.readFileSync(statePath, 'utf-8');
-    const fieldEscaped = escapeStringRegexp(field);
-    const pattern = new RegExp(`(\\*\\*${fieldEscaped}:\\*\\*\\s*)(.*)`, 'i');
-    if (pattern.test(content)) {
-      content = content.replace(pattern, (_match, prefix: string) => `${prefix}${value}`);
-      fs.writeFileSync(statePath, content, 'utf-8');
+    const content = fs.readFileSync(statePath, 'utf-8');
+    const result = stateReplaceField(content, field, value);
+    if (result) {
+      fs.writeFileSync(statePath, result, 'utf-8');
       output({ updated: true });
     } else {
       output({ updated: false, reason: `Field "${field}" not found in STATE.md` });
@@ -247,7 +261,8 @@ export function cmdStateRecordMetric(cwd: string, options: StateMetricOptions, r
     return;
   }
 
-  const metricsPattern = /(##\s*Performance Metrics[\s\S]*?\n\|[^\n]+\n\|[-|\s]+\n)([\s\S]*?)(?=\n##|\n$|$)/i;
+  // Flexible: tolerate varying heading levels (##/###), flexible separator lines (|---|, | --- |, |:---|)
+  const metricsPattern = /(#{2,3}\s*Performance Metrics[\s\S]*?\n\|[^\n]+\n\|[\s:|\-]+\n)([\s\S]*?)(?=\n#{2,3}\s|\n$|$)/i;
   const metricsMatch = content.match(metricsPattern);
 
   if (metricsMatch) {
@@ -294,10 +309,9 @@ export function cmdStateUpdateProgress(cwd: string, raw: boolean): void {
   const bar = '\u2588'.repeat(filled) + '\u2591'.repeat(barWidth - filled);
   const progressStr = `[${bar}] ${percent}%`;
 
-  const progressPattern = /(\*\*Progress:\*\*\s*).*/i;
-  if (progressPattern.test(content)) {
-    content = content.replace(progressPattern, (_match, prefix: string) => `${prefix}${progressStr}`);
-    fs.writeFileSync(statePath, content, 'utf-8');
+  const result = stateReplaceField(content, 'Progress', progressStr);
+  if (result) {
+    fs.writeFileSync(statePath, result, 'utf-8');
     output({ updated: true, percent, completed: totalSummaries, total: totalPlans, bar: progressStr }, raw, progressStr);
   } else {
     output({ updated: false, reason: 'Progress field not found in STATE.md' }, raw, 'false');
@@ -374,19 +388,20 @@ export function cmdStateResolveBlocker(cwd: string, text: string | null, raw: bo
 
   let content = fs.readFileSync(statePath, 'utf-8');
 
-  const sectionPattern = /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
+  const sectionPattern = /(#{2,3}\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n\s*\n?)([\s\S]*?)(?=\n#{2,3}\s|$)/i;
   const match = content.match(sectionPattern);
 
   if (match) {
     const sectionBody = match[2];
     const lines = sectionBody.split('\n');
     const filtered = lines.filter(line => {
-      if (!line.startsWith('- ')) return true;
+      // Match - or * bullets, optionally indented
+      if (!/^\s*[-*]\s+/.test(line)) return true;
       return !line.toLowerCase().includes(text.toLowerCase());
     });
 
     let newBody = filtered.join('\n');
-    if (!newBody.trim() || !newBody.includes('- ')) {
+    if (!newBody.trim() || !/^\s*[-*]\s+/m.test(newBody)) {
       newBody = 'None\n';
     }
 
@@ -440,11 +455,7 @@ export function cmdStateSnapshot(cwd: string, raw: boolean): void {
 
   const content = fs.readFileSync(statePath, 'utf-8');
 
-  const extractField = (fieldName: string): string | null => {
-    const pattern = new RegExp(`\\*\\*${fieldName}:\\*\\*\\s*(.+)`, 'i');
-    const match = content.match(pattern);
-    return match ? match[1].trim() : null;
-  };
+  const extractField = (fieldName: string): string | null => stateExtractField(content, fieldName);
 
   const currentPhase = extractField('Current Phase');
   const currentPhaseName = extractField('Current Phase Name');
@@ -462,12 +473,15 @@ export function cmdStateSnapshot(cwd: string, raw: boolean): void {
   const progressPercent = progressRaw ? parseInt(progressRaw.replace('%', ''), 10) : null;
 
   const decisions: Decision[] = [];
-  const decisionsMatch = content.match(/##\s*Decisions Made[\s\S]*?\n\|[^\n]+\n\|[-|\s]+\n([\s\S]*?)(?=\n##|\n$|$)/i);
+  // Tolerate ##/### heading levels and flexible separator lines (|---|, | --- |, |:---|)
+  const decisionsMatch = content.match(/#{2,3}\s*Decisions Made[\s\S]*?\n\|[^\n]+\n\|[\s:|\-]+\n([\s\S]*?)(?=\n#{2,3}\s|\n$|$)/i);
   if (decisionsMatch) {
     const tableBody = decisionsMatch[1];
-    const rows = tableBody.trim().split('\n').filter(r => r.includes('|'));
+    const rows = tableBody.trim().split('\n').filter(r => r.includes('|') && !r.match(/^\s*$/));
     for (const row of rows) {
-      const cells = row.split('|').map(c => c.trim()).filter(Boolean);
+      // Skip separator lines that snuck through
+      if (/^\s*\|[\s:\-|]+\|\s*$/.test(row)) continue;
+      const cells = parseTableRow(row);
       if (cells.length >= 3) {
         decisions.push({
           phase: cells[0],
@@ -479,12 +493,14 @@ export function cmdStateSnapshot(cwd: string, raw: boolean): void {
   }
 
   const blockers: string[] = [];
-  const blockersMatch = content.match(/##\s*Blockers\s*\n([\s\S]*?)(?=\n##|$)/i);
+  // Tolerate ##/### heading levels
+  const blockersMatch = content.match(/#{2,3}\s*Blockers\s*\n([\s\S]*?)(?=\n#{2,3}\s|$)/i);
   if (blockersMatch) {
     const blockersSection = blockersMatch[1];
-    const items = blockersSection.match(/^-\s+(.+)$/gm) || [];
+    // Match - or * bullets, optionally indented
+    const items = blockersSection.match(/^\s*[-*]\s+(.+)$/gm) || [];
     for (const item of items) {
-      blockers.push(item.replace(/^-\s+/, '').trim());
+      blockers.push(item.replace(/^\s*[-*]\s+/, '').trim());
     }
   }
 
@@ -494,16 +510,12 @@ export function cmdStateSnapshot(cwd: string, raw: boolean): void {
     resume_file: null,
   };
 
-  const sessionMatch = content.match(/##\s*Session\s*\n([\s\S]*?)(?=\n##|$)/i);
+  const sessionMatch = content.match(/#{2,3}\s*Session\s*\n\s*\n?([\s\S]*?)(?=\n#{2,3}\s|$)/i);
   if (sessionMatch) {
     const sessionSection = sessionMatch[1];
-    const lastDateMatch = sessionSection.match(/\*\*Last Date:\*\*\s*(.+)/i);
-    const stoppedAtMatch = sessionSection.match(/\*\*Stopped At:\*\*\s*(.+)/i);
-    const resumeFileMatch = sessionSection.match(/\*\*Resume File:\*\*\s*(.+)/i);
-
-    if (lastDateMatch) session.last_date = lastDateMatch[1].trim();
-    if (stoppedAtMatch) session.stopped_at = stoppedAtMatch[1].trim();
-    if (resumeFileMatch) session.resume_file = resumeFileMatch[1].trim();
+    session.last_date = stateExtractField(sessionSection, 'Last Date');
+    session.stopped_at = stateExtractField(sessionSection, 'Stopped At') || stateExtractField(sessionSection, 'Stopped at');
+    session.resume_file = stateExtractField(sessionSection, 'Resume File') || stateExtractField(sessionSection, 'Resume file');
   }
 
   const snapshot: StateSnapshot = {
