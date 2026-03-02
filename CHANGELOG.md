@@ -1,3 +1,10 @@
+## [4.0.1](https://github.com/maystudios/maxsimcli/compare/v4.0.0...v4.0.1) (2026-03-02)
+
+
+### Bug Fixes
+
+* **mcp:** bundle MCP server dependencies and update README with skills/MCP docs ([7724966](https://github.com/maystudios/maxsimcli/commit/772496696167d8723873b6645826327472824560))
+
 # [4.0.0](https://github.com/maystudios/maxsimcli/compare/v3.12.0...v4.0.0) (2026-03-02)
 
 
