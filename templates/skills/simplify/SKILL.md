@@ -135,3 +135,51 @@ Simplification applies at the task level, after implementation and before commit
 - Make simplification changes as part of the same commit (not a separate task)
 - If simplification reveals a larger refactoring opportunity, file a todo — do not scope-creep
 - Track significant simplifications in the task's commit message (e.g., "extracted shared helper for X")
+
+## Parallel 3-Reviewer Pattern (Execution Pipeline)
+
+When invoked as part of the Execute-Review-Simplify-Review cycle in `execute-plan.md`, simplification runs as 3 parallel review agents. Each reviewer focuses on one dimension:
+
+### Reviewer 1: Code Reuse
+- Find duplicated logic across the codebase (not just within changed files)
+- Identify copy-paste from other files that should be extracted to shared modules
+- Suggest shared helpers for patterns appearing 3+ times (Rule of Three)
+- Check if existing utility functions, library methods, or helpers could replace new code
+- **Output:** List of reuse opportunities with file paths and line ranges
+
+### Reviewer 2: Code Quality
+- Check naming consistency with codebase conventions (read CLAUDE.md first)
+- Verify error handling covers all external calls and edge cases
+- Look for dead code: unused imports, variables, unreachable branches, commented-out code
+- Check for unnecessary abstractions, wrappers, or premature generalizations
+- Verify security: no hardcoded secrets, no unsanitized inputs, no data exposure
+- **Output:** List of quality issues categorized by severity (BLOCKER, HIGH, MEDIUM)
+
+### Reviewer 3: Efficiency
+- Find O(n^2) operations where O(n) is straightforward
+- Identify repeated computations that could be cached or hoisted out of loops
+- Check for unnecessary allocations in hot paths
+- Look for redundant data transformations (data processed multiple times when once suffices)
+- Only flag obvious issues — do not optimize without evidence of a problem
+- **Output:** List of efficiency issues with suggested fixes
+
+### Consolidation
+
+After all 3 reviewers report, the orchestrating agent:
+1. Merges findings into a single deduplicated list
+2. Prioritizes: BLOCKER > HIGH > MEDIUM > informational
+3. Applies fixes for all actionable items (BLOCKER and HIGH)
+4. Files MEDIUM issues as todos if they require larger refactoring
+5. Runs tests to confirm fixes do not break anything
+6. Reports final status: CLEAN (nothing found), FIXED (issues found and resolved), or BLOCKED (cannot fix without architectural change)
+
+### Spawning Pattern
+
+Each reviewer is spawned as a parallel agent via the Agent tool:
+```
+# All 3 run in parallel
+Task(prompt="Reviewer 1: Code Reuse — {files_to_review} ...", subagent_type="maxsim-executor")
+Task(prompt="Reviewer 2: Code Quality — {files_to_review} ...", subagent_type="maxsim-executor")
+Task(prompt="Reviewer 3: Efficiency — {files_to_review} ...", subagent_type="maxsim-executor")
+# Wait for all 3 to complete, then consolidate
+```

@@ -168,14 +168,17 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
 
 3. **Wait for all agents in wave to complete.**
 
-4. **Report completion — spot-check claims first:**
+4. **Report completion — spot-check claims and review cycle:**
 
    For each SUMMARY.md:
    - Verify first 2 files from `key-files.created` exist on disk
    - Check `git log --oneline --all --grep="{phase}-{plan}"` returns ≥1 commit
    - Check for `## Self-Check: FAILED` marker
+   - **Check for `## Review Cycle` section** — verify all review stages show PASS/APPROVED/CLEAN/FIXED (not BLOCKED or FAIL)
 
    If ANY spot-check fails: report which plan failed, route to failure handler — ask "Retry plan?" or "Continue with remaining waves?"
+
+   If review cycle is missing or has unresolved issues: flag the plan as **review-incomplete** — ask "Run review cycle for this plan?" or "Continue (review will block phase completion)?"
 
    If pass — **emit plan-complete lifecycle event** (if `DASHBOARD_ACTIVE`):
    ```
@@ -275,9 +278,26 @@ After all waves:
 1. **03-01**: [one-liner from SUMMARY.md]
 2. **03-02**: [one-liner from SUMMARY.md]
 
+### Review Cycle Summary
+| Plan | Spec Review | Code Review | Simplify | Final Review |
+|------|-------------|-------------|----------|--------------|
+| 03-01 | PASS | APPROVED | CLEAN | — |
+| 03-02 | PASS | APPROVED | FIXED | APPROVED |
+
+[Aggregate review findings from each plan's SUMMARY.md `## Review Cycle` section.
+If any plan has no Review Cycle section: mark as "NOT RUN" and flag for attention.
+If any plan has unresolved BLOCKED/FAIL status: list the blocking issues below.]
+
+### Unresolved Review Issues
+[List any plans with BLOCKED or FAIL review stages. These MUST be resolved before phase completion.]
+
 ### Issues Encountered
 [Aggregate from SUMMARYs, or "None"]
 ```
+
+**Phase completion gate:** If any plan has unresolved review issues (BLOCKED or FAIL in any review stage), the phase CANNOT proceed to `verify_phase_goal`. Present unresolved issues and offer:
+- "Fix review issues now" — re-run the review cycle for affected plans
+- "Override and continue" — mark as acknowledged, proceed (adds warning to VERIFICATION.md)
 </step>
 
 <step name="close_parent_artifacts">
