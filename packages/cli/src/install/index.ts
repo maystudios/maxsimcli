@@ -22,6 +22,7 @@ import {
   verifyInstalled,
   verifyFileInstalled,
   builtInSkills,
+  verifyInstallComplete,
 } from './shared.js';
 import type { InstallResult } from './shared.js';
 import { getCommitAttribution } from './adapters.js';
@@ -33,7 +34,7 @@ import {
   handleStatusline,
   finishInstall,
 } from './hooks.js';
-import { writeManifest, MANIFEST_NAME } from './manifest.js';
+import { writeManifest, readManifest, MANIFEST_NAME } from './manifest.js';
 import { saveLocalPatches, reportLocalPatches } from './patches.js';
 import {
   copyWithPathReplacement,
@@ -113,6 +114,19 @@ async function install(
   );
 
   const failures: string[] = [];
+
+  // Detect prior install via manifest — used for re-run safety
+  const existingManifest = readManifest(targetDir);
+  const isAlreadyCurrent = existingManifest !== null && existingManifest.version === pkg.version;
+
+  if (existingManifest !== null) {
+    const { complete, missing } = verifyInstallComplete(targetDir, runtime, existingManifest);
+    if (!complete) {
+      console.log(`  ${chalk.yellow('!')} Previous install (v${existingManifest.version}) is incomplete — ${missing.length} missing file(s). Re-installing.`);
+    } else if (isAlreadyCurrent) {
+      console.log(`  ${chalk.dim(`Version ${pkg.version} already installed — upgrading in place`)}`);
+    }
+  }
 
   // Save any locally modified MAXSIM files before they get wiped
   saveLocalPatches(targetDir);
@@ -356,25 +370,45 @@ async function install(
     ? path.join(targetDir, '..', '.mcp.json')
     : path.join(process.cwd(), '.mcp.json');
   let mcpConfig: Record<string, unknown> = {};
+  let skipMcpConfig = false;
 
   if (fs.existsSync(mcpJsonPath)) {
+    // Back up existing .mcp.json before modification
+    fs.copyFileSync(mcpJsonPath, mcpJsonPath + '.bak');
+
     try {
       mcpConfig = JSON.parse(fs.readFileSync(mcpJsonPath, 'utf-8'));
     } catch {
-      // Corrupted file — start fresh
+      // Corrupted .mcp.json — warn user
+      console.warn(`  ${chalk.yellow('!')} .mcp.json is corrupted (invalid JSON). Backup saved to .mcp.json.bak`);
+      let startFresh = true;
+      try {
+        startFresh = await confirm({
+          message: '.mcp.json is corrupted. Start with a fresh config? (No = abort MCP setup)',
+          default: true,
+        });
+      } catch {
+        // Non-interactive — default to starting fresh
+      }
+      if (!startFresh) {
+        console.log(`  ${chalk.yellow('!')} Skipping .mcp.json configuration`);
+        skipMcpConfig = true;
+      }
     }
   }
 
-  const mcpServers = (mcpConfig.mcpServers as Record<string, unknown>) ?? {};
-  mcpServers['maxsim'] = {
-    command: 'node',
-    args: ['.claude/maxsim/bin/mcp-server.cjs'],
-    env: {},
-  };
-  mcpConfig.mcpServers = mcpServers;
+  if (!skipMcpConfig) {
+    const mcpServers = (mcpConfig.mcpServers as Record<string, unknown>) ?? {};
+    mcpServers['maxsim'] = {
+      command: 'node',
+      args: ['.claude/maxsim/bin/mcp-server.cjs'],
+      env: {},
+    };
+    mcpConfig.mcpServers = mcpServers;
 
-  fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + '\n', 'utf-8');
-  console.log(`  ${chalk.green('\u2713')} Configured .mcp.json for MCP server auto-discovery`);
+    fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + '\n', 'utf-8');
+    console.log(`  ${chalk.green('\u2713')} Configured .mcp.json for MCP server auto-discovery`);
+  }
 
   if (failures.length > 0) {
     console.error(

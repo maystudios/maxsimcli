@@ -5,6 +5,8 @@ import fsExtra from 'fs-extra';
 import {
   claudeAdapter,
 } from '../adapters/index.js';
+import type { RuntimeName } from '../core/types.js';
+import type { Manifest } from './manifest.js';
 
 // Get version from package.json — read at runtime so semantic-release's version bump
 // is reflected without needing to rebuild dist/install.cjs after the version bump.
@@ -53,9 +55,10 @@ export function copyDirRecursive(src: string, dest: string): void {
 }
 
 /**
- * Verify a directory exists and contains files
+ * Verify a directory exists and contains files.
+ * If expectedFiles is provided, also checks that those specific files exist inside the directory.
  */
-export function verifyInstalled(dirPath: string, description: string): boolean {
+export function verifyInstalled(dirPath: string, description: string, expectedFiles?: string[]): boolean {
   if (!fs.existsSync(dirPath)) {
     console.error(
       `  \u2717 Failed to install ${description}: directory not created`,
@@ -75,6 +78,15 @@ export function verifyInstalled(dirPath: string, description: string): boolean {
       `  \u2717 Failed to install ${description}: ${(e as Error).message}`,
     );
     return false;
+  }
+  if (expectedFiles && expectedFiles.length > 0) {
+    const missing = expectedFiles.filter(f => !fs.existsSync(path.join(dirPath, f)));
+    if (missing.length > 0) {
+      console.error(
+        `  \u2717 Failed to install ${description}: missing files: ${missing.join(', ')}`,
+      );
+      return false;
+    }
   }
   return true;
 }
@@ -97,4 +109,53 @@ export interface InstallResult {
   settings: Record<string, unknown> | null;
   statuslineCommand: string | null;
   runtime: 'claude';
+}
+
+/**
+ * Verify that all major install components are present. Uses the manifest
+ * (if available) to check individual files; otherwise falls back to
+ * directory-level checks.
+ *
+ * Returns an object with `complete` (boolean) and `missing` (list of
+ * component names that are absent or incomplete).
+ */
+export function verifyInstallComplete(
+  configDir: string,
+  _runtime?: RuntimeName,
+  manifest: Manifest | null = null,
+): { complete: boolean; missing: string[] } {
+  const missing: string[] = [];
+
+  // If a manifest exists, verify every file in it is still present
+  if (manifest && manifest.files) {
+    for (const relPath of Object.keys(manifest.files)) {
+      if (!fs.existsSync(path.join(configDir, relPath))) {
+        missing.push(relPath);
+      }
+    }
+    return { complete: missing.length === 0, missing };
+  }
+
+  // Fallback: directory-level checks for major components
+  const components: Array<{ dir: string; label: string }> = [
+    { dir: path.join(configDir, 'maxsim'), label: 'maxsim (workflows/templates)' },
+    { dir: path.join(configDir, 'agents'), label: 'agents' },
+    { dir: path.join(configDir, 'commands', 'maxsim'), label: 'commands' },
+    { dir: path.join(configDir, 'hooks'), label: 'hooks' },
+  ];
+
+  for (const { dir, label } of components) {
+    if (!fs.existsSync(dir)) {
+      missing.push(label);
+    } else {
+      try {
+        const entries = fs.readdirSync(dir);
+        if (entries.length === 0) missing.push(label);
+      } catch {
+        missing.push(label);
+      }
+    }
+  }
+
+  return { complete: missing.length === 0, missing };
 }

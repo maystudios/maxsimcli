@@ -37,6 +37,7 @@ exports.MANIFEST_NAME = void 0;
 exports.fileHash = fileHash;
 exports.generateManifest = generateManifest;
 exports.writeManifest = writeManifest;
+exports.readManifest = readManifest;
 const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
 const crypto = __importStar(require("node:crypto"));
@@ -110,5 +111,19 @@ function writeManifest(configDir) {
     }
     fs.writeFileSync(path.join(configDir, exports.MANIFEST_NAME), JSON.stringify(manifest, null, 2));
     return manifest;
+}
+/**
+ * Read an existing manifest from the config directory, or return null if none exists / is invalid
+ */
+function readManifest(configDir) {
+    const manifestPath = path.join(configDir, exports.MANIFEST_NAME);
+    if (!fs.existsSync(manifestPath))
+        return null;
+    try {
+        return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    }
+    catch {
+        return null;
+    }
 }
 //# sourceMappingURL=manifest.js.map

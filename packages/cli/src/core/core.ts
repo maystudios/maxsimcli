@@ -129,7 +129,7 @@ export function listSubDirs(dir: string, sortByPhase = false): string[] {
 
 /** Extract a human-readable message from an unknown thrown value. */
 export function errorMsg(e: unknown): string {
-  return errorMsg(e);
+  return e instanceof Error ? e.message : String(e);
 }
 
 /** Log only when MAXSIM_DEBUG is set. Accepts an optional context label. */

@@ -59,7 +59,11 @@ let child_process = require("child_process");
 let fs_promises = require("fs/promises");
 let node_stream = require("node:stream");
 
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/depd/index.js
+=======
+//#region ../../../../../node_modules/depd/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_depd = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/*!
 	* depd
@@ -370,7 +374,11 @@ var require_depd = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/bytes/index.js
+=======
+//#region ../../../../../node_modules/bytes/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * bytes
 * Copyright(c) 2012-2014 TJ Holowaychuk
@@ -486,7 +494,11 @@ var require_bytes = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/content-type/index.js
+=======
+//#region ../../../../../node_modules/content-type/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * content-type
 * Copyright(c) 2015 Douglas Christopher Wilson
@@ -632,7 +644,11 @@ var require_content_type = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/setprototypeof/index.js
+=======
+//#region ../../../../../node_modules/setprototypeof/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_setprototypeof = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = Object.setPrototypeOf || ({ __proto__: [] } instanceof Array ? setProtoOf : mixinProperties);
 	function setProtoOf(obj, proto) {
@@ -646,7 +662,11 @@ var require_setprototypeof = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/statuses/codes.json
+=======
+//#region ../../../../../node_modules/statuses/codes.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_codes = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"100": "Continue",
@@ -716,7 +736,11 @@ var require_codes = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/statuses/index.js
+=======
+//#region ../../../../../node_modules/statuses/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * statuses
 * Copyright(c) 2014 Jonathan Ong
@@ -818,7 +842,11 @@ var require_statuses = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/inherits/inherits_browser.js
+=======
+//#region ../../../../../node_modules/inherits/inherits_browser.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_inherits_browser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	if (typeof Object.create === "function") module.exports = function inherits(ctor, superCtor) {
 		if (superCtor) {
@@ -843,7 +871,11 @@ var require_inherits_browser = /* @__PURE__ */ __commonJSMin(((exports, module) 
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/inherits/inherits.js
+=======
+//#region ../../../../../node_modules/inherits/inherits.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_inherits = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	try {
 		var util$7 = require("util");
@@ -857,7 +889,11 @@ var require_inherits = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/toidentifier/index.js
+=======
+//#region ../../../../../node_modules/toidentifier/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * toidentifier
 * Copyright(c) 2016 Douglas Christopher Wilson
@@ -884,7 +920,11 @@ var require_toidentifier = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/http-errors/index.js
+=======
+//#region ../../../../../node_modules/http-errors/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * http-errors
 * Copyright(c) 2014 Jonathan Ong
@@ -1084,7 +1124,11 @@ var require_http_errors = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/ms/index.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/ms/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_ms$4 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Helpers.
@@ -1194,7 +1238,11 @@ var require_ms$4 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/debug/src/debug.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/debug/src/debug.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_debug$3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* This is the common logic for both the Node.js and web browser
@@ -1335,7 +1383,11 @@ var require_debug$3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/debug/src/browser.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/debug/src/browser.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_browser$4 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* This is the web browser implementation of `debug()`.
@@ -1458,7 +1510,11 @@ var require_browser$4 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/debug/src/node.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/debug/src/node.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_node$4 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Module dependencies.
@@ -1631,7 +1687,11 @@ var require_node$4 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/debug/src/index.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/debug/src/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_src$5 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Detect Electron renderer process, which is node, but we should
@@ -1642,7 +1702,11 @@ var require_src$5 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/destroy/index.js
+=======
+//#region ../../../../../node_modules/destroy/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * destroy
 * Copyright(c) 2014 Jonathan Ong
@@ -1792,7 +1856,11 @@ var require_destroy = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/safer-buffer/safer.js
+=======
+//#region ../../../../../node_modules/safer-buffer/safer.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_safer = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var buffer$2 = require("buffer");
 	var Buffer = buffer$2.Buffer;
@@ -1835,7 +1903,11 @@ var require_safer = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/lib/bom-handling.js
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/lib/bom-handling.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_bom_handling$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var BOMChar = "﻿";
 	exports.PrependBOM = PrependBOMWrapper;
@@ -1875,7 +1947,11 @@ var require_bom_handling$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/internal.js
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/internal.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_internal$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var Buffer = require_safer().Buffer;
 	module.exports = {
@@ -2004,7 +2080,11 @@ var require_internal$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/utf16.js
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/utf16.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_utf16$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Buffer = require_safer().Buffer;
 	exports.utf16be = Utf16BECodec;
@@ -2105,7 +2185,11 @@ var require_utf16$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/utf7.js
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/utf7.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_utf7$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Buffer = require_safer().Buffer;
 	exports.utf7 = Utf7Codec;
@@ -2282,7 +2366,11 @@ var require_utf7$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/sbcs-codec.js
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/sbcs-codec.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_sbcs_codec$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Buffer = require_safer().Buffer;
 	exports._sbcs = SBCSCodec;
@@ -2329,7 +2417,11 @@ var require_sbcs_codec$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/sbcs-data.js
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/sbcs-data.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_sbcs_data$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"10029": "maccenteuro",
@@ -2474,7 +2566,11 @@ var require_sbcs_data$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/sbcs-data-generated.js
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/sbcs-data-generated.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_sbcs_data_generated$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"437": "cp437",
@@ -2927,7 +3023,11 @@ var require_sbcs_data_generated$1 = /* @__PURE__ */ __commonJSMin(((exports, mod
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/dbcs-codec.js
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/dbcs-codec.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_dbcs_codec$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Buffer = require_safer().Buffer;
 	exports._dbcs = DBCSCodec;
@@ -3242,7 +3342,11 @@ var require_dbcs_codec$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/shiftjis.json
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/shiftjis.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_shiftjis$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = [
 		[
@@ -3532,7 +3636,11 @@ var require_shiftjis$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/eucjp.json
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/eucjp.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_eucjp$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = [
 		[
@@ -3955,7 +4063,11 @@ var require_eucjp$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/cp936.json
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/cp936.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_cp936$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = [
 		[
@@ -6537,7 +6649,11 @@ var require_cp936$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/gbk-added.json
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/gbk-added.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_gbk_added$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = [
 		[
@@ -6764,7 +6880,11 @@ var require_gbk_added$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/gb18030-ranges.json
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/gb18030-ranges.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_gb18030_ranges$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"uChars": [
@@ -7189,7 +7309,11 @@ var require_gb18030_ranges$1 = /* @__PURE__ */ __commonJSMin(((exports, module) 
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/cp949.json
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/cp949.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_cp949$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = [
 		[
@@ -9407,7 +9531,11 @@ var require_cp949$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/cp950.json
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/cp950.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_cp950$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = [
 		[
@@ -9632,7 +9760,11 @@ var require_cp950$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/big5-added.json
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/tables/big5-added.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_big5_added$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = [
 		["8740", "䏰䰲䘃䖦䕸𧉧䵷䖳𧲱䳢𧳅㮕䜶䝄䱇䱀𤊿𣘗𧍒𦺋𧃒䱗𪍑䝏䗚䲅𧱬䴇䪤䚡𦬣爥𥩔𡩣𣸆𣽡晍囻"],
@@ -9799,7 +9931,11 @@ var require_big5_added$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/dbcs-data.js
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/dbcs-data.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_dbcs_data$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"shiftjis": {
@@ -9912,7 +10048,11 @@ var require_dbcs_data$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/index.js
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/encodings/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_encodings$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var modules = [
 		require_internal$1(),
@@ -9931,7 +10071,11 @@ var require_encodings$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/lib/streams.js
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/lib/streams.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_streams$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var Buffer$5 = require("buffer").Buffer, Transform$1 = require("stream").Transform;
 	module.exports = function(iconv) {
@@ -10023,7 +10167,11 @@ var require_streams$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/lib/extend-node.js
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/lib/extend-node.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_extend_node$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var Buffer$4 = require("buffer").Buffer;
 	module.exports = function(iconv) {
@@ -10168,7 +10316,11 @@ var require_extend_node$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => 
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/node_modules/iconv-lite/lib/index.js
+=======
+//#region ../../../../../node_modules/raw-body/node_modules/iconv-lite/lib/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_lib$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var Buffer = require_safer().Buffer;
 	var bomHandling = require_bom_handling$1(), iconv = module.exports;
@@ -10254,7 +10406,11 @@ var require_lib$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/unpipe/index.js
+=======
+//#region ../../../../../node_modules/unpipe/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * unpipe
 * Copyright(c) 2015 Douglas Christopher Wilson
@@ -10299,7 +10455,11 @@ var require_unpipe = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/raw-body/index.js
+=======
+//#region ../../../../../node_modules/raw-body/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * raw-body
 * Copyright(c) 2013-2014 Jonathan Ong
@@ -10499,7 +10659,11 @@ var require_raw_body = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/lib/bom-handling.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/lib/bom-handling.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_bom_handling = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var BOMChar = "﻿";
 	exports.PrependBOM = PrependBOMWrapper;
@@ -10539,7 +10703,11 @@ var require_bom_handling = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/internal.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/internal.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_internal = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var Buffer = require_safer().Buffer;
 	module.exports = {
@@ -10668,7 +10836,11 @@ var require_internal = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/utf16.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/utf16.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_utf16 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Buffer = require_safer().Buffer;
 	exports.utf16be = Utf16BECodec;
@@ -10769,7 +10941,11 @@ var require_utf16 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/utf7.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/utf7.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_utf7 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Buffer = require_safer().Buffer;
 	exports.utf7 = Utf7Codec;
@@ -10946,7 +11122,11 @@ var require_utf7 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/sbcs-codec.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/sbcs-codec.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_sbcs_codec = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Buffer = require_safer().Buffer;
 	exports._sbcs = SBCSCodec;
@@ -10993,7 +11173,11 @@ var require_sbcs_codec = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/sbcs-data.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/sbcs-data.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_sbcs_data = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"10029": "maccenteuro",
@@ -11138,7 +11322,11 @@ var require_sbcs_data = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/sbcs-data-generated.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/sbcs-data-generated.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_sbcs_data_generated = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"437": "cp437",
@@ -11591,7 +11779,11 @@ var require_sbcs_data_generated = /* @__PURE__ */ __commonJSMin(((exports, modul
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/dbcs-codec.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/dbcs-codec.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_dbcs_codec = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Buffer = require_safer().Buffer;
 	exports._dbcs = DBCSCodec;
@@ -11906,7 +12098,11 @@ var require_dbcs_codec = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/shiftjis.json
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/shiftjis.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_shiftjis = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = [
 		[
@@ -12196,7 +12392,11 @@ var require_shiftjis = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/eucjp.json
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/eucjp.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_eucjp = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = [
 		[
@@ -12619,7 +12819,11 @@ var require_eucjp = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/cp936.json
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/cp936.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_cp936 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = [
 		[
@@ -15201,7 +15405,11 @@ var require_cp936 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/gbk-added.json
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/gbk-added.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_gbk_added = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = [
 		[
@@ -15428,7 +15636,11 @@ var require_gbk_added = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/gb18030-ranges.json
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/gb18030-ranges.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_gb18030_ranges = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"uChars": [
@@ -15853,7 +16065,11 @@ var require_gb18030_ranges = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/cp949.json
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/cp949.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_cp949 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = [
 		[
@@ -18071,7 +18287,11 @@ var require_cp949 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/cp950.json
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/cp950.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_cp950 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = [
 		[
@@ -18296,7 +18516,11 @@ var require_cp950 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/big5-added.json
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/tables/big5-added.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_big5_added = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = [
 		["8740", "䏰䰲䘃䖦䕸𧉧䵷䖳𧲱䳢𧳅㮕䜶䝄䱇䱀𤊿𣘗𧍒𦺋𧃒䱗𪍑䝏䗚䲅𧱬䴇䪤䚡𦬣爥𥩔𡩣𣸆𣽡晍囻"],
@@ -18463,7 +18687,11 @@ var require_big5_added = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/dbcs-data.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/dbcs-data.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_dbcs_data = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"shiftjis": {
@@ -18576,7 +18804,11 @@ var require_dbcs_data = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/index.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/encodings/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_encodings = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var modules = [
 		require_internal(),
@@ -18595,7 +18827,11 @@ var require_encodings = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/lib/streams.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/lib/streams.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_streams = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var Buffer$3 = require("buffer").Buffer, Transform = require("stream").Transform;
 	module.exports = function(iconv) {
@@ -18687,7 +18923,11 @@ var require_streams = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/lib/extend-node.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/lib/extend-node.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_extend_node = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var Buffer$2 = require("buffer").Buffer;
 	module.exports = function(iconv) {
@@ -18832,7 +19072,11 @@ var require_extend_node = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/node_modules/iconv-lite/lib/index.js
+=======
+//#region ../../../../../node_modules/body-parser/node_modules/iconv-lite/lib/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_lib$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var Buffer = require_safer().Buffer;
 	var bomHandling = require_bom_handling(), iconv = module.exports;
@@ -18918,7 +19162,11 @@ var require_lib$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ee-first/index.js
+=======
+//#region ../../../../../node_modules/ee-first/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * ee-first
 * Copyright(c) 2014 Jonathan Ong
@@ -18988,7 +19236,11 @@ var require_ee_first = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/on-finished/index.js
+=======
+//#region ../../../../../node_modules/on-finished/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * on-finished
 * Copyright(c) 2013 Jonathan Ong
@@ -19160,7 +19412,11 @@ var require_on_finished = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/lib/read.js
+=======
+//#region ../../../../../node_modules/body-parser/lib/read.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * body-parser
 * Copyright(c) 2014-2015 Douglas Christopher Wilson
@@ -19313,7 +19569,11 @@ var require_read = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/media-typer/index.js
+=======
+//#region ../../../../../node_modules/media-typer/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_media_typer = /* @__PURE__ */ __commonJSMin(((exports) => {
 	/*!
 	* media-typer
@@ -19494,7 +19754,11 @@ var require_media_typer = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/mime-db/db.json
+=======
+//#region ../../../../../node_modules/mime-db/db.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_db = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"application/1d-interleaved-parityfec": { "source": "iana" },
@@ -26540,7 +26804,11 @@ var require_db = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/mime-db/index.js
+=======
+//#region ../../../../../node_modules/mime-db/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_mime_db = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/*!
 	* mime-db
@@ -26555,7 +26823,11 @@ var require_mime_db = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/mime-types/index.js
+=======
+//#region ../../../../../node_modules/mime-types/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * mime-types
 * Copyright(c) 2014 Jonathan Ong
@@ -26672,7 +26944,11 @@ var require_mime_types = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/type-is/index.js
+=======
+//#region ../../../../../node_modules/type-is/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * type-is
 * Copyright(c) 2014 Jonathan Ong
@@ -26844,7 +27120,11 @@ var require_type_is = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/lib/types/json.js
+=======
+//#region ../../../../../node_modules/body-parser/lib/types/json.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * body-parser
 * Copyright(c) 2014 Jonathan Ong
@@ -27033,7 +27313,11 @@ var require_json = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/lib/types/raw.js
+=======
+//#region ../../../../../node_modules/body-parser/lib/types/raw.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * body-parser
 * Copyright(c) 2014-2015 Douglas Christopher Wilson
@@ -27109,7 +27393,11 @@ var require_raw = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/lib/types/text.js
+=======
+//#region ../../../../../node_modules/body-parser/lib/types/text.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * body-parser
 * Copyright(c) 2014-2015 Douglas Christopher Wilson
@@ -27200,20 +27488,32 @@ var require_text = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/es-errors/type.js
+=======
+//#region ../../../../../node_modules/es-errors/type.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_type = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./type')} */
 	module.exports = TypeError;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/object-inspect/util.inspect.js
+=======
+//#region ../../../../../node_modules/object-inspect/util.inspect.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_util_inspect = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = require("util").inspect;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/object-inspect/index.js
+=======
+//#region ../../../../../node_modules/object-inspect/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_object_inspect = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var hasMap = typeof Map === "function" && Map.prototype;
 	var mapSizeDescriptor = Object.getOwnPropertyDescriptor && hasMap ? Object.getOwnPropertyDescriptor(Map.prototype, "size") : null;
@@ -27596,7 +27896,11 @@ var require_object_inspect = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/side-channel-list/index.js
+=======
+//#region ../../../../../node_modules/side-channel-list/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_side_channel_list = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var inspect = require_object_inspect();
 	var $TypeError = require_type();
@@ -27673,98 +27977,154 @@ var require_side_channel_list = /* @__PURE__ */ __commonJSMin(((exports, module)
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/es-object-atoms/index.js
+=======
+//#region ../../../../../node_modules/es-object-atoms/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_es_object_atoms = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('.')} */
 	module.exports = Object;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/es-errors/index.js
+=======
+//#region ../../../../../node_modules/es-errors/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_es_errors = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('.')} */
 	module.exports = Error;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/es-errors/eval.js
+=======
+//#region ../../../../../node_modules/es-errors/eval.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_eval = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./eval')} */
 	module.exports = EvalError;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/es-errors/range.js
+=======
+//#region ../../../../../node_modules/es-errors/range.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_range = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./range')} */
 	module.exports = RangeError;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/es-errors/ref.js
+=======
+//#region ../../../../../node_modules/es-errors/ref.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_ref$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./ref')} */
 	module.exports = ReferenceError;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/es-errors/syntax.js
+=======
+//#region ../../../../../node_modules/es-errors/syntax.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_syntax = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./syntax')} */
 	module.exports = SyntaxError;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/es-errors/uri.js
+=======
+//#region ../../../../../node_modules/es-errors/uri.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_uri$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./uri')} */
 	module.exports = URIError;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/math-intrinsics/abs.js
+=======
+//#region ../../../../../node_modules/math-intrinsics/abs.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_abs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./abs')} */
 	module.exports = Math.abs;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/math-intrinsics/floor.js
+=======
+//#region ../../../../../node_modules/math-intrinsics/floor.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_floor = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./floor')} */
 	module.exports = Math.floor;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/math-intrinsics/max.js
+=======
+//#region ../../../../../node_modules/math-intrinsics/max.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_max = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./max')} */
 	module.exports = Math.max;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/math-intrinsics/min.js
+=======
+//#region ../../../../../node_modules/math-intrinsics/min.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_min = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./min')} */
 	module.exports = Math.min;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/math-intrinsics/pow.js
+=======
+//#region ../../../../../node_modules/math-intrinsics/pow.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_pow = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./pow')} */
 	module.exports = Math.pow;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/math-intrinsics/round.js
+=======
+//#region ../../../../../node_modules/math-intrinsics/round.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_round = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./round')} */
 	module.exports = Math.round;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/math-intrinsics/isNaN.js
+=======
+//#region ../../../../../node_modules/math-intrinsics/isNaN.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_isNaN = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./isNaN')} */
 	module.exports = Number.isNaN || function isNaN(a) {
@@ -27773,7 +28133,11 @@ var require_isNaN = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/math-intrinsics/sign.js
+=======
+//#region ../../../../../node_modules/math-intrinsics/sign.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_sign = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var $isNaN = require_isNaN();
 	/** @type {import('./sign')} */
@@ -27784,14 +28148,22 @@ var require_sign = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/gopd/gOPD.js
+=======
+//#region ../../../../../node_modules/gopd/gOPD.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_gOPD = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./gOPD')} */
 	module.exports = Object.getOwnPropertyDescriptor;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/gopd/index.js
+=======
+//#region ../../../../../node_modules/gopd/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_gopd = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('.')} */
 	var $gOPD = require_gOPD();
@@ -27804,7 +28176,11 @@ var require_gopd = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/es-define-property/index.js
+=======
+//#region ../../../../../node_modules/es-define-property/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_es_define_property = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('.')} */
 	var $defineProperty = Object.defineProperty || false;
@@ -27817,7 +28193,11 @@ var require_es_define_property = /* @__PURE__ */ __commonJSMin(((exports, module
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/has-symbols/shams.js
+=======
+//#region ../../../../../node_modules/has-symbols/shams.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_shams = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./shams')} */
 	module.exports = function hasSymbols() {
@@ -27847,7 +28227,11 @@ var require_shams = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/has-symbols/index.js
+=======
+//#region ../../../../../node_modules/has-symbols/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_has_symbols = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var origSymbol = typeof Symbol !== "undefined" && Symbol;
 	var hasSymbolSham = require_shams();
@@ -27862,14 +28246,22 @@ var require_has_symbols = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/get-proto/Reflect.getPrototypeOf.js
+=======
+//#region ../../../../../node_modules/get-proto/Reflect.getPrototypeOf.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_Reflect_getPrototypeOf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./Reflect.getPrototypeOf')} */
 	module.exports = typeof Reflect !== "undefined" && Reflect.getPrototypeOf || null;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/get-proto/Object.getPrototypeOf.js
+=======
+//#region ../../../../../node_modules/get-proto/Object.getPrototypeOf.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_Object_getPrototypeOf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var $Object = require_es_object_atoms();
 	/** @type {import('./Object.getPrototypeOf')} */
@@ -27877,7 +28269,11 @@ var require_Object_getPrototypeOf = /* @__PURE__ */ __commonJSMin(((exports, mod
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/function-bind/implementation.js
+=======
+//#region ../../../../../node_modules/function-bind/implementation.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_implementation = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var ERROR_MESSAGE = "Function.prototype.bind called on incompatible ";
 	var toStr = Object.prototype.toString;
@@ -27930,35 +28326,55 @@ var require_implementation = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/function-bind/index.js
+=======
+//#region ../../../../../node_modules/function-bind/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_function_bind = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var implementation = require_implementation();
 	module.exports = Function.prototype.bind || implementation;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/call-bind-apply-helpers/functionCall.js
+=======
+//#region ../../../../../node_modules/call-bind-apply-helpers/functionCall.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_functionCall = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./functionCall')} */
 	module.exports = Function.prototype.call;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/call-bind-apply-helpers/functionApply.js
+=======
+//#region ../../../../../node_modules/call-bind-apply-helpers/functionApply.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_functionApply = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./functionApply')} */
 	module.exports = Function.prototype.apply;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/call-bind-apply-helpers/reflectApply.js
+=======
+//#region ../../../../../node_modules/call-bind-apply-helpers/reflectApply.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_reflectApply = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {import('./reflectApply')} */
 	module.exports = typeof Reflect !== "undefined" && Reflect && Reflect.apply;
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/call-bind-apply-helpers/actualApply.js
+=======
+//#region ../../../../../node_modules/call-bind-apply-helpers/actualApply.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_actualApply = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var bind = require_function_bind();
 	var $apply = require_functionApply();
@@ -27969,7 +28385,11 @@ var require_actualApply = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/call-bind-apply-helpers/index.js
+=======
+//#region ../../../../../node_modules/call-bind-apply-helpers/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_call_bind_apply_helpers = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var bind = require_function_bind();
 	var $TypeError = require_type();
@@ -27983,7 +28403,11 @@ var require_call_bind_apply_helpers = /* @__PURE__ */ __commonJSMin(((exports, m
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/dunder-proto/get.js
+=======
+//#region ../../../../../node_modules/dunder-proto/get.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_get = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var callBind = require_call_bind_apply_helpers();
 	var gOPD = require_gopd();
@@ -28003,7 +28427,11 @@ var require_get = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/get-proto/index.js
+=======
+//#region ../../../../../node_modules/get-proto/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_get_proto = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var reflectGetProto = require_Reflect_getPrototypeOf();
 	var originalGetProto = require_Object_getPrototypeOf();
@@ -28020,7 +28448,11 @@ var require_get_proto = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/hasown/index.js
+=======
+//#region ../../../../../node_modules/hasown/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_hasown = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var call = Function.prototype.call;
 	var $hasOwn = Object.prototype.hasOwnProperty;
@@ -28030,7 +28462,11 @@ var require_hasown = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/get-intrinsic/index.js
+=======
+//#region ../../../../../node_modules/get-intrinsic/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_get_intrinsic = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var undefined;
 	var $Object = require_es_object_atoms();
@@ -28357,7 +28793,11 @@ var require_get_intrinsic = /* @__PURE__ */ __commonJSMin(((exports, module) => 
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/call-bound/index.js
+=======
+//#region ../../../../../node_modules/call-bound/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_call_bound = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var GetIntrinsic = require_get_intrinsic();
 	var callBindBasic = require_call_bind_apply_helpers();
@@ -28372,7 +28812,11 @@ var require_call_bound = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/side-channel-map/index.js
+=======
+//#region ../../../../../node_modules/side-channel-map/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_side_channel_map = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var GetIntrinsic = require_get_intrinsic();
 	var callBound = require_call_bound();
@@ -28425,7 +28869,11 @@ var require_side_channel_map = /* @__PURE__ */ __commonJSMin(((exports, module) 
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/side-channel-weakmap/index.js
+=======
+//#region ../../../../../node_modules/side-channel-weakmap/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_side_channel_weakmap = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var GetIntrinsic = require_get_intrinsic();
 	var callBound = require_call_bound();
@@ -28488,7 +28936,11 @@ var require_side_channel_weakmap = /* @__PURE__ */ __commonJSMin(((exports, modu
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/side-channel/index.js
+=======
+//#region ../../../../../node_modules/side-channel/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_side_channel = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var $TypeError = require_type();
 	var inspect = require_object_inspect();
@@ -28523,7 +28975,11 @@ var require_side_channel = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/qs/lib/formats.js
+=======
+//#region ../../../../../node_modules/qs/lib/formats.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_formats$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var replace = String.prototype.replace;
 	var percentTwenties = /%20/g;
@@ -28547,7 +29003,11 @@ var require_formats$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/qs/lib/utils.js
+=======
+//#region ../../../../../node_modules/qs/lib/utils.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_utils$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var formats = require_formats$1();
 	var getSideChannel = require_side_channel();
@@ -28767,7 +29227,11 @@ var require_utils$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/qs/lib/stringify.js
+=======
+//#region ../../../../../node_modules/qs/lib/stringify.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_stringify$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var getSideChannel = require_side_channel();
 	var utils = require_utils$2();
@@ -28949,7 +29413,11 @@ var require_stringify$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/qs/lib/parse.js
+=======
+//#region ../../../../../node_modules/qs/lib/parse.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_parse = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var utils = require_utils$2();
 	var has = Object.prototype.hasOwnProperty;
@@ -29160,7 +29628,11 @@ var require_parse = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/qs/lib/index.js
+=======
+//#region ../../../../../node_modules/qs/lib/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_lib = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var stringify = require_stringify$1();
 	var parse = require_parse();
@@ -29173,7 +29645,11 @@ var require_lib = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/lib/types/urlencoded.js
+=======
+//#region ../../../../../node_modules/body-parser/lib/types/urlencoded.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * body-parser
 * Copyright(c) 2014 Jonathan Ong
@@ -29375,7 +29851,11 @@ var require_urlencoded = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/body-parser/index.js
+=======
+//#region ../../../../../node_modules/body-parser/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * body-parser
 * Copyright(c) 2014-2015 Douglas Christopher Wilson
@@ -29500,7 +29980,11 @@ var require_body_parser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/merge-descriptors/index.js
+=======
+//#region ../../../../../node_modules/merge-descriptors/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * merge-descriptors
 * Copyright(c) 2014 Jonathan Ong
@@ -29541,7 +30025,11 @@ var require_merge_descriptors = /* @__PURE__ */ __commonJSMin(((exports, module)
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/finalhandler/node_modules/ms/index.js
+=======
+//#region ../../../../../node_modules/finalhandler/node_modules/ms/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_ms$3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Helpers.
@@ -29651,7 +30139,11 @@ var require_ms$3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/finalhandler/node_modules/debug/src/debug.js
+=======
+//#region ../../../../../node_modules/finalhandler/node_modules/debug/src/debug.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_debug$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* This is the common logic for both the Node.js and web browser
@@ -29792,7 +30284,11 @@ var require_debug$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/finalhandler/node_modules/debug/src/browser.js
+=======
+//#region ../../../../../node_modules/finalhandler/node_modules/debug/src/browser.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_browser$3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* This is the web browser implementation of `debug()`.
@@ -29915,7 +30411,11 @@ var require_browser$3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/finalhandler/node_modules/debug/src/node.js
+=======
+//#region ../../../../../node_modules/finalhandler/node_modules/debug/src/node.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_node$3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Module dependencies.
@@ -30088,7 +30588,11 @@ var require_node$3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/finalhandler/node_modules/debug/src/index.js
+=======
+//#region ../../../../../node_modules/finalhandler/node_modules/debug/src/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_src$4 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Detect Electron renderer process, which is node, but we should
@@ -30099,7 +30603,11 @@ var require_src$4 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/encodeurl/index.js
+=======
+//#region ../../../../../node_modules/encodeurl/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * encodeurl
 * Copyright(c) 2016 Douglas Christopher Wilson
@@ -30150,7 +30658,11 @@ var require_encodeurl = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/escape-html/index.js
+=======
+//#region ../../../../../node_modules/escape-html/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * escape-html
 * Copyright(c) 2012-2013 TJ Holowaychuk
@@ -30212,7 +30724,11 @@ var require_escape_html = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/parseurl/index.js
+=======
+//#region ../../../../../node_modules/parseurl/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * parseurl
 * Copyright(c) 2014 Jonathan Ong
@@ -30318,7 +30834,11 @@ var require_parseurl = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/finalhandler/index.js
+=======
+//#region ../../../../../node_modules/finalhandler/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * finalhandler
 * Copyright(c) 2014-2022 Douglas Christopher Wilson
@@ -30540,7 +31060,11 @@ var require_finalhandler = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/node_modules/ms/index.js
+=======
+//#region ../../../../../node_modules/express/node_modules/ms/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_ms$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Helpers.
@@ -30650,7 +31174,11 @@ var require_ms$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/node_modules/debug/src/debug.js
+=======
+//#region ../../../../../node_modules/express/node_modules/debug/src/debug.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_debug$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* This is the common logic for both the Node.js and web browser
@@ -30791,7 +31319,11 @@ var require_debug$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/node_modules/debug/src/browser.js
+=======
+//#region ../../../../../node_modules/express/node_modules/debug/src/browser.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_browser$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* This is the web browser implementation of `debug()`.
@@ -30914,7 +31446,11 @@ var require_browser$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/node_modules/debug/src/node.js
+=======
+//#region ../../../../../node_modules/express/node_modules/debug/src/node.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_node$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Module dependencies.
@@ -31087,7 +31623,11 @@ var require_node$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/node_modules/debug/src/index.js
+=======
+//#region ../../../../../node_modules/express/node_modules/debug/src/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_src$3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Detect Electron renderer process, which is node, but we should
@@ -31098,7 +31638,11 @@ var require_src$3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/array-flatten/array-flatten.js
+=======
+//#region ../../../../../node_modules/array-flatten/array-flatten.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_array_flatten = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Expose `arrayFlatten`.
@@ -31149,7 +31693,11 @@ var require_array_flatten = /* @__PURE__ */ __commonJSMin(((exports, module) => 
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/path-to-regexp/index.js
+=======
+//#region ../../../../../node_modules/path-to-regexp/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_path_to_regexp = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Expose `pathToRegexp`.
@@ -31262,7 +31810,11 @@ var require_path_to_regexp = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/lib/router/layer.js
+=======
+//#region ../../../../../node_modules/express/lib/router/layer.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * express
 * Copyright(c) 2009-2013 TJ Holowaychuk
@@ -31395,7 +31947,11 @@ var require_layer = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/methods/index.js
+=======
+//#region ../../../../../node_modules/methods/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * methods
 * Copyright(c) 2013-2014 TJ Holowaychuk
@@ -31459,7 +32015,11 @@ var require_methods = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/lib/router/route.js
+=======
+//#region ../../../../../node_modules/express/lib/router/route.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * express
 * Copyright(c) 2009-2013 TJ Holowaychuk
@@ -31608,7 +32168,11 @@ var require_route = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/utils-merge/index.js
+=======
+//#region ../../../../../node_modules/utils-merge/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_utils_merge = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Merge object b with object a.
@@ -31631,7 +32195,11 @@ var require_utils_merge = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/lib/router/index.js
+=======
+//#region ../../../../../node_modules/express/lib/router/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * express
 * Copyright(c) 2009-2013 TJ Holowaychuk
@@ -32041,7 +32609,11 @@ var require_router = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/lib/middleware/init.js
+=======
+//#region ../../../../../node_modules/express/lib/middleware/init.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * express
 * Copyright(c) 2009-2013 TJ Holowaychuk
@@ -32079,7 +32651,11 @@ var require_init = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/lib/middleware/query.js
+=======
+//#region ../../../../../node_modules/express/lib/middleware/query.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * express
 * Copyright(c) 2009-2013 TJ Holowaychuk
@@ -32118,7 +32694,11 @@ var require_query = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/lib/view.js
+=======
+//#region ../../../../../node_modules/express/lib/view.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * express
 * Copyright(c) 2009-2013 TJ Holowaychuk
@@ -32247,7 +32827,11 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/node_modules/safe-buffer/index.js
+=======
+//#region ../../../../../node_modules/express/node_modules/safe-buffer/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_safe_buffer$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
 	var buffer$1 = require("buffer");
@@ -32288,7 +32872,11 @@ var require_safe_buffer$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => 
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/content-disposition/node_modules/safe-buffer/index.js
+=======
+//#region ../../../../../node_modules/content-disposition/node_modules/safe-buffer/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_safe_buffer = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
 	var buffer = require("buffer");
@@ -32329,7 +32917,11 @@ var require_safe_buffer = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/content-disposition/index.js
+=======
+//#region ../../../../../node_modules/content-disposition/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * content-disposition
 * Copyright(c) 2014-2017 Douglas Christopher Wilson
@@ -32632,7 +33224,11 @@ var require_content_disposition = /* @__PURE__ */ __commonJSMin(((exports, modul
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/send/node_modules/debug/node_modules/ms/index.js
+=======
+//#region ../../../../../node_modules/send/node_modules/debug/node_modules/ms/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_ms$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Helpers.
@@ -32742,7 +33338,11 @@ var require_ms$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/send/node_modules/debug/src/debug.js
+=======
+//#region ../../../../../node_modules/send/node_modules/debug/src/debug.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_debug = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* This is the common logic for both the Node.js and web browser
@@ -32883,7 +33483,11 @@ var require_debug = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/send/node_modules/debug/src/browser.js
+=======
+//#region ../../../../../node_modules/send/node_modules/debug/src/browser.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_browser$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* This is the web browser implementation of `debug()`.
@@ -33006,7 +33610,11 @@ var require_browser$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/send/node_modules/debug/src/node.js
+=======
+//#region ../../../../../node_modules/send/node_modules/debug/src/node.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_node$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Module dependencies.
@@ -33179,7 +33787,11 @@ var require_node$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/send/node_modules/debug/src/index.js
+=======
+//#region ../../../../../node_modules/send/node_modules/debug/src/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_src$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Detect Electron renderer process, which is node, but we should
@@ -33190,7 +33802,11 @@ var require_src$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/etag/index.js
+=======
+//#region ../../../../../node_modules/etag/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * etag
 * Copyright(c) 2014-2016 Douglas Christopher Wilson
@@ -33267,7 +33883,11 @@ var require_etag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/fresh/index.js
+=======
+//#region ../../../../../node_modules/fresh/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * fresh
 * Copyright(c) 2012 TJ Holowaychuk
@@ -33358,7 +33978,11 @@ var require_fresh = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/send/node_modules/mime/types.json
+=======
+//#region ../../../../../node_modules/send/node_modules/mime/types.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_types$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"application/andrew-inset": ["ez"],
@@ -34457,7 +35081,11 @@ var require_types$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/send/node_modules/mime/mime.js
+=======
+//#region ../../../../../node_modules/send/node_modules/mime/mime.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_mime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	require("path");
 	var fs$19 = require("fs");
@@ -34530,7 +35158,11 @@ var require_mime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ms/index.js
+=======
+//#region ../../../../../node_modules/ms/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_ms = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Helpers.
@@ -34649,7 +35281,11 @@ var require_ms = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/range-parser/index.js
+=======
+//#region ../../../../../node_modules/range-parser/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * range-parser
 * Copyright(c) 2012-2014 TJ Holowaychuk
@@ -34754,7 +35390,11 @@ var require_range_parser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/send/index.js
+=======
+//#region ../../../../../node_modules/send/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * send
 * Copyright(c) 2012 TJ Holowaychuk
@@ -35536,7 +36176,11 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/forwarded/index.js
+=======
+//#region ../../../../../node_modules/forwarded/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * forwarded
 * Copyright(c) 2014-2017 Douglas Christopher Wilson
@@ -35598,7 +36242,11 @@ var require_forwarded = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ipaddr.js/lib/ipaddr.js
+=======
+//#region ../../../../../node_modules/ipaddr.js/lib/ipaddr.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_ipaddr = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	(function() {
 		var expandIPv6, ipaddr = {}, ipv4Part, ipv4Regexes, ipv6Part, ipv6Regexes, matchCIDR, root = this, zoneIndex;
@@ -36270,7 +36918,11 @@ var require_ipaddr = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/proxy-addr/index.js
+=======
+//#region ../../../../../node_modules/proxy-addr/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * proxy-addr
 * Copyright(c) 2014-2016 Douglas Christopher Wilson
@@ -36475,7 +37127,11 @@ var require_proxy_addr = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/lib/utils.js
+=======
+//#region ../../../../../node_modules/express/lib/utils.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * express
 * Copyright(c) 2009-2013 TJ Holowaychuk
@@ -36708,7 +37364,11 @@ var require_utils$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/lib/application.js
+=======
+//#region ../../../../../node_modules/express/lib/application.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * express
 * Copyright(c) 2009-2013 TJ Holowaychuk
@@ -37194,7 +37854,11 @@ var require_application = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/negotiator/lib/charset.js
+=======
+//#region ../../../../../node_modules/negotiator/lib/charset.js
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * negotiator
 * Copyright(c) 2012 Isaac Z. Schlueter
@@ -37321,7 +37985,11 @@ var require_charset = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/negotiator/lib/encoding.js
+=======
+//#region ../../../../../node_modules/negotiator/lib/encoding.js
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * negotiator
 * Copyright(c) 2012 Isaac Z. Schlueter
@@ -37459,7 +38127,11 @@ var require_encoding = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/negotiator/lib/language.js
+=======
+//#region ../../../../../node_modules/negotiator/lib/language.js
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * negotiator
 * Copyright(c) 2012 Isaac Z. Schlueter
@@ -37592,7 +38264,11 @@ var require_language = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/negotiator/lib/mediaType.js
+=======
+//#region ../../../../../node_modules/negotiator/lib/mediaType.js
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * negotiator
 * Copyright(c) 2012 Isaac Z. Schlueter
@@ -37787,7 +38463,11 @@ var require_mediaType = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/negotiator/index.js
+=======
+//#region ../../../../../node_modules/negotiator/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * negotiator
 * Copyright(c) 2012 Federico Romero
@@ -37854,7 +38534,11 @@ var require_negotiator = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/accepts/index.js
+=======
+//#region ../../../../../node_modules/accepts/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * accepts
 * Copyright(c) 2014 Jonathan Ong
@@ -38022,7 +38706,11 @@ var require_accepts = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/lib/request.js
+=======
+//#region ../../../../../node_modules/express/lib/request.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * express
 * Copyright(c) 2009-2013 TJ Holowaychuk
@@ -38432,7 +39120,11 @@ var require_request = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/cookie-signature/index.js
+=======
+//#region ../../../../../node_modules/cookie-signature/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_cookie_signature = /* @__PURE__ */ __commonJSMin(((exports) => {
 	/**
 	* Module dependencies.
@@ -38475,7 +39167,11 @@ var require_cookie_signature = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/cookie/index.js
+=======
+//#region ../../../../../node_modules/cookie/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * cookie
 * Copyright(c) 2012-2014 Roman Shtylman
@@ -38716,7 +39412,11 @@ var require_cookie = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/vary/index.js
+=======
+//#region ../../../../../node_modules/vary/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * vary
 * Copyright(c) 2014-2017 Douglas Christopher Wilson
@@ -38806,7 +39506,11 @@ var require_vary = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/lib/response.js
+=======
+//#region ../../../../../node_modules/express/lib/response.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * express
 * Copyright(c) 2009-2013 TJ Holowaychuk
@@ -39654,7 +40358,11 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/serve-static/index.js
+=======
+//#region ../../../../../node_modules/serve-static/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * serve-static
 * Copyright(c) 2010 Sencha Inc.
@@ -39779,7 +40487,11 @@ var require_serve_static = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/lib/express.js
+=======
+//#region ../../../../../node_modules/express/lib/express.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * express
 * Copyright(c) 2009-2013 TJ Holowaychuk
@@ -39879,7 +40591,11 @@ var require_express$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/express/index.js
+=======
+//#region ../../../../../node_modules/express/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*!
 * express
 * Copyright(c) 2009-2013 TJ Holowaychuk
@@ -39892,7 +40608,11 @@ var require_express = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/totalist/sync/index.mjs
+=======
+//#region ../../../../../node_modules/totalist/sync/index.mjs
+>>>>>>> origin/worktree-agent-a59d4079
 var import_express = /* @__PURE__ */ __toESM(require_express());
 function totalist(dir, callback, pre = "") {
 	dir = (0, path.resolve)(".", dir);
@@ -39906,7 +40626,11 @@ function totalist(dir, callback, pre = "") {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@polka/url/build.mjs
+=======
+//#region ../../../../../node_modules/@polka/url/build.mjs
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * @typedef ParsedURL
 * @type {import('.').ParsedURL}
@@ -39949,7 +40673,11 @@ function parse$2(req) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/mrmime/index.mjs
+=======
+//#region ../../../../../node_modules/mrmime/index.mjs
+>>>>>>> origin/worktree-agent-a59d4079
 const mimes = {
 	"3g2": "video/3gpp2",
 	"3gp": "video/3gpp",
@@ -40397,7 +41125,11 @@ function lookup(extn) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/sirv/build.mjs
+=======
+//#region ../../../../../node_modules/sirv/build.mjs
+>>>>>>> origin/worktree-agent-a59d4079
 const noop = () => {};
 function isMatch(uri, arr) {
 	for (let i = 0; i < arr.length; i++) if (arr[i].test(uri)) return true;
@@ -40542,7 +41274,11 @@ function build_default(dir, opts = {}) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ws/lib/constants.js
+=======
+//#region ../../../../../node_modules/ws/lib/constants.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_constants = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const BINARY_TYPES = [
 		"nodebuffer",
@@ -40566,7 +41302,11 @@ var require_constants = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ws/lib/buffer-util.js
+=======
+//#region ../../../../../node_modules/ws/lib/buffer-util.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_buffer_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { EMPTY_BUFFER } = require_constants();
 	const FastBuffer = Buffer[Symbol.species];
@@ -40667,7 +41407,11 @@ var require_buffer_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ws/lib/limiter.js
+=======
+//#region ../../../../../node_modules/ws/lib/limiter.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_limiter = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const kDone = Symbol("kDone");
 	const kRun = Symbol("kRun");
@@ -40719,7 +41463,11 @@ var require_limiter = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ws/lib/permessage-deflate.js
+=======
+//#region ../../../../../node_modules/ws/lib/permessage-deflate.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_permessage_deflate = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const zlib = require("zlib");
 	const bufferUtil = require_buffer_util();
@@ -41053,7 +41801,11 @@ var require_permessage_deflate = /* @__PURE__ */ __commonJSMin(((exports, module
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ws/lib/validation.js
+=======
+//#region ../../../../../node_modules/ws/lib/validation.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_validation$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { isUtf8 } = require("buffer");
 	const { hasBlob } = require_constants();
@@ -41250,7 +42002,11 @@ var require_validation$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ws/lib/receiver.js
+=======
+//#region ../../../../../node_modules/ws/lib/receiver.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_receiver = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { Writable } = require("stream");
 	const PerMessageDeflate = require_permessage_deflate();
@@ -41698,7 +42454,11 @@ var require_receiver = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ws/lib/sender.js
+=======
+//#region ../../../../../node_modules/ws/lib/sender.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_sender = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { Duplex: Duplex$3 } = require("stream");
 	const { randomFillSync } = require("crypto");
@@ -42194,7 +42954,11 @@ var require_sender = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ws/lib/event-target.js
+=======
+//#region ../../../../../node_modules/ws/lib/event-target.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_event_target = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { kForOnEventAttribute, kListener } = require_constants();
 	const kCode = Symbol("kCode");
@@ -42414,7 +43178,11 @@ var require_event_target = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ws/lib/extension.js
+=======
+//#region ../../../../../node_modules/ws/lib/extension.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_extension = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { tokenChars } = require_validation$1();
 	/**
@@ -42558,7 +43326,11 @@ var require_extension = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ws/lib/websocket.js
+=======
+//#region ../../../../../node_modules/ws/lib/websocket.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_websocket = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const EventEmitter$3 = require("events");
 	const https = require("https");
@@ -43530,7 +44302,11 @@ var require_websocket = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ws/lib/stream.js
+=======
+//#region ../../../../../node_modules/ws/lib/stream.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_stream = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	require_websocket();
 	const { Duplex: Duplex$1 } = require("stream");
@@ -43647,7 +44423,11 @@ var require_stream = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ws/lib/subprotocol.js
+=======
+//#region ../../../../../node_modules/ws/lib/subprotocol.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_subprotocol = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { tokenChars } = require_validation$1();
 	/**
@@ -43687,7 +44467,11 @@ var require_subprotocol = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ws/lib/websocket-server.js
+=======
+//#region ../../../../../node_modules/ws/lib/websocket-server.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_websocket_server = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const EventEmitter$2 = require("events");
 	const http$1 = require("http");
@@ -44062,7 +44846,11 @@ var require_websocket_server = /* @__PURE__ */ __commonJSMin(((exports, module) 
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ws/wrapper.mjs
+=======
+//#region ../../../../../node_modules/ws/wrapper.mjs
+>>>>>>> origin/worktree-agent-a59d4079
 var import_stream = /* @__PURE__ */ __toESM(require_stream(), 1);
 var import_receiver = /* @__PURE__ */ __toESM(require_receiver(), 1);
 var import_sender = /* @__PURE__ */ __toESM(require_sender(), 1);
@@ -44070,7 +44858,11 @@ var import_websocket = /* @__PURE__ */ __toESM(require_websocket(), 1);
 var import_websocket_server = /* @__PURE__ */ __toESM(require_websocket_server(), 1);
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@hono/node-server/dist/index.mjs
+=======
+//#region ../../../../../node_modules/@hono/node-server/dist/index.mjs
+>>>>>>> origin/worktree-agent-a59d4079
 var RequestError = class extends Error {
 	constructor(message, options) {
 		super(message, options);
@@ -44483,7 +45275,11 @@ var getRequestListener = (fetchCallback, options = {}) => {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/core/core.js
+=======
+//#region ../../../../../node_modules/zod/v4/core/core.js
+>>>>>>> origin/worktree-agent-a59d4079
 /** A special constant with type `never` */
 const NEVER = Object.freeze({ status: "aborted" });
 function $constructor(name, initializer, params) {
@@ -44543,7 +45339,11 @@ function config(newConfig) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/core/util.js
+=======
+//#region ../../../../../node_modules/zod/v4/core/util.js
+>>>>>>> origin/worktree-agent-a59d4079
 function getEnumValues(entries) {
 	const numericValues = Object.values(entries).filter((v) => typeof v === "number");
 	return Object.entries(entries).filter(([k, _]) => numericValues.indexOf(+k) === -1).map(([_, v]) => v);
@@ -44857,7 +45657,11 @@ function issue(...args) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/core/errors.js
+=======
+//#region ../../../../../node_modules/zod/v4/core/errors.js
+>>>>>>> origin/worktree-agent-a59d4079
 const initializer$1 = (inst, def) => {
 	inst.name = "$ZodError";
 	Object.defineProperty(inst, "_zod", {
@@ -44915,7 +45719,11 @@ function formatError(error, mapper = (issue) => issue.message) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/core/parse.js
+=======
+//#region ../../../../../node_modules/zod/v4/core/parse.js
+>>>>>>> origin/worktree-agent-a59d4079
 const _parse = (_Err) => (schema, value, _ctx, _params) => {
 	const ctx = _ctx ? Object.assign(_ctx, { async: false }) : { async: false };
 	const result = schema._zod.run({
@@ -45019,7 +45827,11 @@ const _safeDecodeAsync = (_Err) => async (schema, value, _ctx) => {
 const safeDecodeAsync$1 = /* @__PURE__ */ _safeDecodeAsync($ZodRealError);
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/core/regexes.js
+=======
+//#region ../../../../../node_modules/zod/v4/core/regexes.js
+>>>>>>> origin/worktree-agent-a59d4079
 const cuid = /^[cC][^\s-]{8,}$/;
 const cuid2 = /^[0-9a-z]+$/;
 const ulid = /^[0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{26}$/;
@@ -45079,7 +45891,11 @@ const lowercase = /^[^A-Z]*$/;
 const uppercase = /^[^a-z]*$/;
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/core/checks.js
+=======
+//#region ../../../../../node_modules/zod/v4/core/checks.js
+>>>>>>> origin/worktree-agent-a59d4079
 const $ZodCheck = /* @__PURE__ */ $constructor("$ZodCheck", (inst, def) => {
 	var _a;
 	inst._zod ?? (inst._zod = {});
@@ -45438,7 +46254,11 @@ const $ZodCheckOverwrite = /* @__PURE__ */ $constructor("$ZodCheckOverwrite", (i
 });
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/core/doc.js
+=======
+//#region ../../../../../node_modules/zod/v4/core/doc.js
+>>>>>>> origin/worktree-agent-a59d4079
 var Doc = class {
 	constructor(args = []) {
 		this.content = [];
@@ -45470,7 +46290,11 @@ var Doc = class {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/core/versions.js
+=======
+//#region ../../../../../node_modules/zod/v4/core/versions.js
+>>>>>>> origin/worktree-agent-a59d4079
 const version = {
 	major: 4,
 	minor: 3,
@@ -45478,7 +46302,11 @@ const version = {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/core/schemas.js
+=======
+//#region ../../../../../node_modules/zod/v4/core/schemas.js
+>>>>>>> origin/worktree-agent-a59d4079
 const $ZodType = /* @__PURE__ */ $constructor("$ZodType", (inst, def) => {
 	var _a;
 	inst ?? (inst = {});
@@ -46696,7 +47524,11 @@ function handleRefineResult(result, payload, input, inst) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/core/registries.js
+=======
+//#region ../../../../../node_modules/zod/v4/core/registries.js
+>>>>>>> origin/worktree-agent-a59d4079
 var _a$1;
 var $ZodRegistry = class {
 	constructor() {
@@ -46744,7 +47576,11 @@ function registry() {
 const globalRegistry = globalThis.__zod_globalRegistry;
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/core/api.js
+=======
+//#region ../../../../../node_modules/zod/v4/core/api.js
+>>>>>>> origin/worktree-agent-a59d4079
 /* @__NO_SIDE_EFFECTS__ */
 function _string(Class, params) {
 	return new Class({
@@ -47289,7 +48125,11 @@ function meta$2(metadata) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/core/to-json-schema.js
+=======
+//#region ../../../../../node_modules/zod/v4/core/to-json-schema.js
+>>>>>>> origin/worktree-agent-a59d4079
 function initializeContext(params) {
 	let target = params?.target ?? "draft-2020-12";
 	if (target === "draft-4") target = "draft-04";
@@ -47575,7 +48415,11 @@ const createStandardJSONSchemaMethod = (schema, io, processors = {}) => (params)
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/core/json-schema-processors.js
+=======
+//#region ../../../../../node_modules/zod/v4/core/json-schema-processors.js
+>>>>>>> origin/worktree-agent-a59d4079
 const formatMap = {
 	guid: "uuid",
 	url: "uri",
@@ -48032,7 +48876,11 @@ function toJSONSchema(input, params) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/classic/iso.js
+=======
+//#region ../../../../../node_modules/zod/v4/classic/iso.js
+>>>>>>> origin/worktree-agent-a59d4079
 const ZodISODateTime = /* @__PURE__ */ $constructor("ZodISODateTime", (inst, def) => {
 	$ZodISODateTime.init(inst, def);
 	ZodStringFormat.init(inst, def);
@@ -48063,7 +48911,11 @@ function duration(params) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/classic/errors.js
+=======
+//#region ../../../../../node_modules/zod/v4/classic/errors.js
+>>>>>>> origin/worktree-agent-a59d4079
 const initializer = (inst, issues) => {
 	$ZodError.init(inst, issues);
 	inst.name = "ZodError";
@@ -48087,7 +48939,11 @@ const ZodError$1 = $constructor("ZodError", initializer);
 const ZodRealError = $constructor("ZodError", initializer, { Parent: Error });
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/classic/parse.js
+=======
+//#region ../../../../../node_modules/zod/v4/classic/parse.js
+>>>>>>> origin/worktree-agent-a59d4079
 const parse = /* @__PURE__ */ _parse(ZodRealError);
 const parseAsync = /* @__PURE__ */ _parseAsync(ZodRealError);
 const safeParse$1 = /* @__PURE__ */ _safeParse(ZodRealError);
@@ -48102,7 +48958,11 @@ const safeEncodeAsync = /* @__PURE__ */ _safeEncodeAsync(ZodRealError);
 const safeDecodeAsync = /* @__PURE__ */ _safeDecodeAsync(ZodRealError);
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/classic/schemas.js
+=======
+//#region ../../../../../node_modules/zod/v4/classic/schemas.js
+>>>>>>> origin/worktree-agent-a59d4079
 const ZodType$1 = /* @__PURE__ */ $constructor("ZodType", (inst, def) => {
 	$ZodType.init(inst, def);
 	Object.assign(inst["~standard"], { jsonSchema: {
@@ -48734,7 +49594,11 @@ function preprocess(fn, schema) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/types.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/types.js
+>>>>>>> origin/worktree-agent-a59d4079
 const LATEST_PROTOCOL_VERSION = "2025-11-25";
 const DEFAULT_NEGOTIATED_PROTOCOL_VERSION = "2025-03-26";
 const SUPPORTED_PROTOCOL_VERSIONS = [
@@ -49993,7 +50857,11 @@ var UrlElicitationRequiredError = class extends McpError {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/server/webStandardStreamableHttp.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/server/webStandardStreamableHttp.js
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * Web Standards Streamable HTTP Server Transport
 *
@@ -50551,7 +51419,11 @@ var WebStandardStreamableHTTPServerTransport = class {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/server/streamableHttp.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/server/streamableHttp.js
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * Node.js HTTP Streamable HTTP Server Transport
 *
@@ -50698,7 +51570,11 @@ var StreamableHTTPServerTransport = class {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v3/helpers/util.js
+=======
+//#region ../../../../../node_modules/zod/v3/helpers/util.js
+>>>>>>> origin/worktree-agent-a59d4079
 var util$1;
 (function(util) {
 	util.assertEqual = (_) => {};
@@ -50795,7 +51671,11 @@ const getParsedType = (data) => {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v3/ZodError.js
+=======
+//#region ../../../../../node_modules/zod/v3/ZodError.js
+>>>>>>> origin/worktree-agent-a59d4079
 const ZodIssueCode = util$1.arrayToEnum([
 	"invalid_type",
 	"invalid_literal",
@@ -50895,7 +51775,11 @@ ZodError.create = (issues) => {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v3/locales/en.js
+=======
+//#region ../../../../../node_modules/zod/v3/locales/en.js
+>>>>>>> origin/worktree-agent-a59d4079
 const errorMap = (issue, _ctx) => {
 	let message;
 	switch (issue.code) {
@@ -50973,14 +51857,22 @@ const errorMap = (issue, _ctx) => {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v3/errors.js
+=======
+//#region ../../../../../node_modules/zod/v3/errors.js
+>>>>>>> origin/worktree-agent-a59d4079
 let overrideErrorMap = errorMap;
 function getErrorMap() {
 	return overrideErrorMap;
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v3/helpers/parseUtil.js
+=======
+//#region ../../../../../node_modules/zod/v3/helpers/parseUtil.js
+>>>>>>> origin/worktree-agent-a59d4079
 const makeIssue = (params) => {
 	const { data, path, errorMaps, issueData } = params;
 	const fullPath = [...path, ...issueData.path || []];
@@ -51085,7 +51977,11 @@ const isValid = (x) => x.status === "valid";
 const isAsync = (x) => typeof Promise !== "undefined" && x instanceof Promise;
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v3/helpers/errorUtil.js
+=======
+//#region ../../../../../node_modules/zod/v3/helpers/errorUtil.js
+>>>>>>> origin/worktree-agent-a59d4079
 var errorUtil;
 (function(errorUtil) {
 	errorUtil.errToObj = (message) => typeof message === "string" ? { message } : message || {};
@@ -51093,7 +51989,11 @@ var errorUtil;
 })(errorUtil || (errorUtil = {}));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v3/types.js
+=======
+//#region ../../../../../node_modules/zod/v3/types.js
+>>>>>>> origin/worktree-agent-a59d4079
 var ParseInputLazyPath = class {
 	constructor(parent, value, path, key) {
 		this._cachedPath = [];
@@ -54244,7 +55144,11 @@ const preprocessType = ZodEffects.createWithPreprocess;
 const pipelineType = ZodPipeline.create;
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod/v4/mini/schemas.js
+=======
+//#region ../../../../../node_modules/zod/v4/mini/schemas.js
+>>>>>>> origin/worktree-agent-a59d4079
 const ZodMiniType = /* @__PURE__ */ $constructor("ZodMiniType", (inst, def) => {
 	if (!inst._zod) throw new Error("Uninitialized schema in ZodMiniType.");
 	$ZodType.init(inst, def);
@@ -54290,7 +55194,11 @@ const describe = describe$2;
 const meta = meta$2;
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/server/zod-compat.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/server/zod-compat.js
+>>>>>>> origin/worktree-agent-a59d4079
 function isZ4Schema(s) {
 	return !!s._zod;
 }
@@ -54406,7 +55314,11 @@ function getLiteralValue(schema) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/interfaces.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/interfaces.js
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * Experimental task interfaces for MCP SDK.
 * WARNING: These APIs are experimental and may change without notice.
@@ -54424,7 +55336,11 @@ function isTerminal(status) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/Options.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/Options.js
+>>>>>>> origin/worktree-agent-a59d4079
 const ignoreOverride = Symbol("Let zodToJsonSchema decide on which parser to use");
 const defaultOptions$2 = {
 	name: void 0,
@@ -54459,7 +55375,11 @@ const getDefaultOptions = (options) => typeof options === "string" ? {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/Refs.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/Refs.js
+>>>>>>> origin/worktree-agent-a59d4079
 const getRefs = (options) => {
 	const _options = getDefaultOptions(options);
 	const currentPath = _options.name !== void 0 ? [
@@ -54485,7 +55405,11 @@ const getRefs = (options) => {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/errorMessages.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/errorMessages.js
+>>>>>>> origin/worktree-agent-a59d4079
 function addErrorMessage(res, key, errorMessage, refs) {
 	if (!refs?.errorMessages) return;
 	if (errorMessage) res.errorMessage = {
@@ -54499,7 +55423,11 @@ function setResponseValueAndErrors(res, key, value, errorMessage, refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/getRelativePath.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/getRelativePath.js
+>>>>>>> origin/worktree-agent-a59d4079
 const getRelativePath = (pathA, pathB) => {
 	let i = 0;
 	for (; i < pathA.length && i < pathB.length; i++) if (pathA[i] !== pathB[i]) break;
@@ -54507,7 +55435,11 @@ const getRelativePath = (pathA, pathB) => {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/any.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/any.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseAnyDef(refs) {
 	if (refs.target !== "openAi") return {};
 	const anyDefinitionPath = [
@@ -54520,7 +55452,11 @@ function parseAnyDef(refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/array.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/array.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseArrayDef(def, refs) {
 	const res = { type: "array" };
 	if (def.type?._def && def.type?._def?.typeName !== ZodFirstPartyTypeKind.ZodAny) res.items = parseDef(def.type._def, {
@@ -54537,7 +55473,11 @@ function parseArrayDef(def, refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/bigint.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/bigint.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseBigintDef(def, refs) {
 	const res = {
 		type: "integer",
@@ -54569,25 +55509,41 @@ function parseBigintDef(def, refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/boolean.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/boolean.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseBooleanDef() {
 	return { type: "boolean" };
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/branded.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/branded.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseBrandedDef(_def, refs) {
 	return parseDef(_def.type._def, refs);
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/catch.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/catch.js
+>>>>>>> origin/worktree-agent-a59d4079
 const parseCatchDef = (def, refs) => {
 	return parseDef(def.innerType._def, refs);
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/date.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/date.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseDateDef(def, refs, overrideDateStrategy) {
 	const strategy = overrideDateStrategy ?? refs.dateStrategy;
 	if (Array.isArray(strategy)) return { anyOf: strategy.map((item, i) => parseDateDef(def, refs, item)) };
@@ -54622,7 +55578,11 @@ const integerDateParser = (def, refs) => {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/default.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/default.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseDefaultDef(_def, refs) {
 	return {
 		...parseDef(_def.innerType._def, refs),
@@ -54631,13 +55591,21 @@ function parseDefaultDef(_def, refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/effects.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/effects.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseEffectsDef(_def, refs) {
 	return refs.effectStrategy === "input" ? parseDef(_def.schema._def, refs) : parseAnyDef(refs);
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/enum.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/enum.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseEnumDef(def) {
 	return {
 		type: "string",
@@ -54646,7 +55614,11 @@ function parseEnumDef(def) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/intersection.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/intersection.js
+>>>>>>> origin/worktree-agent-a59d4079
 const isJsonSchema7AllOfType = (type) => {
 	if ("type" in type && type.type === "string") return false;
 	return "allOf" in type;
@@ -54689,7 +55661,11 @@ function parseIntersectionDef(def, refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/literal.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/literal.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseLiteralDef(def, refs) {
 	const parsedType = typeof def.value;
 	if (parsedType !== "bigint" && parsedType !== "number" && parsedType !== "boolean" && parsedType !== "string") return { type: Array.isArray(def.value) ? "array" : "object" };
@@ -54704,7 +55680,11 @@ function parseLiteralDef(def, refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/string.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/string.js
+>>>>>>> origin/worktree-agent-a59d4079
 let emojiRegex = void 0;
 /**
 * Generated from the regular expressions found here as of 2024-05-22:
@@ -54950,7 +55930,11 @@ function stringifyRegExpWithFlags(regex, refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/record.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/record.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseRecordDef(def, refs) {
 	if (refs.target === "openAi") console.warn("Warning: OpenAI may not support records in schemas! Try an array of key-value pairs instead.");
 	if (refs.target === "openApi3" && def.keyType?._def.typeName === ZodFirstPartyTypeKind.ZodEnum) return {
@@ -54998,7 +55982,11 @@ function parseRecordDef(def, refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/map.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/map.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseMapDef(def, refs) {
 	if (refs.mapStrategy === "record") return parseRecordDef(def, refs);
 	return {
@@ -55030,7 +56018,11 @@ function parseMapDef(def, refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/nativeEnum.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/nativeEnum.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseNativeEnumDef(def) {
 	const object = def.values;
 	const actualValues = Object.keys(def.values).filter((key) => {
@@ -55044,7 +56036,11 @@ function parseNativeEnumDef(def) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/never.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/never.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseNeverDef(refs) {
 	return refs.target === "openAi" ? void 0 : { not: parseAnyDef({
 		...refs,
@@ -55053,7 +56049,11 @@ function parseNeverDef(refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/null.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/null.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseNullDef(refs) {
 	return refs.target === "openApi3" ? {
 		enum: ["null"],
@@ -55062,7 +56062,11 @@ function parseNullDef(refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/union.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/union.js
+>>>>>>> origin/worktree-agent-a59d4079
 const primitiveMappings = {
 	ZodString: "string",
 	ZodNumber: "number",
@@ -55119,7 +56123,11 @@ const asAnyOf = (def, refs) => {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/nullable.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/nullable.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseNullableDef(def, refs) {
 	if ([
 		"ZodString",
@@ -55160,7 +56168,11 @@ function parseNullableDef(def, refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/number.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/number.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseNumberDef(def, refs) {
 	const res = { type: "number" };
 	if (!def.checks) return res;
@@ -55193,7 +56205,11 @@ function parseNumberDef(def, refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/object.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/object.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseObjectDef(def, refs) {
 	const forceOptionalIntoNullable = refs.target === "openAi";
 	const result = {
@@ -55253,7 +56269,11 @@ function safeIsOptional(schema) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/optional.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/optional.js
+>>>>>>> origin/worktree-agent-a59d4079
 const parseOptionalDef = (def, refs) => {
 	if (refs.currentPath.toString() === refs.propertyPath?.toString()) return parseDef(def.innerType._def, refs);
 	const innerSchema = parseDef(def.innerType._def, {
@@ -55268,7 +56288,11 @@ const parseOptionalDef = (def, refs) => {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/pipeline.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/pipeline.js
+>>>>>>> origin/worktree-agent-a59d4079
 const parsePipelineDef = (def, refs) => {
 	if (refs.pipeStrategy === "input") return parseDef(def.in._def, refs);
 	else if (refs.pipeStrategy === "output") return parseDef(def.out._def, refs);
@@ -55291,13 +56315,21 @@ const parsePipelineDef = (def, refs) => {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/promise.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/promise.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parsePromiseDef(def, refs) {
 	return parseDef(def.type._def, refs);
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/set.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/set.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseSetDef(def, refs) {
 	const schema = {
 		type: "array",
@@ -55313,7 +56345,11 @@ function parseSetDef(def, refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/tuple.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/tuple.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseTupleDef(def, refs) {
 	if (def.rest) return {
 		type: "array",
@@ -55347,25 +56383,41 @@ function parseTupleDef(def, refs) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/undefined.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/undefined.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseUndefinedDef(refs) {
 	return { not: parseAnyDef(refs) };
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/unknown.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/unknown.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseUnknownDef(refs) {
 	return parseAnyDef(refs);
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/readonly.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parsers/readonly.js
+>>>>>>> origin/worktree-agent-a59d4079
 const parseReadonlyDef = (def, refs) => {
 	return parseDef(def.innerType._def, refs);
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/selectParser.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/selectParser.js
+>>>>>>> origin/worktree-agent-a59d4079
 const selectParser = (def, typeName, refs) => {
 	switch (typeName) {
 		case ZodFirstPartyTypeKind.ZodString: return parseStringDef(def, refs);
@@ -55409,7 +56461,11 @@ const selectParser = (def, typeName, refs) => {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/parseDef.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/parseDef.js
+>>>>>>> origin/worktree-agent-a59d4079
 function parseDef(def, refs, forceResolution = false) {
 	const seenItem = refs.seen.get(def);
 	if (refs.override) {
@@ -55459,7 +56515,11 @@ const addMeta = (def, refs, jsonSchema) => {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/zod-to-json-schema/dist/esm/zodToJsonSchema.js
+=======
+//#region ../../../../../node_modules/zod-to-json-schema/dist/esm/zodToJsonSchema.js
+>>>>>>> origin/worktree-agent-a59d4079
 const zodToJsonSchema = (schema, options) => {
 	const refs = getRefs(options);
 	let definitions = typeof options === "object" && options.definitions ? Object.entries(options.definitions).reduce((acc, [name, schema]) => ({
@@ -55523,7 +56583,11 @@ const zodToJsonSchema = (schema, options) => {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/server/zod-json-schema-compat.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/server/zod-json-schema-compat.js
+>>>>>>> origin/worktree-agent-a59d4079
 function mapMiniTarget(t) {
 	if (!t) return "draft-7";
 	if (t === "jsonSchema7" || t === "draft-7") return "draft-7";
@@ -55554,7 +56618,11 @@ function parseWithCompat(schema, data) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/shared/protocol.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/shared/protocol.js
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * The default request timeout, in miliseconds.
 */
@@ -56405,7 +57473,11 @@ function mergeCapabilities(base, additional) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/codegen/code.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/codegen/code.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_code$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.regexpCode = exports.getEsmExportName = exports.getProperty = exports.safeStringify = exports.stringify = exports.strConcat = exports.addCodeArg = exports.str = exports._ = exports.nil = exports._Code = exports.Name = exports.IDENTIFIER = exports._CodeOrName = void 0;
@@ -56541,7 +57613,11 @@ var require_code$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/codegen/scope.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/codegen/scope.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_scope = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.ValueScope = exports.ValueScopeName = exports.Scope = exports.varKinds = exports.UsedValueState = void 0;
@@ -56679,7 +57755,11 @@ var require_scope = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/codegen/index.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/codegen/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.or = exports.and = exports.not = exports.CodeGen = exports.operators = exports.varKinds = exports.ValueScopeName = exports.ValueScope = exports.Scope = exports.Name = exports.regexpCode = exports.stringify = exports.getProperty = exports.nil = exports.strConcat = exports.str = exports._ = void 0;
@@ -57349,7 +58429,11 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/util.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/util.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_util = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.checkStrictMode = exports.getErrorPath = exports.Type = exports.useFunc = exports.setEvaluated = exports.evaluatedPropsToName = exports.mergeEvaluated = exports.eachItem = exports.unescapeJsonPointer = exports.escapeJsonPointer = exports.escapeFragment = exports.unescapeFragment = exports.schemaRefOrVal = exports.schemaHasRulesButRef = exports.schemaHasRules = exports.checkUnknownRules = exports.alwaysValidSchema = exports.toHash = void 0;
@@ -57491,7 +58575,11 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/names.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/names.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_names = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -57517,7 +58605,11 @@ var require_names = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/errors.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/errors.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_errors$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.extendErrors = exports.resetErrorsCount = exports.reportExtraError = exports.reportError = exports.keyword$DataError = exports.keywordError = void 0;
@@ -57614,7 +58706,11 @@ var require_errors$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/validate/boolSchema.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/validate/boolSchema.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_boolSchema = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.boolOrEmptySchema = exports.topBoolOrEmptySchema = void 0;
@@ -57657,7 +58753,11 @@ var require_boolSchema = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/rules.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/rules.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_rules = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.getRules = exports.isJSONType = void 0;
@@ -57716,7 +58816,11 @@ var require_rules = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/validate/applicability.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/validate/applicability.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_applicability = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.shouldUseRule = exports.shouldUseGroup = exports.schemaHasRulesForType = void 0;
@@ -57737,7 +58841,11 @@ var require_applicability = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/validate/dataType.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/validate/dataType.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_dataType = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.reportTypeError = exports.checkDataTypes = exports.checkDataType = exports.coerceAndCheckDataType = exports.getJSONTypes = exports.getSchemaTypes = exports.DataType = void 0;
@@ -57902,7 +59010,11 @@ var require_dataType = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/validate/defaults.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/validate/defaults.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_defaults = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.assignDefaults = void 0;
@@ -57929,7 +59041,11 @@ var require_defaults = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/code.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/code.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_code = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.validateUnion = exports.validateArray = exports.usePattern = exports.callValidateCode = exports.schemaProperties = exports.allSchemaProperties = exports.noPropertyInData = exports.propertyInData = exports.isOwnProperty = exports.hasPropFunc = exports.reportMissingProp = exports.checkMissingProp = exports.checkReportMissingProp = void 0;
@@ -58054,7 +59170,11 @@ var require_code = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/validate/keyword.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/validate/keyword.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_keyword = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.validateKeywordUsage = exports.validSchemaType = exports.funcKeywordCode = exports.macroKeywordCode = void 0;
@@ -58161,7 +59281,11 @@ var require_keyword = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/validate/subschema.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/validate/subschema.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_subschema = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.extendSubschemaMode = exports.extendSubschemaData = exports.getSubschema = void 0;
@@ -58229,7 +59353,11 @@ var require_subschema = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/fast-deep-equal/index.js
+=======
+//#region ../../../../../node_modules/fast-deep-equal/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_fast_deep_equal = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = function equal(a, b) {
 		if (a === b) return true;
@@ -58260,7 +59388,11 @@ var require_fast_deep_equal = /* @__PURE__ */ __commonJSMin(((exports, module) =
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/json-schema-traverse/index.js
+=======
+//#region ../../../../../node_modules/json-schema-traverse/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_json_schema_traverse = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var traverse = module.exports = function(schema, opts, cb) {
 		if (typeof opts == "function") {
@@ -58336,7 +59468,11 @@ var require_json_schema_traverse = /* @__PURE__ */ __commonJSMin(((exports, modu
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/resolve.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/resolve.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_resolve = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.getSchemaRefs = exports.resolveUrl = exports.normalizeId = exports._getFullPath = exports.getFullPath = exports.inlineRef = void 0;
@@ -58464,7 +59600,11 @@ var require_resolve = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/validate/index.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/validate/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_validate = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.getData = exports.KeywordCxt = exports.validateFunctionCode = void 0;
@@ -58884,7 +60024,11 @@ var require_validate = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/runtime/validation_error.js
+=======
+//#region ../../../../../node_modules/ajv/dist/runtime/validation_error.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_validation_error = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var ValidationError = class extends Error {
@@ -58898,7 +60042,11 @@ var require_validation_error = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/ref_error.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/ref_error.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_ref_error = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const resolve_1 = require_resolve();
@@ -58913,7 +60061,11 @@ var require_ref_error = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/compile/index.js
+=======
+//#region ../../../../../node_modules/ajv/dist/compile/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_compile = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.resolveSchema = exports.getCompilingSchema = exports.resolveRef = exports.compileSchema = exports.SchemaEnv = void 0;
@@ -59128,7 +60280,11 @@ var require_compile = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/refs/data.json
+=======
+//#region ../../../../../node_modules/ajv/dist/refs/data.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_data = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"$id": "https://raw.githubusercontent.com/ajv-validator/ajv/master/lib/refs/data.json#",
@@ -59144,7 +60300,11 @@ var require_data = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/fast-uri/lib/utils.js
+=======
+//#region ../../../../../node_modules/fast-uri/lib/utils.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_utils = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/** @type {(value: string) => boolean} */
 	const isUUID = RegExp.prototype.test.bind(/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu);
@@ -59424,7 +60584,11 @@ var require_utils = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/fast-uri/lib/schemes.js
+=======
+//#region ../../../../../node_modules/fast-uri/lib/schemes.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_schemes = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { isUUID } = require_utils();
 	const URN_REG = /([\da-z][\d\-a-z]{0,31}):((?:[\w!$'()*+,\-.:;=@]|%[\da-f]{2})+)/iu;
@@ -59611,7 +60775,11 @@ var require_schemes = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/fast-uri/index.js
+=======
+//#region ../../../../../node_modules/fast-uri/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_fast_uri = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizeComponentEncoding, isIPv4, nonSimpleDomain } = require_utils();
 	const { SCHEMES, getSchemeHandler } = require_schemes();
@@ -59843,7 +61011,11 @@ var require_fast_uri = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/runtime/uri.js
+=======
+//#region ../../../../../node_modules/ajv/dist/runtime/uri.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_uri = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const uri = require_fast_uri();
@@ -59852,7 +61024,11 @@ var require_uri = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/core.js
+=======
+//#region ../../../../../node_modules/ajv/dist/core.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_core$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = void 0;
@@ -60422,7 +61598,11 @@ var require_core$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/core/id.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/core/id.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_id = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const def = {
@@ -60435,7 +61615,11 @@ var require_id = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/core/ref.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/core/ref.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_ref = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.callRef = exports.getValidate = void 0;
@@ -60539,7 +61723,11 @@ var require_ref = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/core/index.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/core/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_core = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const id_1 = require_id();
@@ -60558,7 +61746,11 @@ var require_core = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/validation/limitNumber.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/validation/limitNumber.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_limitNumber = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -60603,7 +61795,11 @@ var require_limitNumber = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/validation/multipleOf.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/validation/multipleOf.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_multipleOf = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -60628,7 +61824,11 @@ var require_multipleOf = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/runtime/ucs2length.js
+=======
+//#region ../../../../../node_modules/ajv/dist/runtime/ucs2length.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_ucs2length = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	function ucs2length(str) {
@@ -60651,7 +61851,11 @@ var require_ucs2length = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/validation/limitLength.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/validation/limitLength.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_limitLength = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -60680,7 +61884,11 @@ var require_limitLength = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/validation/pattern.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/validation/pattern.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_pattern = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const code_1 = require_code();
@@ -60714,7 +61922,11 @@ var require_pattern = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/validation/limitProperties.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/validation/limitProperties.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_limitProperties = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -60740,7 +61952,11 @@ var require_limitProperties = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/validation/required.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/validation/required.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_required = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const code_1 = require_code();
@@ -60808,7 +62024,11 @@ var require_required = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/validation/limitItems.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/validation/limitItems.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_limitItems = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -60834,7 +62054,11 @@ var require_limitItems = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/runtime/equal.js
+=======
+//#region ../../../../../node_modules/ajv/dist/runtime/equal.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_equal = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const equal = require_fast_deep_equal();
@@ -60843,7 +62067,11 @@ var require_equal = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/validation/uniqueItems.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/validation/uniqueItems.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_uniqueItems = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const dataType_1 = require_dataType();
@@ -60908,7 +62136,11 @@ var require_uniqueItems = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/validation/const.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/validation/const.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_const = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -60931,7 +62163,11 @@ var require_const = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/validation/enum.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/validation/enum.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_enum = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -60976,7 +62212,11 @@ var require_enum = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/validation/index.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/validation/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_validation = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const limitNumber_1 = require_limitNumber();
@@ -61013,7 +62253,11 @@ var require_validation = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/additionalItems.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/additionalItems.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_additionalItems = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.validateAdditionalItems = void 0;
@@ -61066,7 +62310,11 @@ var require_additionalItems = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/items.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/items.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_items = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.validateTuple = void 0;
@@ -61120,7 +62368,11 @@ var require_items = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/prefixItems.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/prefixItems.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_prefixItems = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const items_1 = require_items();
@@ -61135,7 +62387,11 @@ var require_prefixItems = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/items2020.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/items2020.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_items2020 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -61164,7 +62420,11 @@ var require_items2020 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/contains.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/contains.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_contains = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -61250,7 +62510,11 @@ var require_contains = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/dependencies.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/dependencies.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_dependencies = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.validateSchemaDeps = exports.validatePropertyDeps = exports.error = void 0;
@@ -61332,7 +62596,11 @@ var require_dependencies = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/propertyNames.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/propertyNames.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_propertyNames = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -61370,7 +62638,11 @@ var require_propertyNames = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/additionalProperties.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/additionalProperties.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_additionalProperties = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const code_1 = require_code();
@@ -61461,7 +62733,11 @@ var require_additionalProperties = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/properties.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/properties.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_properties = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const validate_1 = require_validate();
@@ -61508,7 +62784,11 @@ var require_properties = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/patternProperties.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/patternProperties.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_patternProperties = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const code_1 = require_code();
@@ -61565,7 +62845,11 @@ var require_patternProperties = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/not.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/not.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_not = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const util_1 = require_util();
@@ -61594,7 +62878,11 @@ var require_not = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/anyOf.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/anyOf.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_anyOf = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const def = {
@@ -61608,7 +62896,11 @@ var require_anyOf = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/oneOf.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/oneOf.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_oneOf = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -61656,7 +62948,11 @@ var require_oneOf = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/allOf.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/allOf.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_allOf = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const util_1 = require_util();
@@ -61683,7 +62979,11 @@ var require_allOf = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/if.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/if.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_if = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -61741,7 +63041,11 @@ var require_if = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/thenElse.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/thenElse.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_thenElse = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const util_1 = require_util();
@@ -61756,7 +63060,11 @@ var require_thenElse = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/applicator/index.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/applicator/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_applicator = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const additionalItems_1 = require_additionalItems();
@@ -61798,7 +63106,11 @@ var require_applicator = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/format/format.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/format/format.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_format$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -61888,7 +63200,11 @@ var require_format$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/format/index.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/format/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_format = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const format = [require_format$1().default];
@@ -61896,7 +63212,11 @@ var require_format = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/metadata.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/metadata.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_metadata = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.contentVocabulary = exports.metadataVocabulary = void 0;
@@ -61917,7 +63237,11 @@ var require_metadata = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/draft7.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/draft7.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_draft7 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const core_1 = require_core();
@@ -61937,7 +63261,11 @@ var require_draft7 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/discriminator/types.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/discriminator/types.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_types = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.DiscrError = void 0;
@@ -61949,7 +63277,11 @@ var require_types = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/vocabularies/discriminator/index.js
+=======
+//#region ../../../../../node_modules/ajv/dist/vocabularies/discriminator/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_discriminator = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const codegen_1 = require_codegen();
@@ -62044,7 +63376,11 @@ var require_discriminator = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/refs/json-schema-draft-07.json
+=======
+//#region ../../../../../node_modules/ajv/dist/refs/json-schema-draft-07.json
+>>>>>>> origin/worktree-agent-a59d4079
 var require_json_schema_draft_07 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"$schema": "http://json-schema.org/draft-07/schema#",
@@ -62183,7 +63519,11 @@ var require_json_schema_draft_07 = /* @__PURE__ */ __commonJSMin(((exports, modu
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv/dist/ajv.js
+=======
+//#region ../../../../../node_modules/ajv/dist/ajv.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_ajv = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.MissingRefError = exports.ValidationError = exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = exports.Ajv = void 0;
@@ -62276,7 +63616,11 @@ var require_ajv = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv-formats/dist/formats.js
+=======
+//#region ../../../../../node_modules/ajv-formats/dist/formats.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_formats = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.formatNames = exports.fastFormats = exports.fullFormats = void 0;
@@ -62465,7 +63809,11 @@ var require_formats = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv-formats/dist/limit.js
+=======
+//#region ../../../../../node_modules/ajv-formats/dist/limit.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_limit = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.formatLimitDefinition = void 0;
@@ -62545,7 +63893,11 @@ var require_limit = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/ajv-formats/dist/index.js
+=======
+//#region ../../../../../node_modules/ajv-formats/dist/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_dist$3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const formats_1 = require_formats();
@@ -62580,7 +63932,11 @@ var require_dist$3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/validation/ajv-provider.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/validation/ajv-provider.js
+>>>>>>> origin/worktree-agent-a59d4079
 var import_ajv = /* @__PURE__ */ __toESM(require_ajv(), 1);
 var import_dist$3 = /* @__PURE__ */ __toESM(require_dist$3(), 1);
 function createDefaultAjvInstance() {
@@ -62657,7 +64013,11 @@ var AjvJsonSchemaValidator = class {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/server.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/server.js
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * Experimental server task features for MCP SDK.
 * WARNING: These APIs are experimental and may change without notice.
@@ -62878,7 +64238,11 @@ var ExperimentalServerTasks = class {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/helpers.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/helpers.js
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * Experimental task capability assertion helpers.
 * WARNING: These APIs are experimental and may change without notice.
@@ -62930,7 +64294,11 @@ function assertClientRequestTaskCapability(requests, method, entityName) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/server/index.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/server/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * An MCP server on top of a pluggable transport.
 *
@@ -63272,7 +64640,11 @@ var Server = class extends Protocol {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/server/completable.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/server/completable.js
+>>>>>>> origin/worktree-agent-a59d4079
 const COMPLETABLE_SYMBOL = Symbol.for("mcp.completable");
 /**
 * Checks if a schema is completable (has completion metadata).
@@ -63292,7 +64664,11 @@ var McpZodTypeKind;
 })(McpZodTypeKind || (McpZodTypeKind = {}));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/shared/toolNameValidation.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/shared/toolNameValidation.js
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * Tool name validation utilities according to SEP: Specify Format for Tool Names
 *
@@ -63364,7 +64740,11 @@ function validateAndWarnToolName(name) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/mcp-server.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/mcp-server.js
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * Experimental McpServer task features for MCP SDK.
 * WARNING: These APIs are experimental and may change without notice.
@@ -63396,7 +64776,11 @@ var ExperimentalMcpServerTasks = class {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/server/mcp.js
+=======
+//#region ../../../../../node_modules/@modelcontextprotocol/sdk/dist/esm/server/mcp.js
+>>>>>>> origin/worktree-agent-a59d4079
 /**
 * High-level MCP server that provides a simpler API for working with resources, tools, and prompts.
 * For advanced usage (like sending notifications or setting custom request handlers), use the underlying
@@ -64113,7 +65497,11 @@ function createMcpServer(deps) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/address/dist/esm/address.js
+=======
+//#region ../../../../../node_modules/address/dist/esm/address.js
+>>>>>>> origin/worktree-agent-a59d4079
 function getDefaultInterfaceName() {
 	let val = "eth";
 	const platform = node_os.default.platform();
@@ -64167,7 +65555,11 @@ function ip(interfaceName) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/detect-port/dist/esm/detect-port.js
+=======
+//#region ../../../../../node_modules/detect-port/dist/esm/detect-port.js
+>>>>>>> origin/worktree-agent-a59d4079
 const debug$2 = (0, node_util.debuglog)("detect-port");
 var IPAddressNotAvailableError = class extends Error {
 	constructor(options) {
@@ -64258,6 +65650,7 @@ function listen(port, hostname) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/detect-port/dist/esm/wait-port.js
 const debug$1 = (0, node_util.debuglog)("detect-port:wait-port");
 
@@ -64267,6 +65660,17 @@ var esm_default = detectPort;
 
 //#endregion
 //#region ../../../../../../../../node_modules/is-docker/index.js
+=======
+//#region ../../../../../node_modules/detect-port/dist/esm/wait-port.js
+const debug$1 = (0, node_util.debuglog)("detect-port:wait-port");
+
+//#endregion
+//#region ../../../../../node_modules/detect-port/dist/esm/index.js
+var esm_default = detectPort;
+
+//#endregion
+//#region ../../../../../node_modules/is-docker/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 let isDockerCached;
 function hasDockerEnv() {
 	try {
@@ -64289,7 +65693,11 @@ function isDocker() {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/is-inside-container/index.js
+=======
+//#region ../../../../../node_modules/is-inside-container/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 let cachedResult;
 const hasContainerEnv = () => {
 	try {
@@ -64305,7 +65713,11 @@ function isInsideContainer() {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/is-wsl/index.js
+=======
+//#region ../../../../../node_modules/is-wsl/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 const isWsl = () => {
 	if (node_process.default.platform !== "linux") return false;
 	if (node_os.default.release().toLowerCase().includes("microsoft")) {
@@ -64321,7 +65733,11 @@ const isWsl = () => {
 var is_wsl_default = node_process.default.env.__IS_WSL_TEST__ ? isWsl : isWsl();
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/wsl-utils/index.js
+=======
+//#region ../../../../../node_modules/wsl-utils/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 const wslDrivesMountPoint = (() => {
 	const defaultMountPoint = "/mnt/";
 	let mountPoint;
@@ -64351,7 +65767,11 @@ const powerShellPath = async () => {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/define-lazy-prop/index.js
+=======
+//#region ../../../../../node_modules/define-lazy-prop/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 function defineLazyProperty(object, propertyName, valueGetter) {
 	const define = (value) => Object.defineProperty(object, propertyName, {
 		value,
@@ -64374,7 +65794,11 @@ function defineLazyProperty(object, propertyName, valueGetter) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/default-browser-id/index.js
+=======
+//#region ../../../../../node_modules/default-browser-id/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 const execFileAsync$3 = (0, node_util.promisify)(node_child_process.execFile);
 async function defaultBrowserId() {
 	if (node_process.default.platform !== "darwin") throw new Error("macOS only");
@@ -64389,7 +65813,11 @@ async function defaultBrowserId() {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/run-applescript/index.js
+=======
+//#region ../../../../../node_modules/run-applescript/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 const execFileAsync$2 = (0, node_util.promisify)(node_child_process.execFile);
 async function runAppleScript(script, { humanReadableOutput = true, signal } = {}) {
 	if (node_process.default.platform !== "darwin") throw new Error("macOS only");
@@ -64405,13 +65833,21 @@ async function runAppleScript(script, { humanReadableOutput = true, signal } = {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/bundle-name/index.js
+=======
+//#region ../../../../../node_modules/bundle-name/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 async function bundleName(bundleId) {
 	return runAppleScript(`tell application "Finder" to set app_path to application file id "${bundleId}" as string\ntell application "System Events" to get value of property list item "CFBundleName" of property list file (app_path & ":Contents:Info.plist")`);
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/default-browser/windows.js
+=======
+//#region ../../../../../node_modules/default-browser/windows.js
+>>>>>>> origin/worktree-agent-a59d4079
 const execFileAsync$1 = (0, node_util.promisify)(node_child_process.execFile);
 const windowsBrowserProgIds = {
 	MSEdgeHTM: {
@@ -64502,7 +65938,11 @@ async function defaultBrowser$1(_execFileAsync = execFileAsync$1) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/default-browser/index.js
+=======
+//#region ../../../../../node_modules/default-browser/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 const execFileAsync = (0, node_util.promisify)(node_child_process.execFile);
 const titleize = (string) => string.toLowerCase().replaceAll(/(?:^|\s|-)\S/g, (x) => x.toUpperCase());
 async function defaultBrowser() {
@@ -64530,7 +65970,11 @@ async function defaultBrowser() {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/open/index.js
+=======
+//#region ../../../../../node_modules/open/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 const execFile = (0, node_util.promisify)(node_child_process.default.execFile);
 const __dirname$1 = node_path.default.dirname((0, node_url.fileURLToPath)(require("url").pathToFileURL(__filename).href));
 const localXdgOpenPath = node_path.default.join(__dirname$1, "xdg-open");
@@ -64732,7 +66176,11 @@ defineLazyProperty(apps, "browser", () => "browser");
 defineLazyProperty(apps, "browserPrivate", () => "browserPrivate");
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/debug/src/common.js
+=======
+//#region ../../../../../node_modules/debug/src/common.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_common = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* This is the common logic for both the Node.js and web browser
@@ -64935,7 +66383,11 @@ var require_common = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/debug/src/browser.js
+=======
+//#region ../../../../../node_modules/debug/src/browser.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_browser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* This is the web browser implementation of `debug()`.
@@ -65132,7 +66584,11 @@ var require_browser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/has-flag/index.js
+=======
+//#region ../../../../../node_modules/has-flag/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = (flag, argv = process.argv) => {
 		const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
@@ -65143,7 +66599,11 @@ var require_has_flag = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/supports-color/index.js
+=======
+//#region ../../../../../node_modules/supports-color/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const os$4 = require("os");
 	const tty$1 = require("tty");
@@ -65212,7 +66672,11 @@ var require_supports_color = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/debug/src/node.js
+=======
+//#region ../../../../../node_modules/debug/src/node.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_node = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Module dependencies.
@@ -65420,7 +66884,11 @@ var require_node = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/debug/src/index.js
+=======
+//#region ../../../../../node_modules/debug/src/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_src$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Detect Electron renderer / nwjs process, which is node, but we should
@@ -65431,7 +66899,11 @@ var require_src$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@kwsites/file-exists/dist/src/index.js
+=======
+//#region ../../../../../node_modules/@kwsites/file-exists/dist/src/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_src = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var __importDefault = exports && exports.__importDefault || function(mod) {
 		return mod && mod.__esModule ? mod : { "default": mod };
@@ -65487,7 +66959,11 @@ var require_src = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@kwsites/file-exists/dist/index.js
+=======
+//#region ../../../../../node_modules/@kwsites/file-exists/dist/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_dist$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function __export(m) {
 		for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -65497,7 +66973,11 @@ var require_dist$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/@kwsites/promise-deferred/dist/index.js
+=======
+//#region ../../../../../node_modules/@kwsites/promise-deferred/dist/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_dist$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.createDeferred = exports.deferred = void 0;
@@ -65550,7 +67030,11 @@ var require_dist$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/simple-git/dist/esm/index.js
+=======
+//#region ../../../../../node_modules/simple-git/dist/esm/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var import_dist$1 = require_dist$2();
 var import_src = /* @__PURE__ */ __toESM(require_src$1(), 1);
 var import_dist$2 = require_dist$1();
@@ -68814,7 +70298,11 @@ var Git = require_git();
 init_git_response_error();
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/slugify/slugify.js
+=======
+//#region ../../../../../node_modules/slugify/slugify.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_slugify = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	(function(name, root, factory) {
 		if (typeof exports === "object") {
@@ -68903,7 +70391,11 @@ function getPhasePattern(escapedPhaseNum, flags = "gim") {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/nodes/identity.js
+=======
+//#region ../../../../../node_modules/yaml/dist/nodes/identity.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_identity = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const ALIAS = Symbol.for("yaml.alias");
 	const DOC = Symbol.for("yaml.document");
@@ -68954,7 +70446,11 @@ var require_identity = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/visit.js
+=======
+//#region ../../../../../node_modules/yaml/dist/visit.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_visit = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	const BREAK = Symbol("break visit");
@@ -69145,7 +70641,11 @@ var require_visit = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/doc/directives.js
+=======
+//#region ../../../../../node_modules/yaml/dist/doc/directives.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_directives = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var visit = require_visit();
@@ -69311,7 +70811,11 @@ var require_directives = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/doc/anchors.js
+=======
+//#region ../../../../../node_modules/yaml/dist/doc/anchors.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_anchors = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var visit = require_visit();
@@ -69374,7 +70878,11 @@ var require_anchors = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/doc/applyReviver.js
+=======
+//#region ../../../../../node_modules/yaml/dist/doc/applyReviver.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_applyReviver = /* @__PURE__ */ __commonJSMin(((exports) => {
 	/**
 	* Applies the JSON.parse reviver algorithm as defined in the ECMA-262 spec,
@@ -69415,7 +70923,11 @@ var require_applyReviver = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/nodes/toJS.js
+=======
+//#region ../../../../../node_modules/yaml/dist/nodes/toJS.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_toJS = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	/**
@@ -69453,7 +70965,11 @@ var require_toJS = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/nodes/Node.js
+=======
+//#region ../../../../../node_modules/yaml/dist/nodes/Node.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_Node = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var applyReviver = require_applyReviver();
 	var identity = require_identity();
@@ -69488,7 +71004,11 @@ var require_Node = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/nodes/Alias.js
+=======
+//#region ../../../../../node_modules/yaml/dist/nodes/Alias.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_Alias = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var anchors = require_anchors();
 	var visit = require_visit();
@@ -69582,7 +71102,11 @@ var require_Alias = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/nodes/Scalar.js
+=======
+//#region ../../../../../node_modules/yaml/dist/nodes/Scalar.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_Scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Node = require_Node();
@@ -69610,7 +71134,11 @@ var require_Scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/doc/createNode.js
+=======
+//#region ../../../../../node_modules/yaml/dist/doc/createNode.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_createNode = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Alias = require_Alias();
 	var identity = require_identity();
@@ -69674,7 +71202,11 @@ var require_createNode = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/nodes/Collection.js
+=======
+//#region ../../../../../node_modules/yaml/dist/nodes/Collection.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_Collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var createNode = require_createNode();
 	var identity = require_identity();
@@ -69796,7 +71328,11 @@ var require_Collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/stringify/stringifyComment.js
+=======
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyComment.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_stringifyComment = /* @__PURE__ */ __commonJSMin(((exports) => {
 	/**
 	* Stringifies a comment.
@@ -69817,7 +71353,11 @@ var require_stringifyComment = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/stringify/foldFlowLines.js
+=======
+//#region ../../../../../node_modules/yaml/dist/stringify/foldFlowLines.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_foldFlowLines = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const FOLD_FLOW = "flow";
 	const FOLD_BLOCK = "block";
@@ -69934,7 +71474,11 @@ var require_foldFlowLines = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/stringify/stringifyString.js
+=======
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyString.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_stringifyString = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var foldFlowLines = require_foldFlowLines();
@@ -70159,7 +71703,11 @@ var require_stringifyString = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/stringify/stringify.js
+=======
+//#region ../../../../../node_modules/yaml/dist/stringify/stringify.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_stringify = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var anchors = require_anchors();
 	var identity = require_identity();
@@ -70267,7 +71815,11 @@ var require_stringify = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/stringify/stringifyPair.js
+=======
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyPair.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_stringifyPair = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Scalar = require_Scalar();
@@ -70365,7 +71917,11 @@ var require_stringifyPair = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/log.js
+=======
+//#region ../../../../../node_modules/yaml/dist/log.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_log = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var node_process$3 = require("process");
 	function debug(logLevel, ...messages) {
@@ -70380,7 +71936,11 @@ var require_log = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/yaml-1.1/merge.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/merge.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_merge = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Scalar = require_Scalar();
@@ -70421,7 +71981,11 @@ var require_merge = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/nodes/addPairToJSMap.js
+=======
+//#region ../../../../../node_modules/yaml/dist/nodes/addPairToJSMap.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_addPairToJSMap = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var log = require_log();
 	var merge = require_merge();
@@ -70473,7 +72037,11 @@ var require_addPairToJSMap = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/nodes/Pair.js
+=======
+//#region ../../../../../node_modules/yaml/dist/nodes/Pair.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_Pair = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var createNode = require_createNode();
 	var stringifyPair = require_stringifyPair();
@@ -70507,7 +72075,11 @@ var require_Pair = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/stringify/stringifyCollection.js
+=======
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyCollection.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_stringifyCollection = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var stringify = require_stringify();
@@ -70622,7 +72194,11 @@ var require_stringifyCollection = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/nodes/YAMLMap.js
+=======
+//#region ../../../../../node_modules/yaml/dist/nodes/YAMLMap.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_YAMLMap = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyCollection = require_stringifyCollection();
 	var addPairToJSMap = require_addPairToJSMap();
@@ -70732,7 +72308,11 @@ var require_YAMLMap = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/common/map.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/common/map.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_map = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var YAMLMap = require_YAMLMap();
@@ -70751,7 +72331,11 @@ var require_map = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/nodes/YAMLSeq.js
+=======
+//#region ../../../../../node_modules/yaml/dist/nodes/YAMLSeq.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_YAMLSeq = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var createNode = require_createNode();
 	var stringifyCollection = require_stringifyCollection();
@@ -70858,7 +72442,11 @@ var require_YAMLSeq = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/common/seq.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/common/seq.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_seq = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var YAMLSeq = require_YAMLSeq();
@@ -70877,7 +72465,11 @@ var require_seq = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/common/string.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/common/string.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_string = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyString = require_stringifyString();
 	const string = {
@@ -70894,7 +72486,11 @@ var require_string = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/common/null.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/common/null.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_null = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	const nullTag = {
@@ -70910,7 +72506,11 @@ var require_null = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/core/bool.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/core/bool.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_bool$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	const boolTag = {
@@ -70930,7 +72530,11 @@ var require_bool$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/stringify/stringifyNumber.js
+=======
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyNumber.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_stringifyNumber = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function stringifyNumber({ format, minFractionDigits, tag, value }) {
 		if (typeof value === "bigint") return String(value);
@@ -70952,7 +72556,11 @@ var require_stringifyNumber = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/core/float.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/core/float.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_float$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var stringifyNumber = require_stringifyNumber();
@@ -70995,7 +72603,11 @@ var require_float$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/core/int.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/core/int.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_int$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyNumber = require_stringifyNumber();
 	const intIdentify = (value) => typeof value === "bigint" || Number.isInteger(value);
@@ -71037,7 +72649,11 @@ var require_int$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/core/schema.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/core/schema.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_schema$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var map = require_map();
 	var _null = require_null();
@@ -71063,7 +72679,11 @@ var require_schema$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/json/schema.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/json/schema.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_schema$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var map = require_map();
@@ -71127,7 +72747,11 @@ var require_schema$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/yaml-1.1/binary.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/binary.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_binary = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var node_buffer$1 = require("buffer");
 	var Scalar = require_Scalar();
@@ -71177,7 +72801,11 @@ var require_binary = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/yaml-1.1/pairs.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/pairs.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_pairs = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Pair = require_Pair();
@@ -71238,7 +72866,11 @@ var require_pairs = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/yaml-1.1/omap.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/omap.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_omap = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var toJS = require_toJS();
@@ -71302,7 +72934,11 @@ var require_omap = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/yaml-1.1/bool.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/bool.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_bool = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	function boolStringify({ value, source }, ctx) {
@@ -71330,7 +72966,11 @@ var require_bool = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/yaml-1.1/float.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/float.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_float = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var stringifyNumber = require_stringifyNumber();
@@ -71376,7 +73016,11 @@ var require_float = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/yaml-1.1/int.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/int.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_int = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyNumber = require_stringifyNumber();
 	const intIdentify = (value) => typeof value === "bigint" || Number.isInteger(value);
@@ -71452,7 +73096,11 @@ var require_int = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/yaml-1.1/set.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/set.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_set = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Pair = require_Pair();
@@ -71521,7 +73169,11 @@ var require_set = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/yaml-1.1/timestamp.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/timestamp.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_timestamp = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var stringifyNumber = require_stringifyNumber();
 	/** Internal types handle bigint as number, because TS can't figure it out. */
@@ -71605,7 +73257,11 @@ var require_timestamp = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/yaml-1.1/schema.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/yaml-1.1/schema.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_schema = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var map = require_map();
 	var _null = require_null();
@@ -71647,7 +73303,11 @@ var require_schema = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/tags.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/tags.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_tags = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var map = require_map();
 	var _null = require_null();
@@ -71732,7 +73392,11 @@ var require_tags = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/schema/Schema.js
+=======
+//#region ../../../../../node_modules/yaml/dist/schema/Schema.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_Schema = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var map = require_map();
@@ -71762,7 +73426,11 @@ var require_Schema = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/stringify/stringifyDocument.js
+=======
+//#region ../../../../../node_modules/yaml/dist/stringify/stringifyDocument.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_stringifyDocument = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var stringify = require_stringify();
@@ -71824,7 +73492,11 @@ var require_stringifyDocument = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/doc/Document.js
+=======
+//#region ../../../../../node_modules/yaml/dist/doc/Document.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_Document = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Alias = require_Alias();
 	var Collection = require_Collection();
@@ -72106,7 +73778,11 @@ var require_Document = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/errors.js
+=======
+//#region ../../../../../node_modules/yaml/dist/errors.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_errors = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var YAMLError = class extends Error {
 		constructor(name, pos, code, message) {
@@ -72160,7 +73836,11 @@ var require_errors = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/resolve-props.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-props.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_resolve_props = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function resolveProps(tokens, { flow, indicator, next, offset, onError, parentIndent, startOnNewline }) {
 		let spaceBefore = false;
@@ -72268,7 +73948,11 @@ var require_resolve_props = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/util-contains-newline.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/util-contains-newline.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_util_contains_newline = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function containsNewline(key) {
 		if (!key) return null;
@@ -72298,7 +73982,11 @@ var require_util_contains_newline = /* @__PURE__ */ __commonJSMin(((exports) => 
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/util-flow-indent-check.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/util-flow-indent-check.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_util_flow_indent_check = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var utilContainsNewline = require_util_contains_newline();
 	function flowIndentCheck(indent, fc, onError) {
@@ -72311,7 +73999,11 @@ var require_util_flow_indent_check = /* @__PURE__ */ __commonJSMin(((exports) =>
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/util-map-includes.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/util-map-includes.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_util_map_includes = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	function mapIncludes(ctx, items, search) {
@@ -72324,7 +74016,11 @@ var require_util_map_includes = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/resolve-block-map.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-block-map.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_resolve_block_map = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Pair = require_Pair();
 	var YAMLMap = require_YAMLMap();
@@ -72409,7 +74105,11 @@ var require_resolve_block_map = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/resolve-block-seq.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-block-seq.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_resolve_block_seq = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var YAMLSeq = require_YAMLSeq();
 	var resolveProps = require_resolve_props();
@@ -72452,7 +74152,11 @@ var require_resolve_block_seq = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/resolve-end.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-end.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_resolve_end = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function resolveEnd(end, offset, reqSpace, onError) {
 		let comment = "";
@@ -72491,7 +74195,11 @@ var require_resolve_end = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/resolve-flow-collection.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-flow-collection.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_resolve_flow_collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Pair = require_Pair();
@@ -72647,7 +74355,11 @@ var require_resolve_flow_collection = /* @__PURE__ */ __commonJSMin(((exports) =
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/compose-collection.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/compose-collection.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_compose_collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Scalar = require_Scalar();
@@ -72700,7 +74412,11 @@ var require_compose_collection = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/resolve-block-scalar.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-block-scalar.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_resolve_block_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	function resolveBlockScalar(ctx, scalar, onError) {
@@ -72876,7 +74592,11 @@ var require_resolve_block_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/resolve-flow-scalar.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/resolve-flow-scalar.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_resolve_flow_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Scalar = require_Scalar();
 	var resolveEnd = require_resolve_end();
@@ -73083,7 +74803,11 @@ var require_resolve_flow_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/compose-scalar.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/compose-scalar.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_compose_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var identity = require_identity();
 	var Scalar = require_Scalar();
@@ -73143,7 +74867,11 @@ var require_compose_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/util-empty-scalar-position.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/util-empty-scalar-position.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_util_empty_scalar_position = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function emptyScalarPosition(offset, before, pos) {
 		if (before) {
@@ -73171,7 +74899,11 @@ var require_util_empty_scalar_position = /* @__PURE__ */ __commonJSMin(((exports
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/compose-node.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/compose-node.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_compose_node = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Alias = require_Alias();
 	var identity = require_identity();
@@ -73257,7 +74989,11 @@ var require_compose_node = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/compose-doc.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/compose-doc.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_compose_doc = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var Document = require_Document();
 	var composeNode = require_compose_node();
@@ -73300,7 +75036,11 @@ var require_compose_doc = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/compose/composer.js
+=======
+//#region ../../../../../node_modules/yaml/dist/compose/composer.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_composer = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var node_process$2 = require("process");
 	var directives = require_directives();
@@ -73499,7 +75239,11 @@ var require_composer = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/parse/cst-scalar.js
+=======
+//#region ../../../../../node_modules/yaml/dist/parse/cst-scalar.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_cst_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var resolveBlockScalar = require_resolve_block_scalar();
 	var resolveFlowScalar = require_resolve_flow_scalar();
@@ -73767,7 +75511,11 @@ var require_cst_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/parse/cst-stringify.js
+=======
+//#region ../../../../../node_modules/yaml/dist/parse/cst-stringify.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_cst_stringify = /* @__PURE__ */ __commonJSMin(((exports) => {
 	/**
 	* Stringify a CST document, token, or collection item
@@ -73819,7 +75567,11 @@ var require_cst_stringify = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/parse/cst-visit.js
+=======
+//#region ../../../../../node_modules/yaml/dist/parse/cst-visit.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_cst_visit = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const BREAK = Symbol("break visit");
 	const SKIP = Symbol("skip children");
@@ -73911,7 +75663,11 @@ var require_cst_visit = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/parse/cst.js
+=======
+//#region ../../../../../node_modules/yaml/dist/parse/cst.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_cst = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var cstScalar = require_cst_scalar();
 	var cstStringify = require_cst_stringify();
@@ -73991,7 +75747,11 @@ var require_cst = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/parse/lexer.js
+=======
+//#region ../../../../../node_modules/yaml/dist/parse/lexer.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_lexer = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var cst = require_cst();
 	function isEmpty(ch) {
@@ -74511,7 +76271,11 @@ var require_lexer = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/parse/line-counter.js
+=======
+//#region ../../../../../node_modules/yaml/dist/parse/line-counter.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_line_counter = /* @__PURE__ */ __commonJSMin(((exports) => {
 	/**
 	* Tracks newlines during parsing in order to provide an efficient API for
@@ -74559,7 +76323,11 @@ var require_line_counter = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/parse/parser.js
+=======
+//#region ../../../../../node_modules/yaml/dist/parse/parser.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var node_process$1 = require("process");
 	var cst = require_cst();
@@ -75416,7 +77184,11 @@ var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/public-api.js
+=======
+//#region ../../../../../node_modules/yaml/dist/public-api.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_public_api = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var composer = require_composer();
 	var Document = require_Document();
@@ -75504,7 +77276,11 @@ var require_public_api = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/yaml/dist/index.js
+=======
+//#region ../../../../../node_modules/yaml/dist/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var composer = require_composer();
 	var Document = require_Document();
@@ -75583,7 +77359,11 @@ function extractFrontmatter(content) {
 */
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/escape-string-regexp/index.js
+=======
+//#region ../../../../../node_modules/escape-string-regexp/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 function escapeStringRegexp(string) {
 	if (typeof string !== "string") throw new TypeError("Expected a string");
 	return string.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
@@ -75665,7 +77445,11 @@ function stateReplaceField(content, fieldName, newValue) {
 */
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/readdirp/esm/index.js
+=======
+//#region ../../../../../node_modules/readdirp/esm/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 const EntryTypes = {
 	FILE_TYPE: "files",
 	DIR_TYPE: "directories",
@@ -75883,7 +77667,11 @@ function readdirp(root, options = {}) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/chokidar/esm/handler.js
+=======
+//#region ../../../../../node_modules/chokidar/esm/handler.js
+>>>>>>> origin/worktree-agent-a59d4079
 const STR_DATA = "data";
 const STR_END = "end";
 const STR_CLOSE = "close";
@@ -76597,7 +78385,11 @@ var NodeFsHandler = class {
 };
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/chokidar/esm/index.js
+=======
+//#region ../../../../../node_modules/chokidar/esm/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 /*! chokidar - MIT License (c) 2012 Paul Miller (paulmillr.com) */
 const SLASH = "/";
 const SLASH_SLASH = "//";
@@ -77212,7 +79004,11 @@ function watch(paths, options = {}) {
 }
 
 //#endregion
+<<<<<<< HEAD
 //#region ../../../../../../../../node_modules/lodash.debounce/index.js
+=======
+//#region ../../../../../node_modules/lodash.debounce/index.js
+>>>>>>> origin/worktree-agent-a59d4079
 var require_lodash_debounce = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* lodash (Custom Build) <https://lodash.com/>
