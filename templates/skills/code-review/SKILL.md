@@ -1,6 +1,7 @@
 ---
 name: code-review
 description: Use after completing a phase or significant implementation — requires reviewing all changed code for critical issues before sign-off
+context: fork
 ---
 
 # Code Review
@@ -17,6 +18,24 @@ If you have not read every diff introduced in this phase, you CANNOT mark it com
 "It works" is not "it's correct." Passing tests do not prove code quality.
 Violating this rule is a violation — not a shortcut.
 </HARD-GATE>
+
+## Two-Stage Review Protocol
+
+Code review runs in two mandatory stages, in order:
+
+### Stage 1: Spec Compliance Review
+Verify the implementation matches what was planned:
+- Does the code implement every task in the plan's `<done>` criteria?
+- Are there changes NOT covered by the plan (scope creep)?
+- Do the public interfaces match the plan's specifications?
+- Are there missing pieces the plan required but implementation skipped?
+
+**Stage 1 must PASS before proceeding to Stage 2.** Spec non-compliance is a blocker — the code does the wrong thing well.
+
+### Stage 2: Code Quality Review
+With spec compliance confirmed, review the implementation quality using the gate function steps below (SCOPE → SECURITY → INTERFACES → ERROR HANDLING → TESTS → QUALITY).
+
+**Both stages must pass for sign-off.**
 
 ## The Gate Function
 
@@ -142,10 +161,51 @@ QUALITY: PASS | ISSUES FOUND (list)
 VERDICT: APPROVED | BLOCKED (list blocking issues)
 ```
 
-## In MAXSIM Plan Execution
+## Integration with MAXSIM
 
-Code review applies at phase boundaries:
-- After all tasks in a phase are complete, run this review before marking the phase done
-- Blocking issues must be resolved before phase completion
-- Medium issues should be captured as todos for the next phase
-- The review summary should be included in the phase SUMMARY.md
+### Context Loading
+
+When reviewing within a MAXSIM project, load project context:
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs skill-context code-review
+```
+
+This returns the current phase, plan path, and artifacts. Use this to:
+- Load the current plan for Stage 1 spec compliance checking
+- Reference the phase's success criteria from ROADMAP.md
+- Check for existing review history in SUMMARY.md files
+
+### Stage 1 Integration
+
+For spec compliance review, load the plan:
+1. Read `.planning/phases/{current}/PLAN.md` — this is the spec
+2. For each task in the plan, check if the implementation satisfies its `<done>` criteria
+3. Flag any implementation that goes beyond or falls short of the plan
+4. Produce a Stage 1 verdict: COMPLIANT or NON-COMPLIANT (with list of gaps)
+
+### Stage 2 Integration
+
+For code quality review, use the gate function steps (SCOPE through QUALITY) as defined above.
+
+### STATE.md Hooks
+
+Record review verdicts as decisions:
+- After Stage 1: record compliance verdict with any gaps found
+- After Stage 2: record quality verdict with any blocking issues
+- Review metrics feed into performance tracking (pass rate, common issues)
+
+### Artifact References
+
+- Load plan from `.planning/phases/{current}/PLAN.md` for spec compliance
+- Review summary included in `.planning/phases/{current}/SUMMARY.md`
+- Blocking issues that require architectural decisions get recorded as STATE.md blockers
+- Medium issues filed as `.planning/todos/` entries for follow-up
+
+### Push-Back Protocol
+
+When reviewing code written by another agent:
+- If the code has issues, provide specific, actionable feedback with file paths and line numbers
+- If the agent pushes back on your finding, re-evaluate — but do NOT accept incorrect rationalizations
+- Refer to the "Common Rationalizations" table above for known invalid excuses
+- If 3+ back-and-forth cycles on the same issue, escalate to the user as a blocker
