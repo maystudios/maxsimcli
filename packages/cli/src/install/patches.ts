@@ -3,7 +3,6 @@ import * as path from 'node:path';
 
 import chalk from 'chalk';
 
-import type { RuntimeName } from '../adapters/index.js';
 import { MANIFEST_NAME, fileHash } from './manifest.js';
 import type { Manifest } from './manifest.js';
 
@@ -77,7 +76,6 @@ export function saveLocalPatches(configDir: string): string[] {
  */
 export function reportLocalPatches(
   configDir: string,
-  runtime: RuntimeName = 'claude',
 ): string[] {
   const patchesDir = path.join(configDir, PATCHES_DIR_NAME);
   const metaPath = path.join(patchesDir, 'backup-meta.json');
@@ -93,12 +91,6 @@ export function reportLocalPatches(
   }
 
   if (meta.files && meta.files.length > 0) {
-    const reapplyCommand =
-      runtime === 'opencode'
-        ? '/maxsim-reapply-patches'
-        : runtime === 'codex'
-          ? '$maxsim-reapply-patches'
-          : '/maxsim:reapply-patches';
     console.log('');
     console.log(
       '  ' +
@@ -117,7 +109,7 @@ export function reportLocalPatches(
     );
     console.log(
       '  Run ' +
-        chalk.cyan(reapplyCommand) +
+        chalk.cyan('/maxsim:reapply-patches') +
         ' to merge them into the new version.',
     );
     console.log('  Or manually compare and merge the files.');

@@ -41,7 +41,6 @@ const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
 const crypto = __importStar(require("node:crypto"));
 const shared_js_1 = require("./shared.js");
-const copy_js_1 = require("./copy.js");
 exports.MANIFEST_NAME = 'maxsim-file-manifest.json';
 /**
  * Compute SHA256 hash of file contents
@@ -75,13 +74,9 @@ function generateManifest(dir, baseDir) {
 /**
  * Write file manifest after installation for future modification detection
  */
-function writeManifest(configDir, runtime = 'claude') {
-    const isOpencode = runtime === 'opencode';
-    const isCodex = runtime === 'codex';
+function writeManifest(configDir) {
     const maxsimDir = path.join(configDir, 'maxsim');
     const commandsDir = path.join(configDir, 'commands', 'maxsim');
-    const opencodeCommandDir = path.join(configDir, 'command');
-    const codexSkillsDir = path.join(configDir, 'skills');
     const agentsDir = path.join(configDir, 'agents');
     const manifest = {
         version: shared_js_1.pkg.version,
@@ -92,26 +87,10 @@ function writeManifest(configDir, runtime = 'claude') {
     for (const [rel, hash] of Object.entries(maxsimHashes)) {
         manifest.files['maxsim/' + rel] = hash;
     }
-    if (!isOpencode && !isCodex && fs.existsSync(commandsDir)) {
+    if (fs.existsSync(commandsDir)) {
         const cmdHashes = generateManifest(commandsDir);
         for (const [rel, hash] of Object.entries(cmdHashes)) {
             manifest.files['commands/maxsim/' + rel] = hash;
-        }
-    }
-    if (isOpencode && fs.existsSync(opencodeCommandDir)) {
-        for (const file of fs.readdirSync(opencodeCommandDir)) {
-            if (file.startsWith('maxsim-') && file.endsWith('.md')) {
-                manifest.files['command/' + file] = fileHash(path.join(opencodeCommandDir, file));
-            }
-        }
-    }
-    if (isCodex && fs.existsSync(codexSkillsDir)) {
-        for (const skillName of (0, copy_js_1.listCodexSkillNames)(codexSkillsDir)) {
-            const skillRoot = path.join(codexSkillsDir, skillName);
-            const skillHashes = generateManifest(skillRoot);
-            for (const [rel, hash] of Object.entries(skillHashes)) {
-                manifest.files[`skills/${skillName}/${rel}`] = hash;
-            }
         }
     }
     if (fs.existsSync(agentsDir)) {

@@ -47,7 +47,7 @@ let node_crypto = require("node:crypto");
 node_crypto = __toESM(node_crypto);
 let node_child_process = require("node:child_process");
 
-//#region ../../node_modules/universalify/index.js
+//#region ../../../../../../../../node_modules/universalify/index.js
 var require_universalify = /* @__PURE__ */ __commonJSMin(((exports) => {
 	exports.fromCallback = function(fn) {
 		return Object.defineProperty(function(...args) {
@@ -71,7 +71,7 @@ var require_universalify = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/graceful-fs/polyfills.js
+//#region ../../../../../../../../node_modules/graceful-fs/polyfills.js
 var require_polyfills = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var constants = require("constants");
 	var origCwd = process.cwd;
@@ -324,7 +324,7 @@ var require_polyfills = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/graceful-fs/legacy-streams.js
+//#region ../../../../../../../../node_modules/graceful-fs/legacy-streams.js
 var require_legacy_streams = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var Stream$1 = require("stream").Stream;
 	module.exports = legacy;
@@ -414,7 +414,7 @@ var require_legacy_streams = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 }));
 
 //#endregion
-//#region ../../node_modules/graceful-fs/clone.js
+//#region ../../../../../../../../node_modules/graceful-fs/clone.js
 var require_clone = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = clone;
 	var getPrototypeOf = Object.getPrototypeOf || function(obj) {
@@ -432,7 +432,7 @@ var require_clone = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/graceful-fs/graceful-fs.js
+//#region ../../../../../../../../node_modules/graceful-fs/graceful-fs.js
 var require_graceful_fs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var fs = require("fs");
 	var polyfills = require_polyfills();
@@ -789,7 +789,7 @@ var require_graceful_fs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/fs/index.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/fs/index.js
 var require_fs = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const u = require_universalify().fromCallback;
 	const fs = require_graceful_fs();
@@ -898,7 +898,7 @@ var require_fs = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/mkdirs/utils.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/mkdirs/utils.js
 var require_utils$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const path$11 = require("path");
 	module.exports.checkPath = function checkPath(pth) {
@@ -913,7 +913,7 @@ var require_utils$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/mkdirs/make-dir.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/mkdirs/make-dir.js
 var require_make_dir = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_fs();
 	const { checkPath } = require_utils$1();
@@ -942,7 +942,7 @@ var require_make_dir = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/mkdirs/index.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/mkdirs/index.js
 var require_mkdirs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const { makeDir: _makeDir, makeDirSync } = require_make_dir();
@@ -958,7 +958,7 @@ var require_mkdirs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/path-exists/index.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/path-exists/index.js
 var require_path_exists = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const fs = require_fs();
@@ -972,7 +972,7 @@ var require_path_exists = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/util/utimes.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/util/utimes.js
 var require_utimes = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_fs();
 	const u = require_universalify().fromPromise;
@@ -1002,7 +1002,7 @@ var require_utimes = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/util/stat.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/util/stat.js
 var require_stat = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_fs();
 	const path$10 = require("path");
@@ -1129,7 +1129,7 @@ var require_stat = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/util/async.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/util/async.js
 var require_async = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	async function asyncIteratorConcurrentProcess(iterator, fn) {
 		const promises = [];
@@ -1142,7 +1142,7 @@ var require_async = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/copy/copy.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/copy/copy.js
 var require_copy$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_fs();
 	const path$9 = require("path");
@@ -1234,7 +1234,7 @@ var require_copy$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/copy/copy-sync.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/copy/copy-sync.js
 var require_copy_sync = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_graceful_fs();
 	const path$8 = require("path");
@@ -1348,7 +1348,7 @@ var require_copy_sync = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/copy/index.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/copy/index.js
 var require_copy = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	module.exports = {
@@ -1358,7 +1358,7 @@ var require_copy = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/remove/index.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/remove/index.js
 var require_remove = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_graceful_fs();
 	const u = require_universalify().fromCallback;
@@ -1381,7 +1381,7 @@ var require_remove = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/empty/index.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/empty/index.js
 var require_empty = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const fs = require_fs();
@@ -1418,7 +1418,7 @@ var require_empty = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/ensure/file.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/ensure/file.js
 var require_file = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const path$6 = require("path");
@@ -1466,7 +1466,7 @@ var require_file = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/ensure/link.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/ensure/link.js
 var require_link = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const path$5 = require("path");
@@ -1515,7 +1515,7 @@ var require_link = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/ensure/symlink-paths.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/ensure/symlink-paths.js
 var require_symlink_paths = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const path$4 = require("path");
 	const fs = require_fs();
@@ -1599,7 +1599,7 @@ var require_symlink_paths = /* @__PURE__ */ __commonJSMin(((exports, module) => 
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/ensure/symlink-type.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/ensure/symlink-type.js
 var require_symlink_type = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_fs();
 	const u = require_universalify().fromPromise;
@@ -1630,7 +1630,7 @@ var require_symlink_type = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/ensure/symlink.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/ensure/symlink.js
 var require_symlink = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const path$3 = require("path");
@@ -1679,7 +1679,7 @@ var require_symlink = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/ensure/index.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/ensure/index.js
 var require_ensure = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { createFile, createFileSync } = require_file();
 	const { createLink, createLinkSync } = require_link();
@@ -1701,7 +1701,7 @@ var require_ensure = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/jsonfile/utils.js
+//#region ../../../../../../../../node_modules/jsonfile/utils.js
 var require_utils = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	function stringify(obj, { EOL = "\n", finalEOL = true, replacer = null, spaces } = {}) {
 		const EOF = finalEOL ? EOL : "";
@@ -1718,7 +1718,7 @@ var require_utils = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/jsonfile/index.js
+//#region ../../../../../../../../node_modules/jsonfile/index.js
 var require_jsonfile$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	let _fs;
 	try {
@@ -1781,7 +1781,7 @@ var require_jsonfile$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/json/jsonfile.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/json/jsonfile.js
 var require_jsonfile = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const jsonFile = require_jsonfile$1();
 	module.exports = {
@@ -1793,7 +1793,7 @@ var require_jsonfile = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/output-file/index.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/output-file/index.js
 var require_output_file = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const fs = require_fs();
@@ -1817,7 +1817,7 @@ var require_output_file = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/json/output-json.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/json/output-json.js
 var require_output_json = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { stringify } = require_utils();
 	const { outputFile } = require_output_file();
@@ -1828,7 +1828,7 @@ var require_output_json = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/json/output-json-sync.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/json/output-json-sync.js
 var require_output_json_sync = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const { stringify } = require_utils();
 	const { outputFileSync } = require_output_file();
@@ -1839,7 +1839,7 @@ var require_output_json_sync = /* @__PURE__ */ __commonJSMin(((exports, module) 
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/json/index.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/json/index.js
 var require_json = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	const jsonFile = require_jsonfile();
@@ -1855,7 +1855,7 @@ var require_json = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/move/move.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/move/move.js
 var require_move$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_fs();
 	const path$1 = require("path");
@@ -1896,7 +1896,7 @@ var require_move$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/move/move-sync.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/move/move-sync.js
 var require_move_sync = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const fs = require_graceful_fs();
 	const path = require("path");
@@ -1945,7 +1945,7 @@ var require_move_sync = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/move/index.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/move/index.js
 var require_move = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const u = require_universalify().fromPromise;
 	module.exports = {
@@ -1955,7 +1955,7 @@ var require_move = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fs-extra/lib/index.js
+//#region ../../../../../../../../node_modules/fs-extra/lib/index.js
 var require_lib$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		...require_fs(),
@@ -1972,7 +1972,7 @@ var require_lib$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/chalk/source/vendor/ansi-styles/index.js
+//#region ../../../../../../../../node_modules/chalk/source/vendor/ansi-styles/index.js
 var import_lib = /* @__PURE__ */ __toESM(require_lib$1());
 const ANSI_BACKGROUND_OFFSET = 10;
 const wrapAnsi16 = (offset = 0) => (code) => `\u001B[${code + offset}m`;
@@ -2138,7 +2138,7 @@ function assembleStyles() {
 const ansiStyles = assembleStyles();
 
 //#endregion
-//#region ../../node_modules/chalk/source/vendor/supports-color/index.js
+//#region ../../../../../../../../node_modules/chalk/source/vendor/supports-color/index.js
 function hasFlag(flag, argv = globalThis.Deno ? globalThis.Deno.args : node_process.default.argv) {
 	const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
 	const position = argv.indexOf(prefix + flag);
@@ -2227,7 +2227,7 @@ const supportsColor = {
 };
 
 //#endregion
-//#region ../../node_modules/chalk/source/utilities.js
+//#region ../../../../../../../../node_modules/chalk/source/utilities.js
 function stringReplaceAll(string, substring, replacer) {
 	let index = string.indexOf(substring);
 	if (index === -1) return string;
@@ -2256,7 +2256,7 @@ function stringEncaseCRLFWithFirstIndex(string, prefix, postfix, index) {
 }
 
 //#endregion
-//#region ../../node_modules/chalk/source/index.js
+//#region ../../../../../../../../node_modules/chalk/source/index.js
 const { stdout: stdoutColor, stderr: stderrColor } = supportsColor;
 const GENERATOR = Symbol("GENERATOR");
 const STYLER = Symbol("STYLER");
@@ -2379,7 +2379,7 @@ const chalk = createChalk();
 const chalkStderr = createChalk({ level: stderrColor ? stderrColor.level : 0 });
 
 //#endregion
-//#region ../../node_modules/mimic-function/index.js
+//#region ../../../../../../../../node_modules/mimic-function/index.js
 const copyProperty = (to, from, property, ignoreNonConfigurable) => {
 	if (property === "length" || property === "prototype") return;
 	if (property === "arguments" || property === "caller") return;
@@ -2420,7 +2420,7 @@ function mimicFunction(to, from, { ignoreNonConfigurable = false } = {}) {
 }
 
 //#endregion
-//#region ../../node_modules/restore-cursor/node_modules/onetime/index.js
+//#region ../../../../../../../../node_modules/restore-cursor/node_modules/onetime/index.js
 const calledFunctions = /* @__PURE__ */ new WeakMap();
 const onetime = (function_, options = {}) => {
 	if (typeof function_ !== "function") throw new TypeError("Expected a function");
@@ -2445,7 +2445,7 @@ onetime.callCount = (function_) => {
 };
 
 //#endregion
-//#region ../../node_modules/restore-cursor/node_modules/signal-exit/dist/mjs/signals.js
+//#region ../../../../../../../../node_modules/restore-cursor/node_modules/signal-exit/dist/mjs/signals.js
 /**
 * This is not the set of all possible signals.
 *
@@ -2478,7 +2478,7 @@ if (process.platform !== "win32") signals$1.push("SIGALRM", "SIGABRT", "SIGVTALR
 if (process.platform === "linux") signals$1.push("SIGIO", "SIGPOLL", "SIGPWR", "SIGSTKFLT");
 
 //#endregion
-//#region ../../node_modules/restore-cursor/node_modules/signal-exit/dist/mjs/index.js
+//#region ../../../../../../../../node_modules/restore-cursor/node_modules/signal-exit/dist/mjs/index.js
 const processOk$1 = (process) => !!process && typeof process === "object" && typeof process.removeListener === "function" && typeof process.emit === "function" && typeof process.reallyExit === "function" && typeof process.listeners === "function" && typeof process.kill === "function" && typeof process.pid === "number" && typeof process.on === "function";
 const kExitEmitter$1 = Symbol.for("signal-exit emitter");
 const global$2 = globalThis;
@@ -2646,7 +2646,7 @@ const process$8 = globalThis.process;
 const { onExit: onExit$1, load: load$1, unload: unload$1 } = signalExitWrap$1(processOk$1(process$8) ? new SignalExit$1(process$8) : new SignalExitFallback$1());
 
 //#endregion
-//#region ../../node_modules/restore-cursor/index.js
+//#region ../../../../../../../../node_modules/restore-cursor/index.js
 const terminal = node_process.default.stderr.isTTY ? node_process.default.stderr : node_process.default.stdout.isTTY ? node_process.default.stdout : void 0;
 const restoreCursor = terminal ? onetime(() => {
 	onExit$1(() => {
@@ -2655,7 +2655,7 @@ const restoreCursor = terminal ? onetime(() => {
 }) : () => {};
 
 //#endregion
-//#region ../../node_modules/cli-cursor/index.js
+//#region ../../../../../../../../node_modules/cli-cursor/index.js
 let isHidden = false;
 const cliCursor = {};
 cliCursor.show = (writableStream = node_process.default.stderr) => {
@@ -2676,7 +2676,7 @@ cliCursor.toggle = (force, writableStream) => {
 };
 
 //#endregion
-//#region ../../node_modules/cli-spinners/spinners.json
+//#region ../../../../../../../../node_modules/cli-spinners/spinners.json
 var spinners_default = {
 	dots: {
 		"interval": 80,
@@ -4334,12 +4334,12 @@ var spinners_default = {
 };
 
 //#endregion
-//#region ../../node_modules/cli-spinners/index.js
+//#region ../../../../../../../../node_modules/cli-spinners/index.js
 var cli_spinners_default = spinners_default;
 const spinnersList = Object.keys(spinners_default);
 
 //#endregion
-//#region ../../node_modules/yoctocolors/base.js
+//#region ../../../../../../../../node_modules/yoctocolors/base.js
 const hasColors = node_tty.default?.WriteStream?.prototype?.hasColors?.() ?? false;
 const format = (open, close) => {
 	if (!hasColors) return (input) => input;
@@ -4404,7 +4404,7 @@ const bgCyanBright = format(106, 49);
 const bgWhiteBright = format(107, 49);
 
 //#endregion
-//#region ../../node_modules/is-unicode-supported/index.js
+//#region ../../../../../../../../node_modules/is-unicode-supported/index.js
 function isUnicodeSupported$1() {
 	const { env } = node_process.default;
 	const { TERM, TERM_PROGRAM } = env;
@@ -4413,7 +4413,7 @@ function isUnicodeSupported$1() {
 }
 
 //#endregion
-//#region ../../node_modules/log-symbols/symbols.js
+//#region ../../../../../../../../node_modules/log-symbols/symbols.js
 const _isUnicodeSupported = isUnicodeSupported$1();
 const info = blue(_isUnicodeSupported ? "ℹ" : "i");
 const success = green(_isUnicodeSupported ? "✔" : "√");
@@ -4421,13 +4421,13 @@ const warning = yellow(_isUnicodeSupported ? "⚠" : "‼");
 const error = red(_isUnicodeSupported ? "✖" : "×");
 
 //#endregion
-//#region ../../node_modules/ansi-regex/index.js
+//#region ../../../../../../../../node_modules/ansi-regex/index.js
 function ansiRegex({ onlyFirst = false } = {}) {
 	return new RegExp(`(?:\\u001B\\][\\s\\S]*?(?:\\u0007|\\u001B\\u005C|\\u009C))|[\\u001B\\u009B][[\\]()#;?]*(?:\\d{1,4}(?:[;:]\\d{0,4})*)?[\\dA-PR-TZcf-nq-uy=><~]`, onlyFirst ? void 0 : "g");
 }
 
 //#endregion
-//#region ../../node_modules/ora/node_modules/strip-ansi/index.js
+//#region ../../../../../../../../node_modules/ora/node_modules/strip-ansi/index.js
 const regex = ansiRegex();
 function stripAnsi(string) {
 	if (typeof string !== "string") throw new TypeError(`Expected a \`string\`, got \`${typeof string}\``);
@@ -4435,7 +4435,7 @@ function stripAnsi(string) {
 }
 
 //#endregion
-//#region ../../node_modules/get-east-asian-width/lookup-data.js
+//#region ../../../../../../../../node_modules/get-east-asian-width/lookup-data.js
 const ambiguousRanges = [
 	161,
 	161,
@@ -5084,7 +5084,7 @@ const wideRanges = [
 ];
 
 //#endregion
-//#region ../../node_modules/get-east-asian-width/utilities.js
+//#region ../../../../../../../../node_modules/get-east-asian-width/utilities.js
 /**
 Binary search on a sorted flat array of [start, end] pairs.
 
@@ -5106,7 +5106,7 @@ const isInRange = (ranges, codePoint) => {
 };
 
 //#endregion
-//#region ../../node_modules/get-east-asian-width/lookup.js
+//#region ../../../../../../../../node_modules/get-east-asian-width/lookup.js
 const minimumAmbiguousCodePoint = ambiguousRanges[0];
 const maximumAmbiguousCodePoint = ambiguousRanges.at(-1);
 const minimumFullWidthCodePoint = fullwidthRanges[0];
@@ -5148,7 +5148,7 @@ const isWide = (codePoint) => {
 };
 
 //#endregion
-//#region ../../node_modules/get-east-asian-width/index.js
+//#region ../../../../../../../../node_modules/get-east-asian-width/index.js
 function validate(codePoint) {
 	if (!Number.isSafeInteger(codePoint)) throw new TypeError(`Expected a code point, got \`${typeof codePoint}\`.`);
 }
@@ -5159,7 +5159,7 @@ function eastAsianWidth(codePoint, { ambiguousAsWide = false } = {}) {
 }
 
 //#endregion
-//#region ../../node_modules/ora/node_modules/string-width/index.js
+//#region ../../../../../../../../node_modules/ora/node_modules/string-width/index.js
 /**
 Logic:
 - Segment graphemes to match how terminals render clusters.
@@ -5220,13 +5220,13 @@ function stringWidth(input, options = {}) {
 }
 
 //#endregion
-//#region ../../node_modules/is-interactive/index.js
+//#region ../../../../../../../../node_modules/is-interactive/index.js
 function isInteractive({ stream = process.stdout } = {}) {
 	return Boolean(stream && stream.isTTY && process.env.TERM !== "dumb" && !("CI" in process.env));
 }
 
 //#endregion
-//#region ../../node_modules/stdin-discarder/index.js
+//#region ../../../../../../../../node_modules/stdin-discarder/index.js
 const ASCII_ETX_CODE = 3;
 var StdinDiscarder = class {
 	#activeCount = 0;
@@ -5274,7 +5274,7 @@ const stdinDiscarder = new StdinDiscarder();
 var stdin_discarder_default = Object.freeze(stdinDiscarder);
 
 //#endregion
-//#region ../../node_modules/ora/index.js
+//#region ../../../../../../../../node_modules/ora/index.js
 const RENDER_DEFERRAL_TIMEOUT = 200;
 const SYNCHRONIZED_OUTPUT_ENABLE = "\x1B[?2026h";
 const SYNCHRONIZED_OUTPUT_DISABLE = "\x1B[?2026l";
@@ -5643,17 +5643,16 @@ function ora(options) {
 }
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/key.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/key.js
 const isUpKey = (key, keybindings = []) => key.name === "up" || keybindings.includes("vim") && key.name === "k" || keybindings.includes("emacs") && key.ctrl && key.name === "p";
 const isDownKey = (key, keybindings = []) => key.name === "down" || keybindings.includes("vim") && key.name === "j" || keybindings.includes("emacs") && key.ctrl && key.name === "n";
-const isSpaceKey = (key) => key.name === "space";
 const isBackspaceKey = (key) => key.name === "backspace";
 const isTabKey = (key) => key.name === "tab";
 const isNumberKey = (key) => "1234567890".includes(key.name);
 const isEnterKey = (key) => key.name === "enter" || key.name === "return";
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/errors.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/errors.js
 var AbortPromptError = class extends Error {
 	name = "AbortPromptError";
 	message = "Prompt was aborted";
@@ -5677,7 +5676,7 @@ var ValidationError = class extends Error {
 };
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/hook-engine.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/hook-engine.js
 const hookStorage = new node_async_hooks.AsyncLocalStorage();
 function createStore(rl) {
 	return {
@@ -5774,7 +5773,7 @@ const effectScheduler = {
 };
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/use-state.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/use-state.js
 function useState(defaultValue) {
 	return withPointer((pointer) => {
 		const setState = node_async_hooks.AsyncResource.bind(function setState(newValue) {
@@ -5791,7 +5790,7 @@ function useState(defaultValue) {
 }
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/use-effect.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/use-effect.js
 function useEffect(cb, depArray) {
 	withPointer((pointer) => {
 		const oldDeps = pointer.get();
@@ -5801,7 +5800,7 @@ function useEffect(cb, depArray) {
 }
 
 //#endregion
-//#region ../../node_modules/@inquirer/figures/dist/index.js
+//#region ../../../../../../../../node_modules/@inquirer/figures/dist/index.js
 function isUnicodeSupported() {
 	if (node_process.default.platform !== "win32") return node_process.default.env["TERM"] !== "linux";
 	return Boolean(node_process.default.env["WT_SESSION"]) || Boolean(node_process.default.env["TERMINUS_SUBLIME"]) || node_process.default.env["ConEmuTask"] === "{cmd::Cmder}" || node_process.default.env["TERM_PROGRAM"] === "Terminus-Sublime" || node_process.default.env["TERM_PROGRAM"] === "vscode" || node_process.default.env["TERM"] === "xterm-256color" || node_process.default.env["TERM"] === "alacritty" || node_process.default.env["TERMINAL_EMULATOR"] === "JetBrains-JediTerm";
@@ -6087,7 +6086,7 @@ const figures = shouldUseMain ? mainSymbols : fallbackSymbols;
 const replacements = Object.entries(specialMainSymbols);
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/theme.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/theme.js
 const defaultTheme = {
 	prefix: {
 		idle: (0, node_util.styleText)("blue", "?"),
@@ -6120,7 +6119,7 @@ const defaultTheme = {
 };
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/make-theme.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/make-theme.js
 function isPlainObject(value) {
 	if (typeof value !== "object" || value === null) return false;
 	let proto = value;
@@ -6140,7 +6139,7 @@ function makeTheme(...themes) {
 }
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/use-prefix.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/use-prefix.js
 function usePrefix({ status = "idle", theme }) {
 	const [showLoader, setShowLoader] = useState(false);
 	const [tick, setTick] = useState(0);
@@ -6167,7 +6166,7 @@ function usePrefix({ status = "idle", theme }) {
 }
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/use-memo.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/use-memo.js
 function useMemo(fn, dependencies) {
 	return withPointer((pointer) => {
 		const prev = pointer.get();
@@ -6184,13 +6183,13 @@ function useMemo(fn, dependencies) {
 }
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/use-ref.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/use-ref.js
 function useRef(val) {
 	return useState({ current: val })[0];
 }
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/use-keypress.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/use-keypress.js
 function useKeypress(userHandler) {
 	const signal = useRef(userHandler);
 	signal.current = userHandler;
@@ -6209,7 +6208,7 @@ function useKeypress(userHandler) {
 }
 
 //#endregion
-//#region ../../node_modules/cli-width/index.js
+//#region ../../../../../../../../node_modules/cli-width/index.js
 var require_cli_width = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = cliWidth;
 	function normalizeOpts(options) {
@@ -6238,7 +6237,7 @@ var require_cli_width = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/fast-string-truncated-width/dist/utils.js
+//#region ../../../../../../../../node_modules/fast-string-truncated-width/dist/utils.js
 const getCodePointsLength = (() => {
 	const SURROGATE_PAIR_RE = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
 	return (input) => {
@@ -6256,7 +6255,7 @@ const isWideNotCJKTNotEmoji = (x) => {
 };
 
 //#endregion
-//#region ../../node_modules/fast-string-truncated-width/dist/index.js
+//#region ../../../../../../../../node_modules/fast-string-truncated-width/dist/index.js
 const ANSI_RE = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]|\u001b\]8;[^;]*;.*?(?:\u0007|\u001b\u005c)/y;
 const CONTROL_RE = /[\x00-\x08\x0A-\x1F\x7F-\x9F]{1,1000}/y;
 const CJKT_WIDE_RE = /(?:(?![\uFF61-\uFF9F\uFF00-\uFFEF])[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Script=Tangut}]){1,1000}/uy;
@@ -6347,7 +6346,7 @@ const getStringTruncatedWidth = (input, truncationOptions = {}, widthOptions = {
 };
 
 //#endregion
-//#region ../../node_modules/fast-string-width/dist/index.js
+//#region ../../../../../../../../node_modules/fast-string-width/dist/index.js
 const NO_TRUNCATION = {
 	limit: Infinity,
 	ellipsis: "",
@@ -6358,7 +6357,7 @@ const fastStringWidth = (input, options = {}) => {
 };
 
 //#endregion
-//#region ../../node_modules/fast-wrap-ansi/lib/main.js
+//#region ../../../../../../../../node_modules/fast-wrap-ansi/lib/main.js
 const ESC$1 = "\x1B";
 const CSI = "";
 const END_CODE = 39;
@@ -6524,7 +6523,7 @@ function wrapAnsi(string, columns, options) {
 }
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/utils.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/utils.js
 var import_cli_width = /* @__PURE__ */ __toESM(require_cli_width(), 1);
 /**
 * Force line returns at specific width. This function is ANSI code friendly and it'll
@@ -6551,7 +6550,7 @@ function readlineWidth() {
 }
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/pagination/use-pagination.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/pagination/use-pagination.js
 function usePointerPosition({ active, renderedItems, pageSize, loop }) {
 	const state = useRef({
 		lastPointer: active,
@@ -6635,7 +6634,7 @@ function usePagination({ items, active, renderItem, pageSize, loop = true }) {
 }
 
 //#endregion
-//#region ../../node_modules/mute-stream/lib/index.js
+//#region ../../../../../../../../node_modules/mute-stream/lib/index.js
 var require_lib = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const Stream = require("stream");
 	var MuteStream = class extends Stream {
@@ -6732,7 +6731,7 @@ var require_lib = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/node_modules/signal-exit/dist/mjs/signals.js
+//#region ../../../../../../../../node_modules/@inquirer/core/node_modules/signal-exit/dist/mjs/signals.js
 /**
 * This is not the set of all possible signals.
 *
@@ -6765,7 +6764,7 @@ if (process.platform !== "win32") signals.push("SIGALRM", "SIGABRT", "SIGVTALRM"
 if (process.platform === "linux") signals.push("SIGIO", "SIGPOLL", "SIGPWR", "SIGSTKFLT");
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/node_modules/signal-exit/dist/mjs/index.js
+//#region ../../../../../../../../node_modules/@inquirer/core/node_modules/signal-exit/dist/mjs/index.js
 const processOk = (process) => !!process && typeof process === "object" && typeof process.removeListener === "function" && typeof process.emit === "function" && typeof process.reallyExit === "function" && typeof process.listeners === "function" && typeof process.kill === "function" && typeof process.pid === "number" && typeof process.on === "function";
 const kExitEmitter = Symbol.for("signal-exit emitter");
 const global$1 = globalThis;
@@ -6933,7 +6932,7 @@ const process$1 = globalThis.process;
 const { onExit, load, unload } = signalExitWrap(processOk(process$1) ? new SignalExit(process$1) : new SignalExitFallback());
 
 //#endregion
-//#region ../../node_modules/@inquirer/ansi/dist/index.js
+//#region ../../../../../../../../node_modules/@inquirer/ansi/dist/index.js
 const ESC = "\x1B[";
 /** Move cursor to first column */
 const cursorLeft = ESC + "G";
@@ -6955,7 +6954,7 @@ const eraseLine = ESC + "2K";
 const eraseLines = (lines) => lines > 0 ? (eraseLine + cursorUp(1)).repeat(lines - 1) + eraseLine + cursorLeft : "";
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/screen-manager.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/screen-manager.js
 const height = (content) => content.split("\n").length;
 const lastLine = (content) => content.split("\n").pop() ?? "";
 var ScreenManager = class {
@@ -7011,7 +7010,7 @@ var ScreenManager = class {
 };
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/promise-polyfill.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/promise-polyfill.js
 var PromisePolyfill = class extends Promise {
 	static withResolver() {
 		let resolve;
@@ -7028,7 +7027,7 @@ var PromisePolyfill = class extends Promise {
 };
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/create-prompt.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/create-prompt.js
 var import_lib$1 = /* @__PURE__ */ __toESM(require_lib(), 1);
 const nativeSetImmediate = globalThis.setImmediate;
 function getCallSites() {
@@ -7122,7 +7121,7 @@ function createPrompt(view) {
 }
 
 //#endregion
-//#region ../../node_modules/@inquirer/core/dist/lib/Separator.js
+//#region ../../../../../../../../node_modules/@inquirer/core/dist/lib/Separator.js
 /**
 * Separator object
 * Used to space/separate choices group
@@ -7139,188 +7138,7 @@ var Separator = class {
 };
 
 //#endregion
-//#region ../../node_modules/@inquirer/checkbox/dist/index.js
-const checkboxTheme = {
-	icon: {
-		checked: (0, node_util.styleText)("green", figures.circleFilled),
-		unchecked: figures.circle,
-		cursor: figures.pointer,
-		disabledChecked: (0, node_util.styleText)("green", figures.circleDouble),
-		disabledUnchecked: "-"
-	},
-	style: {
-		disabled: (text) => (0, node_util.styleText)("dim", text),
-		renderSelectedChoices: (selectedChoices) => selectedChoices.map((choice) => choice.short).join(", "),
-		description: (text) => (0, node_util.styleText)("cyan", text),
-		keysHelpTip: (keys) => keys.map(([key, action]) => `${(0, node_util.styleText)("bold", key)} ${(0, node_util.styleText)("dim", action)}`).join((0, node_util.styleText)("dim", " • "))
-	},
-	i18n: { disabledError: "This option is disabled and cannot be toggled." },
-	keybindings: []
-};
-function isSelectable$1(item) {
-	return !Separator.isSeparator(item) && !item.disabled;
-}
-function isNavigable$1(item) {
-	return !Separator.isSeparator(item);
-}
-function isChecked(item) {
-	return !Separator.isSeparator(item) && item.checked;
-}
-function toggle(item) {
-	return isSelectable$1(item) ? {
-		...item,
-		checked: !item.checked
-	} : item;
-}
-function check(checked) {
-	return function(item) {
-		return isSelectable$1(item) ? {
-			...item,
-			checked
-		} : item;
-	};
-}
-function normalizeChoices$1(choices) {
-	return choices.map((choice) => {
-		if (Separator.isSeparator(choice)) return choice;
-		if (typeof choice === "string") return {
-			value: choice,
-			name: choice,
-			short: choice,
-			checkedName: choice,
-			disabled: false,
-			checked: false
-		};
-		const name = choice.name ?? String(choice.value);
-		const normalizedChoice = {
-			value: choice.value,
-			name,
-			short: choice.short ?? name,
-			checkedName: choice.checkedName ?? name,
-			disabled: choice.disabled ?? false,
-			checked: choice.checked ?? false
-		};
-		if (choice.description) normalizedChoice.description = choice.description;
-		return normalizedChoice;
-	});
-}
-var dist_default$2 = createPrompt((config, done) => {
-	const { pageSize = 7, loop = true, required, validate = () => true } = config;
-	const shortcuts = {
-		all: "a",
-		invert: "i",
-		...config.shortcuts
-	};
-	const theme = makeTheme(checkboxTheme, config.theme);
-	const { keybindings } = theme;
-	const [status, setStatus] = useState("idle");
-	const prefix = usePrefix({
-		status,
-		theme
-	});
-	const [items, setItems] = useState(normalizeChoices$1(config.choices));
-	const bounds = useMemo(() => {
-		const first = items.findIndex(isNavigable$1);
-		const last = items.findLastIndex(isNavigable$1);
-		if (first === -1) throw new ValidationError("[checkbox prompt] No selectable choices. All choices are disabled.");
-		return {
-			first,
-			last
-		};
-	}, [items]);
-	const [active, setActive] = useState(bounds.first);
-	const [errorMsg, setError] = useState();
-	useKeypress(async (key) => {
-		if (isEnterKey(key)) {
-			const selection = items.filter(isChecked);
-			const isValid = await validate([...selection]);
-			if (required && !selection.length) setError("At least one choice must be selected");
-			else if (isValid === true) {
-				setStatus("done");
-				done(selection.map((choice) => choice.value));
-			} else setError(isValid || "You must select a valid value");
-		} else if (isUpKey(key, keybindings) || isDownKey(key, keybindings)) {
-			if (errorMsg) setError(void 0);
-			if (loop || isUpKey(key, keybindings) && active !== bounds.first || isDownKey(key, keybindings) && active !== bounds.last) {
-				const offset = isUpKey(key, keybindings) ? -1 : 1;
-				let next = active;
-				do
-					next = (next + offset + items.length) % items.length;
-				while (!isNavigable$1(items[next]));
-				setActive(next);
-			}
-		} else if (isSpaceKey(key)) {
-			const activeItem = items[active];
-			if (activeItem && !Separator.isSeparator(activeItem)) if (activeItem.disabled) setError(theme.i18n.disabledError);
-			else {
-				setError(void 0);
-				setItems(items.map((choice, i) => i === active ? toggle(choice) : choice));
-			}
-		} else if (key.name === shortcuts.all) {
-			const selectAll = items.some((choice) => isSelectable$1(choice) && !choice.checked);
-			setItems(items.map(check(selectAll)));
-		} else if (key.name === shortcuts.invert) setItems(items.map(toggle));
-		else if (isNumberKey(key)) {
-			const selectedIndex = Number(key.name) - 1;
-			let selectableIndex = -1;
-			const position = items.findIndex((item) => {
-				if (Separator.isSeparator(item)) return false;
-				selectableIndex++;
-				return selectableIndex === selectedIndex;
-			});
-			const selectedItem = items[position];
-			if (selectedItem && isSelectable$1(selectedItem)) {
-				setActive(position);
-				setItems(items.map((choice, i) => i === position ? toggle(choice) : choice));
-			}
-		}
-	});
-	const message = theme.style.message(config.message, status);
-	let description;
-	const page = usePagination({
-		items,
-		active,
-		renderItem({ item, isActive }) {
-			if (Separator.isSeparator(item)) return ` ${item.separator}`;
-			const cursor = isActive ? theme.icon.cursor : " ";
-			if (item.disabled) {
-				const disabledLabel = typeof item.disabled === "string" ? item.disabled : "(disabled)";
-				const checkbox = item.checked ? theme.icon.disabledChecked : theme.icon.disabledUnchecked;
-				return theme.style.disabled(`${cursor}${checkbox} ${item.name} ${disabledLabel}`);
-			}
-			if (isActive) description = item.description;
-			const checkbox = item.checked ? theme.icon.checked : theme.icon.unchecked;
-			const name = item.checked ? item.checkedName : item.name;
-			return (isActive ? theme.style.highlight : (x) => x)(`${cursor}${checkbox} ${name}`);
-		},
-		pageSize,
-		loop
-	});
-	if (status === "done") {
-		const selection = items.filter(isChecked);
-		return [
-			prefix,
-			message,
-			theme.style.answer(theme.style.renderSelectedChoices(selection, items))
-		].filter(Boolean).join(" ");
-	}
-	const keys = [["↑↓", "navigate"], ["space", "select"]];
-	if (shortcuts.all) keys.push([shortcuts.all, "all"]);
-	if (shortcuts.invert) keys.push([shortcuts.invert, "invert"]);
-	keys.push(["⏎", "submit"]);
-	const helpLine = theme.style.keysHelpTip(keys);
-	return `${[
-		[prefix, message].filter(Boolean).join(" "),
-		page,
-		" ",
-		description ? theme.style.description(description) : "",
-		errorMsg ? theme.style.error(errorMsg) : "",
-		helpLine
-	].filter(Boolean).join("\n").trimEnd()}${cursorHide}`;
-});
-
-//#endregion
-//#region ../../node_modules/@inquirer/confirm/dist/index.js
+//#region ../../../../../../../../node_modules/@inquirer/confirm/dist/index.js
 function getBooleanValue(value, defaultValue) {
 	let answer = defaultValue !== false;
 	if (/^(y|yes)/i.test(value)) answer = true;
@@ -7361,7 +7179,7 @@ var dist_default$1 = createPrompt((config, done) => {
 });
 
 //#endregion
-//#region ../../node_modules/@inquirer/select/dist/index.js
+//#region ../../../../../../../../node_modules/@inquirer/select/dist/index.js
 const selectTheme = {
 	icon: { cursor: figures.pointer },
 	style: {
@@ -7517,7 +7335,7 @@ var dist_default = createPrompt((config, done) => {
 });
 
 //#endregion
-//#region ../../node_modules/minimist/index.js
+//#region ../../../../../../../../node_modules/minimist/index.js
 var require_minimist = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	function hasKey(obj, keys) {
 		var o = obj;
@@ -7701,25 +7519,6 @@ function expandTilde(filePath) {
 	return filePath;
 }
 /**
-* Extract YAML frontmatter and body from markdown content.
-* Returns null frontmatter if content doesn't start with ---.
-*/
-function extractFrontmatterAndBody(content) {
-	if (!content.startsWith("---")) return {
-		frontmatter: null,
-		body: content
-	};
-	const endIndex = content.indexOf("---", 3);
-	if (endIndex === -1) return {
-		frontmatter: null,
-		body: content
-	};
-	return {
-		frontmatter: content.substring(3, endIndex).trim(),
-		body: content.substring(endIndex + 3)
-	};
-}
-/**
 * Process Co-Authored-By lines based on attribution setting.
 * @param content - File content to process
 * @param attribution - null=remove, undefined=keep default, string=replace
@@ -7769,7 +7568,7 @@ function writeSettings(settingsPath, settings) {
 * Get the global config directory for Claude Code.
 * Priority: explicitDir > CLAUDE_CONFIG_DIR env > ~/.claude
 */
-function getGlobalDir$4(explicitDir) {
+function getGlobalDir$1(explicitDir) {
 	if (explicitDir) return expandTilde(explicitDir);
 	if (process.env.CLAUDE_CONFIG_DIR) return expandTilde(process.env.CLAUDE_CONFIG_DIR);
 	return node_path.join(node_os.homedir(), ".claude");
@@ -7778,7 +7577,7 @@ function getGlobalDir$4(explicitDir) {
 * Get the config directory path relative to home for hook templating.
 * Used for path.join(homeDir, '<configDir>', ...) replacement in hooks.
 */
-function getConfigDirFromHome$4(isGlobal) {
+function getConfigDirFromHome$1(isGlobal) {
 	return "'.claude'";
 }
 /**
@@ -7786,7 +7585,7 @@ function getConfigDirFromHome$4(isGlobal) {
 * For Claude, this is path replacement only — no frontmatter conversion needed.
 * Replaces ~/.claude/ and ./.claude/ references with the actual install path prefix.
 */
-function transformContent$3(content, pathPrefix) {
+function transformContent(content, pathPrefix) {
 	const globalClaudeRegex = /~\/\.claude\//g;
 	const localClaudeRegex = /\.\/\.claude\//g;
 	let result = content.replace(globalClaudeRegex, pathPrefix);
@@ -7800,487 +7599,10 @@ function transformContent$3(content, pathPrefix) {
 const claudeAdapter = {
 	runtime: "claude",
 	dirName: ".claude",
-	getGlobalDir: getGlobalDir$4,
-	getConfigDirFromHome: getConfigDirFromHome$4,
-	transformContent: transformContent$3,
-	commandStructure: "nested"
-};
-
-//#endregion
-//#region src/adapters/transforms/tool-maps.ts
-/**
-* @maxsim/adapters — Tool name mappings per runtime
-*
-* Ported from bin/install.js lines ~327-390
-*/
-/** Tool name mapping from Claude Code to OpenCode */
-const claudeToOpencodeTools = {
-	AskUserQuestion: "question",
-	SlashCommand: "skill",
-	TodoWrite: "todowrite",
-	WebFetch: "webfetch",
-	WebSearch: "websearch"
-};
-/** Tool name mapping from Claude Code to Gemini CLI */
-const claudeToGeminiTools = {
-	Read: "read_file",
-	Write: "write_file",
-	Edit: "replace",
-	Bash: "run_shell_command",
-	Glob: "glob",
-	Grep: "search_file_content",
-	WebSearch: "google_web_search",
-	WebFetch: "web_fetch",
-	TodoWrite: "write_todos",
-	AskUserQuestion: "ask_user"
-};
-/**
-* Convert a Claude Code tool name to OpenCode format.
-* - Applies special mappings (AskUserQuestion -> question, etc.)
-* - Converts to lowercase (except MCP tools which keep their format)
-*/
-function convertToolName(claudeTool) {
-	if (claudeToOpencodeTools[claudeTool]) return claudeToOpencodeTools[claudeTool];
-	if (claudeTool.startsWith("mcp__")) return claudeTool;
-	return claudeTool.toLowerCase();
-}
-/**
-* Convert a Claude Code tool name to Gemini CLI format.
-* - Applies Claude->Gemini mapping (Read->read_file, Bash->run_shell_command, etc.)
-* - Filters out MCP tools (mcp__*) -- auto-discovered at runtime in Gemini
-* - Filters out Task -- agents are auto-registered as tools in Gemini
-* @returns Gemini tool name, or null if tool should be excluded
-*/
-function convertGeminiToolName(claudeTool) {
-	if (claudeTool.startsWith("mcp__")) return null;
-	if (claudeTool === "Task") return null;
-	if (claudeToGeminiTools[claudeTool]) return claudeToGeminiTools[claudeTool];
-	return claudeTool.toLowerCase();
-}
-
-//#endregion
-//#region src/adapters/transforms/content.ts
-/**
-* @maxsim/adapters — Content transformation utilities
-*
-* Ported from bin/install.js lines ~423-564
-*/
-/**
-* Convert /maxsim:command-name to $maxsim-command-name for Codex skill mentions.
-* Ported from install.js line ~423
-*/
-function convertSlashCommandsToCodexSkillMentions(content) {
-	let converted = content.replace(/\/maxsim:([a-z0-9-]+)/gi, (_, commandName) => {
-		return `$maxsim-${String(commandName).toLowerCase()}`;
-	});
-	converted = converted.replace(/\/maxsim-help\b/g, "$maxsim-help");
-	return converted;
-}
-/**
-* Convert Claude markdown to Codex markdown format.
-* Replaces slash commands and $ARGUMENTS placeholder.
-* Ported from install.js line ~431
-*/
-function convertClaudeToCodexMarkdown(content) {
-	let converted = convertSlashCommandsToCodexSkillMentions(content);
-	converted = converted.replace(/\$ARGUMENTS\b/g, "{{MAXSIM_ARGS}}");
-	return converted;
-}
-/**
-* Strip HTML <sub> tags for Gemini CLI output.
-* Terminals don't support subscript -- converts <sub>text</sub> to italic *(text)*.
-* Ported from install.js line ~474
-*/
-function stripSubTags(content) {
-	return content.replace(/<sub>(.*?)<\/sub>/g, "*($1)*");
-}
-/**
-* Convert Claude Code agent frontmatter to Gemini CLI format.
-* - tools: must be a YAML array (not comma-separated string)
-* - tool names: must use Gemini built-in names (read_file, not Read)
-* - color: must be removed (causes validation error)
-* - mcp__* tools: must be excluded (auto-discovered at runtime)
-* - ${VAR} patterns: escaped to $VAR for Gemini template compatibility
-*
-* Ported from install.js line ~487
-*/
-function convertClaudeToGeminiAgent(content) {
-	if (!content.startsWith("---")) return content;
-	const endIndex = content.indexOf("---", 3);
-	if (endIndex === -1) return content;
-	const frontmatter = content.substring(3, endIndex).trim();
-	const body = content.substring(endIndex + 3);
-	const lines = frontmatter.split("\n");
-	const newLines = [];
-	let inAllowedTools = false;
-	const tools = [];
-	for (const line of lines) {
-		const trimmed = line.trim();
-		if (trimmed.startsWith("allowed-tools:")) {
-			inAllowedTools = true;
-			continue;
-		}
-		if (trimmed.startsWith("tools:")) {
-			const toolsValue = trimmed.substring(6).trim();
-			if (toolsValue) {
-				const parsed = toolsValue.split(",").map((t) => t.trim()).filter((t) => t);
-				for (const t of parsed) {
-					const mapped = convertGeminiToolName(t);
-					if (mapped) tools.push(mapped);
-				}
-			} else inAllowedTools = true;
-			continue;
-		}
-		if (trimmed.startsWith("color:")) continue;
-		if (inAllowedTools) {
-			if (trimmed.startsWith("- ")) {
-				const mapped = convertGeminiToolName(trimmed.substring(2).trim());
-				if (mapped) tools.push(mapped);
-				continue;
-			} else if (trimmed && !trimmed.startsWith("-")) inAllowedTools = false;
-		}
-		if (!inAllowedTools) newLines.push(line);
-	}
-	if (tools.length > 0) {
-		newLines.push("tools:");
-		for (const tool of tools) newLines.push(`  - ${tool}`);
-	}
-	return `---\n${newLines.join("\n").trim()}\n---${stripSubTags(body.replace(/\$\{(\w+)\}/g, "$$$1"))}`;
-}
-/**
-* Replace path references in markdown content for a target runtime.
-* Replaces ~/.claude/ with pathPrefix and ./.claude/ with ./dirName/.
-*/
-function replacePathReferences(content, pathPrefix, dirName) {
-	const globalClaudeRegex = /~\/\.claude\//g;
-	const localClaudeRegex = /\.\/\.claude\//g;
-	let result = content.replace(globalClaudeRegex, pathPrefix);
-	result = result.replace(localClaudeRegex, `./${dirName}/`);
-	return result;
-}
-
-//#endregion
-//#region src/adapters/transforms/frontmatter.ts
-/**
-* @maxsim/adapters — Frontmatter conversion functions for opencode, gemini, codex
-*
-* Ported from bin/install.js lines ~308-711
-*/
-/** Color name to hex mapping for opencode compatibility */
-const colorNameToHex = {
-	cyan: "#00FFFF",
-	red: "#FF0000",
-	green: "#00FF00",
-	blue: "#0000FF",
-	yellow: "#FFFF00",
-	magenta: "#FF00FF",
-	orange: "#FFA500",
-	purple: "#800080",
-	pink: "#FFC0CB",
-	white: "#FFFFFF",
-	black: "#000000",
-	gray: "#808080",
-	grey: "#808080"
-};
-/** Collapse whitespace to single line */
-function toSingleLine(value) {
-	return value.replace(/\s+/g, " ").trim();
-}
-/** Quote a value for YAML using JSON.stringify */
-function yamlQuote(value) {
-	return JSON.stringify(value);
-}
-/** Extract a single-line field value from YAML frontmatter text */
-function extractFrontmatterField(frontmatter, fieldName) {
-	const regex = new RegExp(`^${fieldName}:\\s*(.+)$`, "m");
-	const match = frontmatter.match(regex);
-	if (!match) return null;
-	return match[1].trim().replace(/^['"]|['"]$/g, "");
-}
-/**
-* Convert Claude Code frontmatter to OpenCode format.
-* - Converts 'allowed-tools:' array to 'tools:' object with tool: true entries
-* - Converts color names to hex
-* - Removes name: field (opencode uses filename)
-* - Replaces tool name references in body content
-* - Replaces /maxsim: with /maxsim- (flat command structure)
-* - Replaces ~/.claude with ~/.config/opencode
-* - Replaces subagent_type="general-purpose" with "general"
-*
-* Ported from install.js line ~566
-*/
-function convertClaudeToOpencodeFrontmatter(content) {
-	let convertedContent = content;
-	convertedContent = convertedContent.replace(/\bAskUserQuestion\b/g, "question");
-	convertedContent = convertedContent.replace(/\bSlashCommand\b/g, "skill");
-	convertedContent = convertedContent.replace(/\bTodoWrite\b/g, "todowrite");
-	convertedContent = convertedContent.replace(/\/maxsim:/g, "/maxsim-");
-	convertedContent = convertedContent.replace(/~\/\.claude\b/g, "~/.config/opencode");
-	convertedContent = convertedContent.replace(/subagent_type="general-purpose"/g, "subagent_type=\"general\"");
-	if (!convertedContent.startsWith("---")) return convertedContent;
-	const endIndex = convertedContent.indexOf("---", 3);
-	if (endIndex === -1) return convertedContent;
-	const frontmatter = convertedContent.substring(3, endIndex).trim();
-	const body = convertedContent.substring(endIndex + 3);
-	const lines = frontmatter.split("\n");
-	const newLines = [];
-	let inAllowedTools = false;
-	const allowedTools = [];
-	for (const line of lines) {
-		const trimmed = line.trim();
-		if (trimmed.startsWith("allowed-tools:")) {
-			inAllowedTools = true;
-			continue;
-		}
-		if (trimmed.startsWith("tools:")) {
-			const toolsValue = trimmed.substring(6).trim();
-			if (toolsValue) {
-				const tools = toolsValue.split(",").map((t) => t.trim()).filter((t) => t);
-				allowedTools.push(...tools);
-			}
-			continue;
-		}
-		if (trimmed.startsWith("name:")) continue;
-		if (trimmed.startsWith("color:")) {
-			const colorValue = trimmed.substring(6).trim().toLowerCase();
-			const hexColor = colorNameToHex[colorValue];
-			if (hexColor) newLines.push(`color: "${hexColor}"`);
-			else if (colorValue.startsWith("#")) {
-				if (/^#[0-9a-f]{3}$|^#[0-9a-f]{6}$/i.test(colorValue)) newLines.push(line);
-			}
-			continue;
-		}
-		if (inAllowedTools) {
-			if (trimmed.startsWith("- ")) {
-				allowedTools.push(trimmed.substring(2).trim());
-				continue;
-			} else if (trimmed && !trimmed.startsWith("-")) inAllowedTools = false;
-		}
-		if (!inAllowedTools) newLines.push(line);
-	}
-	if (allowedTools.length > 0) {
-		newLines.push("tools:");
-		for (const tool of allowedTools) newLines.push(`  ${convertToolName(tool)}: true`);
-	}
-	return `---\n${newLines.join("\n").trim()}\n---${body}`;
-}
-/**
-* Convert Claude Code markdown command to Gemini TOML format.
-* Ported from install.js line ~677
-*/
-function convertClaudeToGeminiToml(content) {
-	if (!content.startsWith("---")) return `prompt = ${JSON.stringify(content)}\n`;
-	const endIndex = content.indexOf("---", 3);
-	if (endIndex === -1) return `prompt = ${JSON.stringify(content)}\n`;
-	const frontmatter = content.substring(3, endIndex).trim();
-	const body = content.substring(endIndex + 3).trim();
-	let description = "";
-	const lines = frontmatter.split("\n");
-	for (const line of lines) {
-		const trimmed = line.trim();
-		if (trimmed.startsWith("description:")) {
-			description = trimmed.substring(12).trim();
-			break;
-		}
-	}
-	let toml = "";
-	if (description) toml += `description = ${JSON.stringify(description)}\n`;
-	toml += `prompt = ${JSON.stringify(body)}\n`;
-	return toml;
-}
-/**
-* Convert Claude command to Codex skill format with adapter header.
-* Ported from install.js line ~452
-*/
-function convertClaudeCommandToCodexSkill(content, skillName) {
-	const { frontmatter, body } = extractFrontmatterAndBody(convertClaudeToCodexMarkdown(content));
-	let description = `Run MAXSIM workflow ${skillName}.`;
-	if (frontmatter) {
-		const maybeDescription = extractFrontmatterField(frontmatter, "description");
-		if (maybeDescription) description = maybeDescription;
-	}
-	description = toSingleLine(description);
-	const shortDescription = description.length > 180 ? `${description.slice(0, 177)}...` : description;
-	const adapter = getCodexSkillAdapterHeader(skillName);
-	return `---\nname: ${yamlQuote(skillName)}\ndescription: ${yamlQuote(description)}\nmetadata:\n  short-description: ${yamlQuote(shortDescription)}\n---\n\n${adapter}\n\n${body.trimStart()}`;
-}
-/**
-* Generate the Codex skill adapter header block.
-* Ported from install.js line ~437
-*/
-function getCodexSkillAdapterHeader(skillName) {
-	const invocation = `$${skillName}`;
-	return `<codex_skill_adapter>
-Codex skills-first mode:
-- This skill is invoked by mentioning \`${invocation}\`.
-- Treat all user text after \`${invocation}\` as \`{{MAXSIM_ARGS}}\`.
-- If no arguments are present, treat \`{{MAXSIM_ARGS}}\` as empty.
-
-Legacy orchestration compatibility:
-- Any \`Task(...)\` pattern in referenced workflow docs is legacy syntax.
-- Implement equivalent behavior with Codex collaboration tools: \`spawn_agent\`, \`wait\`, \`send_input\`, and \`close_agent\`.
-- Treat legacy \`subagent_type\` names as role hints in the spawned message.
-</codex_skill_adapter>`;
-}
-
-//#endregion
-//#region src/adapters/opencode.ts
-/**
-* @maxsim/adapters — OpenCode adapter
-*
-* Ports the OpenCode-specific logic from bin/install.js:
-*   - getOpencodeGlobalDir()           (lines 79-97)
-*   - getGlobalDir('opencode', ...)    (lines 104-111)
-*   - getDirName('opencode')           (line 46)
-*   - getConfigDirFromHome('opencode', isGlobal) (lines 58-68)
-*   - convertClaudeToOpencodeFrontmatter + path replacement
-*/
-/**
-* Get the global config directory for OpenCode.
-* OpenCode follows XDG Base Directory spec and uses ~/.config/opencode/.
-* Priority: OPENCODE_CONFIG_DIR > dirname(OPENCODE_CONFIG) > XDG_CONFIG_HOME/opencode > ~/.config/opencode
-*/
-function getOpencodeGlobalDir$1() {
-	if (process.env.OPENCODE_CONFIG_DIR) return expandTilde(process.env.OPENCODE_CONFIG_DIR);
-	if (process.env.OPENCODE_CONFIG) return node_path.dirname(expandTilde(process.env.OPENCODE_CONFIG));
-	if (process.env.XDG_CONFIG_HOME) return node_path.join(expandTilde(process.env.XDG_CONFIG_HOME), "opencode");
-	return node_path.join(node_os.homedir(), ".config", "opencode");
-}
-/**
-* Get the global config directory for OpenCode.
-* Priority: explicitDir > env vars (via getOpencodeGlobalDir)
-*/
-function getGlobalDir$3(explicitDir) {
-	if (explicitDir) return expandTilde(explicitDir);
-	return getOpencodeGlobalDir$1();
-}
-/**
-* Get the config directory path relative to home for hook templating.
-*/
-function getConfigDirFromHome$3(isGlobal) {
-	if (!isGlobal) return "'.opencode'";
-	return "'.config', 'opencode'";
-}
-/**
-* Transform markdown content for OpenCode installation.
-* Applies frontmatter conversion and path replacement.
-*/
-function transformContent$2(content, pathPrefix) {
-	let result = replacePathReferences(content, pathPrefix, ".opencode");
-	result = result.replace(/~\/\.opencode\//g, pathPrefix);
-	result = convertClaudeToOpencodeFrontmatter(result);
-	return result;
-}
-/**
-* OpenCode adapter configuration.
-* OpenCode uses flat command structure (command/maxsim-*.md).
-*/
-const opencodeAdapter = {
-	runtime: "opencode",
-	dirName: ".opencode",
-	getGlobalDir: getGlobalDir$3,
-	getConfigDirFromHome: getConfigDirFromHome$3,
-	transformContent: transformContent$2,
-	commandStructure: "flat"
-};
-
-//#endregion
-//#region src/adapters/gemini.ts
-/**
-* @maxsim/adapters — Gemini adapter
-*
-* Ports the Gemini-specific logic from bin/install.js:
-*   - getGlobalDir('gemini', ...)         (lines 113-122)
-*   - getDirName('gemini')                (line 47)
-*   - getConfigDirFromHome('gemini', isGlobal) (line 69)
-*   - convertClaudeToGeminiToml + convertClaudeToGeminiAgent + stripSubTags
-*/
-/**
-* Get the global config directory for Gemini.
-* Priority: explicitDir > GEMINI_CONFIG_DIR env > ~/.gemini
-*/
-function getGlobalDir$2(explicitDir) {
-	if (explicitDir) return expandTilde(explicitDir);
-	if (process.env.GEMINI_CONFIG_DIR) return expandTilde(process.env.GEMINI_CONFIG_DIR);
-	return node_path.join(node_os.homedir(), ".gemini");
-}
-/**
-* Get the config directory path relative to home for hook templating.
-*/
-function getConfigDirFromHome$2(_isGlobal) {
-	return "'.gemini'";
-}
-/**
-* Transform markdown content for Gemini installation.
-* Applies TOML conversion for commands, agent conversion for agents,
-* stripSubTags, and path replacement.
-*/
-function transformContent$1(content, pathPrefix) {
-	let result = replacePathReferences(content, pathPrefix, ".gemini");
-	result = stripSubTags(result);
-	result = convertClaudeToGeminiToml(result);
-	return result;
-}
-/**
-* Gemini adapter configuration.
-* Gemini uses nested command structure (commands/maxsim/*.toml).
-*/
-const geminiAdapter = {
-	runtime: "gemini",
-	dirName: ".gemini",
-	getGlobalDir: getGlobalDir$2,
-	getConfigDirFromHome: getConfigDirFromHome$2,
-	transformContent: transformContent$1,
-	commandStructure: "nested"
-};
-
-//#endregion
-//#region src/adapters/codex.ts
-/**
-* @maxsim/adapters — Codex adapter
-*
-* Ports the Codex-specific logic from bin/install.js:
-*   - getGlobalDir('codex', ...)         (lines 124-133)
-*   - getDirName('codex')                (line 48)
-*   - getConfigDirFromHome('codex', isGlobal) (line 70)
-*   - convertClaudeCommandToCodexSkill + convertClaudeToCodexMarkdown
-*/
-/**
-* Get the global config directory for Codex.
-* Priority: explicitDir > CODEX_HOME env > ~/.codex
-*/
-function getGlobalDir$1(explicitDir) {
-	if (explicitDir) return expandTilde(explicitDir);
-	if (process.env.CODEX_HOME) return expandTilde(process.env.CODEX_HOME);
-	return node_path.join(node_os.homedir(), ".codex");
-}
-/**
-* Get the config directory path relative to home for hook templating.
-*/
-function getConfigDirFromHome$1(_isGlobal) {
-	return "'.codex'";
-}
-/**
-* Transform markdown content for Codex installation.
-* Applies Codex markdown conversion and path replacement.
-*/
-function transformContent(content, pathPrefix) {
-	let result = replacePathReferences(content, pathPrefix, ".codex");
-	result = result.replace(/~\/\.codex\//g, pathPrefix);
-	result = convertClaudeCommandToCodexSkill(result);
-	return result;
-}
-/**
-* Codex adapter configuration.
-* Codex uses skill-based command structure (skills/maxsim-star/SKILL.md).
-*/
-const codexAdapter = {
-	runtime: "codex",
-	dirName: ".codex",
 	getGlobalDir: getGlobalDir$1,
 	getConfigDirFromHome: getConfigDirFromHome$1,
 	transformContent,
-	commandStructure: "skills"
+	commandStructure: "nested"
 };
 
 //#endregion
@@ -8288,37 +7610,22 @@ const codexAdapter = {
 const pkg = JSON.parse(node_fs.readFileSync(node_path.resolve(__dirname, "..", "package.json"), "utf-8"));
 const templatesRoot = node_path.resolve(__dirname, "assets", "templates");
 /**
-* Adapter registry keyed by runtime name
+* Get the global config directory, using the Claude adapter
 */
-const adapterMap = {
-	claude: claudeAdapter,
-	opencode: opencodeAdapter,
-	gemini: geminiAdapter,
-	codex: codexAdapter
-};
-/**
-* Get adapter for a runtime
-*/
-function getAdapter(runtime) {
-	return adapterMap[runtime];
-}
-/**
-* Get the global config directory for a runtime, using adapter
-*/
-function getGlobalDir(runtime, explicitDir = null) {
-	return getAdapter(runtime).getGlobalDir(explicitDir);
+function getGlobalDir(explicitDir = null) {
+	return claudeAdapter.getGlobalDir(explicitDir);
 }
 /**
 * Get the config directory path relative to home for hook templating
 */
-function getConfigDirFromHome(runtime, isGlobal) {
-	return getAdapter(runtime).getConfigDirFromHome(isGlobal);
+function getConfigDirFromHome(isGlobal) {
+	return claudeAdapter.getConfigDirFromHome(isGlobal);
 }
 /**
-* Get the local directory name for a runtime
+* Get the local directory name
 */
-function getDirName(runtime) {
-	return getAdapter(runtime).dirName;
+function getDirName() {
+	return claudeAdapter.dirName;
 }
 /**
 * Recursively remove a directory, handling Windows read-only file attributes.
@@ -8332,13 +7639,6 @@ function safeRmDir(dirPath) {
 */
 function copyDirRecursive(src, dest) {
 	import_lib.default.copySync(src, dest, { dereference: true });
-}
-/**
-* Get the global config directory for OpenCode (for JSONC permissions)
-* OpenCode follows XDG Base Directory spec
-*/
-function getOpencodeGlobalDir() {
-	return opencodeAdapter.getGlobalDir();
 }
 /**
 * Verify a directory exists and contains files
@@ -8372,99 +7672,20 @@ function verifyFileInstalled(filePath, description) {
 
 //#endregion
 //#region src/install/adapters.ts
-const attributionCache = /* @__PURE__ */ new Map();
+let attributionCached = false;
+let attributionValue;
 /**
-* Get commit attribution setting for a runtime
+* Get commit attribution setting for Claude Code
 * @returns null = remove, undefined = keep default, string = custom
 */
-function getCommitAttribution(runtime, explicitConfigDir) {
-	if (attributionCache.has(runtime)) return attributionCache.get(runtime);
-	let result;
-	if (runtime === "opencode") result = readSettings(node_path.join(getGlobalDir("opencode", null), "opencode.json")).disable_ai_attribution === true ? null : void 0;
-	else if (runtime === "gemini") {
-		const attr = readSettings(node_path.join(getGlobalDir("gemini", explicitConfigDir), "settings.json")).attribution;
-		if (!attr || attr.commit === void 0) result = void 0;
-		else if (attr.commit === "") result = null;
-		else result = attr.commit;
-	} else if (runtime === "claude") {
-		const attr = readSettings(node_path.join(getGlobalDir("claude", explicitConfigDir), "settings.json")).attribution;
-		if (!attr || attr.commit === void 0) result = void 0;
-		else if (attr.commit === "") result = null;
-		else result = attr.commit;
-	} else result = void 0;
-	attributionCache.set(runtime, result);
-	return result;
-}
-/**
-* Parse JSONC (JSON with Comments) by stripping comments and trailing commas.
-*/
-function parseJsonc(content) {
-	if (content.charCodeAt(0) === 65279) content = content.slice(1);
-	let result = "";
-	let inString = false;
-	let i = 0;
-	while (i < content.length) {
-		const char = content[i];
-		const next = content[i + 1];
-		if (inString) {
-			result += char;
-			if (char === "\\" && i + 1 < content.length) {
-				result += next;
-				i += 2;
-				continue;
-			}
-			if (char === "\"") inString = false;
-			i++;
-		} else if (char === "\"") {
-			inString = true;
-			result += char;
-			i++;
-		} else if (char === "/" && next === "/") while (i < content.length && content[i] !== "\n") i++;
-		else if (char === "/" && next === "*") {
-			i += 2;
-			while (i < content.length - 1 && !(content[i] === "*" && content[i + 1] === "/")) i++;
-			i += 2;
-		} else {
-			result += char;
-			i++;
-		}
-	}
-	result = result.replace(/,(\s*[}\]])/g, "$1");
-	return JSON.parse(result);
-}
-/**
-* Configure OpenCode permissions to allow reading MAXSIM reference docs
-*/
-function configureOpencodePermissions(isGlobal = true) {
-	const opencodeConfigDir = isGlobal ? getOpencodeGlobalDir() : node_path.join(process.cwd(), ".opencode");
-	const configPath = node_path.join(opencodeConfigDir, "opencode.json");
-	node_fs.mkdirSync(opencodeConfigDir, { recursive: true });
-	let config = {};
-	if (node_fs.existsSync(configPath)) try {
-		config = parseJsonc(node_fs.readFileSync(configPath, "utf8"));
-	} catch (e) {
-		console.log(`  ${chalk.yellow("⚠")} Could not parse opencode.json - skipping permission config`);
-		console.log(`    ${chalk.dim(`Reason: ${e.message}`)}`);
-		console.log(`    ${chalk.dim("Your config was NOT modified. Fix the syntax manually if needed.")}`);
-		return;
-	}
-	if (!config.permission) config.permission = {};
-	const permission = config.permission;
-	const maxsimPath = opencodeConfigDir === node_path.join(node_os.homedir(), ".config", "opencode") ? "~/.config/opencode/maxsim/*" : `${opencodeConfigDir.replace(/\\/g, "/")}/maxsim/*`;
-	let modified = false;
-	if (!permission.read || typeof permission.read !== "object") permission.read = {};
-	if (permission.read[maxsimPath] !== "allow") {
-		permission.read[maxsimPath] = "allow";
-		modified = true;
-	}
-	if (!permission.external_directory || typeof permission.external_directory !== "object") permission.external_directory = {};
-	if (permission.external_directory[maxsimPath] !== "allow") {
-		permission.external_directory[maxsimPath] = "allow";
-		modified = true;
-	}
-	if (!modified) return;
-	node_fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n");
-	console.log(`  ${chalk.green("✓")} Configured read permission for MAXSIM docs`);
+function getCommitAttribution(explicitConfigDir) {
+	if (attributionCached) return attributionValue;
+	const attr = readSettings(node_path.join(getGlobalDir(explicitConfigDir), "settings.json")).attribution;
+	if (!attr || attr.commit === void 0) attributionValue = void 0;
+	else if (attr.commit === "") attributionValue = null;
+	else attributionValue = attr.commit;
+	attributionCached = true;
+	return attributionValue;
 }
 
 //#endregion
@@ -8663,11 +7884,9 @@ function cleanupOrphanedHooks(settings) {
 	return settings;
 }
 /**
-* Install hook files and configure settings.json for a runtime
+* Install hook files and configure settings.json
 */
-function installHookFiles(targetDir, runtime, isGlobal, failures) {
-	getDirName(runtime);
-	if (runtime === "codex") return;
+function installHookFiles(targetDir, isGlobal, failures) {
 	let hooksSrc = null;
 	const bundledHooksDir = node_path.resolve(__dirname, "assets", "hooks");
 	if (node_fs.existsSync(bundledHooksDir)) hooksSrc = bundledHooksDir;
@@ -8680,7 +7899,7 @@ function installHookFiles(targetDir, runtime, isGlobal, failures) {
 		const hooksDest = node_path.join(targetDir, "hooks");
 		node_fs.mkdirSync(hooksDest, { recursive: true });
 		const hookEntries = node_fs.readdirSync(hooksSrc);
-		const configDirReplacement = getConfigDirFromHome(runtime, isGlobal);
+		const configDirReplacement = getConfigDirFromHome(isGlobal);
 		for (const entry of hookEntries) {
 			const srcFile = node_path.join(hooksSrc, entry);
 			if (node_fs.statSync(srcFile).isFile() && entry.endsWith(".cjs") && !entry.includes(".d.")) {
@@ -8701,33 +7920,30 @@ function installHookFiles(targetDir, runtime, isGlobal, failures) {
 /**
 * Configure hooks and statusline in settings.json
 */
-function configureSettingsHooks(targetDir, runtime, isGlobal) {
-	const dirName = getDirName(runtime);
-	const isOpencode = runtime === "opencode";
+function configureSettingsHooks(targetDir, isGlobal) {
+	const dirName = getDirName();
 	const settingsPath = node_path.join(targetDir, "settings.json");
 	const settings = cleanupOrphanedHooks(readSettings(settingsPath));
 	const statuslineCommand = isGlobal ? buildHookCommand(targetDir, "maxsim-statusline.js") : "node " + dirName + "/hooks/maxsim-statusline.js";
 	const updateCheckCommand = isGlobal ? buildHookCommand(targetDir, "maxsim-check-update.js") : "node " + dirName + "/hooks/maxsim-check-update.js";
 	const contextMonitorCommand = isGlobal ? buildHookCommand(targetDir, "maxsim-context-monitor.js") : "node " + dirName + "/hooks/maxsim-context-monitor.js";
-	if (!isOpencode) {
-		if (!settings.hooks) settings.hooks = {};
-		const installHooks = settings.hooks;
-		if (!installHooks.SessionStart) installHooks.SessionStart = [];
-		if (!installHooks.SessionStart.some((entry) => entry.hooks && entry.hooks.some((h) => h.command && h.command.includes("maxsim-check-update")))) {
-			installHooks.SessionStart.push({ hooks: [{
-				type: "command",
-				command: updateCheckCommand
-			}] });
-			console.log(`  ${chalk.green("✓")} Configured update check hook`);
-		}
-		if (!installHooks.PostToolUse) installHooks.PostToolUse = [];
-		if (!installHooks.PostToolUse.some((entry) => entry.hooks && entry.hooks.some((h) => h.command && h.command.includes("maxsim-context-monitor")))) {
-			installHooks.PostToolUse.push({ hooks: [{
-				type: "command",
-				command: contextMonitorCommand
-			}] });
-			console.log(`  ${chalk.green("✓")} Configured context window monitor hook`);
-		}
+	if (!settings.hooks) settings.hooks = {};
+	const installHooks = settings.hooks;
+	if (!installHooks.SessionStart) installHooks.SessionStart = [];
+	if (!installHooks.SessionStart.some((entry) => entry.hooks && entry.hooks.some((h) => h.command && h.command.includes("maxsim-check-update")))) {
+		installHooks.SessionStart.push({ hooks: [{
+			type: "command",
+			command: updateCheckCommand
+		}] });
+		console.log(`  ${chalk.green("✓")} Configured update check hook`);
+	}
+	if (!installHooks.PostToolUse) installHooks.PostToolUse = [];
+	if (!installHooks.PostToolUse.some((entry) => entry.hooks && entry.hooks.some((h) => h.command && h.command.includes("maxsim-context-monitor")))) {
+		installHooks.PostToolUse.push({ hooks: [{
+			type: "command",
+			command: contextMonitorCommand
+		}] });
+		console.log(`  ${chalk.green("✓")} Configured context window monitor hook`);
 	}
 	return {
 		settingsPath,
@@ -8769,136 +7985,20 @@ async function handleStatusline(settings, isInteractive, forceStatusline) {
 /**
 * Apply statusline config, then print completion message
 */
-function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline, runtime = "claude", isGlobal = true) {
-	const isOpencode = runtime === "opencode";
-	const isCodex = runtime === "codex";
-	if (shouldInstallStatusline && !isOpencode && !isCodex) {
+function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline, isGlobal = true) {
+	if (shouldInstallStatusline) {
 		settings.statusLine = {
 			type: "command",
 			command: statuslineCommand
 		};
 		console.log(`  ${chalk.green("✓")} Configured statusline`);
 	}
-	if (!isCodex && settingsPath && settings) writeSettings(settingsPath, settings);
-	if (isOpencode) configureOpencodePermissions(isGlobal);
-	let program = "Claude Code";
-	if (runtime === "opencode") program = "OpenCode";
-	if (runtime === "gemini") program = "Gemini";
-	if (runtime === "codex") program = "Codex";
-	let command = "/maxsim:help";
-	if (runtime === "opencode") command = "/maxsim-help";
-	if (runtime === "codex") command = "$maxsim-help";
+	if (settingsPath && settings) writeSettings(settingsPath, settings);
 	console.log(`
-  ${chalk.green("Done!")} Launch ${program} and run ${chalk.cyan(command)}.
+  ${chalk.green("Done!")} Launch Claude Code and run ${chalk.cyan("/maxsim:help")}.
 
   ${chalk.cyan("Join the community:")} https://discord.gg/5JJgD5svVS
 `);
-}
-
-//#endregion
-//#region src/install/copy.ts
-/**
-* Copy commands to a flat structure for OpenCode
-* OpenCode expects: command/maxsim-help.md (invoked as /maxsim-help)
-* Source structure: commands/maxsim/help.md
-*/
-function copyFlattenedCommands(srcDir, destDir, prefix, pathPrefix, runtime, explicitConfigDir) {
-	if (!node_fs.existsSync(srcDir)) return;
-	if (node_fs.existsSync(destDir)) {
-		for (const file of node_fs.readdirSync(destDir)) if (file.startsWith(`${prefix}-`) && file.endsWith(".md")) node_fs.unlinkSync(node_path.join(destDir, file));
-	} else node_fs.mkdirSync(destDir, { recursive: true });
-	const entries = node_fs.readdirSync(srcDir, { withFileTypes: true });
-	for (const entry of entries) {
-		const srcPath = node_path.join(srcDir, entry.name);
-		if (entry.isDirectory()) copyFlattenedCommands(srcPath, destDir, `${prefix}-${entry.name}`, pathPrefix, runtime, explicitConfigDir);
-		else if (entry.name.endsWith(".md")) {
-			const destName = `${prefix}-${entry.name.replace(".md", "")}.md`;
-			const destPath = node_path.join(destDir, destName);
-			let content = node_fs.readFileSync(srcPath, "utf8");
-			const globalClaudeRegex = /~\/\.claude\//g;
-			const localClaudeRegex = /\.\/\.claude\//g;
-			const opencodeDirRegex = /~\/\.opencode\//g;
-			content = content.replace(globalClaudeRegex, pathPrefix);
-			content = content.replace(localClaudeRegex, `./${getDirName(runtime)}/`);
-			content = content.replace(opencodeDirRegex, pathPrefix);
-			content = processAttribution(content, getCommitAttribution(runtime, explicitConfigDir));
-			content = convertClaudeToOpencodeFrontmatter(content);
-			node_fs.writeFileSync(destPath, content);
-		}
-	}
-}
-function listCodexSkillNames(skillsDir, prefix = "maxsim-") {
-	if (!node_fs.existsSync(skillsDir)) return [];
-	return node_fs.readdirSync(skillsDir, { withFileTypes: true }).filter((entry) => entry.isDirectory() && entry.name.startsWith(prefix)).filter((entry) => node_fs.existsSync(node_path.join(skillsDir, entry.name, "SKILL.md"))).map((entry) => entry.name).sort();
-}
-function copyCommandsAsCodexSkills(srcDir, skillsDir, prefix, pathPrefix, runtime, explicitConfigDir) {
-	if (!node_fs.existsSync(srcDir)) return;
-	node_fs.mkdirSync(skillsDir, { recursive: true });
-	const existing = node_fs.readdirSync(skillsDir, { withFileTypes: true });
-	for (const entry of existing) if (entry.isDirectory() && entry.name.startsWith(`${prefix}-`)) node_fs.rmSync(node_path.join(skillsDir, entry.name), { recursive: true });
-	function recurse(currentSrcDir, currentPrefix) {
-		const entries = node_fs.readdirSync(currentSrcDir, { withFileTypes: true });
-		for (const entry of entries) {
-			const srcPath = node_path.join(currentSrcDir, entry.name);
-			if (entry.isDirectory()) {
-				recurse(srcPath, `${currentPrefix}-${entry.name}`);
-				continue;
-			}
-			if (!entry.name.endsWith(".md")) continue;
-			const skillName = `${currentPrefix}-${entry.name.replace(".md", "")}`;
-			const skillDir = node_path.join(skillsDir, skillName);
-			node_fs.mkdirSync(skillDir, { recursive: true });
-			let content = node_fs.readFileSync(srcPath, "utf8");
-			const globalClaudeRegex = /~\/\.claude\//g;
-			const localClaudeRegex = /\.\/\.claude\//g;
-			const codexDirRegex = /~\/\.codex\//g;
-			content = content.replace(globalClaudeRegex, pathPrefix);
-			content = content.replace(localClaudeRegex, `./${getDirName(runtime)}/`);
-			content = content.replace(codexDirRegex, pathPrefix);
-			content = processAttribution(content, getCommitAttribution(runtime, explicitConfigDir));
-			content = convertClaudeCommandToCodexSkill(content, skillName);
-			node_fs.writeFileSync(node_path.join(skillDir, "SKILL.md"), content);
-		}
-	}
-	recurse(srcDir, prefix);
-}
-/**
-* Recursively copy directory, replacing paths in .md files
-* Deletes existing destDir first to remove orphaned files from previous versions
-*/
-function copyWithPathReplacement(srcDir, destDir, pathPrefix, runtime, explicitConfigDir, isCommand = false) {
-	const isOpencode = runtime === "opencode";
-	const isCodex = runtime === "codex";
-	const dirName = getDirName(runtime);
-	if (node_fs.existsSync(destDir)) node_fs.rmSync(destDir, { recursive: true });
-	node_fs.mkdirSync(destDir, { recursive: true });
-	const entries = node_fs.readdirSync(srcDir, { withFileTypes: true });
-	for (const entry of entries) {
-		const srcPath = node_path.join(srcDir, entry.name);
-		const destPath = node_path.join(destDir, entry.name);
-		if (entry.isDirectory()) copyWithPathReplacement(srcPath, destPath, pathPrefix, runtime, explicitConfigDir, isCommand);
-		else if (entry.name.endsWith(".md")) {
-			let content = node_fs.readFileSync(srcPath, "utf8");
-			const globalClaudeRegex = /~\/\.claude\//g;
-			const localClaudeRegex = /\.\/\.claude\//g;
-			content = content.replace(globalClaudeRegex, pathPrefix);
-			content = content.replace(localClaudeRegex, `./${dirName}/`);
-			content = processAttribution(content, getCommitAttribution(runtime, explicitConfigDir));
-			if (isOpencode) {
-				content = convertClaudeToOpencodeFrontmatter(content);
-				node_fs.writeFileSync(destPath, content);
-			} else if (runtime === "gemini") if (isCommand) {
-				content = stripSubTags(content);
-				const tomlContent = convertClaudeToGeminiToml(content);
-				const tomlPath = destPath.replace(/\.md$/, ".toml");
-				node_fs.writeFileSync(tomlPath, tomlContent);
-			} else node_fs.writeFileSync(destPath, content);
-			else if (isCodex) {
-				content = convertClaudeToCodexMarkdown(content);
-				node_fs.writeFileSync(destPath, content);
-			} else node_fs.writeFileSync(destPath, content);
-		} else node_fs.copyFileSync(srcPath, destPath);
-	}
 }
 
 //#endregion
@@ -8930,13 +8030,9 @@ function generateManifest(dir, baseDir) {
 /**
 * Write file manifest after installation for future modification detection
 */
-function writeManifest(configDir, runtime = "claude") {
-	const isOpencode = runtime === "opencode";
-	const isCodex = runtime === "codex";
+function writeManifest(configDir) {
 	const maxsimDir = node_path.join(configDir, "maxsim");
 	const commandsDir = node_path.join(configDir, "commands", "maxsim");
-	const opencodeCommandDir = node_path.join(configDir, "command");
-	const codexSkillsDir = node_path.join(configDir, "skills");
 	const agentsDir = node_path.join(configDir, "agents");
 	const manifest = {
 		version: pkg.version,
@@ -8945,16 +8041,9 @@ function writeManifest(configDir, runtime = "claude") {
 	};
 	const maxsimHashes = generateManifest(maxsimDir);
 	for (const [rel, hash] of Object.entries(maxsimHashes)) manifest.files["maxsim/" + rel] = hash;
-	if (!isOpencode && !isCodex && node_fs.existsSync(commandsDir)) {
+	if (node_fs.existsSync(commandsDir)) {
 		const cmdHashes = generateManifest(commandsDir);
 		for (const [rel, hash] of Object.entries(cmdHashes)) manifest.files["commands/maxsim/" + rel] = hash;
-	}
-	if (isOpencode && node_fs.existsSync(opencodeCommandDir)) {
-		for (const file of node_fs.readdirSync(opencodeCommandDir)) if (file.startsWith("maxsim-") && file.endsWith(".md")) manifest.files["command/" + file] = fileHash(node_path.join(opencodeCommandDir, file));
-	}
-	if (isCodex && node_fs.existsSync(codexSkillsDir)) for (const skillName of listCodexSkillNames(codexSkillsDir)) {
-		const skillHashes = generateManifest(node_path.join(codexSkillsDir, skillName));
-		for (const [rel, hash] of Object.entries(skillHashes)) manifest.files[`skills/${skillName}/${rel}`] = hash;
 	}
 	if (node_fs.existsSync(agentsDir)) {
 		for (const file of node_fs.readdirSync(agentsDir)) if (file.startsWith("maxsim-") && file.endsWith(".md")) manifest.files["agents/" + file] = fileHash(node_path.join(agentsDir, file));
@@ -9010,7 +8099,7 @@ function saveLocalPatches(configDir) {
 /**
 * After install, report backed-up patches for user to reapply.
 */
-function reportLocalPatches(configDir, runtime = "claude") {
+function reportLocalPatches(configDir) {
 	const patchesDir = node_path.join(configDir, PATCHES_DIR_NAME);
 	const metaPath = node_path.join(patchesDir, "backup-meta.json");
 	if (!node_fs.existsSync(metaPath)) return [];
@@ -9021,13 +8110,12 @@ function reportLocalPatches(configDir, runtime = "claude") {
 		return [];
 	}
 	if (meta.files && meta.files.length > 0) {
-		const reapplyCommand = runtime === "opencode" ? "/maxsim-reapply-patches" : runtime === "codex" ? "$maxsim-reapply-patches" : "/maxsim:reapply-patches";
 		console.log("");
 		console.log("  " + chalk.yellow("Local patches detected") + " (from v" + meta.from_version + "):");
 		for (const f of meta.files) console.log("     " + chalk.cyan(f));
 		console.log("");
 		console.log("  Your modifications are saved in " + chalk.cyan(PATCHES_DIR_NAME + "/"));
-		console.log("  Run " + chalk.cyan(reapplyCommand) + " to merge them into the new version.");
+		console.log("  Run " + chalk.cyan("/maxsim:reapply-patches") + " to merge them into the new version.");
 		console.log("  Or manually compare and merge the files.");
 		console.log("");
 	}
@@ -9035,58 +8123,52 @@ function reportLocalPatches(configDir, runtime = "claude") {
 }
 
 //#endregion
+//#region src/install/copy.ts
+/**
+* Recursively copy directory, replacing paths in .md files
+* Deletes existing destDir first to remove orphaned files from previous versions
+*/
+function copyWithPathReplacement(srcDir, destDir, pathPrefix, explicitConfigDir, isCommand = false) {
+	if (node_fs.existsSync(destDir)) node_fs.rmSync(destDir, { recursive: true });
+	node_fs.mkdirSync(destDir, { recursive: true });
+	const entries = node_fs.readdirSync(srcDir, { withFileTypes: true });
+	for (const entry of entries) {
+		const srcPath = node_path.join(srcDir, entry.name);
+		const destPath = node_path.join(destDir, entry.name);
+		if (entry.isDirectory()) copyWithPathReplacement(srcPath, destPath, pathPrefix, explicitConfigDir, isCommand);
+		else if (entry.name.endsWith(".md")) {
+			let content = node_fs.readFileSync(srcPath, "utf8");
+			const globalClaudeRegex = /~\/\.claude\//g;
+			const localClaudeRegex = /\.\/\.claude\//g;
+			content = content.replace(globalClaudeRegex, pathPrefix);
+			content = content.replace(localClaudeRegex, "./.claude/");
+			content = processAttribution(content, getCommitAttribution(explicitConfigDir));
+			node_fs.writeFileSync(destPath, content);
+		} else node_fs.copyFileSync(srcPath, destPath);
+	}
+}
+
+//#endregion
 //#region src/install/uninstall.ts
 /**
-* Uninstall MAXSIM from the specified directory for a specific runtime
+* Uninstall MAXSIM from the specified directory
 */
-function uninstall(isGlobal, runtime = "claude", explicitConfigDir = null) {
-	const isOpencode = runtime === "opencode";
-	const isCodex = runtime === "codex";
-	const dirName = getDirName(runtime);
-	const targetDir = isGlobal ? getGlobalDir(runtime, explicitConfigDir) : node_path.join(process.cwd(), dirName);
+function uninstall(isGlobal, explicitConfigDir = null) {
+	const dirName = getDirName();
+	const targetDir = isGlobal ? getGlobalDir(explicitConfigDir) : node_path.join(process.cwd(), dirName);
 	const locationLabel = isGlobal ? targetDir.replace(node_os.homedir(), "~") : targetDir.replace(process.cwd(), ".");
-	let runtimeLabel = "Claude Code";
-	if (runtime === "opencode") runtimeLabel = "OpenCode";
-	if (runtime === "gemini") runtimeLabel = "Gemini";
-	if (runtime === "codex") runtimeLabel = "Codex";
-	console.log(`  Uninstalling MAXSIM from ${chalk.cyan(runtimeLabel)} at ${chalk.cyan(locationLabel)}\n`);
+	console.log(`  Uninstalling MAXSIM from ${chalk.cyan("Claude Code")} at ${chalk.cyan(locationLabel)}\n`);
 	if (!node_fs.existsSync(targetDir)) {
 		console.log(`  ${chalk.yellow("⚠")} Directory does not exist: ${locationLabel}`);
 		console.log(`  Nothing to uninstall.\n`);
 		return;
 	}
 	let removedCount = 0;
-	if (isOpencode) {
-		const commandDir = node_path.join(targetDir, "command");
-		if (node_fs.existsSync(commandDir)) {
-			const files = node_fs.readdirSync(commandDir);
-			for (const file of files) if (file.startsWith("maxsim-") && file.endsWith(".md")) {
-				node_fs.unlinkSync(node_path.join(commandDir, file));
-				removedCount++;
-			}
-			console.log(`  ${chalk.green("✓")} Removed MAXSIM commands from command/`);
-		}
-	} else if (isCodex) {
-		const skillsDir = node_path.join(targetDir, "skills");
-		if (node_fs.existsSync(skillsDir)) {
-			let skillCount = 0;
-			const entries = node_fs.readdirSync(skillsDir, { withFileTypes: true });
-			for (const entry of entries) if (entry.isDirectory() && entry.name.startsWith("maxsim-")) {
-				node_fs.rmSync(node_path.join(skillsDir, entry.name), { recursive: true });
-				skillCount++;
-			}
-			if (skillCount > 0) {
-				removedCount++;
-				console.log(`  ${chalk.green("✓")} Removed ${skillCount} Codex skills`);
-			}
-		}
-	} else {
-		const maxsimCommandsDir = node_path.join(targetDir, "commands", "maxsim");
-		if (node_fs.existsSync(maxsimCommandsDir)) {
-			node_fs.rmSync(maxsimCommandsDir, { recursive: true });
-			removedCount++;
-			console.log(`  ${chalk.green("✓")} Removed commands/maxsim/`);
-		}
+	const maxsimCommandsDir = node_path.join(targetDir, "commands", "maxsim");
+	if (node_fs.existsSync(maxsimCommandsDir)) {
+		node_fs.rmSync(maxsimCommandsDir, { recursive: true });
+		removedCount++;
+		console.log(`  ${chalk.green("✓")} Removed commands/maxsim/`);
 	}
 	const maxsimDir = node_path.join(targetDir, "maxsim");
 	if (node_fs.existsSync(maxsimDir)) {
@@ -9177,34 +8259,9 @@ function uninstall(isGlobal, runtime = "claude", explicitConfigDir = null) {
 			removedCount++;
 		}
 	}
-	if (isOpencode) {
-		const opencodeConfigDir = isGlobal ? getOpencodeGlobalDir() : node_path.join(process.cwd(), ".opencode");
-		const configPath = node_path.join(opencodeConfigDir, "opencode.json");
-		if (node_fs.existsSync(configPath)) try {
-			const config = JSON.parse(node_fs.readFileSync(configPath, "utf8"));
-			let modified = false;
-			const permission = config.permission;
-			if (permission) {
-				for (const permType of ["read", "external_directory"]) if (permission[permType]) {
-					const keys = Object.keys(permission[permType]);
-					for (const key of keys) if (key.includes("maxsim")) {
-						delete permission[permType][key];
-						modified = true;
-					}
-					if (Object.keys(permission[permType]).length === 0) delete permission[permType];
-				}
-				if (Object.keys(permission).length === 0) delete config.permission;
-			}
-			if (modified) {
-				node_fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n");
-				removedCount++;
-				console.log(`  ${chalk.green("✓")} Removed MAXSIM permissions from opencode.json`);
-			}
-		} catch {}
-	}
 	if (removedCount === 0) console.log(`  ${chalk.yellow("⚠")} No MAXSIM files found to remove.`);
 	console.log(`
-  ${chalk.green("Done!")} MAXSIM has been uninstalled from ${runtimeLabel}.
+  ${chalk.green("Done!")} MAXSIM has been uninstalled from Claude Code.
   Your other files and settings have been preserved.
 `);
 }
@@ -9215,12 +8272,7 @@ const argv = (0, import_minimist.default)(process.argv.slice(2), {
 	boolean: [
 		"global",
 		"local",
-		"opencode",
 		"claude",
-		"gemini",
-		"codex",
-		"both",
-		"all",
 		"uninstall",
 		"help",
 		"version",
@@ -9238,28 +8290,8 @@ const argv = (0, import_minimist.default)(process.argv.slice(2), {
 });
 const hasGlobal = !!argv["global"];
 const hasLocal = !!argv["local"];
-const hasOpencode = !!argv["opencode"];
-const hasClaude = !!argv["claude"];
-const hasGemini = !!argv["gemini"];
-const hasCodex = !!argv["codex"];
-const hasBoth = !!argv["both"];
-const hasAll = !!argv["all"];
 const hasUninstall = !!argv["uninstall"];
-let selectedRuntimes = [];
-if (hasAll) selectedRuntimes = [
-	"claude",
-	"opencode",
-	"gemini",
-	"codex"
-];
-else if (hasBoth) selectedRuntimes = ["claude", "opencode"];
-else {
-	if (hasOpencode) selectedRuntimes.push("opencode");
-	if (hasClaude) selectedRuntimes.push("claude");
-	if (hasGemini) selectedRuntimes.push("gemini");
-	if (hasCodex) selectedRuntimes.push("codex");
-}
-const banner = "\n" + chalk.cyan(figlet.default.textSync("MAXSIM", { font: "ANSI Shadow" }).split("\n").map((line) => "  " + line).join("\n")) + "\n\n  MAXSIM " + chalk.dim("v" + pkg.version) + "\n  A meta-prompting, context engineering and spec-driven\n  development system for Claude Code, OpenCode, Gemini, and Codex.\n";
+const banner = "\n" + chalk.cyan(figlet.default.textSync("MAXSIM", { font: "ANSI Shadow" }).split("\n").map((line) => "  " + line).join("\n")) + "\n\n  MAXSIM " + chalk.dim("v" + pkg.version) + "\n  A meta-prompting, context engineering and spec-driven\n  development system for Claude Code.\n";
 const explicitConfigDir = argv["config-dir"] || null;
 const hasHelp = !!argv["help"];
 const hasVersion = !!argv["version"];
@@ -9270,23 +8302,17 @@ if (hasVersion) {
 }
 console.log(banner);
 if (hasHelp) {
-	console.log(`  ${chalk.yellow("Usage:")} npx maxsimcli [options]\n\n  ${chalk.yellow("Options:")}\n    ${chalk.cyan("-g, --global")}              Install globally (to config directory)\n    ${chalk.cyan("-l, --local")}               Install locally (to current directory)\n    ${chalk.cyan("--claude")}                  Install for Claude Code only\n    ${chalk.cyan("--opencode")}                Install for OpenCode only\n    ${chalk.cyan("--gemini")}                  Install for Gemini only\n    ${chalk.cyan("--codex")}                   Install for Codex only\n    ${chalk.cyan("--all")}                     Install for all runtimes\n    ${chalk.cyan("-u, --uninstall")}           Uninstall MAXSIM (remove all MAXSIM files)\n    ${chalk.cyan("-c, --config-dir <path>")}   Specify custom config directory\n    ${chalk.cyan("-h, --help")}                Show this help message\n    ${chalk.cyan("--force-statusline")}        Replace existing statusline config\n\n  ${chalk.yellow("Examples:")}\n    ${chalk.dim("# Interactive install (prompts for runtime and location)")}\n    npx maxsimcli\n\n    ${chalk.dim("# Install for Claude Code globally")}\n    npx maxsimcli --claude --global\n\n    ${chalk.dim("# Install for Gemini globally")}\n    npx maxsimcli --gemini --global\n\n    ${chalk.dim("# Install for Codex globally")}\n    npx maxsimcli --codex --global\n\n    ${chalk.dim("# Install for all runtimes globally")}\n    npx maxsimcli --all --global\n\n    ${chalk.dim("# Install to custom config directory")}\n    npx maxsimcli --codex --global --config-dir ~/.codex-work\n\n    ${chalk.dim("# Install to current project only")}\n    npx maxsimcli --claude --local\n\n    ${chalk.dim("# Uninstall MAXSIM from Codex globally")}\n    npx maxsimcli --codex --global --uninstall\n\n  ${chalk.yellow("Notes:")}\n    The --config-dir option is useful when you have multiple configurations.\n    It takes priority over CLAUDE_CONFIG_DIR / GEMINI_CONFIG_DIR / CODEX_HOME environment variables.\n`);
+	console.log(`  ${chalk.yellow("Usage:")} npx maxsimcli [options]\n\n  ${chalk.yellow("Options:")}\n    ${chalk.cyan("-g, --global")}              Install globally (to config directory)\n    ${chalk.cyan("-l, --local")}               Install locally (to current directory)\n    ${chalk.cyan("-u, --uninstall")}           Uninstall MAXSIM (remove all MAXSIM files)\n    ${chalk.cyan("-c, --config-dir <path>")}   Specify custom config directory\n    ${chalk.cyan("-h, --help")}                Show this help message\n    ${chalk.cyan("--force-statusline")}        Replace existing statusline config\n\n  ${chalk.yellow("Examples:")}\n    ${chalk.dim("# Interactive install (prompts for location)")}\n    npx maxsimcli\n\n    ${chalk.dim("# Install globally")}\n    npx maxsimcli --global\n\n    ${chalk.dim("# Install to current project only")}\n    npx maxsimcli --local\n\n    ${chalk.dim("# Install to custom config directory")}\n    npx maxsimcli --global --config-dir ~/.claude-work\n\n    ${chalk.dim("# Uninstall MAXSIM globally")}\n    npx maxsimcli --global --uninstall\n\n  ${chalk.yellow("Notes:")}\n    The --config-dir option is useful when you have multiple configurations.\n    It takes priority over the CLAUDE_CONFIG_DIR environment variable.\n`);
 	process.exit(0);
 }
-async function install(isGlobal, runtime = "claude") {
-	const isOpencode = runtime === "opencode";
-	const isGemini = runtime === "gemini";
-	const isCodex = runtime === "codex";
-	const dirName = getDirName(runtime);
+async function install(isGlobal) {
+	const runtime = "claude";
+	const dirName = getDirName();
 	const src = templatesRoot;
-	const targetDir = isGlobal ? getGlobalDir(runtime, explicitConfigDir) : node_path.join(process.cwd(), dirName);
+	const targetDir = isGlobal ? getGlobalDir(explicitConfigDir) : node_path.join(process.cwd(), dirName);
 	const locationLabel = isGlobal ? targetDir.replace(node_os.homedir(), "~") : targetDir.replace(process.cwd(), ".");
 	const pathPrefix = isGlobal ? `${targetDir.replace(/\\/g, "/")}/` : `./${dirName}/`;
-	let runtimeLabel = "Claude Code";
-	if (isOpencode) runtimeLabel = "OpenCode";
-	if (isGemini) runtimeLabel = "Gemini";
-	if (isCodex) runtimeLabel = "Codex";
-	console.log(`  Installing for ${chalk.cyan(runtimeLabel)} to ${chalk.cyan(locationLabel)}\n`);
+	console.log(`  Installing for ${chalk.cyan("Claude Code")} to ${chalk.cyan(locationLabel)}\n`);
 	const failures = [];
 	saveLocalPatches(targetDir);
 	cleanupOrphanedFiles(targetDir);
@@ -9294,37 +8320,15 @@ async function install(isGlobal, runtime = "claude") {
 		text: "Installing commands...",
 		color: "cyan"
 	}).start();
-	if (isOpencode) {
-		const commandDir = node_path.join(targetDir, "command");
-		node_fs.mkdirSync(commandDir, { recursive: true });
-		copyFlattenedCommands(node_path.join(src, "commands", "maxsim"), commandDir, "maxsim", pathPrefix, runtime, explicitConfigDir);
-		if (verifyInstalled(commandDir, "command/maxsim-*")) {
-			const count = node_fs.readdirSync(commandDir).filter((f) => f.startsWith("maxsim-")).length;
-			spinner.succeed(chalk.green("✓") + ` Installed ${count} commands to command/`);
-		} else {
-			spinner.fail("Failed to install commands");
-			failures.push("command/maxsim-*");
-		}
-	} else if (isCodex) {
-		const skillsDir = node_path.join(targetDir, "skills");
-		copyCommandsAsCodexSkills(node_path.join(src, "commands", "maxsim"), skillsDir, "maxsim", pathPrefix, runtime, explicitConfigDir);
-		const installedSkillNames = listCodexSkillNames(skillsDir);
-		if (installedSkillNames.length > 0) spinner.succeed(chalk.green("✓") + ` Installed ${installedSkillNames.length} skills to skills/`);
-		else {
-			spinner.fail("Failed to install skills");
-			failures.push("skills/maxsim-*");
-		}
-	} else {
-		const commandsDir = node_path.join(targetDir, "commands");
-		node_fs.mkdirSync(commandsDir, { recursive: true });
-		const maxsimSrc = node_path.join(src, "commands", "maxsim");
-		const maxsimDest = node_path.join(commandsDir, "maxsim");
-		copyWithPathReplacement(maxsimSrc, maxsimDest, pathPrefix, runtime, explicitConfigDir, true);
-		if (verifyInstalled(maxsimDest, "commands/maxsim")) spinner.succeed(chalk.green("✓") + " Installed commands/maxsim");
-		else {
-			spinner.fail("Failed to install commands/maxsim");
-			failures.push("commands/maxsim");
-		}
+	const commandsDir = node_path.join(targetDir, "commands");
+	node_fs.mkdirSync(commandsDir, { recursive: true });
+	const maxsimSrc = node_path.join(src, "commands", "maxsim");
+	const maxsimDest = node_path.join(commandsDir, "maxsim");
+	copyWithPathReplacement(maxsimSrc, maxsimDest, pathPrefix, explicitConfigDir, true);
+	if (verifyInstalled(maxsimDest, "commands/maxsim")) spinner.succeed(chalk.green("✓") + " Installed commands/maxsim");
+	else {
+		spinner.fail("Failed to install commands/maxsim");
+		failures.push("commands/maxsim");
 	}
 	spinner = ora({
 		text: "Installing workflows and templates...",
@@ -9340,7 +8344,7 @@ async function install(isGlobal, runtime = "claude") {
 	node_fs.mkdirSync(skillDest, { recursive: true });
 	for (const subdir of maxsimSubdirs) {
 		const subdirSrc = node_path.join(src, subdir);
-		if (node_fs.existsSync(subdirSrc)) copyWithPathReplacement(subdirSrc, node_path.join(skillDest, subdir), pathPrefix, runtime, explicitConfigDir);
+		if (node_fs.existsSync(subdirSrc)) copyWithPathReplacement(subdirSrc, node_path.join(skillDest, subdir), pathPrefix, explicitConfigDir);
 	}
 	if (verifyInstalled(skillDest, "maxsim")) spinner.succeed(chalk.green("✓") + " Installed maxsim");
 	else {
@@ -9362,10 +8366,7 @@ async function install(isGlobal, runtime = "claude") {
 		for (const entry of agentEntries) if (entry.isFile() && entry.name.endsWith(".md")) {
 			let content = node_fs.readFileSync(node_path.join(agentsSrc, entry.name), "utf8");
 			content = content.replace(/~\/\.claude\//g, pathPrefix);
-			content = processAttribution(content, getCommitAttribution(runtime, explicitConfigDir));
-			if (isOpencode) content = convertClaudeToOpencodeFrontmatter(content);
-			else if (isGemini) content = convertClaudeToGeminiAgent(content);
-			else if (isCodex) content = convertClaudeToCodexMarkdown(content);
+			content = processAttribution(content, getCommitAttribution(explicitConfigDir));
 			node_fs.writeFileSync(node_path.join(agentsDest, entry.name), content);
 		}
 		if (verifyInstalled(agentsDest, "agents")) spinner.succeed(chalk.green("✓") + " Installed agents");
@@ -9396,7 +8397,7 @@ async function install(isGlobal, runtime = "claude") {
 			if (node_fs.existsSync(skillMd)) {
 				let content = node_fs.readFileSync(skillMd, "utf8");
 				content = content.replace(/~\/\.claude\//g, pathPrefix);
-				content = processAttribution(content, getCommitAttribution(runtime, explicitConfigDir));
+				content = processAttribution(content, getCommitAttribution(explicitConfigDir));
 				node_fs.writeFileSync(skillMd, content);
 			}
 		}
@@ -9439,30 +8440,28 @@ async function install(isGlobal, runtime = "claude") {
 	node_fs.writeFileSync(versionDest, pkg.version);
 	if (verifyFileInstalled(versionDest, "VERSION")) console.log(`  ${chalk.green("✓")} Wrote VERSION (${pkg.version})`);
 	else failures.push("VERSION");
-	if (!isCodex) {
-		const pkgJsonDest = node_path.join(targetDir, "package.json");
-		node_fs.writeFileSync(pkgJsonDest, "{\"type\":\"commonjs\"}\n");
-		console.log(`  ${chalk.green("✓")} Wrote package.json (CommonJS mode)`);
-		const toolSrc = node_path.resolve(__dirname, "cli.cjs");
-		const binDir = node_path.join(targetDir, "maxsim", "bin");
-		const toolDest = node_path.join(binDir, "maxsim-tools.cjs");
-		if (node_fs.existsSync(toolSrc)) {
-			node_fs.mkdirSync(binDir, { recursive: true });
-			node_fs.copyFileSync(toolSrc, toolDest);
-			console.log(`  ${chalk.green("✓")} Installed maxsim-tools.cjs`);
-		} else {
-			console.warn(`  ${chalk.yellow("!")} cli.cjs not found at ${toolSrc} — maxsim-tools.cjs not installed`);
-			failures.push("maxsim-tools.cjs");
-		}
-		const mcpSrc = node_path.resolve(__dirname, "mcp-server.cjs");
-		const mcpDest = node_path.join(binDir, "mcp-server.cjs");
-		if (node_fs.existsSync(mcpSrc)) {
-			node_fs.mkdirSync(binDir, { recursive: true });
-			node_fs.copyFileSync(mcpSrc, mcpDest);
-			console.log(`  ${chalk.green("✓")} Installed mcp-server.cjs`);
-		} else console.warn(`  ${chalk.yellow("!")} mcp-server.cjs not found — MCP server not installed`);
-		installHookFiles(targetDir, runtime, isGlobal, failures);
+	const pkgJsonDest = node_path.join(targetDir, "package.json");
+	node_fs.writeFileSync(pkgJsonDest, "{\"type\":\"commonjs\"}\n");
+	console.log(`  ${chalk.green("✓")} Wrote package.json (CommonJS mode)`);
+	const toolSrc = node_path.resolve(__dirname, "cli.cjs");
+	const binDir = node_path.join(targetDir, "maxsim", "bin");
+	const toolDest = node_path.join(binDir, "maxsim-tools.cjs");
+	if (node_fs.existsSync(toolSrc)) {
+		node_fs.mkdirSync(binDir, { recursive: true });
+		node_fs.copyFileSync(toolSrc, toolDest);
+		console.log(`  ${chalk.green("✓")} Installed maxsim-tools.cjs`);
+	} else {
+		console.warn(`  ${chalk.yellow("!")} cli.cjs not found at ${toolSrc} — maxsim-tools.cjs not installed`);
+		failures.push("maxsim-tools.cjs");
 	}
+	const mcpSrc = node_path.resolve(__dirname, "mcp-server.cjs");
+	const mcpDest = node_path.join(binDir, "mcp-server.cjs");
+	if (node_fs.existsSync(mcpSrc)) {
+		node_fs.mkdirSync(binDir, { recursive: true });
+		node_fs.copyFileSync(mcpSrc, mcpDest);
+		console.log(`  ${chalk.green("✓")} Installed mcp-server.cjs`);
+	} else console.warn(`  ${chalk.yellow("!")} mcp-server.cjs not found — MCP server not installed`);
+	installHookFiles(targetDir, isGlobal, failures);
 	const dashboardSrc = node_path.resolve(__dirname, "assets", "dashboard");
 	if (node_fs.existsSync(dashboardSrc)) {
 		let networkMode = false;
@@ -9489,44 +8488,28 @@ async function install(isGlobal, runtime = "claude") {
 		else spinner.succeed(chalk.green("✓") + " Installed dashboard (server.js not found in bundle)");
 		if (networkMode) applyFirewallRule(3333);
 	}
-	if (!isOpencode && !isCodex && !isGemini) {
-		const mcpJsonPath = isGlobal ? node_path.join(targetDir, "..", ".mcp.json") : node_path.join(process.cwd(), ".mcp.json");
-		let mcpConfig = {};
-		if (node_fs.existsSync(mcpJsonPath)) try {
-			mcpConfig = JSON.parse(node_fs.readFileSync(mcpJsonPath, "utf-8"));
-		} catch {}
-		const mcpServers = mcpConfig.mcpServers ?? {};
-		mcpServers["maxsim"] = {
-			command: "node",
-			args: [".claude/maxsim/bin/mcp-server.cjs"],
-			env: {}
-		};
-		mcpConfig.mcpServers = mcpServers;
-		node_fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + "\n", "utf-8");
-		console.log(`  ${chalk.green("✓")} Configured .mcp.json for MCP server auto-discovery`);
-	}
+	const mcpJsonPath = isGlobal ? node_path.join(targetDir, "..", ".mcp.json") : node_path.join(process.cwd(), ".mcp.json");
+	let mcpConfig = {};
+	if (node_fs.existsSync(mcpJsonPath)) try {
+		mcpConfig = JSON.parse(node_fs.readFileSync(mcpJsonPath, "utf-8"));
+	} catch {}
+	const mcpServers = mcpConfig.mcpServers ?? {};
+	mcpServers["maxsim"] = {
+		command: "node",
+		args: [".claude/maxsim/bin/mcp-server.cjs"],
+		env: {}
+	};
+	mcpConfig.mcpServers = mcpServers;
+	node_fs.writeFileSync(mcpJsonPath, JSON.stringify(mcpConfig, null, 2) + "\n", "utf-8");
+	console.log(`  ${chalk.green("✓")} Configured .mcp.json for MCP server auto-discovery`);
 	if (failures.length > 0) {
 		console.error(`\n  ${chalk.yellow("Installation incomplete!")} Failed: ${failures.join(", ")}`);
 		process.exit(1);
 	}
-	writeManifest(targetDir, runtime);
+	writeManifest(targetDir);
 	console.log(`  ${chalk.green("✓")} Wrote file manifest (${MANIFEST_NAME})`);
-	reportLocalPatches(targetDir, runtime);
-	if (isCodex) return {
-		settingsPath: null,
-		settings: null,
-		statuslineCommand: null,
-		runtime
-	};
-	const { settingsPath, settings, statuslineCommand } = configureSettingsHooks(targetDir, runtime, isGlobal);
-	if (isGemini) {
-		if (!settings.experimental) settings.experimental = {};
-		const experimental = settings.experimental;
-		if (!experimental.enableAgents) {
-			experimental.enableAgents = true;
-			console.log(`  ${chalk.green("✓")} Enabled experimental agents`);
-		}
-	}
+	reportLocalPatches(targetDir);
+	const { settingsPath, settings, statuslineCommand } = configureSettingsHooks(targetDir, isGlobal);
 	return {
 		settingsPath,
 		settings,
@@ -9535,56 +8518,27 @@ async function install(isGlobal, runtime = "claude") {
 	};
 }
 /**
-* Prompt for runtime selection (multi-select)
-*/
-async function promptRuntime() {
-	return await dist_default$2({
-		message: "Which runtime(s) would you like to install for?",
-		choices: [
-			{
-				name: "Claude Code  " + chalk.dim("(~/.claude)"),
-				value: "claude",
-				checked: true
-			},
-			{
-				name: "OpenCode     " + chalk.dim("(~/.config/opencode)") + "  — open source, free models",
-				value: "opencode"
-			},
-			{
-				name: "Gemini       " + chalk.dim("(~/.gemini)"),
-				value: "gemini"
-			},
-			{
-				name: "Codex        " + chalk.dim("(~/.codex)"),
-				value: "codex"
-			}
-		],
-		validate: (choices) => choices.length > 0 || "Please select at least one runtime"
-	});
-}
-/**
 * Prompt for install location
 */
-async function promptLocation(runtimes) {
+async function promptLocation() {
 	if (!process.stdin.isTTY) {
 		console.log(chalk.yellow("Non-interactive terminal detected, defaulting to global install") + "\n");
 		return true;
 	}
-	const pathExamples = runtimes.map((r) => getGlobalDir(r, explicitConfigDir).replace(node_os.homedir(), "~")).join(", ");
-	const localExamples = runtimes.map((r) => `./${getDirName(r)}`).join(", ");
+	const globalPath = getGlobalDir(explicitConfigDir).replace(node_os.homedir(), "~");
 	return await dist_default({
 		message: "Where would you like to install?",
 		choices: [{
-			name: "Global  " + chalk.dim(`(${pathExamples})`) + "  — available in all projects",
+			name: "Global  " + chalk.dim(`(${globalPath})`) + "  — available in all projects",
 			value: "global"
 		}, {
-			name: "Local   " + chalk.dim(`(${localExamples})`) + "  — this project only",
+			name: "Local   " + chalk.dim("(./.claude)") + "  — this project only",
 			value: "local"
 		}]
 	}) === "global";
 }
 /**
-* Prompt whether to enable Agent Teams (Claude only, experimental feature)
+* Prompt whether to enable Agent Teams (experimental feature)
 */
 async function promptAgentTeams() {
 	console.log();
@@ -9598,29 +8552,20 @@ async function promptAgentTeams() {
 	});
 }
 /**
-* Install MAXSIM for all selected runtimes
+* Install MAXSIM for Claude Code
 */
-async function installAllRuntimes(runtimes, isGlobal, isInteractive) {
-	const results = [];
-	for (const runtime of runtimes) {
-		const result = await install(isGlobal, runtime);
-		results.push(result);
-	}
-	const statuslineRuntimes = ["claude", "gemini"];
-	const primaryStatuslineResult = results.find((r) => statuslineRuntimes.includes(r.runtime));
+async function installForClaude(isGlobal, isInteractive) {
+	const result = await install(isGlobal);
 	let shouldInstallStatusline = false;
-	if (primaryStatuslineResult && primaryStatuslineResult.settings) shouldInstallStatusline = await handleStatusline(primaryStatuslineResult.settings, isInteractive, forceStatusline);
+	if (result.settings) shouldInstallStatusline = await handleStatusline(result.settings, isInteractive, forceStatusline);
 	let enableAgentTeams = false;
-	if (isInteractive && runtimes.includes("claude")) enableAgentTeams = await promptAgentTeams();
-	for (const result of results) {
-		const useStatusline = statuslineRuntimes.includes(result.runtime) && shouldInstallStatusline;
-		if (result.runtime === "claude" && enableAgentTeams && result.settings) {
-			const env = result.settings.env ?? {};
-			env["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"] = "1";
-			result.settings.env = env;
-		}
-		finishInstall(result.settingsPath, result.settings, result.statuslineCommand, useStatusline, result.runtime, isGlobal);
+	if (isInteractive) enableAgentTeams = await promptAgentTeams();
+	if (enableAgentTeams && result.settings) {
+		const env = result.settings.env ?? {};
+		env["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"] = "1";
+		result.settings.env = env;
 	}
+	finishInstall(result.settingsPath, result.settings, result.statuslineCommand, shouldInstallStatusline, isGlobal);
 }
 const subcommand = argv._[0];
 (async () => {
@@ -9639,20 +8584,12 @@ const subcommand = argv._[0];
 			console.error(chalk.yellow("--uninstall requires --global or --local"));
 			process.exit(1);
 		}
-		const runtimes = selectedRuntimes.length > 0 ? selectedRuntimes : ["claude"];
-		for (const runtime of runtimes) uninstall(hasGlobal, runtime, explicitConfigDir);
-	} else if (selectedRuntimes.length > 0) if (!hasGlobal && !hasLocal) {
-		const isGlobal = await promptLocation(selectedRuntimes);
-		await installAllRuntimes(selectedRuntimes, isGlobal, true);
-	} else await installAllRuntimes(selectedRuntimes, hasGlobal, false);
-	else if (hasGlobal || hasLocal) await installAllRuntimes(["claude"], hasGlobal, false);
+		uninstall(hasGlobal, explicitConfigDir);
+	} else if (hasGlobal || hasLocal) await installForClaude(hasGlobal, false);
 	else if (!process.stdin.isTTY) {
-		console.log(chalk.yellow("Non-interactive terminal detected, defaulting to Claude Code global install") + "\n");
-		await installAllRuntimes(["claude"], true, false);
-	} else {
-		const runtimes = await promptRuntime();
-		await installAllRuntimes(runtimes, await promptLocation(runtimes), true);
-	}
+		console.log(chalk.yellow("Non-interactive terminal detected, defaulting to global install") + "\n");
+		await installForClaude(true, false);
+	} else await installForClaude(await promptLocation(), true);
 })().catch((err) => {
 	if (err instanceof Error && err.message.includes("User force closed")) {
 		console.log("\n" + chalk.yellow("Installation cancelled") + "\n");

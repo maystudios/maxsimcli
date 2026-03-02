@@ -361,14 +361,14 @@ export interface PhasesListOptions {
     phase: string | null;
     includeArchived: boolean;
 }
-export type RuntimeName = 'claude' | 'opencode' | 'gemini' | 'codex';
+export type RuntimeName = 'claude';
 export interface AdapterConfig {
     runtime: RuntimeName;
     dirName: string;
     getGlobalDir(explicitDir?: string | null): string;
     getConfigDirFromHome(isGlobal: boolean): string;
     transformContent(content: string, pathPrefix: string): string;
-    commandStructure: 'nested' | 'flat' | 'skills';
+    commandStructure: 'nested';
 }
 export {};
 //# sourceMappingURL=types.d.ts.map

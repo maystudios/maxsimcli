@@ -2,9 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as crypto from 'node:crypto';
 
-import type { RuntimeName } from '../adapters/index.js';
 import { pkg } from './shared.js';
-import { listCodexSkillNames } from './copy.js';
 
 export const MANIFEST_NAME = 'maxsim-file-manifest.json';
 
@@ -50,14 +48,9 @@ export interface Manifest {
  */
 export function writeManifest(
   configDir: string,
-  runtime: RuntimeName = 'claude',
 ): Manifest {
-  const isOpencode = runtime === 'opencode';
-  const isCodex = runtime === 'codex';
   const maxsimDir = path.join(configDir, 'maxsim');
   const commandsDir = path.join(configDir, 'commands', 'maxsim');
-  const opencodeCommandDir = path.join(configDir, 'command');
-  const codexSkillsDir = path.join(configDir, 'skills');
   const agentsDir = path.join(configDir, 'agents');
   const manifest: Manifest = {
     version: pkg.version,
@@ -69,28 +62,10 @@ export function writeManifest(
   for (const [rel, hash] of Object.entries(maxsimHashes)) {
     manifest.files['maxsim/' + rel] = hash;
   }
-  if (!isOpencode && !isCodex && fs.existsSync(commandsDir)) {
+  if (fs.existsSync(commandsDir)) {
     const cmdHashes = generateManifest(commandsDir);
     for (const [rel, hash] of Object.entries(cmdHashes)) {
       manifest.files['commands/maxsim/' + rel] = hash;
-    }
-  }
-  if (isOpencode && fs.existsSync(opencodeCommandDir)) {
-    for (const file of fs.readdirSync(opencodeCommandDir)) {
-      if (file.startsWith('maxsim-') && file.endsWith('.md')) {
-        manifest.files['command/' + file] = fileHash(
-          path.join(opencodeCommandDir, file),
-        );
-      }
-    }
-  }
-  if (isCodex && fs.existsSync(codexSkillsDir)) {
-    for (const skillName of listCodexSkillNames(codexSkillsDir)) {
-      const skillRoot = path.join(codexSkillsDir, skillName);
-      const skillHashes = generateManifest(skillRoot);
-      for (const [rel, hash] of Object.entries(skillHashes)) {
-        manifest.files[`skills/${skillName}/${rel}`] = hash;
-      }
     }
   }
   if (fs.existsSync(agentsDir)) {

@@ -3,15 +3,12 @@ import * as fs from 'node:fs';
 import chalk from 'chalk';
 import { confirm } from '@inquirer/prompts';
 
-import type { RuntimeName } from '../adapters/index.js';
 import {
   readSettings,
   writeSettings,
   buildHookCommand,
 } from '../adapters/index.js';
-import { configureOpencodePermissions } from './adapters.js';
 import { getDirName, getConfigDirFromHome, verifyInstalled } from './shared.js';
-import type { InstallResult } from './shared.js';
 import * as path from 'node:path';
 import ora from 'ora';
 
@@ -105,19 +102,13 @@ export function cleanupOrphanedHooks(
 }
 
 /**
- * Install hook files and configure settings.json for a runtime
+ * Install hook files and configure settings.json
  */
 export function installHookFiles(
   targetDir: string,
-  runtime: RuntimeName,
   isGlobal: boolean,
   failures: string[],
 ): void {
-  const dirName = getDirName(runtime);
-  const isCodex = runtime === 'codex';
-
-  if (isCodex) return;
-
   // Copy hooks from bundled assets directory
   let hooksSrc: string | null = null;
   const bundledHooksDir = path.resolve(__dirname, 'assets', 'hooks');
@@ -132,7 +123,7 @@ export function installHookFiles(
     const hooksDest = path.join(targetDir, 'hooks');
     fs.mkdirSync(hooksDest, { recursive: true });
     const hookEntries = fs.readdirSync(hooksSrc);
-    const configDirReplacement = getConfigDirFromHome(runtime, isGlobal);
+    const configDirReplacement = getConfigDirFromHome(isGlobal);
     for (const entry of hookEntries) {
       const srcFile = path.join(hooksSrc, entry);
       if (fs.statSync(srcFile).isFile() && entry.endsWith('.cjs') && !entry.includes('.d.')) {
@@ -157,11 +148,9 @@ export function installHookFiles(
  */
 export function configureSettingsHooks(
   targetDir: string,
-  runtime: RuntimeName,
   isGlobal: boolean,
 ): { settingsPath: string; settings: Record<string, unknown>; statuslineCommand: string; updateCheckCommand: string; contextMonitorCommand: string } {
-  const dirName = getDirName(runtime);
-  const isOpencode = runtime === 'opencode';
+  const dirName = getDirName();
 
   const settingsPath = path.join(targetDir, 'settings.json');
   const settings = cleanupOrphanedHooks(readSettings(settingsPath));
@@ -179,64 +168,62 @@ export function configureSettingsHooks(
     hooks?: Array<{ type: string; command: string }>;
   }
 
-  // Configure SessionStart hook for update checking (skip for opencode)
-  if (!isOpencode) {
-    if (!settings.hooks) {
-      settings.hooks = {};
-    }
-    const installHooks = settings.hooks as Record<string, InstallHookEntry[]>;
-    if (!installHooks.SessionStart) {
-      installHooks.SessionStart = [];
-    }
+  // Configure SessionStart hook for update checking
+  if (!settings.hooks) {
+    settings.hooks = {};
+  }
+  const installHooks = settings.hooks as Record<string, InstallHookEntry[]>;
+  if (!installHooks.SessionStart) {
+    installHooks.SessionStart = [];
+  }
 
-    const hasMaxsimUpdateHook = installHooks.SessionStart.some(
-      (entry: InstallHookEntry) =>
-        entry.hooks &&
-        entry.hooks.some(
-          (h) => h.command && h.command.includes('maxsim-check-update'),
-        ),
+  const hasMaxsimUpdateHook = installHooks.SessionStart.some(
+    (entry: InstallHookEntry) =>
+      entry.hooks &&
+      entry.hooks.some(
+        (h) => h.command && h.command.includes('maxsim-check-update'),
+      ),
+  );
+
+  if (!hasMaxsimUpdateHook) {
+    installHooks.SessionStart.push({
+      hooks: [
+        {
+          type: 'command',
+          command: updateCheckCommand,
+        },
+      ],
+    });
+    console.log(
+      `  ${chalk.green('\u2713')} Configured update check hook`,
     );
+  }
 
-    if (!hasMaxsimUpdateHook) {
-      installHooks.SessionStart.push({
-        hooks: [
-          {
-            type: 'command',
-            command: updateCheckCommand,
-          },
-        ],
-      });
-      console.log(
-        `  ${chalk.green('\u2713')} Configured update check hook`,
-      );
-    }
+  // Configure PostToolUse hook for context window monitoring
+  if (!installHooks.PostToolUse) {
+    installHooks.PostToolUse = [];
+  }
 
-    // Configure PostToolUse hook for context window monitoring
-    if (!installHooks.PostToolUse) {
-      installHooks.PostToolUse = [];
-    }
+  const hasContextMonitorHook = installHooks.PostToolUse.some(
+    (entry: InstallHookEntry) =>
+      entry.hooks &&
+      entry.hooks.some(
+        (h) => h.command && h.command.includes('maxsim-context-monitor'),
+      ),
+  );
 
-    const hasContextMonitorHook = installHooks.PostToolUse.some(
-      (entry: InstallHookEntry) =>
-        entry.hooks &&
-        entry.hooks.some(
-          (h) => h.command && h.command.includes('maxsim-context-monitor'),
-        ),
+  if (!hasContextMonitorHook) {
+    installHooks.PostToolUse.push({
+      hooks: [
+        {
+          type: 'command',
+          command: contextMonitorCommand,
+        },
+      ],
+    });
+    console.log(
+      `  ${chalk.green('\u2713')} Configured context window monitor hook`,
     );
-
-    if (!hasContextMonitorHook) {
-      installHooks.PostToolUse.push({
-        hooks: [
-          {
-            type: 'command',
-            command: contextMonitorCommand,
-          },
-        ],
-      });
-      console.log(
-        `  ${chalk.green('\u2713')} Configured context window monitor hook`,
-      );
-    }
   }
 
   return { settingsPath, settings, statuslineCommand, updateCheckCommand, contextMonitorCommand };
@@ -296,13 +283,9 @@ export function finishInstall(
   settings: Record<string, unknown> | null,
   statuslineCommand: string | null,
   shouldInstallStatusline: boolean,
-  runtime: RuntimeName = 'claude',
   isGlobal: boolean = true,
 ): void {
-  const isOpencode = runtime === 'opencode';
-  const isCodex = runtime === 'codex';
-
-  if (shouldInstallStatusline && !isOpencode && !isCodex) {
+  if (shouldInstallStatusline) {
     settings!.statusLine = {
       type: 'command',
       command: statuslineCommand,
@@ -310,24 +293,12 @@ export function finishInstall(
     console.log(`  ${chalk.green('\u2713')} Configured statusline`);
   }
 
-  if (!isCodex && settingsPath && settings) {
+  if (settingsPath && settings) {
     writeSettings(settingsPath, settings);
   }
 
-  if (isOpencode) {
-    configureOpencodePermissions(isGlobal);
-  }
-
-  let program = 'Claude Code';
-  if (runtime === 'opencode') program = 'OpenCode';
-  if (runtime === 'gemini') program = 'Gemini';
-  if (runtime === 'codex') program = 'Codex';
-
-  let command = '/maxsim:help';
-  if (runtime === 'opencode') command = '/maxsim-help';
-  if (runtime === 'codex') command = '$maxsim-help';
   console.log(`
-  ${chalk.green('Done!')} Launch ${program} and run ${chalk.cyan(command)}.
+  ${chalk.green('Done!')} Launch Claude Code and run ${chalk.cyan('/maxsim:help')}.
 
   ${chalk.cyan('Join the community:')} https://discord.gg/5JJgD5svVS
 `);
