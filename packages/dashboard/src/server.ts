@@ -961,6 +961,8 @@ app.get('/api/server-info', (_req: Request, res: Response) => {
     localUrl: `http://localhost:${resolvedPort}`,
     networkUrl: localNetworkIp ? `http://${localNetworkIp}:${resolvedPort}` : null,
     tailscaleUrl: tailscaleIp ? `http://${tailscaleIp}:${resolvedPort}` : null,
+    projectName: path.basename(projectCwd),
+    projectCwd,
   });
 });
 

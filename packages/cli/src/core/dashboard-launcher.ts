@@ -15,7 +15,7 @@ import { debugLog, errorMsg } from './core.js';
 
 export const DEFAULT_PORT = 3333;
 export const PORT_RANGE_END = 3343;
-export const HEALTH_TIMEOUT_MS = 1500;
+export const HEALTH_TIMEOUT_MS = 10_000;
 
 // ─── Health check ───────────────────────────────────────────────────────────
 
