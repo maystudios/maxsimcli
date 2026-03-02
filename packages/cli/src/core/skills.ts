@@ -8,8 +8,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { output, error, safeReadFile } from './core.js';
+import { safeReadFile } from './core.js';
 import { extractFrontmatter } from './frontmatter.js';
+import { cmdOk, cmdErr, type CmdResult } from './types.js';
 
 // ─── Internal helpers ────────────────────────────────────────────────────────
 
@@ -56,11 +57,11 @@ function readSkillInfo(skillDir: string, dirName: string): SkillInfo | null {
 /**
  * List all installed skills from `.claude/skills/`.
  */
-export function cmdSkillList(cwd: string, raw: boolean): void {
+export function cmdSkillList(cwd: string): CmdResult {
   const dir = skillsDir(cwd);
 
   if (!fs.existsSync(dir)) {
-    output({ skills: [], count: 0 }, raw, 'No skills installed.');
+    return cmdOk({ skills: [], count: 0 }, 'No skills installed.');
   }
 
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -72,15 +73,15 @@ export function cmdSkillList(cwd: string, raw: boolean): void {
     if (info) skills.push(info);
   }
 
-  output({ skills, count: skills.length }, raw, skills.map(s => `${s.name}: ${s.description}`).join('\n'));
+  return cmdOk({ skills, count: skills.length }, skills.map(s => `${s.name}: ${s.description}`).join('\n'));
 }
 
 /**
  * Install a specific skill from the templates directory.
  */
-export function cmdSkillInstall(cwd: string, skillName: string | undefined, raw: boolean): void {
+export function cmdSkillInstall(cwd: string, skillName: string | undefined): CmdResult {
   if (!skillName) {
-    error('skill name required. Usage: skill-install <name>');
+    return cmdErr('skill name required. Usage: skill-install <name>');
   }
 
   const srcFile = path.join(skillsTemplateDir(), skillName, 'SKILL.md');
@@ -88,7 +89,7 @@ export function cmdSkillInstall(cwd: string, skillName: string | undefined, raw:
   if (!fs.existsSync(srcFile)) {
     // List available skills for a helpful error
     const available = listAvailableTemplates();
-    error(`Skill "${skillName}" not found in templates. Available: ${available.join(', ')}`);
+    return cmdErr(`Skill "${skillName}" not found in templates. Available: ${available.join(', ')}`);
   }
 
   const destDir = path.join(skillsDir(cwd), skillName);
@@ -97,13 +98,13 @@ export function cmdSkillInstall(cwd: string, skillName: string | undefined, raw:
   fs.mkdirSync(destDir, { recursive: true });
   fs.copyFileSync(srcFile, destFile);
 
-  output({ installed: true, skill: skillName, path: path.relative(cwd, destFile) }, raw, `Installed skill: ${skillName}`);
+  return cmdOk({ installed: true, skill: skillName, path: path.relative(cwd, destFile) }, `Installed skill: ${skillName}`);
 }
 
 /**
  * Update one or all installed skills from the templates source.
  */
-export function cmdSkillUpdate(cwd: string, skillName: string | undefined, raw: boolean): void {
+export function cmdSkillUpdate(cwd: string, skillName: string | undefined): CmdResult {
   const dir = skillsDir(cwd);
   const templateDir = skillsTemplateDir();
 
@@ -111,25 +112,23 @@ export function cmdSkillUpdate(cwd: string, skillName: string | undefined, raw: 
     // Update a single skill
     const srcFile = path.join(templateDir, skillName, 'SKILL.md');
     if (!fs.existsSync(srcFile)) {
-      error(`Skill template "${skillName}" not found.`);
+      return cmdErr(`Skill template "${skillName}" not found.`);
     }
 
     const destDir = path.join(dir, skillName);
     if (!fs.existsSync(destDir)) {
-      error(`Skill "${skillName}" is not installed. Use skill-install first.`);
+      return cmdErr(`Skill "${skillName}" is not installed. Use skill-install first.`);
     }
 
     const destFile = path.join(destDir, 'SKILL.md');
     fs.copyFileSync(srcFile, destFile);
 
-    output({ updated: [skillName], skipped: [], not_found: [] }, raw, `Updated skill: ${skillName}`);
-    return;
+    return cmdOk({ updated: [skillName], skipped: [], not_found: [] }, `Updated skill: ${skillName}`);
   }
 
   // Update all installed skills
   if (!fs.existsSync(dir)) {
-    output({ updated: [], skipped: [], not_found: [] }, raw, 'No skills installed.');
-    return;
+    return cmdOk({ updated: [], skipped: [], not_found: [] }, 'No skills installed.');
   }
 
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -156,7 +155,7 @@ export function cmdSkillUpdate(cwd: string, skillName: string | undefined, raw: 
     ? `Updated ${updated.length} skill(s): ${updated.join(', ')}`
     : 'No skills updated.';
 
-  output({ updated, skipped }, raw, summary);
+  return cmdOk({ updated, skipped }, summary);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
