@@ -1,6 +1,7 @@
 ---
 name: using-maxsim
 description: Entry skill that establishes MAXSIM workflow rules — triggers before any action to route work through the correct MAXSIM commands, skills, and agents
+alwaysApply: true
 ---
 
 # Using MAXSIM
@@ -49,11 +50,15 @@ Skills are behavioral rules that activate automatically based on context:
 
 | Skill | Triggers When |
 |-------|---------------|
+| `using-maxsim` | Always (alwaysApply) — entry point for all MAXSIM work |
 | `systematic-debugging` | Any bug, test failure, or unexpected behavior encountered |
 | `tdd` | Implementing any feature or bug fix (write test first) |
 | `verification-before-completion` | Before claiming any work is complete or passing |
 | `memory-management` | Recurring patterns, errors, or decisions worth persisting |
-| `using-maxsim` | Always — entry point for all MAXSIM work |
+| `brainstorming` | Before implementing any significant feature or design |
+| `roadmap-writing` | When creating or restructuring a project roadmap |
+| `simplify` | When reviewing and cleaning up code changes |
+| `code-review` | When reviewing implementation quality |
 
 ## Available Agents
 
