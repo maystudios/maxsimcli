@@ -84,6 +84,7 @@ export interface ExecutePhaseContext {
   state_path: string;
   roadmap_path: string;
   config_path: string;
+  skill_paths: string;
 }
 
 export interface PlanPhaseContext {
@@ -393,6 +394,8 @@ export function cmdInitExecutePhase(cwd: string, phase: string | undefined, raw:
   const milestone = getMilestoneInfo(cwd);
   const phase_req_ids = extractReqIds(cwd, phase!);
 
+  const skillPaths = path.join(os.homedir(), '.claude', 'skills');
+
   const result: ExecutePhaseContext = {
     executor_model: resolveModelInternal(cwd, 'maxsim-executor'),
     verifier_model: resolveModelInternal(cwd, 'maxsim-verifier'),
@@ -431,6 +434,7 @@ export function cmdInitExecutePhase(cwd: string, phase: string | undefined, raw:
     state_path: '.planning/STATE.md',
     roadmap_path: '.planning/ROADMAP.md',
     config_path: '.planning/config.json',
+    skill_paths: skillPaths,
   };
 
   output(result, raw);

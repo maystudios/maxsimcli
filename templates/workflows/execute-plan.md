@@ -144,11 +144,30 @@ Deviations are normal — handle via rules below.
 
 1. Read @context files from prompt
 2. Per task:
-   - `type="auto"`: if `tdd="true"` → TDD execution. Implement with deviation rules + auth gates. Verify done criteria. Commit (see task_commit). Track hash for Summary.
+   - `type="auto"`: if `tdd="true"` → TDD execution. Implement with deviation rules + auth gates. Verify done criteria. **Simplify** (see simplify_pass). Re-verify. Commit (see task_commit). Track hash for Summary.
    - `type="checkpoint:*"`: STOP → checkpoint_protocol → wait for user → continue only after confirmation.
 3. Run `<verification>` checks
 4. Confirm `<success_criteria>` met
 5. Document deviations in Summary
+</step>
+
+<step name="simplify_pass">
+## Post-Task Simplification
+
+After each task's implementation passes tests but BEFORE committing, run a simplification pass on the files modified by that task:
+
+1. **Duplication check:** Scan modified files for copy-pasted blocks, near-identical functions, repeated patterns. Extract shared helpers where 3+ lines repeat.
+2. **Dead code removal:** Remove unused imports, unreachable branches, commented-out code, unused variables/functions introduced by this task.
+3. **Complexity reduction:** Simplify nested conditionals (early returns), flatten callback chains, replace verbose patterns with idiomatic equivalents.
+
+**Rules:**
+- Only simplify files touched by the current task — do NOT refactor unrelated code
+- Changes must be behavior-preserving (no new features, no bug fixes)
+- If no simplification opportunities found, skip — do not force changes
+- After applying simplifications, re-run the task's verification to confirm nothing broke
+- Track simplifications as part of the task (not as separate deviations)
+
+**Skip if:** Task only modifies config files, documentation, or has fewer than 10 lines of code changes.
 </step>
 
 <authentication_gates>
@@ -269,6 +288,51 @@ TASK_COMMITS+=("Task ${TASK_NUM}: ${TASK_COMMIT}")
 ```
 
 </task_commit>
+
+<wave_code_review>
+## Post-Wave Code Review Gate
+
+After ALL tasks in a wave complete (all committed), run a 2-stage code review on the wave's changes before proceeding to the next wave.
+
+**1. Identify wave changes:**
+```bash
+# Get the diff for all commits in this wave
+WAVE_FIRST_COMMIT=$(echo "${TASK_COMMITS[0]}" | awk '{print $NF}')
+git diff ${WAVE_FIRST_COMMIT}^..HEAD --name-only
+```
+
+**2. Stage 1 — Spec Compliance:**
+Review each task's implementation against its `<done>` criteria from the plan:
+- Are all done criteria actually met (not just claimed)?
+- Do implementations match the task specifications?
+- Are there gaps between what was specified and what was built?
+
+**On PASS:** Proceed to Stage 2.
+**On FAIL:** Fix blocking issues inline, re-run affected task verification, re-commit fixes.
+
+**3. Stage 2 — Code Quality:**
+Review the wave's changed files for:
+- Consistent naming conventions and code style
+- Proper error handling on all new code paths
+- No hardcoded values that should be configurable
+- No security issues (exposed secrets, injection vectors, missing auth checks)
+
+**On PASS:** Wave complete — proceed to next wave.
+**On FAIL:** Fix issues inline, re-verify, re-commit fixes.
+
+**4. Record review verdict in wave notes:**
+```
+Wave {N} Review: PASS (spec: pass, quality: pass)
+```
+Or with issues:
+```
+Wave {N} Review: PASS after fixes (spec: 1 fix, quality: 2 fixes)
+```
+
+**Max retries:** 2 per stage. After 2 retries still failing: flag in SUMMARY.md under "Wave Review Issues", continue to next wave.
+
+**Skip if:** Wave contains only a single documentation or config task.
+</wave_code_review>
 
 <step name="checkpoint_protocol">
 On `type="checkpoint:*"`: automate everything possible first. Checkpoints are for verification/decisions only.
