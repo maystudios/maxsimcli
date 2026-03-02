@@ -9,7 +9,7 @@ import {
   writeSettings,
   buildHookCommand,
 } from '../adapters/index.js';
-import { getDirName, getConfigDirFromHome, verifyInstalled } from './shared.js';
+import { getDirName, getConfigDirFromHome, verifyInstalled, removeBuiltInSkills } from './shared.js';
 import * as path from 'node:path';
 import ora from 'ora';
 
@@ -21,6 +21,15 @@ export function cleanupOrphanedFiles(configDir: string): void {
     'hooks/maxsim-notify.sh',
     'hooks/statusline.js',
   ];
+
+  // Clean up legacy agents/skills/ directory (skills moved to skills/)
+  const legacySkillsDir = path.join(configDir, 'agents', 'skills');
+  if (fs.existsSync(legacySkillsDir)) {
+    const removed = removeBuiltInSkills(legacySkillsDir);
+    if (removed > 0) {
+      console.log(`  ${chalk.green('\u2713')} Removed ${removed} legacy skills from agents/skills/`);
+    }
+  }
 
   for (const relPath of orphanedFiles) {
     const fullPath = path.join(configDir, relPath);

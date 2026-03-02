@@ -6,7 +6,7 @@ import chalk from 'chalk';
 
 import type { RuntimeName } from '../adapters/index.js';
 import { readSettings, writeSettings } from '../adapters/index.js';
-import { getDirName, getGlobalDir } from './shared.js';
+import { getDirName, getGlobalDir, removeBuiltInSkills } from './shared.js';
 
 /**
  * Uninstall MAXSIM from the specified directory
@@ -52,7 +52,31 @@ export function uninstall(isGlobal: boolean, runtime: RuntimeName = 'claude', ex
     console.log(`  ${chalk.green('\u2713')} Removed maxsim/`);
   }
 
-  // 3. Remove MAXSIM agents
+  // 3. Remove MAXSIM skills from skills/ directory
+  const skillsDir = path.join(targetDir, 'skills');
+  if (fs.existsSync(skillsDir)) {
+    const skillCount = removeBuiltInSkills(skillsDir);
+    if (skillCount > 0) {
+      removedCount++;
+      console.log(
+        `  ${chalk.green('\u2713')} Removed ${skillCount} MAXSIM skills from skills/`,
+      );
+    }
+  }
+
+  // 3b. Remove legacy MAXSIM skills from agents/skills/ directory
+  const legacySkillsDir = path.join(targetDir, 'agents', 'skills');
+  if (fs.existsSync(legacySkillsDir)) {
+    const legacySkillCount = removeBuiltInSkills(legacySkillsDir);
+    if (legacySkillCount > 0) {
+      removedCount++;
+      console.log(
+        `  ${chalk.green('\u2713')} Removed ${legacySkillCount} legacy MAXSIM skills from agents/skills/`,
+      );
+    }
+  }
+
+  // 4. Remove MAXSIM agents
   const agentsDir = path.join(targetDir, 'agents');
   if (fs.existsSync(agentsDir)) {
     const files = fs.readdirSync(agentsDir);
@@ -71,7 +95,7 @@ export function uninstall(isGlobal: boolean, runtime: RuntimeName = 'claude', ex
     }
   }
 
-  // 4. Remove MAXSIM hooks
+  // 5. Remove MAXSIM hooks
   const hooksDir = path.join(targetDir, 'hooks');
   if (fs.existsSync(hooksDir)) {
     const maxsimHooks = [
@@ -96,7 +120,7 @@ export function uninstall(isGlobal: boolean, runtime: RuntimeName = 'claude', ex
     }
   }
 
-  // 5. Remove MAXSIM package.json (CommonJS mode marker)
+  // 6. Remove MAXSIM package.json (CommonJS mode marker)
   const pkgJsonPath = path.join(targetDir, 'package.json');
   if (fs.existsSync(pkgJsonPath)) {
     try {
@@ -113,7 +137,7 @@ export function uninstall(isGlobal: boolean, runtime: RuntimeName = 'claude', ex
     }
   }
 
-  // 6. Clean up settings.json
+  // 7. Clean up settings.json
   const settingsPath = path.join(targetDir, 'settings.json');
   if (fs.existsSync(settingsPath)) {
     const settings = readSettings(settingsPath);

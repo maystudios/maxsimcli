@@ -26,7 +26,7 @@ Before researching, discover project context:
 
 **Project instructions:** Read `./CLAUDE.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
 
-**Project skills:** Check `.agents/skills/` directory if it exists:
+**Project skills:** Check `skills/` directory if it exists:
 1. List available skills (subdirectories)
 2. Read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during research
@@ -559,7 +559,7 @@ When any trigger condition below applies, read the full skill file via the Read 
 
 | Skill | Read | Trigger |
 |-------|------|---------|
-| Verification Before Completion | `.agents/skills/verification-before-completion/SKILL.md` | Before concluding research with confidence ratings |
+| Verification Before Completion | `skills/verification-before-completion/SKILL.md` | Before concluding research with confidence ratings |
 
 **Project skills override built-in skills.**
 

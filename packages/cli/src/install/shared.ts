@@ -104,6 +104,39 @@ export function verifyFileInstalled(filePath: string, description: string): bool
   return true;
 }
 
+/**
+ * Built-in MAXSIM skill names — used during install, uninstall, and orphan cleanup
+ * to identify MAXSIM-owned skill directories (preserving user custom skills).
+ */
+export const BUILT_IN_SKILLS = [
+  'tdd',
+  'systematic-debugging',
+  'verification-before-completion',
+  'code-review',
+  'simplify',
+  'memory-management',
+  'using-maxsim',
+  'batch-execution',
+  'subagent-driven-development',
+  'writing-plans',
+] as const;
+
+/**
+ * Remove MAXSIM built-in skill directories from a given parent directory.
+ * Returns the number of skill directories removed.
+ */
+export function removeBuiltInSkills(skillsParentDir: string): number {
+  let count = 0;
+  for (const skill of BUILT_IN_SKILLS) {
+    const skillDir = path.join(skillsParentDir, skill);
+    if (fs.existsSync(skillDir)) {
+      fs.rmSync(skillDir, { recursive: true });
+      count++;
+    }
+  }
+  return count;
+}
+
 export interface InstallResult {
   settingsPath: string | null;
   settings: Record<string, unknown> | null;
