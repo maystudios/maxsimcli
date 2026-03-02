@@ -74,6 +74,15 @@ const hasHelp = !!argv['help'];
 const hasVersion = !!argv['version'];
 const forceStatusline = !!argv['force-statusline'];
 
+// Reject deprecated multi-runtime flags
+const deprecatedFlags = ['opencode', 'gemini', 'codex', 'both', 'all'] as const;
+for (const flag of deprecatedFlags) {
+  if (argv[flag]) {
+    console.error(`Error: The --${flag} flag is no longer supported. MAXSIM v2.0 is Claude Code only.`);
+    process.exit(1);
+  }
+}
+
 // Show version if requested (before banner for clean output)
 if (hasVersion) {
   console.log(pkg.version);

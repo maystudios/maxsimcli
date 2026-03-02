@@ -103,7 +103,7 @@ function writeManifest(configDir) {
     }
     // Include skills in manifest (skills/<skill-name>/*)
     const skillsManifestDir = path.join(configDir, 'skills');
-    if (!isCodex && fs.existsSync(skillsManifestDir)) {
+    if (fs.existsSync(skillsManifestDir)) {
         const skillHashes = generateManifest(skillsManifestDir);
         for (const [rel, hash] of Object.entries(skillHashes)) {
             manifest.files['skills/' + rel] = hash;
