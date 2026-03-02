@@ -5,6 +5,7 @@ Initialize a new project through unified flow: questioning, research (optional),
 <required_reading>
 Read all files referenced by the invoking prompt's execution_context before starting.
 @./references/dashboard-bridge.md
+@./references/thinking-partner.md
 </required_reading>
 
 <tool_mandate>
@@ -224,9 +225,17 @@ Ask inline (freeform, NOT AskUserQuestion):
 
 Wait for their response. This gives you the context needed to ask intelligent follow-up questions.
 
-**Follow the thread:**
+**Follow the thread (thinking-partner mode):**
 
 Based on what they said, ask follow-up questions that dig into their response. Use AskUserQuestion with options that probe what they mentioned — interpretations, clarifications, concrete examples.
+
+Apply thinking-partner behaviors from `thinking-partner.md`:
+- **Challenge vague answers** — "Good UX" means what? Push for specifics.
+- **Surface unstated assumptions** — Name assumptions the user didn't realize they were making.
+- **Propose alternatives with trade-offs** — Don't just accept the first approach. Offer 2-3 paths.
+- **Suggest directions** — "Have you considered...?" Frame as possibilities, not mandates.
+- **Make consequences visible** — "If we go with X, that means Y will need to change."
+- **Disagree constructively** — If you see a risk, say so.
 
 Keep following threads. Each answer opens new threads to explore. Ask about:
 - What excited them
@@ -345,6 +354,101 @@ Do not compress. Capture everything gathered.
 mkdir -p .planning
 node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs: initialize project" --files .planning/PROJECT.md
 ```
+
+## 4b. Generate Artefakte
+
+After PROJECT.md is committed, generate artefakte documents that capture structured insights from questioning.
+
+**DECISIONS.md** — Key decisions made during questioning with rationale:
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs artefakte-write .planning/DECISIONS.md
+```
+
+Write content:
+
+```markdown
+# Key Decisions
+
+**Generated:** [date]
+**Source:** Project initialization questioning
+
+| # | Decision | Rationale | Alternatives Considered | Status |
+|---|----------|-----------|------------------------|--------|
+| 1 | [Choice from questioning] | [Why this was chosen] | [What else was discussed] | Locked |
+| 2 | [Choice from questioning] | [Why this was chosen] | [What else was discussed] | Locked |
+
+---
+*Decisions captured during /maxsim:new-project initialization*
+```
+
+**ACCEPTANCE-CRITERIA.md** — Measurable success criteria derived from user's vision:
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs artefakte-write .planning/ACCEPTANCE-CRITERIA.md
+```
+
+Write content:
+
+```markdown
+# Acceptance Criteria
+
+**Generated:** [date]
+**Source:** Project initialization
+
+## Project-Level Criteria
+
+These define what "done" looks like for the entire project:
+
+- [ ] [Observable outcome from user's vision]
+- [ ] [Observable outcome from user's vision]
+- [ ] [Observable outcome from user's vision]
+
+## Phase-Level Criteria
+
+Populated per-phase during /maxsim:discuss-phase.
+
+---
+*Criteria derived from project initialization*
+```
+
+**NO-GOS.md** — Explicit exclusions and anti-patterns:
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs artefakte-write .planning/NO-GOS.md
+```
+
+Write content:
+
+```markdown
+# No-Gos
+
+**Generated:** [date]
+**Source:** Project initialization
+
+## Excluded Features
+
+- [Feature explicitly excluded] — [why]
+
+## Anti-Patterns
+
+- [Approach to avoid] — [why]
+
+## Scope Boundaries
+
+- [What this project is NOT]
+
+---
+*No-gos captured during /maxsim:new-project initialization*
+```
+
+**Commit artefakte:**
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs: generate initialization artefakte" --files .planning/DECISIONS.md .planning/ACCEPTANCE-CRITERIA.md .planning/NO-GOS.md
+```
+
+**If auto mode:** Generate artefakte from the provided document with reasonable inferences. Mark uncertain entries with `(inferred)`.
 
 ## 5. Workflow Preferences
 

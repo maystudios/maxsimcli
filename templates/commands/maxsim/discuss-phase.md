@@ -29,6 +29,7 @@ Every single question to the user MUST use the `AskUserQuestion` tool. NEVER ask
 
 <execution_context>
 @./workflows/discuss-phase.md
+@./references/thinking-partner.md
 @./templates/context.md
 </execution_context>
 

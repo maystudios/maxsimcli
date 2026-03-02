@@ -7,6 +7,7 @@ Output: `.planning/` directory with config.json, PROJECT.md, REQUIREMENTS.md, RO
 <required_reading>
 Read all files referenced by the invoking prompt's execution_context before starting.
 @./references/dashboard-bridge.md
+@./references/thinking-partner.md
 </required_reading>
 
 <tool_mandate>
@@ -529,6 +530,11 @@ Ask user to confirm or correct via AskUserQuestion:
 
 If "Some corrections": ask "What needs correcting?" (freeform), capture corrections, apply to working context.
 
+Apply thinking-partner behaviors when presenting findings:
+- **Surface unstated assumptions** — "The scan assumes X is your primary framework — is that accurate?"
+- **Make consequences visible** — "Your architecture pattern means Y for future phases."
+- **Propose alternatives** — If concerns were found, suggest approaches: "The scan found tech debt in Z. We could address it early or defer — here are the trade-offs."
+
 ## Step 7: Future Direction Questions
 
 **If auto mode:** Skip. Generate generic "continue development" goals. Proceed to Step 9.
@@ -627,6 +633,15 @@ Ask inline (freeform, NOT AskUserQuestion):
 "What is your vision for this project? What are you trying to build? No time horizon needed -- just purpose and direction."
 
 Wait for response.
+
+**Thinking-partner follow-up on vision:**
+
+After the user shares their vision, apply thinking-partner behaviors:
+- Challenge vague statements: "You said 'improve performance' — improve which operations, for which users?"
+- Surface assumptions: "That assumes users will migrate from X — is that the plan?"
+- Propose alternatives if the vision seems narrow: "Have you considered approaching it from Y angle instead?"
+
+Use 1-2 follow-up AskUserQuestion prompts to sharpen the vision if needed. Don't over-question — 1-2 rounds max.
 
 ## Step 8: Milestone Suggestion
 
@@ -991,6 +1006,104 @@ Pre-populate:
 
 Already written in Step 5. If merge mode and config.json existed, it was preserved (unless user chose overwrite).
 
+### 9f: Artefakte Generation
+
+Generate structured artefakte documents from gathered context.
+
+**DECISIONS.md:**
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs artefakte-write .planning/DECISIONS.md
+```
+
+Write content:
+
+```markdown
+# Key Decisions
+
+**Generated:** [date]
+**Source:** Init-existing initialization
+
+| # | Decision | Rationale | Alternatives Considered | Status |
+|---|----------|-----------|------------------------|--------|
+| 1 | [Config choice: mode] | [Why] | [Other options] | Locked |
+| 2 | [Stage assessment] | [Evidence from scan] | [Other stages considered] | Locked |
+| 3 | [Any constraint decisions from Step 7] | [Why] | [Alternatives] | Locked |
+
+---
+*Decisions captured during /maxsim:init-existing initialization*
+```
+
+**ACCEPTANCE-CRITERIA.md:**
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs artefakte-write .planning/ACCEPTANCE-CRITERIA.md
+```
+
+Write content:
+
+```markdown
+# Acceptance Criteria
+
+**Generated:** [date]
+**Source:** Init-existing initialization
+
+## Project-Level Criteria
+
+- [ ] [Observable outcome from user's vision]
+- [ ] [Observable outcome from user's vision]
+- [ ] [Stability guard from production constraints, if applicable]
+
+## Phase-Level Criteria
+
+Populated per-phase during /maxsim:discuss-phase.
+
+---
+*Criteria derived from init-existing initialization*
+```
+
+**NO-GOS.md:**
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs artefakte-write .planning/NO-GOS.md
+```
+
+Write content:
+
+```markdown
+# No-Gos
+
+**Generated:** [date]
+**Source:** Init-existing initialization
+
+## Must Not Break
+
+[From production constraints / GUARD requirements in REQUIREMENTS.md]
+
+- [Critical thing that cannot break] -- [why]
+
+## Anti-Patterns
+
+[From CONCERNS.md and user input]
+
+- [Approach to avoid] -- [why]
+
+## Scope Boundaries
+
+- [What this milestone is NOT trying to achieve]
+
+---
+*No-gos captured during /maxsim:init-existing initialization*
+```
+
+**If auto mode:** Generate artefakte from scan findings with reasonable inferences. Mark uncertain entries with `(inferred)`.
+
+**Commit artefakte:**
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs: generate initialization artefakte" --files .planning/DECISIONS.md .planning/ACCEPTANCE-CRITERIA.md .planning/NO-GOS.md
+```
+
 ## Step 10: Git Stage and Summary
 
 Stage all changed files:
@@ -1057,6 +1170,9 @@ Print next steps:
 - `.planning/REQUIREMENTS.md`
 - `.planning/ROADMAP.md`
 - `.planning/STATE.md`
+- `.planning/DECISIONS.md`
+- `.planning/ACCEPTANCE-CRITERIA.md`
+- `.planning/NO-GOS.md`
 - `.planning/codebase/STACK.md`
 - `.planning/codebase/ARCHITECTURE.md`
 - `.planning/codebase/CONVENTIONS.md`

@@ -24,6 +24,9 @@ Initialize a new project through unified flow: questioning → research (optiona
 - `.planning/REQUIREMENTS.md` — scoped requirements
 - `.planning/ROADMAP.md` — phase structure
 - `.planning/STATE.md` — project memory
+- `.planning/DECISIONS.md` — key decisions with rationale (artefakte)
+- `.planning/ACCEPTANCE-CRITERIA.md` — measurable success criteria (artefakte)
+- `.planning/NO-GOS.md` — explicit exclusions and anti-patterns (artefakte)
 
 **After this command:** Run `/maxsim:plan-phase 1` to start execution.
 </objective>
@@ -31,6 +34,7 @@ Initialize a new project through unified flow: questioning → research (optiona
 <execution_context>
 @./workflows/new-project.md
 @./references/questioning.md
+@./references/thinking-partner.md
 @./references/ui-brand.md
 @./templates/project.md
 @./templates/requirements.md

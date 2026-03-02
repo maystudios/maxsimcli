@@ -5,6 +5,7 @@ Capture an idea, task, or issue that surfaces during a MAXSIM session as a struc
 <required_reading>
 Read all files referenced by the invoking prompt's execution_context before starting.
 @./references/dashboard-bridge.md
+@./references/thinking-partner.md
 </required_reading>
 
 <process>
@@ -40,6 +41,57 @@ Formulate:
 - `problem`: What's wrong or why this is needed
 - `solution`: Approach hints or "TBD" if just an idea
 - `files`: Relevant paths with line numbers from conversation
+</step>
+
+<step name="discussion_mode">
+**Discussion mode triggers:**
+
+1. `--discuss` flag is present in $ARGUMENTS
+2. Complexity detected: title contains "refactor", "redesign", "migrate", "architecture", or problem description exceeds 3 sentences
+
+**If neither trigger:** Skip to infer_area (quick-add path).
+
+**If discussion mode activated:**
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ MAXSIM ► TODO DISCUSSION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+Apply thinking-partner behaviors to clarify the todo before filing:
+
+**Round 1 — Scope clarification (2-3 questions):**
+
+Use AskUserQuestion to probe:
+- What exactly is the problem? (Challenge vagueness)
+- What does "done" look like for this? (Make abstract concrete)
+- Is this one thing or multiple things? (Surface hidden scope)
+
+**Round 2 — Approach exploration (2-3 questions):**
+
+Use AskUserQuestion to explore:
+- What approaches have you considered? (Propose alternatives with trade-offs)
+- What constraints exist? (Surface unstated assumptions)
+- What could go wrong? (Make consequences visible)
+
+**Round 3 — Readiness check:**
+
+Use AskUserQuestion:
+- header: "Todo"
+- question: "Ready to file this todo?"
+- options:
+  - "File it" -- Capture what we discussed
+  - "Keep discussing" -- I want to explore more
+  - "Split into multiple" -- This is actually several todos
+
+If "Keep discussing": ask 2-3 more probing questions, then check again.
+If "Split into multiple": help user define 2-3 separate todos, file each one.
+If "File it": continue to infer_area.
+
+**Discussion mode enriches the todo file** — the Problem section includes discussion insights, and a new "## Approach" section captures approach decisions (replacing "## Solution" with richer content).
+
+**Time budget:** 20-30 minutes max. After 6 rounds of questions, offer to file what you have.
 </step>
 
 <step name="infer_area">
@@ -89,11 +141,14 @@ slug=$(node ~/.claude/maxsim/bin/maxsim-tools.cjs generate-slug "$title" --raw)
 
 Write to `.planning/todos/pending/${date}-${slug}.md`:
 
+**Quick mode format:**
+
 ```markdown
 ---
 created: [timestamp]
 title: [title]
 area: [area]
+mode: quick
 files:
   - [file:lines]
 ---
@@ -105,6 +160,40 @@ files:
 ## Solution
 
 [approach hints or "TBD"]
+```
+
+**Discussion mode format (enriched):**
+
+```markdown
+---
+created: [timestamp]
+title: [title]
+area: [area]
+mode: discussed
+files:
+  - [file:lines]
+---
+
+## Problem
+
+[problem description enriched with discussion insights]
+
+## Scope
+
+[What's in scope and what's not — from discussion round 1]
+
+## Approach
+
+[Approach decisions with trade-offs explored — from discussion round 2]
+[Include alternatives considered and why this approach was chosen]
+
+## Risks
+
+[What could go wrong — from discussion]
+
+## Solution
+
+[Concrete next steps or "TBD"]
 ```
 </step>
 

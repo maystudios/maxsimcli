@@ -12,6 +12,7 @@ You are a thinking partner, not an interviewer. The user is the visionary — yo
 
 <required_reading>
 @./references/dashboard-bridge.md
+@./references/thinking-partner.md
 </required_reading>
 
 <tool_mandate>
@@ -52,7 +53,7 @@ Every question directed at the user MUST use a structured tool. NEVER write a qu
 </downstream_awareness>
 
 <philosophy>
-**User = founder/visionary. Claude = builder.**
+**User = founder/visionary. Claude = thinking partner and builder.**
 
 The user knows:
 - How they imagine it working
@@ -67,6 +68,16 @@ The user doesn't know (and shouldn't be asked):
 - Success metrics (inferred from the work)
 
 Ask about vision and implementation choices. Capture decisions for downstream agents.
+
+**Thinking-partner behaviors (from thinking-partner.md):**
+- **Challenge vague answers** — "Cards" could mean many things. Push for specifics.
+- **Surface unstated assumptions** — "You're assuming mobile-first — is that intentional?"
+- **Propose alternatives with trade-offs** — Don't just accept first choice. Offer 2-3 options.
+- **Make consequences visible** — "Infinite scroll means no shareable page positions."
+- **Disagree constructively** — If an approach has risks, name them.
+- **Follow the thread** — Build on what they just said. Don't jump topics.
+
+Apply these behaviors within each discussion area. The user should feel like they're thinking through decisions with a collaborator, not answering a survey.
 </philosophy>
 
 <scope_guardrail>
@@ -314,6 +325,15 @@ Ask 4 questions per area before offering to continue or move on. Each answer oft
      - Loop: discuss new areas, then prompt again
    - If "I'm ready for context": Proceed to write_context
 
+**Adaptive probing (thinking-partner mode):**
+
+Within each area, adapt your questioning based on the user's certainty level:
+- **User is confident** (picks options quickly) — probe deeper: "You chose X — have you considered how that interacts with Y?"
+- **User is uncertain** (picks "Other", hedges) — propose alternatives: "Here are 3 approaches with trade-offs..."
+- **User defers** (picks "You decide") — accept but name consequences: "I'll go with X because [reason]. That means Y."
+
+Challenge decisions that may have hidden costs. If the user picks something that conflicts with an earlier decision, surface it: "Earlier you said A, but this implies B. Which takes priority?"
+
 **Question design:**
 - Options should be concrete, not abstract ("Cards" not "Option A")
 - Each answer should inform the next question
@@ -400,6 +420,70 @@ mkdir -p ".planning/phases/${padded_phase}-${phase_slug}"
 ```
 
 Write file.
+
+**Generate phase-specific artefakte:**
+
+After writing CONTEXT.md, append phase-specific entries to the project-level artefakte files.
+
+**Append to DECISIONS.md:**
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs artefakte-append .planning/DECISIONS.md
+```
+
+Append content:
+
+```markdown
+
+## Phase [X]: [Name]
+
+| # | Decision | Rationale | Alternatives Considered | Status |
+|---|----------|-----------|------------------------|--------|
+| [next #] | [Decision from discussion] | [Why chosen] | [What else was offered] | Locked |
+```
+
+**Append to ACCEPTANCE-CRITERIA.md:**
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs artefakte-append .planning/ACCEPTANCE-CRITERIA.md
+```
+
+Append content under "Phase-Level Criteria":
+
+```markdown
+
+### Phase [X]: [Name]
+
+- [ ] [Observable outcome from decisions — e.g., "User sees card-based layout on feed page"]
+- [ ] [Observable outcome from decisions — e.g., "Infinite scroll loads next batch on scroll"]
+- [ ] [Observable outcome from decisions — e.g., "Empty state shows onboarding prompt"]
+```
+
+**Append to NO-GOS.md (if applicable):**
+
+If any "don't do this" or "avoid this approach" decisions were made during discussion:
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs artefakte-append .planning/NO-GOS.md
+```
+
+Append content:
+
+```markdown
+
+## Phase [X]: [Name]
+
+- [Approach to avoid] -- [why, from discussion]
+```
+
+If no no-gos emerged from discussion, skip this append.
+
+**Commit artefakte updates:**
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs(${padded_phase}): update artefakte from phase discussion" --files .planning/DECISIONS.md .planning/ACCEPTANCE-CRITERIA.md .planning/NO-GOS.md
+```
+
 </step>
 
 <step name="confirm_creation">
