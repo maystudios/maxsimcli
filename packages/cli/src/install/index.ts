@@ -25,6 +25,7 @@ import {
   copyDirRecursive,
   verifyInstalled,
   verifyFileInstalled,
+  removeBuiltInSkills,
 } from './shared.js';
 import type { InstallResult } from './shared.js';
 import { getCommitAttribution } from './adapters.js';
@@ -262,21 +263,15 @@ async function install(
     }
   }
 
-  // Copy skills to agents/skills/ directory
+  // Copy skills to skills/ directory
   const skillsSrc = path.join(src, 'skills');
   if (fs.existsSync(skillsSrc)) {
     spinner = ora({ text: 'Installing skills...', color: 'cyan' }).start();
-    const skillsDest = path.join(targetDir, 'agents', 'skills');
+    const skillsDest = path.join(targetDir, 'skills');
 
     // Remove old MAXSIM built-in skills before copying new ones (preserve user custom skills)
     if (fs.existsSync(skillsDest)) {
-      const builtInSkills = ['tdd', 'systematic-debugging', 'verification-before-completion'];
-      for (const skill of builtInSkills) {
-        const skillDir = path.join(skillsDest, skill);
-        if (fs.existsSync(skillDir)) {
-          fs.rmSync(skillDir, { recursive: true });
-        }
-      }
+      removeBuiltInSkills(skillsDest);
     }
 
     // Copy skills directory recursively
@@ -300,10 +295,10 @@ async function install(
     const installedSkillDirs = fs.readdirSync(skillsDest, { withFileTypes: true })
       .filter(e => e.isDirectory()).length;
     if (installedSkillDirs > 0) {
-      spinner.succeed(chalk.green('\u2713') + ` Installed ${installedSkillDirs} skills to agents/skills/`);
+      spinner.succeed(chalk.green('\u2713') + ` Installed ${installedSkillDirs} skills to skills/`);
     } else {
       spinner.fail('Failed to install skills');
-      failures.push('agents/skills');
+      failures.push('skills');
     }
   }
 

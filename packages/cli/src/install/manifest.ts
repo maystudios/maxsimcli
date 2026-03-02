@@ -102,12 +102,12 @@ export function writeManifest(
       }
     }
   }
-  // Include skills in manifest (agents/skills/<skill-name>/*)
-  const skillsManifestDir = path.join(agentsDir, 'skills');
+  // Include skills in manifest (skills/<skill-name>/*)
+  const skillsManifestDir = path.join(configDir, 'skills');
   if (fs.existsSync(skillsManifestDir)) {
     const skillHashes = generateManifest(skillsManifestDir);
     for (const [rel, hash] of Object.entries(skillHashes)) {
-      manifest.files['agents/skills/' + rel] = hash;
+      manifest.files['skills/' + rel] = hash;
     }
   }
 
