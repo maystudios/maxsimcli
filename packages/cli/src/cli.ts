@@ -89,6 +89,9 @@ import {
   cmdArtefakteList,
   cmdContextLoad,
   cmdStart,
+  cmdSkillList,
+  cmdSkillInstall,
+  cmdSkillUpdate,
 } from './core/index.js';
 
 // ─── Arg parsing utilities ───────────────────────────────────────────────────
@@ -378,6 +381,9 @@ const COMMANDS: Record<string, Handler> = {
   'artefakte-append': (args, cwd, raw) => cmdArtefakteAppend(cwd, args[1], getFlag(args, '--entry') ?? undefined, getFlag(args, '--phase') ?? undefined, raw),
   'artefakte-list': (args, cwd, raw) => cmdArtefakteList(cwd, getFlag(args, '--phase') ?? undefined, raw),
   'context-load': (args, cwd, raw) => cmdContextLoad(cwd, getFlag(args, '--phase') ?? undefined, getFlag(args, '--topic') ?? undefined, hasFlag(args, 'include-history'), raw),
+  'skill-list': (_args, cwd, raw) => cmdSkillList(cwd, raw),
+  'skill-install': (args, cwd, raw) => cmdSkillInstall(cwd, args[1], raw),
+  'skill-update': (args, cwd, raw) => cmdSkillUpdate(cwd, args[1], raw),
   'start': async (args, cwd, raw) => cmdStart(cwd, { noBrowser: hasFlag(args, 'no-browser'), networkMode: hasFlag(args, 'network') }, raw),
   'dashboard': (args) => handleDashboard(args.slice(1)),
   'start-server': async () => {
