@@ -1,185 +1,142 @@
 ---
 name: simplify
-description: Use after implementation and before commit — requires reviewing changed code for reuse opportunities, quality issues, and unnecessary complexity
+description: >-
+  Reviews changed code for reuse opportunities, unnecessary complexity, and
+  dead weight using three parallel review agents. Use when reviewing code
+  before committing, cleaning up implementations, or preparing changes for
+  review.
 ---
 
 # Simplify
 
-Every line of code is a liability. Less code that does the same thing is always better.
+Every line of code is a liability. Remove what does not earn its place.
 
-**If you have not looked for ways to simplify, you are shipping the first draft.**
+**HARD GATE**: No code ships without a simplification pass. If you have not checked for duplication, dead code, and unnecessary complexity, the change is not ready. "It works" is the starting point, not the finish line.
 
-## The Iron Law
+## When to Use
 
-<HARD-GATE>
-NO COMMIT WITHOUT REVIEWING FOR SIMPLIFICATION.
-If you have not checked for duplication, dead code, and unnecessary complexity, you CANNOT commit.
-"It works" is the starting point, not the finish line.
-Violating this rule is a violation — not a preference.
-</HARD-GATE>
+- After implementing a feature or fix, before committing
+- When preparing changes for code review
+- When cleaning up code that has grown organically over multiple iterations
+- When onboarding to a file and noticing accumulated complexity
 
-## The Gate Function
+Do NOT use this skill when:
+- Making a hotfix where speed matters more than polish (file a follow-up instead)
+- The changes are purely mechanical (renames, formatting, dependency bumps)
 
-After implementation is complete and tests pass, BEFORE committing:
+## Process
 
-### 1. DIFF — Review What Changed
+### 1. DIFF — Identify What Changed
 
-- Run `git diff --staged` (or `git diff` for unstaged changes)
-- Read every line you are about to commit
-- Flag anything that feels "off" — trust that instinct
+- Collect the set of modified and added files
+- Read each file in full, not just the changed hunks
+- Note files that interact with the changes (callers, consumers, shared modules)
 
-```bash
-# Review staged changes
-git diff --staged
-# Or all uncommitted changes
-git diff
-```
+### 2. DUPLICATION — Eliminate Repeated Logic
 
-### 2. DUPLICATION — Find Reuse Opportunities
+- Are there patterns repeated across files that should be a shared helper?
+- Does new code duplicate existing utilities or library functions?
+- Could two similar implementations be merged behind a single interface?
+- Is there copy-paste that should be refactored?
 
-- Does any new code duplicate existing logic in the codebase?
-- Are there two or more blocks that do similar things and could share a helper?
-- Could an existing utility, library function, or helper replace new code?
-- Is there copy-paste from another file that should be extracted?
+**Rule of three**: If the same pattern appears three times, extract it.
 
-**Rule of three:** If the same pattern appears three times, extract it. Two occurrences are acceptable.
+### 3. DEAD CODE — Remove What Is Not Called
 
-### 3. DEAD CODE — Remove What Is Not Used
-
-- Are there unused imports, variables, or functions?
-- Are there commented-out code blocks? (Delete them — git has history)
-- Are there unreachable branches or impossible conditions?
-- Are there parameters that are always passed the same value?
-
-**If it is not called, it does not belong. Delete it.**
+- Delete unused imports, variables, functions, and parameters
+- Remove commented-out code blocks (version control is the archive)
+- Strip unreachable branches and impossible conditions
+- Drop feature flags and configuration for features that no longer exist
 
 ### 4. COMPLEXITY — Question Every Abstraction
 
-- Is there a wrapper that adds no value beyond indirection?
-- Is there a generic solution where a specific one would be simpler?
-- Are there feature flags, configuration options, or extension points for hypothetical future needs?
-- Could a 3-line inline block replace a 20-line abstraction?
+- Does every wrapper, adapter, or indirection layer justify its existence?
+- Are there generics or parametrization that serve only one concrete case?
+- Could a 20-line class be replaced by a 3-line function?
+- Is there defensive programming that guards against conditions that cannot occur?
 
-**The right amount of abstraction is the minimum needed for the current requirements.**
+**If removing it does not break anything, it should not be there.**
 
-### 5. CLARITY — Improve Readability
+### 5. CLARITY — Tighten Naming and Structure
 
-- Are variable and function names self-explanatory?
-- Could a confusing block be rewritten more clearly without comments?
-- Are there nested conditions that could be flattened with early returns?
-- Is the control flow straightforward or unnecessarily clever?
+- Are names self-documenting? Rename anything that needs a comment to explain.
+- Could nested logic be flattened with early returns?
+- Is control flow straightforward, or does it require tracing to understand?
+- Are there layers of indirection that obscure the data path?
 
-### 6. EFFICIENCY — Check for Obvious Issues
+### 6. REVIEW — Final Sanity Check
 
-- Are there O(n^2) operations where O(n) is straightforward?
-- Are there repeated computations that could be cached or hoisted?
-- Are there unnecessary allocations in hot paths?
-- Is data being transformed multiple times when once would suffice?
+- Re-read the simplified code end to end
+- Confirm all tests still pass
+- Verify no behavioral changes were introduced (simplify, do not alter)
 
-**Only fix efficiency issues that are obvious. Do not optimize without evidence of a problem.**
+## Parallel 3-Reviewer Pattern
 
-## Review Checklist
+When invoked as part of the execute-phase cycle, simplification runs as three parallel review agents, each focused on one dimension.
 
-| Category | Question | Action if Yes |
-|----------|----------|---------------|
-| Duplication | Same logic exists elsewhere? | Extract shared helper or reuse existing |
-| Duplication | Copy-paste from another file? | Extract to shared module |
-| Dead code | Unused imports or variables? | Delete them |
-| Dead code | Commented-out code? | Delete it (git has history) |
-| Complexity | Abstraction for one call site? | Inline it |
-| Complexity | Generic where specific suffices? | Simplify to specific |
-| Complexity | Config for hypothetical needs? | Remove until needed |
-| Clarity | Confusing variable name? | Rename to describe purpose |
-| Clarity | Deep nesting? | Flatten with early returns |
-| Efficiency | O(n^2) with obvious O(n) fix? | Fix it now |
-| Efficiency | Same computation in a loop? | Hoist outside the loop |
+### Reviewer 1: Code Reuse
+
+- Scan all changed files for duplicated patterns
+- Cross-reference against existing shared utilities and helpers
+- Flag any logic that appears three or more times without extraction
+- **Output**: List of reuse opportunities with file paths and line ranges
+
+### Reviewer 2: Code Quality
+
+- Check for dead code: unused imports, unreachable branches, commented blocks
+- Verify naming consistency with codebase conventions
+- Flag unnecessary abstractions, wrappers, and indirection
+- **Output**: List of quality issues categorized by severity
+
+### Reviewer 3: Efficiency
+
+- Identify over-engineered solutions (parametrization serving one case, generic interfaces with one implementor)
+- Flag defensive programming that guards impossible conditions
+- Check for configuration and feature flags that serve no current purpose
+- **Output**: List of efficiency issues with suggested removals
+
+### Consolidation
+
+After all three reviewers complete:
+1. Merge findings into a deduplicated list
+2. Apply fixes for all actionable items (BLOCKER and HIGH priority first)
+3. Re-run tests to confirm nothing broke
+4. Report status: CLEAN (nothing found), FIXED (issues resolved), or BLOCKED (cannot simplify without architectural changes)
 
 ## Common Rationalizations — REJECT THESE
 
 | Excuse | Why It Violates the Rule |
 |--------|--------------------------|
-| "It works, don't touch it" | Working is the minimum bar. Simplify before it becomes legacy. |
-| "We might need the flexibility later" | YAGNI. Add flexibility when you need it, not before. |
-| "Refactoring is risky" | Small simplifications with passing tests are safe. Large refactors are a separate task. |
-| "The duplication is minor" | Minor duplication compounds. Three occurrences is the threshold, not six. |
-| "I'll clean it up in a follow-up" | Follow-ups rarely happen. Simplify now while context is fresh. |
-| "It's just a few extra lines" | Every unnecessary line is maintenance cost. Delete it. |
+| "It might be needed later" | Delete it. Re-adding is cheaper than maintaining unused code. |
+| "The abstraction makes it extensible" | Extensibility that serves no current requirement is dead weight. |
+| "Refactoring is risky" | Small, tested simplifications reduce risk. Accumulated complexity increases it. |
+| "I'll clean it up later" | Later never comes. Simplify now while context is fresh. |
 
 ## Red Flags — STOP If You Catch Yourself:
 
-- Committing without reading your own diff
+- Skipping the simplification pass because the diff is small
 - Keeping dead code "just in case"
-- Adding a utility class for a single use case
-- Building configuration for features no one has requested
-- Writing a comment to explain code that could be rewritten to be self-evident
-- Skipping simplification because "it's good enough"
+- Adding complexity during a simplification pass
+- Merging without having read the full file (not just changed lines)
 
-**If any red flag triggers: STOP. Review the diff again. Simplify before committing.**
+**If any red flag triggers: STOP. Complete the simplification cycle before proceeding.**
 
 ## Verification Checklist
 
-Before committing, confirm:
+Before reporting completion, confirm:
 
-- [ ] All staged changes have been reviewed line by line
-- [ ] No duplication with existing codebase logic (or duplication is below threshold)
-- [ ] No dead code: unused imports, variables, unreachable branches, commented code
-- [ ] No unnecessary abstractions, wrappers, or premature generalizations
-- [ ] Naming is clear and consistent with codebase conventions
-- [ ] No obvious efficiency issues (unnecessary O(n^2), repeated computations)
-- [ ] Tests still pass after simplification changes
+- [ ] All changed files were reviewed in full (not just diffs)
+- [ ] No duplicated logic remains that appears three or more times
+- [ ] No dead code: unused imports, commented blocks, unreachable branches
+- [ ] No unnecessary abstractions, wrappers, or indirection layers
+- [ ] All tests pass after simplification
+- [ ] No behavioral changes were introduced (simplify only, do not alter)
 
-## In MAXSIM Plan Execution
+## MAXSIM Integration
 
-Simplification applies at the task level, after implementation and before commit:
-- After task implementation is complete and tests pass, run this review
-- Make simplification changes as part of the same commit (not a separate task)
-- If simplification reveals a larger refactoring opportunity, file a todo — do not scope-creep
-- Track significant simplifications in the task's commit message (e.g., "extracted shared helper for X")
-
-## Parallel 3-Reviewer Pattern (Execution Pipeline)
-
-When invoked as part of the Execute-Review-Simplify-Review cycle in `execute-plan.md`, simplification runs as 3 parallel review agents. Each reviewer focuses on one dimension:
-
-### Reviewer 1: Code Reuse
-- Find duplicated logic across the codebase (not just within changed files)
-- Identify copy-paste from other files that should be extracted to shared modules
-- Suggest shared helpers for patterns appearing 3+ times (Rule of Three)
-- Check if existing utility functions, library methods, or helpers could replace new code
-- **Output:** List of reuse opportunities with file paths and line ranges
-
-### Reviewer 2: Code Quality
-- Check naming consistency with codebase conventions (read CLAUDE.md first)
-- Verify error handling covers all external calls and edge cases
-- Look for dead code: unused imports, variables, unreachable branches, commented-out code
-- Check for unnecessary abstractions, wrappers, or premature generalizations
-- Verify security: no hardcoded secrets, no unsanitized inputs, no data exposure
-- **Output:** List of quality issues categorized by severity (BLOCKER, HIGH, MEDIUM)
-
-### Reviewer 3: Efficiency
-- Find O(n^2) operations where O(n) is straightforward
-- Identify repeated computations that could be cached or hoisted out of loops
-- Check for unnecessary allocations in hot paths
-- Look for redundant data transformations (data processed multiple times when once suffices)
-- Only flag obvious issues — do not optimize without evidence of a problem
-- **Output:** List of efficiency issues with suggested fixes
-
-### Consolidation
-
-After all 3 reviewers report, the orchestrating agent:
-1. Merges findings into a single deduplicated list
-2. Prioritizes: BLOCKER > HIGH > MEDIUM > informational
-3. Applies fixes for all actionable items (BLOCKER and HIGH)
-4. Files MEDIUM issues as todos if they require larger refactoring
-5. Runs tests to confirm fixes do not break anything
-6. Reports final status: CLEAN (nothing found), FIXED (issues found and resolved), or BLOCKED (cannot fix without architectural change)
-
-### Spawning Pattern
-
-Each reviewer is spawned as a parallel agent via the Agent tool:
-```
-# All 3 run in parallel
-Task(prompt="Reviewer 1: Code Reuse — {files_to_review} ...", subagent_type="maxsim-executor")
-Task(prompt="Reviewer 2: Code Quality — {files_to_review} ...", subagent_type="maxsim-executor")
-Task(prompt="Reviewer 3: Efficiency — {files_to_review} ...", subagent_type="maxsim-executor")
-# Wait for all 3 to complete, then consolidate
-```
+When a plan specifies `skill: "simplify"`:
+- The orchestrator collects changed files from the implementation step
+- Three parallel reviewers (Reuse, Quality, Efficiency) are spawned
+- Findings are consolidated and fixes applied
+- Progress is tracked in STATE.md via decision entries
+- Final results are recorded in SUMMARY.md
