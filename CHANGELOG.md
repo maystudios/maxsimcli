@@ -1,3 +1,10 @@
+## [4.2.3](https://github.com/maystudios/maxsimcli/compare/v4.2.2...v4.2.3) (2026-03-03)
+
+
+### Bug Fixes
+
+* **test:** mock node:fs in adapters test to handle shared.ts side effects ([648176f](https://github.com/maystudios/maxsimcli/commit/648176f411b47d6fe83fada2fb240d83481dd171))
+
 ## [4.2.2](https://github.com/maystudios/maxsimcli/compare/v4.2.1...v4.2.2) (2026-03-03)
 
 
