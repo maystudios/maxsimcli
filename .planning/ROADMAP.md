@@ -177,7 +177,8 @@ Make MAXSIM the definitive SDD platform for Claude Code. Agents and skills work 
   2. `maxsimcli` install flow contains no runtime selection logic or multi-runtime conditional branches
   3. README and docs describe MAXSIM as a Claude Code-only tool with v5.0 SDD-native vision
   4. `npm run build` passes and all existing tests pass after cleanup
-**Plans**: TBD
+**Plans**:
+- [ ] 16-01: Inline adapter functions, delete adapters/, remove core types, update docs
 
 ### Phase 17: Skill System Cleanup
 **Goal**: Skills have non-conflicting names, coherent coverage, and accurate activation descriptions
@@ -248,7 +249,7 @@ Phase 16 → Phase 17 ∥ Phase 18 → Phase 19 → Phase 20
 | 13. Execution Pipeline Completion | 1/1 | Complete | 2026-03-02 |
 | 14. Dashboard & MCP Completion | 1/1 | Complete | 2026-03-02 |
 | 15. Traceability Repair | 1/1 | Complete | 2026-03-02 |
-| 16. Codebase Cleanup | 0/? | Not started | - |
+| 16. Codebase Cleanup | 0/1 | Planned | - |
 | 17. Skill System Cleanup | 0/? | Not started | - |
 | 18. Deep Init Questioning | 0/? | Not started | - |
 | 19. Agent Coherence | 0/? | Not started | - |
