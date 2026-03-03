@@ -1,3 +1,4 @@
+#!/usr/bin/env sh
 npm run build
 npm run lint
 node scripts/pre-push-docs-check.cjs
