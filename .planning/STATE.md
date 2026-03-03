@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-03-03)
 
 **Core value:** Every AI-assisted coding task runs with the right amount of context — no more, no less — producing consistent, correct output from phase 1 to phase 50.
-**Current focus:** v5.0 SDD-Native Architecture — Phase 16 (Codebase Cleanup) is next
+**Current focus:** Phase 16 — Codebase Cleanup (complete)
 
 ## Current Position
 
 Milestone: v5.0 SDD-Native Architecture
-Phase: 16 of 20 (Codebase Cleanup) -- Not started
-Plan: 0 of ? in current phase
-Status: v2.0 Complete — v5.0 roadmap created, ready to begin Phase 16
-Last activity: 2026-03-03 -- v5.0 roadmap initialized (Phases 16-20)
+Phase: 16 of 20 (Codebase Cleanup) -- Complete
+Plan: 1 of 1 in current phase (16-01-PLAN.md) -- Complete
+Status: complete
+Last activity: 2026-03-03 -- Phase 16 plan 01 complete (adapter removal, Claude-only cleanup)
 
-Progress: [████████████████░░░░] v2.0 done (15/15), v5.0 starting (0/5)
+Progress: [█████████████████░░░] v2.0 done (15/15), v5.0 in progress (1/5)
 
 ## Performance Metrics
 
@@ -30,9 +30,15 @@ Progress: [████████████████░░░░] v2.0 do
 |-------|-------|-------|----------|
 | 01 | 4 | 55m 22s | 13m 51s |
 
+**By Phase (v5.0):**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| 16 | 1 | 6m 52s | 6m 52s |
+
 **Recent Trend:**
-- Last 5 plans: 01-01 (5m 29s), 01-02 (5m 14s), 01-03 (42m 31s), 01-04 (2m 8s)
-- v5.0 velocity not yet established
+- Last 5 plans: 01-02 (5m 14s), 01-03 (42m 31s), 01-04 (2m 8s), 16-01 (6m 52s)
+- v5.0 velocity: 6m 52s avg (1 plan)
 
 *Updated after each plan completion*
 
@@ -61,11 +67,11 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet — Phase 16 plan not yet created.
+None.
 
 ### Blockers/Concerns
 
-- CLEAN-01/CLEAN-02: Multi-runtime adapter dead code still present — Phase 16 removes it
+- ~~CLEAN-01/CLEAN-02: Multi-runtime adapter dead code still present — Phase 16 removes it~~ RESOLVED (16-01)
 - SKILL-07: `simplify` and `batch` skill names conflict with Claude Code built-ins — Phase 17 renames them
 - AGENT-02: Context assembly is currently ad-hoc — Phase 19 formalizes per-role context rules
 - DRIFT-01: No drift detection mechanism exists yet — Phase 20 builds `/maxsim:check-drift`
@@ -73,6 +79,6 @@ None yet — Phase 16 plan not yet created.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: v5.0 roadmap created (Phases 16-20). v2.0 milestone complete (Phases 1-15). Ready to plan Phase 16.
+Stopped at: Completed 16-01-PLAN.md (adapter removal and Claude-only cleanup)
 Resume file: None
-Next action: Run /maxsim:plan-phase for Phase 16 (Codebase Cleanup)
+Next action: Phase 16 complete. Ready for Phase 17 (Skills Overhaul) or Phase 18 (Init Redesign).

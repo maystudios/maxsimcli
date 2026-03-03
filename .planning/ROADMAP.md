@@ -26,7 +26,7 @@ MAXSIM v2.0 is built on three pillars: deep collaborative planning, context engi
 - [x] **Phase 13: Execution Pipeline Completion** - (completed 2026-03-02)
 - [x] **Phase 14: Dashboard & MCP Completion** - (completed 2026-03-02)
 - [x] **Phase 15: Traceability Repair** - (completed 2026-03-02)
-- [ ] **Phase 16: Codebase Cleanup** - Remove multi-runtime dead code, update install flow, refresh docs for Claude Code-only focus
+- [x] **Phase 16: Codebase Cleanup** - Remove multi-runtime dead code, update install flow, refresh docs for Claude Code-only focus (completed 2026-03-03)
 - [ ] **Phase 17: Skill System Cleanup** - Rename conflicting skills, eliminate coverage gaps, sharpen activation descriptions
 - [ ] **Phase 18: Deep Init Questioning** - Comprehensive onboarding with tech stack research, constraints, and no-go gathering
 - [ ] **Phase 19: Agent Coherence** - Coordinated agent prompt system with role-aware context and standard two-stage review
@@ -160,7 +160,7 @@ Make MAXSIM the definitive SDD platform for Claude Code. Agents and skills work 
 
 ### Phases
 
-- [ ] **Phase 16: Codebase Cleanup** - Remove multi-runtime dead code, update install flow, refresh docs for Claude Code-only focus
+- [x] **Phase 16: Codebase Cleanup** - Remove multi-runtime dead code, update install flow, refresh docs for Claude Code-only focus (completed 2026-03-03)
 - [ ] **Phase 17: Skill System Cleanup** - Rename conflicting skills, eliminate coverage gaps, sharpen activation descriptions
 - [ ] **Phase 18: Deep Init Questioning** - Comprehensive onboarding with tech stack research, constraints, and no-go gathering
 - [ ] **Phase 19: Agent Coherence** - Coordinated agent prompt system with role-aware context and standard two-stage review
