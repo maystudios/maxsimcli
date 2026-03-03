@@ -1,3 +1,10 @@
+## [4.2.2](https://github.com/maystudios/maxsimcli/compare/v4.2.1...v4.2.2) (2026-03-03)
+
+
+### Bug Fixes
+
+* **hooks:** restore shebang in pre-push hook ([d03f1cb](https://github.com/maystudios/maxsimcli/commit/d03f1cbfd7001c60884c880d7feb73d85e3ffe05))
+
 ## [4.2.1](https://github.com/maystudios/maxsimcli/compare/v4.2.0...v4.2.1) (2026-03-02)
 
 
