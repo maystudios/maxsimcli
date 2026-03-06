@@ -28,12 +28,16 @@ import {
   errorMsg,
   todayISO,
   escapePhaseNum,
+  archivePathAsync,
+  execGit,
+  safeReadFileAsync,
 } from './core.js';
 import { extractFrontmatter } from './frontmatter.js';
 import { cmdOk, cmdErr } from './types.js';
 import type {
   PhasesListOptions,
   CmdResult,
+  ArchivePreview,
 } from './types.js';
 
 // ─── Core result types ──────────────────────────────────────────────────────
@@ -936,5 +940,254 @@ export async function cmdPhaseComplete(cwd: string, phaseNum: string | undefined
     });
   } catch (e) {
     return cmdErr((e as Error).message);
+  }
+}
+
+// ─── Phase archive ──────────────────────────────────────────────────────────
+
+/**
+ * Scan STATE.md for lines matching a phase-tagged pattern in a specific section.
+ */
+function findPhaseTaggedLines(content: string, sectionPattern: RegExp, phaseNum: string): string[] {
+  const match = content.match(sectionPattern);
+  if (!match || !match[2]) return [];
+
+  const escaped = escapePhaseNum(phaseNum);
+  const tagPattern = new RegExp(`^\\s*-\\s*\\[Phase\\s+${escaped}\\]`, 'i');
+  return match[2].split('\n').filter(line => tagPattern.test(line));
+}
+
+const DECISIONS_SECTION_PATTERN = /(#{2,3}\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n#{2,3}\s|\n##[^#]|$)/i;
+const BLOCKERS_SECTION_PATTERN = /(#{2,3}\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n\s*\n?)([\s\S]*?)(?=\n#{2,3}\s|$)/i;
+
+export async function archivePhasePreview(cwd: string, phaseNum: string, outcomeSummary: string): Promise<CmdResult> {
+  const phaseInfo = await findPhaseInternalAsync(cwd, phaseNum);
+  if (!phaseInfo) {
+    return cmdErr(`Phase ${phaseNum} not found`);
+  }
+
+  const archiveDir = await archivePathAsync(cwd);
+  const phaseDirName = path.basename(phaseInfo.directory);
+  const archiveDest = path.join(archiveDir, phaseDirName);
+
+  // Read STATE.md
+  const stContent = await safeReadFileAsync(statePath(cwd)) ?? '';
+  const decisionsToRemove = findPhaseTaggedLines(stContent, DECISIONS_SECTION_PATTERN, phaseNum);
+  const blockersToRemove = findPhaseTaggedLines(stContent, BLOCKERS_SECTION_PATTERN, phaseNum);
+
+  // Read ROADMAP.md section
+  const rmContent = await safeReadFileAsync(roadmapPath(cwd)) ?? '';
+  const escaped = escapePhaseNum(phaseNum);
+  const sectionPattern = new RegExp(
+    `#{2,4}\\s*Phase\\s+${escaped}\\s*:[\\s\\S]*?(?=\\n#{2,4}\\s+Phase\\s+\\d|\\n## |$)`,
+    'i',
+  );
+  const sectionMatch = rmContent.match(sectionPattern);
+  const sectionToCollapse = sectionMatch ? sectionMatch[0].trim() : '';
+
+  const phaseName = phaseInfo.phase_name ? phaseInfo.phase_name.replace(/-/g, ' ') : `Phase ${phaseNum}`;
+  const collapsedLine = `- [x] Phase ${phaseNum}: ${phaseName} -- ${outcomeSummary}`;
+
+  const preview: ArchivePreview = {
+    phase_dir: phaseInfo.directory,
+    archive_dir: path.relative(cwd, archiveDest).replace(/\\/g, '/'),
+    decisions_to_prune: decisionsToRemove,
+    blockers_to_prune: blockersToRemove,
+    roadmap_section_to_collapse: sectionToCollapse,
+    collapsed_line: collapsedLine,
+  };
+
+  return cmdOk(preview);
+}
+
+/**
+ * Prune phase-tagged lines from a section in STATE.md content.
+ */
+function pruneSection(content: string, sectionPattern: RegExp, phaseNum: string): string {
+  const match = content.match(sectionPattern);
+  if (!match || !match[2]) return content;
+
+  const escaped = escapePhaseNum(phaseNum);
+  const tagPattern = new RegExp(`^\\s*-\\s*\\[Phase\\s+${escaped}\\]`, 'i');
+  const lines = match[2].split('\n');
+  const filtered = lines.filter(line => !tagPattern.test(line));
+
+  let newBody = filtered.join('\n');
+  // Check if remaining body has any bullet content
+  if (!newBody.trim() || !/^\s*[-*]\s+/m.test(newBody)) {
+    newBody = '\nNone.\n';
+  }
+
+  return content.replace(sectionPattern, (_m, header) => `${header}${newBody}`);
+}
+
+export async function archivePhaseExecute(cwd: string, phaseNum: string, outcomeSummary: string): Promise<CmdResult> {
+  // Re-read all files fresh (pitfall #6)
+  const phaseInfo = await findPhaseInternalAsync(cwd, phaseNum);
+  if (!phaseInfo) {
+    return cmdErr(`Phase ${phaseNum} not found`);
+  }
+
+  const archiveDir = await archivePathAsync(cwd);
+  const phaseDirName = path.basename(phaseInfo.directory);
+  const archiveDest = path.join(archiveDir, phaseDirName);
+  const phaseDirFull = path.join(cwd, phaseInfo.directory);
+
+  // 1. Create archive directory
+  await fsp.mkdir(archiveDir, { recursive: true });
+
+  // 2. Move phase directory (with EXDEV fallback)
+  try {
+    await fsp.rename(phaseDirFull, archiveDest);
+  } catch (e: unknown) {
+    if ((e as NodeJS.ErrnoException).code === 'EXDEV') {
+      debugLog('archive-rename-exdev', 'falling back to copy+delete');
+      await fsp.cp(phaseDirFull, archiveDest, { recursive: true });
+      await fsp.rm(phaseDirFull, { recursive: true, force: true });
+    } else {
+      throw e;
+    }
+  }
+
+  // 3. Prune STATE.md
+  const stPath = statePath(cwd);
+  let stContent = await safeReadFileAsync(stPath);
+  if (stContent) {
+    stContent = pruneSection(stContent, DECISIONS_SECTION_PATTERN, phaseNum);
+    stContent = pruneSection(stContent, BLOCKERS_SECTION_PATTERN, phaseNum);
+    await fsp.writeFile(stPath, stContent, 'utf-8');
+  }
+
+  // 4. Collapse ROADMAP.md
+  const rmPath = roadmapPath(cwd);
+  let rmContent = await safeReadFileAsync(rmPath);
+  if (rmContent) {
+    const escaped = escapePhaseNum(phaseNum);
+
+    // Remove detail section
+    const sectionPattern = new RegExp(
+      `\\n?#{2,4}\\s*Phase\\s+${escaped}\\s*:[\\s\\S]*?(?=\\n#{2,4}\\s+Phase\\s+\\d|\\n## |$)`,
+      'i',
+    );
+    rmContent = rmContent.replace(sectionPattern, '');
+
+    // Update checklist line — handle both bold and plain formats
+    const phaseName = phaseInfo.phase_name ? phaseInfo.phase_name.replace(/-/g, ' ') : `Phase ${phaseNum}`;
+    const checklistPattern = new RegExp(
+      `-\\s*\\[[ x]\\]\\s*(?:\\*\\*)?Phase\\s+${escaped}[:\\s][^\\n]*`,
+      'i',
+    );
+    rmContent = rmContent.replace(checklistPattern,
+      `- [x] Phase ${phaseNum}: ${phaseName} -- ${outcomeSummary}`,
+    );
+
+    await fsp.writeFile(rmPath, rmContent, 'utf-8');
+  }
+
+  // 5. Stage and commit
+  const filesToStage = [
+    phaseInfo.directory,
+    path.relative(cwd, archiveDest).replace(/\\/g, '/'),
+    '.planning/STATE.md',
+    '.planning/ROADMAP.md',
+  ];
+  await execGit(cwd, ['add', ...filesToStage]);
+  await execGit(cwd, ['commit', '-m', `chore(phase-${phaseNum}): archive completed phase`]);
+
+  return cmdOk({
+    archived: true,
+    phase: phaseNum,
+    archive_path: path.relative(cwd, archiveDest).replace(/\\/g, '/'),
+    decisions_pruned: findPhaseTaggedLines(await safeReadFileAsync(statePath(cwd)) ?? '', DECISIONS_SECTION_PATTERN, phaseNum).length === 0,
+    blockers_pruned: true,
+    roadmap_collapsed: true,
+  });
+}
+
+// ─── Get archived phase ─────────────────────────────────────────────────────
+
+export async function cmdGetArchivedPhase(cwd: string, phaseNum: string): Promise<CmdResult> {
+  if (!phaseNum) {
+    return cmdErr('phase number required');
+  }
+
+  const normalized = normalizePhaseName(phaseNum);
+
+  // Search .planning/archive/
+  const archiveDir = planningPath(cwd, 'archive');
+  const found = await searchArchiveLocations(archiveDir, normalized);
+  if (found) return cmdOk(found);
+
+  // Search legacy .planning/milestones/
+  const milestonesDir = planningPath(cwd, 'milestones');
+  if (await pathExistsAsync(milestonesDir)) {
+    try {
+      const entries = await fsp.readdir(milestonesDir, { withFileTypes: true });
+      const phaseDirs = entries
+        .filter(e => e.isDirectory() && /^v[\d.]+-phases$/.test(e.name))
+        .map(e => e.name)
+        .sort()
+        .reverse();
+
+      for (const archiveName of phaseDirs) {
+        const archPath = path.join(milestonesDir, archiveName);
+        const result = await searchForPhaseInDir(archPath, normalized, archiveName);
+        if (result) return cmdOk(result);
+      }
+    } catch (e) {
+      debugLog('get-archived-phase-milestones-failed', e);
+    }
+  }
+
+  return cmdErr(`Phase ${phaseNum} not found in archive`);
+}
+
+async function searchArchiveLocations(archiveDir: string, normalized: string): Promise<Record<string, unknown> | null> {
+  if (!(await pathExistsAsync(archiveDir))) return null;
+
+  try {
+    const entries = await fsp.readdir(archiveDir, { withFileTypes: true });
+    const versionDirs = entries
+      .filter(e => e.isDirectory())
+      .map(e => e.name)
+      .sort()
+      .reverse();
+
+    for (const versionName of versionDirs) {
+      const versionPath = path.join(archiveDir, versionName);
+      const result = await searchForPhaseInDir(versionPath, normalized, versionName);
+      if (result) return result;
+    }
+  } catch (e) {
+    debugLog('search-archive-locations-failed', e);
+  }
+  return null;
+}
+
+async function searchForPhaseInDir(baseDir: string, normalized: string, milestone: string): Promise<Record<string, unknown> | null> {
+  try {
+    const dirs = await listSubDirsAsync(baseDir, true);
+    const match = dirs.find(d => d.startsWith(normalized));
+    if (!match) return null;
+
+    const phaseDir = path.join(baseDir, match);
+    const files = await fsp.readdir(phaseDir);
+    const mdFiles = files.filter(f => f.endsWith('.md'));
+
+    const contents: Record<string, string> = {};
+    for (const f of mdFiles) {
+      contents[f] = await fsp.readFile(path.join(phaseDir, f), 'utf-8');
+    }
+
+    return {
+      phase: normalized,
+      milestone,
+      directory: match,
+      files: mdFiles,
+      contents,
+    };
+  } catch (e) {
+    debugLog('search-for-phase-in-dir-failed', e);
+    return null;
   }
 }

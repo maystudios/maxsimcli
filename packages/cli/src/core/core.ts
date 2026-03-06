@@ -660,6 +660,32 @@ export async function findPhaseInternalAsync(cwd: string, phase: string): Promis
   const current = await searchPhaseInDirAsync(pd, path.join('.planning', 'phases'), normalized);
   if (current) return current;
 
+  // Search new archive location: .planning/archive/<milestone>/
+  const archiveDir = planningPath(cwd, 'archive');
+  if (await pathExistsAsync(archiveDir)) {
+    try {
+      const archiveEntries = await fsp.readdir(archiveDir, { withFileTypes: true });
+      const versionDirs = archiveEntries
+        .filter(e => e.isDirectory())
+        .map(e => e.name)
+        .sort()
+        .reverse();
+
+      for (const versionName of versionDirs) {
+        const versionPath = path.join(archiveDir, versionName);
+        const relBase = path.join('.planning', 'archive', versionName);
+        const result = await searchPhaseInDirAsync(versionPath, relBase, normalized);
+        if (result) {
+          result.archived = versionName;
+          return result;
+        }
+      }
+    } catch (e) {
+      debugLog('find-phase-async-archive-search-failed', e);
+    }
+  }
+
+  // Legacy: search .planning/milestones/
   const milestonesDir = planningPath(cwd, 'milestones');
 
   if (!(await pathExistsAsync(milestonesDir))) return null;
@@ -676,9 +702,9 @@ export async function findPhaseInternalAsync(cwd: string, phase: string): Promis
       const versionMatch = archiveName.match(/^(v[\d.]+)-phases$/);
       if (!versionMatch) continue;
       const version = versionMatch[1];
-      const archivePath = path.join(milestonesDir, archiveName);
+      const archiveMilestonePath = path.join(milestonesDir, archiveName);
       const relBase = path.join('.planning', 'milestones', archiveName);
-      const result = await searchPhaseInDirAsync(archivePath, relBase, normalized);
+      const result = await searchPhaseInDirAsync(archiveMilestonePath, relBase, normalized);
       if (result) {
         result.archived = version;
         return result;
@@ -692,9 +718,37 @@ export async function findPhaseInternalAsync(cwd: string, phase: string): Promis
 }
 
 export async function getArchivedPhaseDirsAsync(cwd: string): Promise<ArchivedPhaseDir[]> {
-  const milestonesDir = planningPath(cwd, 'milestones');
   const results: ArchivedPhaseDir[] = [];
 
+  // New archive location: .planning/archive/<milestone>/
+  const archiveDir = planningPath(cwd, 'archive');
+  try {
+    const archiveEntries = await fsp.readdir(archiveDir, { withFileTypes: true });
+    const versionDirs = archiveEntries
+      .filter(e => e.isDirectory())
+      .map(e => e.name)
+      .sort()
+      .reverse();
+
+    for (const versionName of versionDirs) {
+      const versionPath = path.join(archiveDir, versionName);
+      const dirs = await listSubDirsAsync(versionPath, true);
+
+      for (const dir of dirs) {
+        results.push({
+          name: dir,
+          milestone: versionName,
+          basePath: path.join('.planning', 'archive', versionName),
+          fullPath: path.join(versionPath, dir),
+        });
+      }
+    }
+  } catch (e) {
+    debugLog('get-archived-phase-dirs-async-archive-failed', e);
+  }
+
+  // Legacy: .planning/milestones/
+  const milestonesDir = planningPath(cwd, 'milestones');
   try {
     const milestoneEntries = await fsp.readdir(milestonesDir, { withFileTypes: true });
     const phaseDirs = milestoneEntries
@@ -707,15 +761,15 @@ export async function getArchivedPhaseDirsAsync(cwd: string): Promise<ArchivedPh
       const versionMatch = archiveName.match(/^(v[\d.]+)-phases$/);
       if (!versionMatch) continue;
       const version = versionMatch[1];
-      const archivePath = path.join(milestonesDir, archiveName);
-      const dirs = await listSubDirsAsync(archivePath, true);
+      const archiveMilestonePath = path.join(milestonesDir, archiveName);
+      const dirs = await listSubDirsAsync(archiveMilestonePath, true);
 
       for (const dir of dirs) {
         results.push({
           name: dir,
           milestone: version,
           basePath: path.join('.planning', 'milestones', archiveName),
-          fullPath: path.join(archivePath, dir),
+          fullPath: path.join(archiveMilestonePath, dir),
         });
       }
     }
@@ -759,6 +813,16 @@ export async function getRoadmapPhaseInternalAsync(cwd: string, phaseNum: string
     debugLog('get-roadmap-phase-async-failed', { phase: phaseNum, error: errorMsg(e) });
     return null;
   }
+}
+
+export function archivePath(cwd: string, milestone?: string): string {
+  const ms = milestone ?? getMilestoneInfo(cwd).version;
+  return planningPath(cwd, 'archive', ms);
+}
+
+export async function archivePathAsync(cwd: string, milestone?: string): Promise<string> {
+  const ms = milestone ?? (await getMilestoneInfoAsync(cwd)).version;
+  return planningPath(cwd, 'archive', ms);
 }
 
 export async function getMilestoneInfoAsync(cwd: string): Promise<MilestoneInfo> {

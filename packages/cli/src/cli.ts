@@ -93,6 +93,9 @@ import {
   cmdSkillList,
   cmdSkillInstall,
   cmdSkillUpdate,
+  archivePhasePreview,
+  archivePhaseExecute,
+  cmdGetArchivedPhase,
 } from './core/index.js';
 
 // ─── Arg parsing utilities ───────────────────────────────────────────────────
@@ -263,10 +266,12 @@ const handlePhase: Handler = async (args, cwd, raw) => {
     'insert': () => cmdPhaseInsert(cwd, args[2], args.slice(3).join(' ')),
     'remove': () => cmdPhaseRemove(cwd, args[2], { force: hasFlag(args, 'force') }),
     'complete': () => cmdPhaseComplete(cwd, args[2]),
+    'archive-preview': () => archivePhasePreview(cwd, args[2], args.slice(3).join(' ')),
+    'archive-execute': () => archivePhaseExecute(cwd, args[2], args.slice(3).join(' ')),
   };
   const handler = sub ? handlers[sub] : undefined;
   if (handler) return handleResult(await handler(), raw);
-  error('Unknown phase subcommand. Available: next-decimal, add, insert, remove, complete');
+  error('Unknown phase subcommand. Available: next-decimal, add, insert, remove, complete, archive-preview, archive-execute');
 };
 
 const handleMilestone: Handler = (args, cwd, raw) => {
@@ -371,6 +376,7 @@ const COMMANDS: Record<string, Handler> = {
     handleResult(cmdScaffold(cwd, args[1], { phase: f.phase, name: f.name ? args.slice(args.indexOf('--name') + 1).join(' ') : null }, raw), raw);
   },
   'init': handleInit,
+  'get-archived-phase': async (args, cwd, raw) => handleResult(await cmdGetArchivedPhase(cwd, args[1]), raw),
   'phase-plan-index': async (args, cwd, raw) => handleResult(await cmdPhasePlanIndex(cwd, args[1]), raw),
   'state-snapshot': async (_args, cwd, raw) => handleResult(await cmdStateSnapshot(cwd, raw), raw),
   'summary-extract': (args, cwd, raw) => {

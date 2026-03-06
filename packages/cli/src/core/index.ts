@@ -64,6 +64,7 @@ export type {
   PhaseCompleteResult,
   PhasePlanIndexResult,
   PhasesListOptions,
+  ArchivePreview,
 } from './types.js';
 
 // Runtime value exports from types
@@ -105,6 +106,8 @@ export {
   getMilestoneInfo,
   listSubDirsAsync,
   safeReadFileAsync,
+  archivePath,
+  archivePathAsync,
 } from './core.js';
 
 // Frontmatter exports
@@ -214,6 +217,9 @@ export {
   cmdPhaseInsert,
   cmdPhaseRemove,
   cmdPhaseComplete,
+  archivePhasePreview,
+  archivePhaseExecute,
+  cmdGetArchivedPhase,
 } from './phase.js';
 
 // Template exports

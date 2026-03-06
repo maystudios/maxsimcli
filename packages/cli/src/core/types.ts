@@ -498,3 +498,14 @@ export interface PhasesListOptions {
   limit?: number;
 }
 
+// ─── Archive interfaces ─────────────────────────────────────────────────────
+
+export interface ArchivePreview {
+  phase_dir: string;
+  archive_dir: string;
+  decisions_to_prune: string[];
+  blockers_to_prune: string[];
+  roadmap_section_to_collapse: string;
+  collapsed_line: string;
+}
+
