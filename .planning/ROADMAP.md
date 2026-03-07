@@ -79,9 +79,11 @@ MAXSIM is a working product with 35+ commands, 13 agents, 11 skills, and a dashb
 **Depends on**: Nothing (independent)
 **Requirements**: FLOW-01, FLOW-02
 **Success Criteria** (what must be TRUE):
-  1. `/maxsim:discuss-todo` or equivalent command runs a shorter collaborative discussion (15-20 min) for small work items and bugs
+  1. `/maxsim:discuss` command runs a shorter collaborative discussion for small work items and bugs, triaging to todo or phase
   2. `phase-list` command supports pagination for projects with 50+ phases -- returns chunked output with offset/limit
-**Plans**: TBD
+**Plans**: 2 plans in 1 wave
+  - [ ] 05-01: Discuss command and workflow (FLOW-01) — Wave 1
+  - [ ] 05-02: Phase listing pagination (FLOW-02) — Wave 1
 
 ## Progress
 
@@ -94,4 +96,4 @@ Phase 1 -> Phase 2 || Phase 5 -> Phase 3 -> Phase 4
 | 2. Deep Init Questioning | 3/3 | Complete | 2026-03-07 |
 | 3. Agent Coherence | 2/4 | In Progress | - |
 | 4. Spec Drift Management | 0/3 | Not started | - |
-| 5. Workflow Coverage | 0/? | Not started | - |
+| 5. Workflow Coverage | 0/2 | Not started | - |
