@@ -6,15 +6,15 @@ MAXSIM is a working product with 35+ commands, 13 agents, 11 skills, and a dashb
 
 ## Milestone
 
-- [ ] **v5.0 Context-Aware SDD** -- Phases 1-5 (active)
+- [x] **v5.0 Context-Aware SDD** -- Phases 1-5 (complete)
 
 ## Phases
 
 - [x] **Phase 1: Context Rot Prevention** - Auto-prune completed phases, archive stale context, keep planning docs focused on current work
 - [x] **Phase 2: Deep Init Questioning** - Comprehensive onboarding with tech stack research, constraints, and no-go gathering
-- [ ] **Phase 3: Agent Coherence** - Coordinated agent prompt system with role-aware context and standard two-stage review
-- [ ] **Phase 4: Spec Drift Management** - `/maxsim:check-drift` command that compares spec to codebase and generates realignment plans
-- [ ] **Phase 5: Workflow Coverage** - Todo/bug discussion flow and phase listing pagination
+- [x] **Phase 3: Agent Coherence** - Coordinated agent prompt system with role-aware context and standard two-stage review
+- [x] **Phase 4: Spec Drift Management** - `/maxsim:check-drift` command that compares spec to codebase and generates realignment plans
+- [x] **Phase 5: Workflow Coverage** - Todo/bug discussion flow and phase listing pagination
 
 ## Phase Details
 
@@ -57,8 +57,8 @@ MAXSIM is a working product with 35+ commands, 13 agents, 11 skills, and a dashb
 **Plans**: 4 plans in 2 waves
   - [x] 03-01: Agent coherence - core agents (AGENT-01, AGENT-04) — Wave 1
   - [x] 03-02: Agent coherence - support agents + registry (AGENT-01, AGENT-04) — Wave 1
-  - [ ] 03-03: CLI init commands + frontmatter schema (AGENT-02) — Wave 2
-  - [ ] 03-04: Two-stage review enforcement (AGENT-03) — Wave 2
+  - [x] 03-03: CLI init commands + frontmatter schema (AGENT-02) — Wave 2
+  - [x] 03-04: Two-stage review enforcement (AGENT-03) — Wave 2
 
 ### Phase 4: Spec Drift Management
 **Goal**: Users can detect and correct divergence between `.planning/` spec and actual codebase state using a single command
@@ -70,9 +70,9 @@ MAXSIM is a working product with 35+ commands, 13 agents, 11 skills, and a dashb
   3. User can invoke realign-to-code path that updates `.planning/` to reflect current codebase
   4. User can invoke realign-to-spec path that generates a fix plan for what code changes are needed
 **Plans**: 3 plans in 2 waves
-  - [ ] 04-01: Drift core module + types + CLI wiring (DRIFT-01, DRIFT-02) — Wave 1
-  - [ ] 04-02: Drift-checker agent + check-drift command/workflow (DRIFT-01, DRIFT-02) — Wave 2
-  - [ ] 04-03: Realign command + workflow (DRIFT-03, DRIFT-04) — Wave 2
+  - [x] 04-01: Drift core module + types + CLI wiring (DRIFT-01, DRIFT-02) — Wave 1
+  - [x] 04-02: Drift-checker agent + check-drift command/workflow (DRIFT-01, DRIFT-02) — Wave 2
+  - [x] 04-03: Realign command + workflow (DRIFT-03, DRIFT-04) — Wave 2
 
 ### Phase 5: Workflow Coverage
 **Goal**: Fill the two verified gaps in workflow coverage -- todo/bug discussion flow and phase listing pagination
@@ -82,8 +82,8 @@ MAXSIM is a working product with 35+ commands, 13 agents, 11 skills, and a dashb
   1. `/maxsim:discuss` command runs a shorter collaborative discussion for small work items and bugs, triaging to todo or phase
   2. `phase-list` command supports pagination for projects with 50+ phases -- returns chunked output with offset/limit
 **Plans**: 2 plans in 1 wave
-  - [ ] 05-01: Discuss command and workflow (FLOW-01) — Wave 1
-  - [ ] 05-02: Phase listing pagination (FLOW-02) — Wave 1
+  - [x] 05-01: Discuss command and workflow (FLOW-01) — Wave 1
+  - [x] 05-02: Phase listing pagination (FLOW-02) — Wave 1
 
 ## Progress
 
@@ -94,6 +94,6 @@ Phase 1 -> Phase 2 || Phase 5 -> Phase 3 -> Phase 4
 |-------|----------------|--------|-----------|
 | 1. Context Rot Prevention | 2/2 | Complete | 2026-03-06 |
 | 2. Deep Init Questioning | 3/3 | Complete | 2026-03-07 |
-| 3. Agent Coherence | 2/4 | In Progress | - |
-| 4. Spec Drift Management | 0/3 | Not started | - |
-| 5. Workflow Coverage | 0/2 | Not started | - |
+| 3. Agent Coherence | 4/4 | Complete | 2026-03-07 |
+| 4. Spec Drift Management | 3/3 | Complete | 2026-03-07 |
+| 5. Workflow Coverage | 2/2 | Complete | 2026-03-07 |

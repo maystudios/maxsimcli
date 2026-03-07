@@ -89,12 +89,10 @@ MAXSIM is a working product at v4.2.x with real users. The following is implemen
 
 ## Known Tech Debt
 
-- Large monolithic modules: server.ts (1159 lines), verify.ts (965 lines), phase.ts (940 lines)
-- 98 `any` type usages across 26 files
+- Large monolithic modules: server.ts (1371 lines), verify.ts (965 lines), phase.ts (1193 lines)
+- 5 `any` type usages across 4 files
 - Mixed error handling: exceptions vs CmdResult vs CliOutput/CliError
-- Sync/async file I/O inconsistency in hot paths
-- No pagination for large phase listings
-- Missing todo/bug discussion flow
+- Sync/async file I/O inconsistency in CLI tool functions
 
 ---
 *Rewritten 2026-03-06 -- clean slate for next milestone*
