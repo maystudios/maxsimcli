@@ -69,7 +69,10 @@ MAXSIM is a working product with 35+ commands, 13 agents, 11 skills, and a dashb
   2. The drift report identifies specific mismatches: requirements marked complete but not implemented, and implemented features not captured in `.planning/`
   3. User can invoke realign-to-code path that updates `.planning/` to reflect current codebase
   4. User can invoke realign-to-spec path that generates a fix plan for what code changes are needed
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
+  - [ ] 04-01: Drift core module + types + CLI wiring (DRIFT-01, DRIFT-02) — Wave 1
+  - [ ] 04-02: Drift-checker agent + check-drift command/workflow (DRIFT-01, DRIFT-02) — Wave 2
+  - [ ] 04-03: Realign command + workflow (DRIFT-03, DRIFT-04) — Wave 2
 
 ### Phase 5: Workflow Coverage
 **Goal**: Fill the two verified gaps in workflow coverage -- todo/bug discussion flow and phase listing pagination
@@ -90,5 +93,5 @@ Phase 1 -> Phase 2 || Phase 5 -> Phase 3 -> Phase 4
 | 1. Context Rot Prevention | 2/2 | Complete | 2026-03-06 |
 | 2. Deep Init Questioning | 3/3 | Complete | 2026-03-07 |
 | 3. Agent Coherence | 2/4 | In Progress | - |
-| 4. Spec Drift Management | 0/? | Not started | - |
+| 4. Spec Drift Management | 0/3 | Not started | - |
 | 5. Workflow Coverage | 0/? | Not started | - |
