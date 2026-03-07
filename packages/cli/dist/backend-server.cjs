@@ -32122,17 +32122,17 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @private
 	*/
 	var debug = require_src$3()("express:view");
-	var path$22 = require("path");
-	var fs$20 = require("fs");
+	var path$23 = require("path");
+	var fs$21 = require("fs");
 	/**
 	* Module variables.
 	* @private
 	*/
-	var dirname = path$22.dirname;
-	var basename = path$22.basename;
-	var extname = path$22.extname;
-	var join = path$22.join;
-	var resolve = path$22.resolve;
+	var dirname = path$23.dirname;
+	var basename = path$23.basename;
+	var extname = path$23.extname;
+	var join = path$23.join;
+	var resolve = path$23.resolve;
 	/**
 	* Module exports.
 	* @public
@@ -32229,7 +32229,7 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	function tryStat(path) {
 		debug("stat \"%s\"", path);
 		try {
-			return fs$20.statSync(path);
+			return fs$21.statSync(path);
 		} catch (e) {
 			return;
 		}
@@ -34450,7 +34450,7 @@ var require_types$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 //#region ../../node_modules/send/node_modules/mime/mime.js
 var require_mime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	require("path");
-	var fs$19 = require("fs");
+	var fs$20 = require("fs");
 	function Mime() {
 		this.types = Object.create(null);
 		this.extensions = Object.create(null);
@@ -34485,7 +34485,7 @@ var require_mime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	Mime.prototype.load = function(file) {
 		this._loading = file;
 		var map = {};
-		fs$19.readFileSync(file, "ascii").split(/[\r\n]+/).forEach(function(line) {
+		fs$20.readFileSync(file, "ascii").split(/[\r\n]+/).forEach(function(line) {
 			var fields = line.replace(/\s*#.*|^\s*|\s*$/g, "").split(/\s+/);
 			map[fields.shift()] = fields;
 		});
@@ -34764,12 +34764,12 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var escapeHtml = require_escape_html();
 	var etag = require_etag();
 	var fresh = require_fresh();
-	var fs$18 = require("fs");
+	var fs$19 = require("fs");
 	var mime = require_mime();
 	var ms = require_ms();
 	var onFinished = require_on_finished();
 	var parseRange = require_range_parser();
-	var path$21 = require("path");
+	var path$22 = require("path");
 	var statuses = require_statuses();
 	var Stream = require("stream");
 	var util$3 = require("util");
@@ -34777,11 +34777,11 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* Path function references.
 	* @private
 	*/
-	var extname = path$21.extname;
-	var join = path$21.join;
-	var normalize = path$21.normalize;
-	var resolve = path$21.resolve;
-	var sep = path$21.sep;
+	var extname = path$22.extname;
+	var join = path$22.join;
+	var normalize = path$22.normalize;
+	var resolve = path$22.resolve;
+	var sep = path$22.sep;
 	/**
 	* Regular expression for identifying a bytes Range header.
 	* @private
@@ -35229,7 +35229,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		var i = 0;
 		var self = this;
 		debug("stat \"%s\"", path);
-		fs$18.stat(path, function onstat(err, stat) {
+		fs$19.stat(path, function onstat(err, stat) {
 			if (err && err.code === "ENOENT" && !extname(path) && path[path.length - 1] !== sep) return next(err);
 			if (err) return self.onStatError(err);
 			if (stat.isDirectory()) return self.redirect(path);
@@ -35240,7 +35240,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			if (self._extensions.length <= i) return err ? self.onStatError(err) : self.error(404);
 			var p = path + "." + self._extensions[i++];
 			debug("stat \"%s\"", p);
-			fs$18.stat(p, function(err, stat) {
+			fs$19.stat(p, function(err, stat) {
 				if (err) return next(err);
 				if (stat.isDirectory()) return next();
 				self.emit("file", p, stat);
@@ -35264,7 +35264,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			var p = join(path, self._index[i]);
 			debug("stat \"%s\"", p);
-			fs$18.stat(p, function(err, stat) {
+			fs$19.stat(p, function(err, stat) {
 				if (err) return next(err);
 				if (stat.isDirectory()) return next();
 				self.emit("file", p, stat);
@@ -35283,7 +35283,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	SendStream.prototype.stream = function stream(path, options) {
 		var self = this;
 		var res = this.res;
-		var stream$5 = fs$18.createReadStream(path, options);
+		var stream$5 = fs$19.createReadStream(path, options);
 		this.emit("stream", stream$5);
 		stream$5.pipe(res);
 		function cleanup() {
@@ -38817,7 +38817,7 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var http$3 = require("http");
 	var isAbsolute = require_utils$1().isAbsolute;
 	var onFinished = require_on_finished();
-	var path$20 = require("path");
+	var path$21 = require("path");
 	var statuses = require_statuses();
 	var merge = require_utils_merge();
 	var sign = require_cookie_signature().sign;
@@ -38826,9 +38826,9 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var setCharset = require_utils$1().setCharset;
 	var cookie = require_cookie();
 	var send = require_send();
-	var extname = path$20.extname;
+	var extname = path$21.extname;
 	var mime = send.mime;
-	var resolve = path$20.resolve;
+	var resolve = path$21.resolve;
 	var vary = require_vary();
 	/**
 	* Response prototype.
@@ -74964,6 +74964,14 @@ function parseTodoFrontmatter(content) {
 * Verify — Verification suite, consistency, and health validation
 *
 * Ported from maxsim/bin/lib/verify.cjs
+*/
+
+//#endregion
+//#region src/core/drift.ts
+/**
+* Drift — Drift report CRUD, requirement extraction, and spec extraction
+*
+* Provides CLI tool commands for the drift-checker agent and realign workflow.
 */
 
 //#endregion

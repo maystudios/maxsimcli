@@ -3,8 +3,8 @@
  *
  * Ported from maxsim/bin/lib/init.cjs
  */
-import type { BranchingStrategy, ModelResolution, CmdResult } from './types.js';
-export type WorkflowType = 'execute-phase' | 'plan-phase' | 'new-project' | 'new-milestone' | 'quick' | 'resume' | 'verify-work' | 'phase-op' | 'todos' | 'milestone-op' | 'map-codebase' | 'init-existing' | 'progress';
+import type { BranchingStrategy, ModelResolution, CmdResult, CheckDriftContext, RealignContext } from './types.js';
+export type WorkflowType = 'execute-phase' | 'plan-phase' | 'new-project' | 'new-milestone' | 'quick' | 'resume' | 'verify-work' | 'phase-op' | 'todos' | 'milestone-op' | 'map-codebase' | 'init-existing' | 'progress' | 'check-drift' | 'realign';
 export interface ExecutePhaseContext {
     executor_model: ModelResolution;
     verifier_model: ModelResolution;
@@ -257,7 +257,7 @@ export interface ProgressContext {
     project_path: string;
     config_path: string;
 }
-export type InitContext = ExecutePhaseContext | PlanPhaseContext | NewProjectContext | NewMilestoneContext | QuickContext | ResumeContext | VerifyWorkContext | PhaseOpContext | TodosContext | MilestoneOpContext | MapCodebaseContext | InitExistingContext | ProgressContext;
+export type InitContext = ExecutePhaseContext | PlanPhaseContext | NewProjectContext | NewMilestoneContext | QuickContext | ResumeContext | VerifyWorkContext | PhaseOpContext | TodosContext | MilestoneOpContext | MapCodebaseContext | InitExistingContext | ProgressContext | CheckDriftContext | RealignContext;
 export declare function cmdInitExecutePhase(cwd: string, phase: string | undefined): CmdResult;
 export declare function cmdInitPlanPhase(cwd: string, phase: string | undefined): CmdResult;
 export declare function cmdInitNewProject(cwd: string): CmdResult;
@@ -271,5 +271,17 @@ export declare function cmdInitMilestoneOp(cwd: string): CmdResult;
 export declare function cmdInitMapCodebase(cwd: string): CmdResult;
 export declare function cmdInitExisting(cwd: string): CmdResult;
 export declare function cmdInitProgress(cwd: string): CmdResult;
+/**
+ * Scan .planning/codebase/ for .md files and return relative paths.
+ * Returns empty array if the directory does not exist.
+ */
+export declare function listCodebaseDocs(cwd: string): string[];
+export declare function cmdInitExecutor(cwd: string, phase: string | undefined): CmdResult;
+export declare function cmdInitPlanner(cwd: string, phase: string | undefined): CmdResult;
+export declare function cmdInitResearcher(cwd: string, phase: string | undefined): CmdResult;
+export declare function cmdInitVerifier(cwd: string, phase: string | undefined): CmdResult;
+export declare function cmdInitDebugger(cwd: string, phase: string | undefined): CmdResult;
+export declare function cmdInitCheckDrift(cwd: string): CmdResult;
+export declare function cmdInitRealign(cwd: string, direction: string | undefined): CmdResult;
 export {};
 //# sourceMappingURL=init.d.ts.map

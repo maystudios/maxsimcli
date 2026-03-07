@@ -1,3 +1,29 @@
+## [4.3.1](https://github.com/maystudios/maxsimcli/compare/v4.3.0...v4.3.1) (2026-03-07)
+
+
+### Bug Fixes
+
+* **install:** skip symlinks in manifest generation to prevent EISDIR crash ([02b113b](https://github.com/maystudios/maxsimcli/commit/02b113bf2301737d9fc658e8e60e3b48013b4624))
+
+# [4.3.0](https://github.com/maystudios/maxsimcli/compare/v4.2.3...v4.3.0) (2026-03-07)
+
+
+### Bug Fixes
+
+* **test:** update e2e test for renamed simplify -> maxsim-simplify skill ([dc21577](https://github.com/maystudios/maxsimcli/commit/dc2157798ab4f1e29f77fbdc8d14a5e697c6e6e2))
+
+
+### Features
+
+* **01-01:** implement phase archive sweep with preview/execute and get-archived-phase ([7761f3c](https://github.com/maystudios/maxsimcli/commit/7761f3c00d5d7dc1d674813b1a5a7ab331b09f9c))
+* **01-02:** add stale context detection and milestone STATE.md reset ([ed1c460](https://github.com/maystudios/maxsimcli/commit/ed1c460488424c5b0b842c8d097508806e4eb847))
+* **02-01:** enhance research agents with actionable output formats ([4310e59](https://github.com/maystudios/maxsimcli/commit/4310e596e9c33734019100497133bb60d65fe7a4))
+* **02-01:** rewrite questioning reference with domain checklist and no-gos tracking ([8b85ada](https://github.com/maystudios/maxsimcli/commit/8b85ada91710ef875e79e31dad0740ac4ed309de))
+* **02-02:** add Tech Stack Decisions section to PROJECT.md template ([b0acaa5](https://github.com/maystudios/maxsimcli/commit/b0acaa59d624350ead42c33eb8492801a89d6955))
+* **02-02:** create CONVENTIONS.md template for agent-ready init output ([e984a1a](https://github.com/maystudios/maxsimcli/commit/e984a1a69a4ffe0b180530f60713f9f8183c5f0b))
+* **02-03:** add conventions_path to init context assembly ([50c3d10](https://github.com/maystudios/maxsimcli/commit/50c3d1075f3a0902c232401b25a3ae023c263beb))
+* **02-03:** wire deep questioning, conventions, and dry-run into init workflows ([f83a649](https://github.com/maystudios/maxsimcli/commit/f83a6496065b87fd458b082228e5621c42881456))
+
 ## [4.2.3](https://github.com/maystudios/maxsimcli/compare/v4.2.2...v4.2.3) (2026-03-03)
 
 

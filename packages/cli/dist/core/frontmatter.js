@@ -93,6 +93,12 @@ exports.FRONTMATTER_SCHEMAS = {
     verification: {
         required: ['phase', 'verified', 'status', 'score'],
     },
+    review: {
+        required: ['status', 'critical_count', 'warning_count'],
+    },
+    drift: {
+        required: ['status', 'checked', 'total_items', 'critical_count', 'warning_count', 'info_count'],
+    },
 };
 // ─── Frontmatter CRUD commands ──────────────────────────────────────────────
 function cmdFrontmatterGet(cwd, filePath, field) {

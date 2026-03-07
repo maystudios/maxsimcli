@@ -40,7 +40,7 @@ export interface ModelProfileEntry {
     budget: ModelTier;
     tokenburner: ModelTier;
 }
-export type AgentType = 'maxsim-planner' | 'maxsim-roadmapper' | 'maxsim-executor' | 'maxsim-phase-researcher' | 'maxsim-project-researcher' | 'maxsim-research-synthesizer' | 'maxsim-debugger' | 'maxsim-codebase-mapper' | 'maxsim-verifier' | 'maxsim-plan-checker' | 'maxsim-integration-checker';
+export type AgentType = 'maxsim-planner' | 'maxsim-roadmapper' | 'maxsim-executor' | 'maxsim-phase-researcher' | 'maxsim-project-researcher' | 'maxsim-research-synthesizer' | 'maxsim-debugger' | 'maxsim-codebase-mapper' | 'maxsim-verifier' | 'maxsim-plan-checker' | 'maxsim-integration-checker' | 'maxsim-drift-checker';
 export type ModelProfiles = Record<AgentType, ModelProfileEntry>;
 export interface PhaseSearchResult {
     found: true;
@@ -383,6 +383,137 @@ export interface ArchivePreview {
     blockers_to_prune: string[];
     roadmap_section_to_collapse: string;
     collapsed_line: string;
+}
+export interface ExecutorAgentContext {
+    executor_model: string;
+    verifier_model: string;
+    commit_docs: boolean;
+    parallelization: boolean;
+    branching_strategy: string;
+    phase_branch_template: string;
+    milestone_branch_template: string;
+    phase_found: boolean;
+    phase_dir: string | null;
+    phase_number: string | null;
+    phase_name: string | null;
+    state_path: string;
+    conventions_path?: string;
+    codebase_docs: string[];
+}
+export interface PlannerAgentContext {
+    planner_model: string;
+    checker_model: string;
+    commit_docs: boolean;
+    research_enabled: boolean;
+    plan_checker_enabled: boolean;
+    phase_found: boolean;
+    phase_dir: string | null;
+    phase_number: string | null;
+    phase_name: string | null;
+    phase_req_ids: string | null;
+    has_research: boolean;
+    has_context: boolean;
+    has_plans: boolean;
+    plan_count: number;
+    state_path: string;
+    roadmap_path: string;
+    requirements_path: string;
+    conventions_path?: string;
+    context_path?: string;
+    research_path?: string;
+    codebase_docs: string[];
+}
+export interface ResearcherAgentContext {
+    researcher_model: string;
+    commit_docs: boolean;
+    brave_search: boolean;
+    phase_found: boolean;
+    phase_dir: string | null;
+    phase_number: string | null;
+    phase_name: string | null;
+    padded_phase: string | null;
+    phase_req_ids: string | null;
+    has_research: boolean;
+    has_context: boolean;
+    state_path: string;
+    roadmap_path: string;
+    requirements_path: string;
+    conventions_path?: string;
+    context_path?: string;
+    codebase_docs: string[];
+}
+export interface VerifierAgentContext {
+    verifier_model: string;
+    commit_docs: boolean;
+    phase_found: boolean;
+    phase_dir: string | null;
+    phase_number: string | null;
+    phase_name: string | null;
+    phase_req_ids: string | null;
+    state_path: string;
+    roadmap_path: string;
+    requirements_path: string;
+    codebase_docs: string[];
+}
+export interface DebuggerAgentContext {
+    debugger_model: string;
+    commit_docs: boolean;
+    phase_found: boolean;
+    phase_dir: string | null;
+    phase_number: string | null;
+    phase_name: string | null;
+    state_path: string;
+    conventions_path?: string;
+    codebase_docs: string[];
+}
+export type DriftStatus = 'drift' | 'aligned';
+export type DriftSeverity = 'critical' | 'warning' | 'info';
+export type DriftDirection = 'spec_ahead' | 'code_ahead' | 'undocumented';
+export type DriftItemStatus = 'NEW' | 'RESOLVED' | 'UNCHANGED';
+export interface DriftReportFrontmatter {
+    status: DriftStatus;
+    checked: string;
+    previous_hash: string | null;
+    previous_report_date: string | null;
+    total_items: number;
+    aligned_count: number;
+    critical_count: number;
+    warning_count: number;
+    info_count: number;
+    undocumented_count: number;
+    spec_files_checked: string[];
+}
+export interface CheckDriftContext {
+    drift_model: string;
+    commit_docs: boolean;
+    has_planning: boolean;
+    has_requirements: boolean;
+    has_roadmap: boolean;
+    has_nogos: boolean;
+    has_conventions: boolean;
+    has_previous_report: boolean;
+    previous_report_path: string | null;
+    spec_files: string[];
+    phase_dirs: string[];
+    archived_milestone_dirs: string[];
+    state_path: string;
+    requirements_path: string;
+    roadmap_path: string;
+    nogos_path: string | null;
+    conventions_path: string | null;
+    codebase_docs: string[];
+}
+export interface RealignContext {
+    commit_docs: boolean;
+    direction: string | null;
+    has_report: boolean;
+    report_path: string;
+    has_planning: boolean;
+    state_path: string;
+    roadmap_path: string;
+    requirements_path: string;
+    phase_dirs: string[];
+    codebase_docs: string[];
 }
 export {};
 //# sourceMappingURL=types.d.ts.map

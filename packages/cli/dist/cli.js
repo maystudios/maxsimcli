@@ -244,6 +244,21 @@ const handleValidate = (args, cwd, raw) => {
         return handler();
     (0, index_js_1.error)('Unknown validate subcommand. Available: consistency, health');
 };
+const handleDrift = (args, cwd, raw) => {
+    const sub = args[1];
+    const handlers = {
+        'read-report': () => (0, index_js_1.cmdDriftReadReport)(cwd),
+        'extract-requirements': () => (0, index_js_1.cmdDriftExtractRequirements)(cwd),
+        'extract-nogos': () => (0, index_js_1.cmdDriftExtractNoGos)(cwd),
+        'extract-conventions': () => (0, index_js_1.cmdDriftExtractConventions)(cwd),
+        'write-report': () => (0, index_js_1.cmdDriftWriteReport)(cwd, getFlag(args, '--content'), getFlag(args, '--content-file')),
+        'previous-hash': () => (0, index_js_1.cmdDriftPreviousHash)(cwd),
+    };
+    const handler = sub ? handlers[sub] : undefined;
+    if (handler)
+        return handleResult(handler(), raw);
+    (0, index_js_1.error)('Unknown drift subcommand. Available: read-report, extract-requirements, extract-nogos, extract-conventions, write-report, previous-hash');
+};
 const handleInit = (args, cwd, raw) => {
     const workflow = args[1];
     const handlers = {
@@ -260,11 +275,20 @@ const handleInit = (args, cwd, raw) => {
         'map-codebase': () => (0, index_js_1.cmdInitMapCodebase)(cwd),
         'init-existing': () => (0, index_js_1.cmdInitExisting)(cwd),
         'progress': () => (0, index_js_1.cmdInitProgress)(cwd),
+        // Agent-level inits
+        'executor': () => (0, index_js_1.cmdInitExecutor)(cwd, args[2]),
+        'planner': () => (0, index_js_1.cmdInitPlanner)(cwd, args[2]),
+        'researcher': () => (0, index_js_1.cmdInitResearcher)(cwd, args[2]),
+        'verifier': () => (0, index_js_1.cmdInitVerifier)(cwd, args[2]),
+        'debugger': () => (0, index_js_1.cmdInitDebugger)(cwd, args[2]),
+        // Drift-related inits
+        'check-drift': () => (0, index_js_1.cmdInitCheckDrift)(cwd),
+        'realign': () => (0, index_js_1.cmdInitRealign)(cwd, args[2]),
     };
     const handler = workflow ? handlers[workflow] : undefined;
     if (handler)
         return handleResult(handler(), raw);
-    (0, index_js_1.error)(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, init-existing, progress`);
+    (0, index_js_1.error)(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, init-existing, progress, executor, planner, researcher, verifier, debugger, check-drift, realign`);
 };
 // ─── Command registry ────────────────────────────────────────────────────────
 const COMMANDS = {
@@ -304,6 +328,7 @@ const COMMANDS = {
     'phase': handlePhase,
     'milestone': handleMilestone,
     'validate': handleValidate,
+    'drift': handleDrift,
     'progress': (args, cwd, raw) => handleResult((0, index_js_1.cmdProgressRender)(cwd, args[1] || 'json', raw), raw),
     'todo': (args, cwd, raw) => {
         if (args[1] === 'complete')

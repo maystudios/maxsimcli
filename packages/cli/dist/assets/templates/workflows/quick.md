@@ -288,6 +288,116 @@ Note: For quick tasks producing multiple plans (rare), spawn executors in parall
 
 ---
 
+**Step 6.3: Two-Stage Review**
+
+Run spec-compliance and code-quality review on the completed quick task. This applies to ALL quick tasks regardless of model profile or `--full` flag (per locked decision: "Quick means fast planning, not skipped quality gates").
+
+Display banner:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ MAXSIM ► REVIEWING RESULTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+◆ Running two-stage review...
+```
+
+1. Read the completed SUMMARY.md from `${QUICK_DIR}/${next_num}-SUMMARY.md` to understand what was built.
+2. Get modified files: `git diff --name-only HEAD~{N}` where N = number of commits from the executor.
+3. Read the quick plan at `${QUICK_DIR}/${next_num}-PLAN.md` to get task specs.
+
+**Spec Review:**
+
+```
+Task(
+  prompt="
+    <review_context>
+    **Plan:** quick-${next_num}
+    **Description:** ${DESCRIPTION}
+
+    <task_specs>
+    {Copy task specs (action, done criteria, files) from ${QUICK_DIR}/${next_num}-PLAN.md}
+    </task_specs>
+
+    <modified_files>
+    {output of git diff --name-only HEAD~N}
+    </modified_files>
+
+    <plan_frontmatter>
+    {Plan frontmatter including requirements if present}
+    </plan_frontmatter>
+    </review_context>
+  ",
+  subagent_type="maxsim-spec-reviewer",
+  model="{executor_model}",
+  description="Spec review: ${DESCRIPTION}"
+)
+```
+
+Parse output frontmatter for `status:` field.
+If FAIL: fix issues, commit (`fix(quick-${next_num}): address spec review findings`), retry (max 2 retries).
+On retry exhaustion (3 total attempts):
+
+```
+## REVIEW BLOCKED
+
+**Stage:** Spec Compliance
+**Task:** quick-${next_num}: ${DESCRIPTION}
+**Attempts:** 3 (initial + 2 retries)
+**Failing Issues:**
+- {issue list from review}
+
+**Options:**
+1. Fix manually and continue
+2. Skip review for this task
+3. Abort execution
+```
+
+STOP and wait for user decision.
+
+**Code Review:**
+
+```
+Task(
+  prompt="
+    <review_context>
+    **Plan:** quick-${next_num}
+
+    <modified_files>
+    {output of git diff --name-only HEAD~N, updated after any spec-review fix commits}
+    </modified_files>
+
+    <conventions>
+    {Content of .planning/CONVENTIONS.md or .planning/codebase/CONVENTIONS.md, or 'No CONVENTIONS.md found'}
+    </conventions>
+
+    <test_results>
+    {Last 20 lines of npm test output if package.json exists, or 'No tests available'}
+    </test_results>
+    </review_context>
+  ",
+  subagent_type="maxsim-code-reviewer",
+  model="{executor_model}",
+  description="Code review: ${DESCRIPTION}"
+)
+```
+
+Same retry logic as spec review (max 2 retries, then REVIEW BLOCKED with user options).
+
+**Record review results** in the quick task SUMMARY.md:
+
+Append `## Review Cycle` section to `${QUICK_DIR}/${next_num}-SUMMARY.md`:
+```markdown
+## Review Cycle
+- Spec: {PASS/FAIL/SKIPPED} ({retry_count} retries)
+- Code: {PASS/FAIL/SKIPPED} ({retry_count} retries)
+- Issues: {critical_count} critical, {warning_count} warnings
+```
+
+If `--full` flag was set: this review is part of the full quality pipeline (alongside plan-checking and verification that `--full` already enables).
+If `--full` was NOT set: the review STILL runs (per locked decision).
+
+---
+
 **Step 6.5: Verification (only when `$FULL_MODE`)**
 
 Skip this step entirely if NOT `$FULL_MODE`.

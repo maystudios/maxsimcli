@@ -26636,9 +26636,9 @@ var require_mime_types = /* @__PURE__ */ __commonJSMin(((exports) => {
 	* @param {string} path
 	* @return {boolean|string}
 	*/
-	function lookup(path$74) {
-		if (!path$74 || typeof path$74 !== "string") return false;
-		var extension = extname("x." + path$74).toLowerCase().substr(1);
+	function lookup(path$75) {
+		if (!path$75 || typeof path$75 !== "string") return false;
+		var extension = extname("x." + path$75).toLowerCase().substr(1);
 		if (!extension) return false;
 		return exports.types[extension] || false;
 	}
@@ -32132,17 +32132,17 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @private
 	*/
 	var debug = require_src$3()("express:view");
-	var path$19 = require("path");
-	var fs$20 = require("fs");
+	var path$20 = require("path");
+	var fs$21 = require("fs");
 	/**
 	* Module variables.
 	* @private
 	*/
-	var dirname = path$19.dirname;
-	var basename = path$19.basename;
-	var extname = path$19.extname;
-	var join = path$19.join;
-	var resolve = path$19.resolve;
+	var dirname = path$20.dirname;
+	var basename = path$20.basename;
+	var extname = path$20.extname;
+	var join = path$20.join;
+	var resolve = path$20.resolve;
 	/**
 	* Module exports.
 	* @public
@@ -32190,17 +32190,17 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @private
 	*/
 	View.prototype.lookup = function lookup(name) {
-		var path$71;
+		var path$72;
 		var roots = [].concat(this.root);
 		debug("lookup \"%s\"", name);
-		for (var i = 0; i < roots.length && !path$71; i++) {
+		for (var i = 0; i < roots.length && !path$72; i++) {
 			var root = roots[i];
 			var loc = resolve(root, name);
 			var dir = dirname(loc);
 			var file = basename(loc);
-			path$71 = this.resolve(dir, file);
+			path$72 = this.resolve(dir, file);
 		}
-		return path$71;
+		return path$72;
 	};
 	/**
 	* Render with the given options.
@@ -32222,12 +32222,12 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*/
 	View.prototype.resolve = function resolve(dir, file) {
 		var ext = this.ext;
-		var path$72 = join(dir, file);
-		var stat = tryStat(path$72);
-		if (stat && stat.isFile()) return path$72;
-		path$72 = join(dir, basename(file, ext), "index" + ext);
-		stat = tryStat(path$72);
-		if (stat && stat.isFile()) return path$72;
+		var path$73 = join(dir, file);
+		var stat = tryStat(path$73);
+		if (stat && stat.isFile()) return path$73;
+		path$73 = join(dir, basename(file, ext), "index" + ext);
+		stat = tryStat(path$73);
+		if (stat && stat.isFile()) return path$73;
 	};
 	/**
 	* Return a stat, maybe.
@@ -32236,10 +32236,10 @@ var require_view = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @return {fs.Stats}
 	* @private
 	*/
-	function tryStat(path$73) {
-		debug("stat \"%s\"", path$73);
+	function tryStat(path$74) {
+		debug("stat \"%s\"", path$74);
 		try {
-			return fs$20.statSync(path$73);
+			return fs$21.statSync(path$74);
 		} catch (e) {
 			return;
 		}
@@ -34460,7 +34460,7 @@ var require_types$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 //#region ../../node_modules/send/node_modules/mime/mime.js
 var require_mime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	require("path");
-	var fs$19 = require("fs");
+	var fs$20 = require("fs");
 	function Mime() {
 		this.types = Object.create(null);
 		this.extensions = Object.create(null);
@@ -34495,7 +34495,7 @@ var require_mime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	Mime.prototype.load = function(file) {
 		this._loading = file;
 		var map = {};
-		fs$19.readFileSync(file, "ascii").split(/[\r\n]+/).forEach(function(line) {
+		fs$20.readFileSync(file, "ascii").split(/[\r\n]+/).forEach(function(line) {
 			var fields = line.replace(/\s*#.*|^\s*|\s*$/g, "").split(/\s+/);
 			map[fields.shift()] = fields;
 		});
@@ -34505,8 +34505,8 @@ var require_mime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* Lookup a mime type based on extension
 	*/
-	Mime.prototype.lookup = function(path$70, fallback) {
-		var ext = path$70.replace(/^.*[\.\/\\]/, "").toLowerCase();
+	Mime.prototype.lookup = function(path$71, fallback) {
+		var ext = path$71.replace(/^.*[\.\/\\]/, "").toLowerCase();
 		return this.types[ext] || fallback || this.default_type;
 	};
 	/**
@@ -34774,12 +34774,12 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var escapeHtml = require_escape_html();
 	var etag = require_etag();
 	var fresh = require_fresh();
-	var fs$18 = require("fs");
+	var fs$19 = require("fs");
 	var mime = require_mime();
 	var ms = require_ms();
 	var onFinished = require_on_finished();
 	var parseRange = require_range_parser();
-	var path$18 = require("path");
+	var path$19 = require("path");
 	var statuses = require_statuses();
 	var Stream = require("stream");
 	var util$2 = require("util");
@@ -34787,11 +34787,11 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* Path function references.
 	* @private
 	*/
-	var extname = path$18.extname;
-	var join = path$18.join;
-	var normalize = path$18.normalize;
-	var resolve = path$18.resolve;
-	var sep = path$18.sep;
+	var extname = path$19.extname;
+	var join = path$19.join;
+	var normalize = path$19.normalize;
+	var resolve = path$19.resolve;
+	var sep = path$19.sep;
 	/**
 	* Regular expression for identifying a bytes Range header.
 	* @private
@@ -34822,8 +34822,8 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @return {SendStream}
 	* @public
 	*/
-	function send(req, path$58, options) {
-		return new SendStream(req, path$58, options);
+	function send(req, path$59, options) {
+		return new SendStream(req, path$59, options);
 	}
 	/**
 	* Initialize a `SendStream` with the given `path`.
@@ -34833,11 +34833,11 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {object} [options]
 	* @private
 	*/
-	function SendStream(req, path$59, options) {
+	function SendStream(req, path$60, options) {
 		Stream.call(this);
 		var opts = options || {};
 		this.options = opts;
-		this.path = path$59;
+		this.path = path$60;
 		this.req = req;
 		this._acceptRanges = opts.acceptRanges !== void 0 ? Boolean(opts.acceptRanges) : true;
 		this._cacheControl = opts.cacheControl !== void 0 ? Boolean(opts.cacheControl) : true;
@@ -34907,8 +34907,8 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @return {SendStream}
 	* @api public
 	*/
-	SendStream.prototype.root = function root(path$60) {
-		this._root = resolve(String(path$60));
+	SendStream.prototype.root = function root(path$61) {
+		this._root = resolve(String(path$61));
 		debug("root %s", this._root);
 		return this;
 	};
@@ -35085,10 +35085,10 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {string} path
 	* @private
 	*/
-	SendStream.prototype.redirect = function redirect(path$61) {
+	SendStream.prototype.redirect = function redirect(path$62) {
 		var res = this.res;
 		if (hasListeners(this, "directory")) {
-			this.emit("directory", res, path$61);
+			this.emit("directory", res, path$62);
 			return;
 		}
 		if (this.hasTrailingSlash()) {
@@ -35115,38 +35115,38 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	SendStream.prototype.pipe = function pipe(res) {
 		var root = this._root;
 		this.res = res;
-		var path$62 = decode(this.path);
-		if (path$62 === -1) {
+		var path$63 = decode(this.path);
+		if (path$63 === -1) {
 			this.error(400);
 			return res;
 		}
-		if (~path$62.indexOf("\0")) {
+		if (~path$63.indexOf("\0")) {
 			this.error(400);
 			return res;
 		}
 		var parts;
 		if (root !== null) {
-			if (path$62) path$62 = normalize("." + sep + path$62);
-			if (UP_PATH_REGEXP.test(path$62)) {
-				debug("malicious path \"%s\"", path$62);
+			if (path$63) path$63 = normalize("." + sep + path$63);
+			if (UP_PATH_REGEXP.test(path$63)) {
+				debug("malicious path \"%s\"", path$63);
 				this.error(403);
 				return res;
 			}
-			parts = path$62.split(sep);
-			path$62 = normalize(join(root, path$62));
+			parts = path$63.split(sep);
+			path$63 = normalize(join(root, path$63));
 		} else {
-			if (UP_PATH_REGEXP.test(path$62)) {
-				debug("malicious path \"%s\"", path$62);
+			if (UP_PATH_REGEXP.test(path$63)) {
+				debug("malicious path \"%s\"", path$63);
 				this.error(403);
 				return res;
 			}
-			parts = normalize(path$62).split(sep);
-			path$62 = resolve(path$62);
+			parts = normalize(path$63).split(sep);
+			path$63 = resolve(path$63);
 		}
 		if (containsDotFile(parts)) {
 			var access = this._dotfiles;
 			if (access === void 0) access = parts[parts.length - 1][0] === "." ? this._hidden ? "allow" : "ignore" : "allow";
-			debug("%s dotfile \"%s\"", access, path$62);
+			debug("%s dotfile \"%s\"", access, path$63);
 			switch (access) {
 				case "allow": break;
 				case "deny":
@@ -35158,10 +35158,10 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 		}
 		if (this._index.length && this.hasTrailingSlash()) {
-			this.sendIndex(path$62);
+			this.sendIndex(path$63);
 			return res;
 		}
-		this.sendFile(path$62);
+		this.sendFile(path$63);
 		return res;
 	};
 	/**
@@ -35170,7 +35170,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {String} path
 	* @api public
 	*/
-	SendStream.prototype.send = function send(path$63, stat) {
+	SendStream.prototype.send = function send(path$64, stat) {
 		var len = stat.size;
 		var options = this.options;
 		var opts = {};
@@ -35182,9 +35182,9 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			this.headersAlreadySent();
 			return;
 		}
-		debug("pipe \"%s\"", path$63);
-		this.setHeader(path$63, stat);
-		this.type(path$63);
+		debug("pipe \"%s\"", path$64);
+		this.setHeader(path$64, stat);
+		this.type(path$64);
 		if (this.isConditionalGET()) {
 			if (this.isPreconditionFailure()) {
 				this.error(412);
@@ -35227,7 +35227,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			res.end();
 			return;
 		}
-		this.stream(path$63, opts);
+		this.stream(path$64, opts);
 	};
 	/**
 	* Transfer file for `path`.
@@ -35235,22 +35235,22 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {String} path
 	* @api private
 	*/
-	SendStream.prototype.sendFile = function sendFile(path$64) {
+	SendStream.prototype.sendFile = function sendFile(path$65) {
 		var i = 0;
 		var self = this;
-		debug("stat \"%s\"", path$64);
-		fs$18.stat(path$64, function onstat(err, stat) {
-			if (err && err.code === "ENOENT" && !extname(path$64) && path$64[path$64.length - 1] !== sep) return next(err);
+		debug("stat \"%s\"", path$65);
+		fs$19.stat(path$65, function onstat(err, stat) {
+			if (err && err.code === "ENOENT" && !extname(path$65) && path$65[path$65.length - 1] !== sep) return next(err);
 			if (err) return self.onStatError(err);
-			if (stat.isDirectory()) return self.redirect(path$64);
-			self.emit("file", path$64, stat);
-			self.send(path$64, stat);
+			if (stat.isDirectory()) return self.redirect(path$65);
+			self.emit("file", path$65, stat);
+			self.send(path$65, stat);
 		});
 		function next(err) {
 			if (self._extensions.length <= i) return err ? self.onStatError(err) : self.error(404);
-			var p = path$64 + "." + self._extensions[i++];
+			var p = path$65 + "." + self._extensions[i++];
 			debug("stat \"%s\"", p);
-			fs$18.stat(p, function(err, stat) {
+			fs$19.stat(p, function(err, stat) {
 				if (err) return next(err);
 				if (stat.isDirectory()) return next();
 				self.emit("file", p, stat);
@@ -35264,7 +35264,7 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {String} path
 	* @api private
 	*/
-	SendStream.prototype.sendIndex = function sendIndex(path$65) {
+	SendStream.prototype.sendIndex = function sendIndex(path$66) {
 		var i = -1;
 		var self = this;
 		function next(err) {
@@ -35272,9 +35272,9 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				if (err) return self.onStatError(err);
 				return self.error(404);
 			}
-			var p = join(path$65, self._index[i]);
+			var p = join(path$66, self._index[i]);
 			debug("stat \"%s\"", p);
-			fs$18.stat(p, function(err, stat) {
+			fs$19.stat(p, function(err, stat) {
 				if (err) return next(err);
 				if (stat.isDirectory()) return next();
 				self.emit("file", p, stat);
@@ -35290,10 +35290,10 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {Object} options
 	* @api private
 	*/
-	SendStream.prototype.stream = function stream(path$66, options) {
+	SendStream.prototype.stream = function stream(path$67, options) {
 		var self = this;
 		var res = this.res;
-		var stream$5 = fs$18.createReadStream(path$66, options);
+		var stream$5 = fs$19.createReadStream(path$67, options);
 		this.emit("stream", stream$5);
 		stream$5.pipe(res);
 		function cleanup() {
@@ -35315,10 +35315,10 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {String} path
 	* @api private
 	*/
-	SendStream.prototype.type = function type(path$67) {
+	SendStream.prototype.type = function type(path$68) {
 		var res = this.res;
 		if (res.getHeader("Content-Type")) return;
-		var type = mime.lookup(path$67);
+		var type = mime.lookup(path$68);
 		if (!type) {
 			debug("no content-type");
 			return;
@@ -35335,9 +35335,9 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {Object} stat
 	* @api private
 	*/
-	SendStream.prototype.setHeader = function setHeader(path$68, stat) {
+	SendStream.prototype.setHeader = function setHeader(path$69, stat) {
 		var res = this.res;
-		this.emit("headers", res, path$68, stat);
+		this.emit("headers", res, path$69, stat);
 		if (this._acceptRanges && !res.getHeader("Accept-Ranges")) {
 			debug("accept ranges");
 			res.setHeader("Accept-Ranges", "bytes");
@@ -35431,9 +35431,9 @@ var require_send = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @param {String} path
 	* @api private
 	*/
-	function decode(path$69) {
+	function decode(path$70) {
 		try {
-			return decodeURIComponent(path$69);
+			return decodeURIComponent(path$70);
 		} catch (err) {
 			return -1;
 		}
@@ -36855,13 +36855,13 @@ var require_application = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*/
 	app.use = function use(fn) {
 		var offset = 0;
-		var path$53 = "/";
+		var path$54 = "/";
 		if (typeof fn !== "function") {
 			var arg = fn;
 			while (Array.isArray(arg) && arg.length !== 0) arg = arg[0];
 			if (typeof arg !== "function") {
 				offset = 1;
-				path$53 = fn;
+				path$54 = fn;
 			}
 		}
 		var fns = flatten(slice.call(arguments, offset));
@@ -36869,11 +36869,11 @@ var require_application = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		this.lazyrouter();
 		var router = this._router;
 		fns.forEach(function(fn) {
-			if (!fn || !fn.handle || !fn.set) return router.use(path$53, fn);
-			debug(".use app under %s", path$53);
-			fn.mountpath = path$53;
+			if (!fn || !fn.handle || !fn.set) return router.use(path$54, fn);
+			debug(".use app under %s", path$54);
+			fn.mountpath = path$54;
 			fn.parent = this;
-			router.use(path$53, function mounted_app(req, res, next) {
+			router.use(path$54, function mounted_app(req, res, next) {
 				var orig = req.app;
 				fn.handle(req, res, function(err) {
 					setPrototypeOf(req, orig.request);
@@ -36894,9 +36894,9 @@ var require_application = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*
 	* @public
 	*/
-	app.route = function route(path$54) {
+	app.route = function route(path$55) {
 		this.lazyrouter();
-		return this._router.route(path$54);
+		return this._router.route(path$55);
 	};
 	/**
 	* Register the given template engine callback `fn`
@@ -37012,7 +37012,7 @@ var require_application = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @return {String}
 	* @private
 	*/
-	app.path = function path$55() {
+	app.path = function path$56() {
 		return this.parent ? this.parent.path() + this.mountpath : "";
 	};
 	/**
@@ -37073,10 +37073,10 @@ var require_application = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* Delegate `.VERB(...)` calls to `router.VERB(...)`.
 	*/
 	methods.forEach(function(method) {
-		app[method] = function(path$56) {
-			if (method === "get" && arguments.length === 1) return this.set(path$56);
+		app[method] = function(path$57) {
+			if (method === "get" && arguments.length === 1) return this.set(path$57);
 			this.lazyrouter();
-			var route = this._router.route(path$56);
+			var route = this._router.route(path$57);
 			route[method].apply(route, slice.call(arguments, 1));
 			return this;
 		};
@@ -37090,9 +37090,9 @@ var require_application = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @return {app} for chaining
 	* @public
 	*/
-	app.all = function all(path$57) {
+	app.all = function all(path$58) {
 		this.lazyrouter();
-		var route = this._router.route(path$57);
+		var route = this._router.route(path$58);
 		var args = slice.call(arguments, 1);
 		for (var i = 0; i < methods.length; i++) route[methods[i]].apply(route, args);
 		return this;
@@ -38827,7 +38827,7 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var http$3 = require("http");
 	var isAbsolute = require_utils$1().isAbsolute;
 	var onFinished = require_on_finished();
-	var path$17 = require("path");
+	var path$18 = require("path");
 	var statuses = require_statuses();
 	var merge = require_utils_merge();
 	var sign = require_cookie_signature().sign;
@@ -38836,9 +38836,9 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var setCharset = require_utils$1().setCharset;
 	var cookie = require_cookie();
 	var send = require_send();
-	var extname = path$17.extname;
+	var extname = path$18.extname;
 	var mime = send.mime;
-	var resolve = path$17.resolve;
+	var resolve = path$18.resolve;
 	var vary = require_vary();
 	/**
 	* Response prototype.
@@ -39102,20 +39102,20 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*
 	* @public
 	*/
-	res.sendFile = function sendFile(path$50, options, callback) {
+	res.sendFile = function sendFile(path$51, options, callback) {
 		var done = callback;
 		var req = this.req;
 		var res = this;
 		var next = req.next;
 		var opts = options || {};
-		if (!path$50) throw new TypeError("path argument is required to res.sendFile");
-		if (typeof path$50 !== "string") throw new TypeError("path must be a string to res.sendFile");
+		if (!path$51) throw new TypeError("path argument is required to res.sendFile");
+		if (typeof path$51 !== "string") throw new TypeError("path must be a string to res.sendFile");
 		if (typeof options === "function") {
 			done = options;
 			opts = {};
 		}
-		if (!opts.root && !isAbsolute(path$50)) throw new TypeError("path must be absolute or specify root to res.sendFile");
-		sendfile(res, send(req, encodeURI(path$50), opts), opts, function(err) {
+		if (!opts.root && !isAbsolute(path$51)) throw new TypeError("path must be absolute or specify root to res.sendFile");
+		sendfile(res, send(req, encodeURI(path$51), opts), opts, function(err) {
 			if (done) return done(err);
 			if (err && err.code === "EISDIR") return next();
 			if (err && err.code !== "ECONNABORTED" && err.syscall !== "write") next(err);
@@ -39161,7 +39161,7 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*
 	* @public
 	*/
-	res.sendfile = function(path$51, options, callback) {
+	res.sendfile = function(path$52, options, callback) {
 		var done = callback;
 		var req = this.req;
 		var res = this;
@@ -39171,7 +39171,7 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			done = options;
 			opts = {};
 		}
-		sendfile(res, send(req, path$51, opts), opts, function(err) {
+		sendfile(res, send(req, path$52, opts), opts, function(err) {
 			if (done) return done(err);
 			if (err && err.code === "EISDIR") return next();
 			if (err && err.code !== "ECONNABORTED" && err.syscall !== "write") next(err);
@@ -39195,7 +39195,7 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*
 	* @public
 	*/
-	res.download = function download(path$52, filename, options, callback) {
+	res.download = function download(path$53, filename, options, callback) {
 		var done = callback;
 		var name = filename;
 		var opts = options || null;
@@ -39211,7 +39211,7 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			name = null;
 			opts = filename;
 		}
-		var headers = { "Content-Disposition": contentDisposition(name || path$52) };
+		var headers = { "Content-Disposition": contentDisposition(name || path$53) };
 		if (opts && opts.headers) {
 			var keys = Object.keys(opts.headers);
 			for (var i = 0; i < keys.length; i++) {
@@ -39221,7 +39221,7 @@ var require_response = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		}
 		opts = Object.create(opts);
 		opts.headers = headers;
-		var fullPath = !opts.root ? resolve(path$52) : path$52;
+		var fullPath = !opts.root ? resolve(path$53) : path$53;
 		return this.sendFile(fullPath, opts, done);
 	};
 	/**
@@ -39707,9 +39707,9 @@ var require_serve_static = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			var forwardError = !fallthrough;
 			var originalUrl = parseUrl.original(req);
-			var path$49 = parseUrl(req).pathname;
-			if (path$49 === "/" && originalUrl.pathname.substr(-1) !== "/") path$49 = "";
-			var stream = send(req, path$49, opts);
+			var path$50 = parseUrl(req).pathname;
+			if (path$50 === "/" && originalUrl.pathname.substr(-1) !== "/") path$50 = "";
+			var stream = send(req, path$50, opts);
 			stream.on("directory", onDirectory);
 			if (setHeaders) stream.on("headers", setHeaders);
 			if (fallthrough) stream.on("file", function onFile() {
@@ -75700,6 +75700,14 @@ function stateReplaceField(content, fieldName, newValue) {
 */
 
 //#endregion
+//#region ../cli/src/core/drift.ts
+/**
+* Drift — Drift report CRUD, requirement extraction, and spec extraction
+*
+* Provides CLI tool commands for the drift-checker agent and realign workflow.
+*/
+
+//#endregion
 //#region ../cli/src/core/phase.ts
 /**
 * Phase — Phase CRUD, query, and lifecycle operations
@@ -76319,14 +76327,14 @@ const FsWatchInstances = /* @__PURE__ */ new Map();
 * @param emitRaw emits raw event data
 * @returns {NativeFsWatcher}
 */
-function createFsWatchInstance(path$41, options, listener, errHandler, emitRaw) {
+function createFsWatchInstance(path$42, options, listener, errHandler, emitRaw) {
 	const handleEvent = (rawEvent, evPath) => {
-		listener(path$41);
-		emitRaw(rawEvent, evPath, { watchedPath: path$41 });
-		if (evPath && path$41 !== evPath) fsWatchBroadcast(path.resolve(path$41, evPath), KEY_LISTENERS, path.join(path$41, evPath));
+		listener(path$42);
+		emitRaw(rawEvent, evPath, { watchedPath: path$42 });
+		if (evPath && path$42 !== evPath) fsWatchBroadcast(path.resolve(path$42, evPath), KEY_LISTENERS, path.join(path$42, evPath));
 	};
 	try {
-		return (0, fs.watch)(path$41, { persistent: options.persistent }, handleEvent);
+		return (0, fs.watch)(path$42, { persistent: options.persistent }, handleEvent);
 	} catch (error) {
 		errHandler(error);
 		return;
@@ -76351,12 +76359,12 @@ const fsWatchBroadcast = (fullPath, listenerType, val1, val2, val3) => {
 * @param options to be passed to fs_watch
 * @param handlers container for event listener functions
 */
-const setFsWatchListener = (path$45, fullPath, options, handlers) => {
+const setFsWatchListener = (path$46, fullPath, options, handlers) => {
 	const { listener, errHandler, rawEmitter } = handlers;
 	let cont = FsWatchInstances.get(fullPath);
 	let watcher;
 	if (!options.persistent) {
-		watcher = createFsWatchInstance(path$45, options, listener, errHandler, rawEmitter);
+		watcher = createFsWatchInstance(path$46, options, listener, errHandler, rawEmitter);
 		if (!watcher) return;
 		return watcher.close.bind(watcher);
 	}
@@ -76365,13 +76373,13 @@ const setFsWatchListener = (path$45, fullPath, options, handlers) => {
 		addAndConvert(cont, KEY_ERR, errHandler);
 		addAndConvert(cont, KEY_RAW, rawEmitter);
 	} else {
-		watcher = createFsWatchInstance(path$45, options, fsWatchBroadcast.bind(null, fullPath, KEY_LISTENERS), errHandler, fsWatchBroadcast.bind(null, fullPath, KEY_RAW));
+		watcher = createFsWatchInstance(path$46, options, fsWatchBroadcast.bind(null, fullPath, KEY_LISTENERS), errHandler, fsWatchBroadcast.bind(null, fullPath, KEY_RAW));
 		if (!watcher) return;
 		watcher.on(EV.ERROR, async (error) => {
 			const broadcastErr = fsWatchBroadcast.bind(null, fullPath, KEY_ERR);
 			if (cont) cont.watcherUnusable = true;
 			if (isWindows && error.code === "EPERM") try {
-				await (await (0, fs_promises.open)(path$45, "r")).close();
+				await (await (0, fs_promises.open)(path$46, "r")).close();
 				broadcastErr(error);
 			} catch (err) {}
 			else broadcastErr(error);
@@ -76407,7 +76415,7 @@ const FsWatchFileInstances = /* @__PURE__ */ new Map();
 * @param handlers container for event listener functions
 * @returns closer
 */
-const setFsWatchFileListener = (path$46, fullPath, options, handlers) => {
+const setFsWatchFileListener = (path$47, fullPath, options, handlers) => {
 	const { listener, rawEmitter } = handlers;
 	let cont = FsWatchFileInstances.get(fullPath);
 	const copts = cont && cont.options;
@@ -76431,7 +76439,7 @@ const setFsWatchFileListener = (path$46, fullPath, options, handlers) => {
 					});
 				});
 				const currmtime = curr.mtimeMs;
-				if (curr.size !== prev.size || currmtime > prev.mtimeMs || currmtime === 0) foreach(cont.listeners, (listener) => listener(path$46, curr));
+				if (curr.size !== prev.size || currmtime > prev.mtimeMs || currmtime === 0) foreach(cont.listeners, (listener) => listener(path$47, curr));
 			})
 		};
 		FsWatchFileInstances.set(fullPath, cont);
@@ -76461,22 +76469,22 @@ var NodeFsHandler = class {
 	* @param listener on fs change
 	* @returns closer for the watcher instance
 	*/
-	_watchWithNodeFs(path$42, listener) {
+	_watchWithNodeFs(path$43, listener) {
 		const opts = this.fsw.options;
-		const directory = path.dirname(path$42);
-		const basename = path.basename(path$42);
+		const directory = path.dirname(path$43);
+		const basename = path.basename(path$43);
 		this.fsw._getWatchedDir(directory).add(basename);
-		const absolutePath = path.resolve(path$42);
+		const absolutePath = path.resolve(path$43);
 		const options = { persistent: opts.persistent };
 		if (!listener) listener = EMPTY_FN;
 		let closer;
 		if (opts.usePolling) {
 			options.interval = opts.interval !== opts.binaryInterval && isBinaryPath(basename) ? opts.binaryInterval : opts.interval;
-			closer = setFsWatchFileListener(path$42, absolutePath, options, {
+			closer = setFsWatchFileListener(path$43, absolutePath, options, {
 				listener,
 				rawEmitter: this.fsw._emitRaw
 			});
-		} else closer = setFsWatchListener(path$42, absolutePath, options, {
+		} else closer = setFsWatchListener(path$43, absolutePath, options, {
 			listener,
 			errHandler: this._boundHandleError,
 			rawEmitter: this.fsw._emitRaw
@@ -76494,7 +76502,7 @@ var NodeFsHandler = class {
 		const parent = this.fsw._getWatchedDir(dirname);
 		let prevStats = stats;
 		if (parent.has(basename)) return;
-		const listener = async (path$47, newStats) => {
+		const listener = async (path$48, newStats) => {
 			if (!this.fsw._throttle(THROTTLE_MODE_WATCH, file, 5)) return;
 			if (!newStats || newStats.mtimeMs === 0) try {
 				const newStats = await (0, fs_promises.stat)(file);
@@ -76503,10 +76511,10 @@ var NodeFsHandler = class {
 				const mt = newStats.mtimeMs;
 				if (!at || at <= mt || mt !== prevStats.mtimeMs) this.fsw._emit(EV.CHANGE, file, newStats);
 				if ((isMacos || isLinux || isFreeBSD) && prevStats.ino !== newStats.ino) {
-					this.fsw._closeFile(path$47);
+					this.fsw._closeFile(path$48);
 					prevStats = newStats;
 					const closer = this._watchWithNodeFs(file, listener);
-					if (closer) this.fsw._addPathCloser(path$47, closer);
+					if (closer) this.fsw._addPathCloser(path$48, closer);
 				} else prevStats = newStats;
 			} catch (error) {
 				this.fsw._remove(dirname, basename);
@@ -76533,7 +76541,7 @@ var NodeFsHandler = class {
 	* @param item basename of this item
 	* @returns true if no more processing is needed for this entry.
 	*/
-	async _handleSymlink(entry, directory, path$48, item) {
+	async _handleSymlink(entry, directory, path$49, item) {
 		if (this.fsw.closed) return;
 		const full = entry.fullPath;
 		const dir = this.fsw._getWatchedDir(directory);
@@ -76541,7 +76549,7 @@ var NodeFsHandler = class {
 			this.fsw._incrReadyCount();
 			let linkPath;
 			try {
-				linkPath = await (0, fs_promises.realpath)(path$48);
+				linkPath = await (0, fs_promises.realpath)(path$49);
 			} catch (e) {
 				this.fsw._emitReady();
 				return true;
@@ -76550,12 +76558,12 @@ var NodeFsHandler = class {
 			if (dir.has(item)) {
 				if (this.fsw._symlinkPaths.get(full) !== linkPath) {
 					this.fsw._symlinkPaths.set(full, linkPath);
-					this.fsw._emit(EV.CHANGE, path$48, entry.stats);
+					this.fsw._emit(EV.CHANGE, path$49, entry.stats);
 				}
 			} else {
 				dir.add(item);
 				this.fsw._symlinkPaths.set(full, linkPath);
-				this.fsw._emit(EV.ADD, path$48, entry.stats);
+				this.fsw._emit(EV.ADD, path$49, entry.stats);
 			}
 			this.fsw._emitReady();
 			return true;
@@ -76580,17 +76588,17 @@ var NodeFsHandler = class {
 				return;
 			}
 			const item = entry.path;
-			let path$43 = path.join(directory, item);
+			let path$44 = path.join(directory, item);
 			current.add(item);
-			if (entry.stats.isSymbolicLink() && await this._handleSymlink(entry, directory, path$43, item)) return;
+			if (entry.stats.isSymbolicLink() && await this._handleSymlink(entry, directory, path$44, item)) return;
 			if (this.fsw.closed) {
 				stream = void 0;
 				return;
 			}
 			if (item === target || !target && !previous.has(item)) {
 				this.fsw._incrReadyCount();
-				path$43 = path.join(dir, path.relative(dir, path$43));
-				this._addToNodeFs(path$43, initialAdd, wh, depth + 1);
+				path$44 = path.join(dir, path.relative(dir, path$44));
+				this._addToNodeFs(path$44, initialAdd, wh, depth + 1);
 			}
 		}).on(EV.ERROR, this._boundHandleError);
 		return new Promise((resolve, reject) => {
@@ -76653,13 +76661,13 @@ var NodeFsHandler = class {
 	* @param depth Child path actually targeted for watch
 	* @param target Child path actually targeted for watch
 	*/
-	async _addToNodeFs(path$44, initialAdd, priorWh, depth, target) {
+	async _addToNodeFs(path$45, initialAdd, priorWh, depth, target) {
 		const ready = this.fsw._emitReady;
-		if (this.fsw._isIgnored(path$44) || this.fsw.closed) {
+		if (this.fsw._isIgnored(path$45) || this.fsw.closed) {
 			ready();
 			return false;
 		}
-		const wh = this.fsw._getWatchHelpers(path$44);
+		const wh = this.fsw._getWatchHelpers(path$45);
 		if (priorWh) {
 			wh.filterPath = (entry) => priorWh.filterPath(entry);
 			wh.filterDir = (entry) => priorWh.filterDir(entry);
@@ -76674,29 +76682,29 @@ var NodeFsHandler = class {
 			const follow = this.fsw.options.followSymlinks;
 			let closer;
 			if (stats.isDirectory()) {
-				const absPath = path.resolve(path$44);
-				const targetPath = follow ? await (0, fs_promises.realpath)(path$44) : path$44;
+				const absPath = path.resolve(path$45);
+				const targetPath = follow ? await (0, fs_promises.realpath)(path$45) : path$45;
 				if (this.fsw.closed) return;
 				closer = await this._handleDir(wh.watchPath, stats, initialAdd, depth, target, wh, targetPath);
 				if (this.fsw.closed) return;
 				if (absPath !== targetPath && targetPath !== void 0) this.fsw._symlinkPaths.set(absPath, targetPath);
 			} else if (stats.isSymbolicLink()) {
-				const targetPath = follow ? await (0, fs_promises.realpath)(path$44) : path$44;
+				const targetPath = follow ? await (0, fs_promises.realpath)(path$45) : path$45;
 				if (this.fsw.closed) return;
 				const parent = path.dirname(wh.watchPath);
 				this.fsw._getWatchedDir(parent).add(wh.watchPath);
 				this.fsw._emit(EV.ADD, wh.watchPath, stats);
-				closer = await this._handleDir(parent, stats, initialAdd, depth, path$44, wh, targetPath);
+				closer = await this._handleDir(parent, stats, initialAdd, depth, path$45, wh, targetPath);
 				if (this.fsw.closed) return;
-				if (targetPath !== void 0) this.fsw._symlinkPaths.set(path.resolve(path$44), targetPath);
+				if (targetPath !== void 0) this.fsw._symlinkPaths.set(path.resolve(path$45), targetPath);
 			} else closer = this._handleFile(wh.watchPath, stats, initialAdd);
 			ready();
-			if (closer) this.fsw._addPathCloser(path$44, closer);
+			if (closer) this.fsw._addPathCloser(path$45, closer);
 			return false;
 		} catch (error) {
 			if (this.fsw._handleError(error)) {
 				ready();
-				return path$44;
+				return path$45;
 			}
 		}
 	}
@@ -76733,22 +76741,22 @@ function createPattern(matcher) {
 	};
 	return () => false;
 }
-function normalizePath(path$20) {
-	if (typeof path$20 !== "string") throw new Error("string expected");
-	path$20 = path.normalize(path$20);
-	path$20 = path$20.replace(/\\/g, "/");
+function normalizePath(path$21) {
+	if (typeof path$21 !== "string") throw new Error("string expected");
+	path$21 = path.normalize(path$21);
+	path$21 = path$21.replace(/\\/g, "/");
 	let prepend = false;
-	if (path$20.startsWith("//")) prepend = true;
+	if (path$21.startsWith("//")) prepend = true;
 	const DOUBLE_SLASH_RE = /\/\//;
-	while (path$20.match(DOUBLE_SLASH_RE)) path$20 = path$20.replace(DOUBLE_SLASH_RE, "/");
-	if (prepend) path$20 = "/" + path$20;
-	return path$20;
+	while (path$21.match(DOUBLE_SLASH_RE)) path$21 = path$21.replace(DOUBLE_SLASH_RE, "/");
+	if (prepend) path$21 = "/" + path$21;
+	return path$21;
 }
 function matchPatterns(patterns, testString, stats) {
-	const path$30 = normalizePath(testString);
+	const path$31 = normalizePath(testString);
 	for (let index = 0; index < patterns.length; index++) {
 		const pattern = patterns[index];
-		if (pattern(path$30, stats)) return true;
+		if (pattern(path$31, stats)) return true;
 	}
 	return false;
 }
@@ -76773,14 +76781,14 @@ const toUnix = (string) => {
 	if (prepend) str = SLASH + str;
 	return str;
 };
-const normalizePathToUnix = (path$21) => toUnix(path.normalize(toUnix(path$21)));
-const normalizeIgnored = (cwd = "") => (path$22) => {
-	if (typeof path$22 === "string") return normalizePathToUnix(path.isAbsolute(path$22) ? path$22 : path.join(cwd, path$22));
-	else return path$22;
+const normalizePathToUnix = (path$22) => toUnix(path.normalize(toUnix(path$22)));
+const normalizeIgnored = (cwd = "") => (path$23) => {
+	if (typeof path$23 === "string") return normalizePathToUnix(path.isAbsolute(path$23) ? path$23 : path.join(cwd, path$23));
+	else return path$23;
 };
-const getAbsolutePath = (path$23, cwd) => {
-	if (path.isAbsolute(path$23)) return path$23;
-	return path.join(cwd, path$23);
+const getAbsolutePath = (path$24, cwd) => {
+	if (path.isAbsolute(path$24)) return path$24;
+	return path.join(cwd, path$24);
 };
 const EMPTY_SET = Object.freeze(/* @__PURE__ */ new Set());
 /**
@@ -76830,10 +76838,10 @@ var DirEntry = class {
 const STAT_METHOD_F = "stat";
 const STAT_METHOD_L = "lstat";
 var WatchHelper = class {
-	constructor(path$24, follow, fsw) {
+	constructor(path$25, follow, fsw) {
 		this.fsw = fsw;
-		const watchPath = path$24;
-		this.path = path$24 = path$24.replace(REPLACER_RE, "");
+		const watchPath = path$25;
+		this.path = path$25 = path$25.replace(REPLACER_RE, "");
 		this.watchPath = watchPath;
 		this.fullWatchPath = path.resolve(watchPath);
 		this.dirParts = [];
@@ -76946,17 +76954,17 @@ var FSWatcher = class extends events.EventEmitter {
 		this.closed = false;
 		this._closePromise = void 0;
 		let paths = unifyPaths(paths_);
-		if (cwd) paths = paths.map((path$31) => {
-			return getAbsolutePath(path$31, cwd);
+		if (cwd) paths = paths.map((path$32) => {
+			return getAbsolutePath(path$32, cwd);
 		});
-		paths.forEach((path$32) => {
-			this._removeIgnoredPath(path$32);
+		paths.forEach((path$33) => {
+			this._removeIgnoredPath(path$33);
 		});
 		this._userIgnored = void 0;
 		if (!this._readyCount) this._readyCount = 0;
 		this._readyCount += paths.length;
-		Promise.all(paths.map(async (path$33) => {
-			const res = await this._nodeFsHandler._addToNodeFs(path$33, !_internal, void 0, 0, _origAdd);
+		Promise.all(paths.map(async (path$34) => {
+			const res = await this._nodeFsHandler._addToNodeFs(path$34, !_internal, void 0, 0, _origAdd);
 			if (res) this._emitReady();
 			return res;
 		})).then((results) => {
@@ -76974,15 +76982,15 @@ var FSWatcher = class extends events.EventEmitter {
 		if (this.closed) return this;
 		const paths = unifyPaths(paths_);
 		const { cwd } = this.options;
-		paths.forEach((path$25) => {
-			if (!path.isAbsolute(path$25) && !this._closers.has(path$25)) {
-				if (cwd) path$25 = path.join(cwd, path$25);
-				path$25 = path.resolve(path$25);
+		paths.forEach((path$26) => {
+			if (!path.isAbsolute(path$26) && !this._closers.has(path$26)) {
+				if (cwd) path$26 = path.join(cwd, path$26);
+				path$26 = path.resolve(path$26);
 			}
-			this._closePath(path$25);
-			this._addIgnoredPath(path$25);
-			if (this._watched.has(path$25)) this._addIgnoredPath({
-				path: path$25,
+			this._closePath(path$26);
+			this._addIgnoredPath(path$26);
+			if (this._watched.has(path$26)) this._addIgnoredPath({
+				path: path$26,
 				recursive: true
 			});
 			this._userIgnored = void 0;
@@ -77038,34 +77046,34 @@ var FSWatcher = class extends events.EventEmitter {
 	* @param stats arguments to be passed with event
 	* @returns the error if defined, otherwise the value of the FSWatcher instance's `closed` flag
 	*/
-	async _emit(event, path$26, stats) {
+	async _emit(event, path$27, stats) {
 		if (this.closed) return;
 		const opts = this.options;
-		if (isWindows) path$26 = path.normalize(path$26);
-		if (opts.cwd) path$26 = path.relative(opts.cwd, path$26);
-		const args = [path$26];
+		if (isWindows) path$27 = path.normalize(path$27);
+		if (opts.cwd) path$27 = path.relative(opts.cwd, path$27);
+		const args = [path$27];
 		if (stats != null) args.push(stats);
 		const awf = opts.awaitWriteFinish;
 		let pw;
-		if (awf && (pw = this._pendingWrites.get(path$26))) {
+		if (awf && (pw = this._pendingWrites.get(path$27))) {
 			pw.lastChange = /* @__PURE__ */ new Date();
 			return this;
 		}
 		if (opts.atomic) {
 			if (event === EVENTS.UNLINK) {
-				this._pendingUnlinks.set(path$26, [event, ...args]);
+				this._pendingUnlinks.set(path$27, [event, ...args]);
 				setTimeout(() => {
-					this._pendingUnlinks.forEach((entry, path$34) => {
+					this._pendingUnlinks.forEach((entry, path$35) => {
 						this.emit(...entry);
 						this.emit(EVENTS.ALL, ...entry);
-						this._pendingUnlinks.delete(path$34);
+						this._pendingUnlinks.delete(path$35);
 					});
 				}, typeof opts.atomic === "number" ? opts.atomic : 100);
 				return this;
 			}
-			if (event === EVENTS.ADD && this._pendingUnlinks.has(path$26)) {
+			if (event === EVENTS.ADD && this._pendingUnlinks.has(path$27)) {
 				event = EVENTS.CHANGE;
-				this._pendingUnlinks.delete(path$26);
+				this._pendingUnlinks.delete(path$27);
 			}
 		}
 		if (awf && (event === EVENTS.ADD || event === EVENTS.CHANGE) && this._readyEmitted) {
@@ -77080,14 +77088,14 @@ var FSWatcher = class extends events.EventEmitter {
 					this.emitWithAll(event, args);
 				}
 			};
-			this._awaitWriteFinish(path$26, awf.stabilityThreshold, event, awfEmit);
+			this._awaitWriteFinish(path$27, awf.stabilityThreshold, event, awfEmit);
 			return this;
 		}
 		if (event === EVENTS.CHANGE) {
-			if (!this._throttle(EVENTS.CHANGE, path$26, 50)) return this;
+			if (!this._throttle(EVENTS.CHANGE, path$27, 50)) return this;
 		}
 		if (opts.alwaysStat && stats === void 0 && (event === EVENTS.ADD || event === EVENTS.ADD_DIR || event === EVENTS.CHANGE)) {
-			const fullPath = opts.cwd ? path.join(opts.cwd, path$26) : path$26;
+			const fullPath = opts.cwd ? path.join(opts.cwd, path$27) : path$27;
 			let stats;
 			try {
 				stats = await (0, fs_promises.stat)(fullPath);
@@ -77114,20 +77122,20 @@ var FSWatcher = class extends events.EventEmitter {
 	* @param timeout duration of time to suppress duplicate actions
 	* @returns tracking object or false if action should be suppressed
 	*/
-	_throttle(actionType, path$35, timeout) {
+	_throttle(actionType, path$36, timeout) {
 		if (!this._throttled.has(actionType)) this._throttled.set(actionType, /* @__PURE__ */ new Map());
 		const action = this._throttled.get(actionType);
 		if (!action) throw new Error("invalid throttle");
-		const actionPath = action.get(path$35);
+		const actionPath = action.get(path$36);
 		if (actionPath) {
 			actionPath.count++;
 			return false;
 		}
 		let timeoutObject;
 		const clear = () => {
-			const item = action.get(path$35);
+			const item = action.get(path$36);
 			const count = item ? item.count : 0;
-			action.delete(path$35);
+			action.delete(path$36);
 			clearTimeout(timeoutObject);
 			if (item) clearTimeout(item.timeoutObject);
 			return count;
@@ -77138,7 +77146,7 @@ var FSWatcher = class extends events.EventEmitter {
 			clear,
 			count: 0
 		};
-		action.set(path$35, thr);
+		action.set(path$36, thr);
 		return thr;
 	}
 	_incrReadyCount() {
@@ -77152,34 +77160,34 @@ var FSWatcher = class extends events.EventEmitter {
 	* @param event
 	* @param awfEmit Callback to be called when ready for event to be emitted.
 	*/
-	_awaitWriteFinish(path$27, threshold, event, awfEmit) {
+	_awaitWriteFinish(path$28, threshold, event, awfEmit) {
 		const awf = this.options.awaitWriteFinish;
 		if (typeof awf !== "object") return;
 		const pollInterval = awf.pollInterval;
 		let timeoutHandler;
-		let fullPath = path$27;
-		if (this.options.cwd && !path.isAbsolute(path$27)) fullPath = path.join(this.options.cwd, path$27);
+		let fullPath = path$28;
+		if (this.options.cwd && !path.isAbsolute(path$28)) fullPath = path.join(this.options.cwd, path$28);
 		const now = /* @__PURE__ */ new Date();
 		const writes = this._pendingWrites;
 		function awaitWriteFinishFn(prevStat) {
 			(0, fs.stat)(fullPath, (err, curStat) => {
-				if (err || !writes.has(path$27)) {
+				if (err || !writes.has(path$28)) {
 					if (err && err.code !== "ENOENT") awfEmit(err);
 					return;
 				}
 				const now = Number(/* @__PURE__ */ new Date());
-				if (prevStat && curStat.size !== prevStat.size) writes.get(path$27).lastChange = now;
-				if (now - writes.get(path$27).lastChange >= threshold) {
-					writes.delete(path$27);
+				if (prevStat && curStat.size !== prevStat.size) writes.get(path$28).lastChange = now;
+				if (now - writes.get(path$28).lastChange >= threshold) {
+					writes.delete(path$28);
 					awfEmit(void 0, curStat);
 				} else timeoutHandler = setTimeout(awaitWriteFinishFn, pollInterval, curStat);
 			});
 		}
-		if (!writes.has(path$27)) {
-			writes.set(path$27, {
+		if (!writes.has(path$28)) {
+			writes.set(path$28, {
 				lastChange: now,
 				cancelWait: () => {
-					writes.delete(path$27);
+					writes.delete(path$28);
 					clearTimeout(timeoutHandler);
 					return event;
 				}
@@ -77190,24 +77198,24 @@ var FSWatcher = class extends events.EventEmitter {
 	/**
 	* Determines whether user has asked to ignore this path.
 	*/
-	_isIgnored(path$36, stats) {
-		if (this.options.atomic && DOT_RE.test(path$36)) return true;
+	_isIgnored(path$37, stats) {
+		if (this.options.atomic && DOT_RE.test(path$37)) return true;
 		if (!this._userIgnored) {
 			const { cwd } = this.options;
 			const ignored = (this.options.ignored || []).map(normalizeIgnored(cwd));
 			this._userIgnored = anymatch([...[...this._ignoredPaths].map(normalizeIgnored(cwd)), ...ignored], void 0);
 		}
-		return this._userIgnored(path$36, stats);
+		return this._userIgnored(path$37, stats);
 	}
-	_isntIgnored(path$37, stat) {
-		return !this._isIgnored(path$37, stat);
+	_isntIgnored(path$38, stat) {
+		return !this._isIgnored(path$38, stat);
 	}
 	/**
 	* Provides a set of common helpers and properties relating to symlink handling.
 	* @param path file or directory pattern being watched
 	*/
-	_getWatchHelpers(path$38) {
-		return new WatchHelper(path$38, this.options.followSymlinks, this);
+	_getWatchHelpers(path$39) {
+		return new WatchHelper(path$39, this.options.followSymlinks, this);
 	}
 	/**
 	* Provides directory tracking objects
@@ -77233,50 +77241,50 @@ var FSWatcher = class extends events.EventEmitter {
 	* @param item      base path of item/directory
 	*/
 	_remove(directory, item, isDirectory) {
-		const path$28 = path.join(directory, item);
-		const fullPath = path.resolve(path$28);
-		isDirectory = isDirectory != null ? isDirectory : this._watched.has(path$28) || this._watched.has(fullPath);
-		if (!this._throttle("remove", path$28, 100)) return;
+		const path$29 = path.join(directory, item);
+		const fullPath = path.resolve(path$29);
+		isDirectory = isDirectory != null ? isDirectory : this._watched.has(path$29) || this._watched.has(fullPath);
+		if (!this._throttle("remove", path$29, 100)) return;
 		if (!isDirectory && this._watched.size === 1) this.add(directory, item, true);
-		this._getWatchedDir(path$28).getChildren().forEach((nested) => this._remove(path$28, nested));
+		this._getWatchedDir(path$29).getChildren().forEach((nested) => this._remove(path$29, nested));
 		const parent = this._getWatchedDir(directory);
 		const wasTracked = parent.has(item);
 		parent.remove(item);
 		if (this._symlinkPaths.has(fullPath)) this._symlinkPaths.delete(fullPath);
-		let relPath = path$28;
-		if (this.options.cwd) relPath = path.relative(this.options.cwd, path$28);
+		let relPath = path$29;
+		if (this.options.cwd) relPath = path.relative(this.options.cwd, path$29);
 		if (this.options.awaitWriteFinish && this._pendingWrites.has(relPath)) {
 			if (this._pendingWrites.get(relPath).cancelWait() === EVENTS.ADD) return;
 		}
-		this._watched.delete(path$28);
+		this._watched.delete(path$29);
 		this._watched.delete(fullPath);
 		const eventName = isDirectory ? EVENTS.UNLINK_DIR : EVENTS.UNLINK;
-		if (wasTracked && !this._isIgnored(path$28)) this._emit(eventName, path$28);
-		this._closePath(path$28);
+		if (wasTracked && !this._isIgnored(path$29)) this._emit(eventName, path$29);
+		this._closePath(path$29);
 	}
 	/**
 	* Closes all watchers for a path
 	*/
-	_closePath(path$29) {
-		this._closeFile(path$29);
-		const dir = path.dirname(path$29);
-		this._getWatchedDir(dir).remove(path.basename(path$29));
+	_closePath(path$30) {
+		this._closeFile(path$30);
+		const dir = path.dirname(path$30);
+		this._getWatchedDir(dir).remove(path.basename(path$30));
 	}
 	/**
 	* Closes only file-specific watchers
 	*/
-	_closeFile(path$39) {
-		const closers = this._closers.get(path$39);
+	_closeFile(path$40) {
+		const closers = this._closers.get(path$40);
 		if (!closers) return;
 		closers.forEach((closer) => closer());
-		this._closers.delete(path$39);
+		this._closers.delete(path$40);
 	}
-	_addPathCloser(path$40, closer) {
+	_addPathCloser(path$41, closer) {
 		if (!closer) return;
-		let list = this._closers.get(path$40);
+		let list = this._closers.get(path$41);
 		if (!list) {
 			list = [];
-			this._closers.set(path$40, list);
+			this._closers.set(path$41, list);
 		}
 		list.push(closer);
 	}

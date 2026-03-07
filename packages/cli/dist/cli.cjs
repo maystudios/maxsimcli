@@ -4722,6 +4722,12 @@ const MODEL_PROFILES = {
 		balanced: "sonnet",
 		budget: "haiku",
 		tokenburner: "opus"
+	},
+	"maxsim-drift-checker": {
+		quality: "sonnet",
+		balanced: "sonnet",
+		budget: "haiku",
+		tokenburner: "opus"
 	}
 };
 /** Thrown by output() to signal successful command completion. */
@@ -12030,6 +12036,19 @@ const FRONTMATTER_SCHEMAS = {
 		"verified",
 		"status",
 		"score"
+	] },
+	review: { required: [
+		"status",
+		"critical_count",
+		"warning_count"
+	] },
+	drift: { required: [
+		"status",
+		"checked",
+		"total_items",
+		"critical_count",
+		"warning_count",
+		"info_count"
 	] }
 };
 function cmdFrontmatterGet(cwd, filePath, field) {
@@ -14560,6 +14579,164 @@ function cmdValidateHealth(cwd, options) {
 }
 
 //#endregion
+//#region src/core/drift.ts
+/**
+* Drift — Drift report CRUD, requirement extraction, and spec extraction
+*
+* Provides CLI tool commands for the drift-checker agent and realign workflow.
+*/
+const DRIFT_REPORT_NAME = "DRIFT-REPORT.md";
+/**
+* Read the drift report from .planning/DRIFT-REPORT.md.
+* Returns parsed frontmatter and body content, or structured error if not found.
+*/
+function cmdDriftReadReport(cwd) {
+	const content = safeReadFile(planningPath(cwd, DRIFT_REPORT_NAME));
+	if (!content) return cmdOk({
+		found: false,
+		path: `.planning/${DRIFT_REPORT_NAME}`,
+		error: "Drift report not found"
+	});
+	const frontmatter = extractFrontmatter(content);
+	const bodyMatch = content.match(/^---\n[\s\S]+?\n---\n?([\s\S]*)$/);
+	const body = bodyMatch ? bodyMatch[1].trim() : content;
+	return cmdOk({
+		found: true,
+		path: `.planning/${DRIFT_REPORT_NAME}`,
+		frontmatter,
+		body
+	});
+}
+/**
+* Write content to .planning/DRIFT-REPORT.md.
+* Supports direct content or reading from a file (tmpfile pattern for large reports).
+*/
+function cmdDriftWriteReport(cwd, content, contentFile) {
+	let reportContent;
+	if (contentFile) {
+		const fileContent = safeReadFile(node_path.default.isAbsolute(contentFile) ? contentFile : node_path.default.join(cwd, contentFile));
+		if (!fileContent) return cmdErr(`Content file not found: ${contentFile}`);
+		reportContent = fileContent;
+	} else if (content) reportContent = content;
+	else return cmdErr("Either --content or --content-file is required");
+	const reportPath = planningPath(cwd, DRIFT_REPORT_NAME);
+	const planningDir = planningPath(cwd);
+	if (!node_fs.default.existsSync(planningDir)) return cmdErr(".planning/ directory does not exist");
+	try {
+		node_fs.default.writeFileSync(reportPath, reportContent, "utf-8");
+		return cmdOk({
+			written: true,
+			path: `.planning/${DRIFT_REPORT_NAME}`
+		});
+	} catch (e) {
+		debugLog("drift-write-report-failed", e);
+		return cmdErr(`Failed to write drift report: ${e instanceof Error ? e.message : String(e)}`);
+	}
+}
+/**
+* Extract all requirements from .planning/REQUIREMENTS.md.
+* Parses requirement lines matching `- [ ] **ID**: description` or `- [x] **ID**: description`.
+*/
+function cmdDriftExtractRequirements(cwd) {
+	const content = safeReadFile(planningPath(cwd, "REQUIREMENTS.md"));
+	if (!content) return cmdOk({
+		found: false,
+		path: ".planning/REQUIREMENTS.md",
+		requirements: []
+	});
+	const requirements = [];
+	const lines = content.split("\n");
+	for (let i = 0; i < lines.length; i++) {
+		const match = lines[i].match(/^-\s+\[([ xX])\]\s+\*\*([^*]+)\*\*[:\s]+(.+)/);
+		if (match) requirements.push({
+			id: match[2].trim(),
+			description: match[3].trim(),
+			complete: match[1].toLowerCase() === "x",
+			line_number: i + 1
+		});
+	}
+	return cmdOk({
+		found: true,
+		path: ".planning/REQUIREMENTS.md",
+		count: requirements.length,
+		requirements
+	});
+}
+/**
+* Extract no-go rules from .planning/NO-GOS.md.
+* Returns array of no-go items with section context, or empty if file missing.
+*/
+function cmdDriftExtractNoGos(cwd) {
+	const content = safeReadFile(planningPath(cwd, "NO-GOS.md"));
+	if (!content) return cmdOk({
+		found: false,
+		path: ".planning/NO-GOS.md",
+		nogos: []
+	});
+	const nogos = [];
+	const lines = content.split("\n");
+	let currentSection = "General";
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i];
+		const headingMatch = line.match(/^#{2,3}\s+(.+)/);
+		if (headingMatch) {
+			currentSection = headingMatch[1].trim();
+			continue;
+		}
+		const bulletMatch = line.match(/^\s*[-*]\s+(.+)/);
+		if (bulletMatch) {
+			const ruleText = bulletMatch[1].trim();
+			if (ruleText.length > 5) nogos.push({
+				rule: ruleText,
+				section: currentSection,
+				line_number: i + 1
+			});
+		}
+	}
+	return cmdOk({
+		found: true,
+		path: ".planning/NO-GOS.md",
+		count: nogos.length,
+		nogos
+	});
+}
+/**
+* Read .planning/CONVENTIONS.md and return its full content.
+* Returns the raw content for agent analysis, or null if missing.
+*/
+function cmdDriftExtractConventions(cwd) {
+	const content = safeReadFile(planningPath(cwd, "CONVENTIONS.md"));
+	if (!content) return cmdOk({
+		found: false,
+		path: ".planning/CONVENTIONS.md",
+		content: null
+	});
+	return cmdOk({
+		found: true,
+		path: ".planning/CONVENTIONS.md",
+		content
+	});
+}
+/**
+* Read existing DRIFT-REPORT.md frontmatter for diff tracking.
+* Returns previous_hash and checked date, or null if no report exists.
+*/
+function cmdDriftPreviousHash(cwd) {
+	const content = safeReadFile(planningPath(cwd, DRIFT_REPORT_NAME));
+	if (!content) return cmdOk({
+		found: false,
+		hash: null,
+		checked_date: null
+	});
+	const frontmatter = extractFrontmatter(content);
+	return cmdOk({
+		found: true,
+		hash: frontmatter.previous_hash ?? null,
+		checked_date: frontmatter.checked ?? null
+	});
+}
+
+//#endregion
 //#region src/core/phase.ts
 /**
 * Phase — Phase CRUD, query, and lifecycle operations
@@ -16696,6 +16873,210 @@ function cmdInitProgress(cwd) {
 		config_path: ".planning/config.json"
 	});
 }
+/**
+* Scan .planning/codebase/ for .md files and return relative paths.
+* Returns empty array if the directory does not exist.
+*/
+function listCodebaseDocs(cwd) {
+	const codebaseDir = planningPath(cwd, "codebase");
+	try {
+		return node_fs.default.readdirSync(codebaseDir).filter((f) => f.endsWith(".md")).map((f) => node_path.default.join(".planning", "codebase", f));
+	} catch {
+		return [];
+	}
+}
+function cmdInitExecutor(cwd, phase) {
+	if (!phase) return cmdErr("phase required for init executor");
+	const config = loadConfig(cwd);
+	const phaseInfo = findPhaseInternal(cwd, phase);
+	const codebaseDocs = listCodebaseDocs(cwd);
+	const result = {
+		executor_model: resolveModelInternal(cwd, "maxsim-executor"),
+		verifier_model: resolveModelInternal(cwd, "maxsim-verifier"),
+		commit_docs: config.commit_docs,
+		parallelization: config.parallelization,
+		branching_strategy: config.branching_strategy,
+		phase_branch_template: config.phase_branch_template,
+		milestone_branch_template: config.milestone_branch_template,
+		phase_found: !!phaseInfo,
+		phase_dir: phaseInfo?.directory ?? null,
+		phase_number: phaseInfo?.phase_number ?? null,
+		phase_name: phaseInfo?.phase_name ?? null,
+		state_path: ".planning/STATE.md",
+		codebase_docs: codebaseDocs
+	};
+	if (pathExistsInternal(cwd, ".planning/CONVENTIONS.md")) result.conventions_path = ".planning/CONVENTIONS.md";
+	return cmdOk(result);
+}
+function cmdInitPlanner(cwd, phase) {
+	if (!phase) return cmdErr("phase required for init planner");
+	const config = loadConfig(cwd);
+	const phaseInfo = findPhaseInternal(cwd, phase);
+	const phase_req_ids = extractReqIds(cwd, phase);
+	const codebaseDocs = listCodebaseDocs(cwd);
+	const result = {
+		planner_model: resolveModelInternal(cwd, "maxsim-planner"),
+		checker_model: resolveModelInternal(cwd, "maxsim-plan-checker"),
+		commit_docs: config.commit_docs,
+		research_enabled: config.research,
+		plan_checker_enabled: config.plan_checker,
+		phase_found: !!phaseInfo,
+		phase_dir: phaseInfo?.directory ?? null,
+		phase_number: phaseInfo?.phase_number ?? null,
+		phase_name: phaseInfo?.phase_name ?? null,
+		phase_req_ids,
+		has_research: phaseInfo?.has_research ?? false,
+		has_context: phaseInfo?.has_context ?? false,
+		has_plans: (phaseInfo?.plans?.length ?? 0) > 0,
+		plan_count: phaseInfo?.plans?.length ?? 0,
+		state_path: ".planning/STATE.md",
+		roadmap_path: ".planning/ROADMAP.md",
+		requirements_path: ".planning/REQUIREMENTS.md",
+		codebase_docs: codebaseDocs
+	};
+	if (pathExistsInternal(cwd, ".planning/CONVENTIONS.md")) result.conventions_path = ".planning/CONVENTIONS.md";
+	if (phaseInfo?.directory) {
+		const artifacts = scanPhaseArtifacts(cwd, phaseInfo.directory);
+		if (artifacts.context_path) result.context_path = artifacts.context_path;
+		if (artifacts.research_path) result.research_path = artifacts.research_path;
+	}
+	return cmdOk(result);
+}
+function cmdInitResearcher(cwd, phase) {
+	if (!phase) return cmdErr("phase required for init researcher");
+	const config = loadConfig(cwd);
+	const phaseInfo = findPhaseInternal(cwd, phase);
+	const phase_req_ids = extractReqIds(cwd, phase);
+	const codebaseDocs = listCodebaseDocs(cwd);
+	const result = {
+		researcher_model: resolveModelInternal(cwd, "maxsim-phase-researcher"),
+		commit_docs: config.commit_docs,
+		brave_search: config.brave_search,
+		phase_found: !!phaseInfo,
+		phase_dir: phaseInfo?.directory ?? null,
+		phase_number: phaseInfo?.phase_number ?? null,
+		phase_name: phaseInfo?.phase_name ?? null,
+		padded_phase: phaseInfo?.phase_number?.padStart(2, "0") ?? null,
+		phase_req_ids,
+		has_research: phaseInfo?.has_research ?? false,
+		has_context: phaseInfo?.has_context ?? false,
+		state_path: ".planning/STATE.md",
+		roadmap_path: ".planning/ROADMAP.md",
+		requirements_path: ".planning/REQUIREMENTS.md",
+		codebase_docs: codebaseDocs
+	};
+	if (pathExistsInternal(cwd, ".planning/CONVENTIONS.md")) result.conventions_path = ".planning/CONVENTIONS.md";
+	if (phaseInfo?.directory) {
+		const artifacts = scanPhaseArtifacts(cwd, phaseInfo.directory);
+		if (artifacts.context_path) result.context_path = artifacts.context_path;
+	}
+	return cmdOk(result);
+}
+function cmdInitVerifier(cwd, phase) {
+	if (!phase) return cmdErr("phase required for init verifier");
+	const config = loadConfig(cwd);
+	const phaseInfo = findPhaseInternal(cwd, phase);
+	const phase_req_ids = extractReqIds(cwd, phase);
+	const codebaseDocs = listCodebaseDocs(cwd);
+	return cmdOk({
+		verifier_model: resolveModelInternal(cwd, "maxsim-verifier"),
+		commit_docs: config.commit_docs,
+		phase_found: !!phaseInfo,
+		phase_dir: phaseInfo?.directory ?? null,
+		phase_number: phaseInfo?.phase_number ?? null,
+		phase_name: phaseInfo?.phase_name ?? null,
+		phase_req_ids,
+		state_path: ".planning/STATE.md",
+		roadmap_path: ".planning/ROADMAP.md",
+		requirements_path: ".planning/REQUIREMENTS.md",
+		codebase_docs: codebaseDocs
+	});
+}
+function cmdInitDebugger(cwd, phase) {
+	const config = loadConfig(cwd);
+	const phaseInfo = phase ? findPhaseInternal(cwd, phase) : null;
+	const codebaseDocs = listCodebaseDocs(cwd);
+	const result = {
+		debugger_model: resolveModelInternal(cwd, "maxsim-debugger"),
+		commit_docs: config.commit_docs,
+		phase_found: !!phaseInfo,
+		phase_dir: phaseInfo?.directory ?? null,
+		phase_number: phaseInfo?.phase_number ?? null,
+		phase_name: phaseInfo?.phase_name ?? null,
+		state_path: ".planning/STATE.md",
+		codebase_docs: codebaseDocs
+	};
+	if (pathExistsInternal(cwd, ".planning/CONVENTIONS.md")) result.conventions_path = ".planning/CONVENTIONS.md";
+	return cmdOk(result);
+}
+function cmdInitCheckDrift(cwd) {
+	const config = loadConfig(cwd);
+	const driftModel = resolveModelInternal(cwd, "maxsim-drift-checker");
+	const hasPlanning = pathExistsInternal(cwd, ".planning");
+	const hasRequirements = pathExistsInternal(cwd, ".planning/REQUIREMENTS.md");
+	const hasRoadmap = pathExistsInternal(cwd, ".planning/ROADMAP.md");
+	const hasNogos = pathExistsInternal(cwd, ".planning/NO-GOS.md");
+	const hasConventions = pathExistsInternal(cwd, ".planning/CONVENTIONS.md");
+	const hasPreviousReport = pathExistsInternal(cwd, ".planning/DRIFT-REPORT.md");
+	const specFiles = [];
+	if (hasRequirements) specFiles.push(".planning/REQUIREMENTS.md");
+	if (hasRoadmap) specFiles.push(".planning/ROADMAP.md");
+	if (pathExistsInternal(cwd, ".planning/STATE.md")) specFiles.push(".planning/STATE.md");
+	if (hasNogos) specFiles.push(".planning/NO-GOS.md");
+	if (hasConventions) specFiles.push(".planning/CONVENTIONS.md");
+	let phaseDirs = [];
+	try {
+		phaseDirs = listSubDirs(phasesPath(cwd), true).map((d) => `.planning/phases/${d}`);
+	} catch {}
+	let archivedMilestoneDirs = [];
+	try {
+		archivedMilestoneDirs = getArchivedPhaseDirs(cwd).map((a) => a.basePath);
+		archivedMilestoneDirs = [...new Set(archivedMilestoneDirs)];
+	} catch {}
+	const codebaseDocs = listCodebaseDocs(cwd);
+	return cmdOk({
+		drift_model: driftModel,
+		commit_docs: config.commit_docs,
+		has_planning: hasPlanning,
+		has_requirements: hasRequirements,
+		has_roadmap: hasRoadmap,
+		has_nogos: hasNogos,
+		has_conventions: hasConventions,
+		has_previous_report: hasPreviousReport,
+		previous_report_path: hasPreviousReport ? ".planning/DRIFT-REPORT.md" : null,
+		spec_files: specFiles,
+		phase_dirs: phaseDirs,
+		archived_milestone_dirs: archivedMilestoneDirs,
+		state_path: ".planning/STATE.md",
+		requirements_path: ".planning/REQUIREMENTS.md",
+		roadmap_path: ".planning/ROADMAP.md",
+		nogos_path: hasNogos ? ".planning/NO-GOS.md" : null,
+		conventions_path: hasConventions ? ".planning/CONVENTIONS.md" : null,
+		codebase_docs: codebaseDocs
+	});
+}
+function cmdInitRealign(cwd, direction) {
+	const config = loadConfig(cwd);
+	const hasReport = pathExistsInternal(cwd, ".planning/DRIFT-REPORT.md");
+	const hasPlanning = pathExistsInternal(cwd, ".planning");
+	let phaseDirs = [];
+	try {
+		phaseDirs = listSubDirs(phasesPath(cwd), true).map((d) => `.planning/phases/${d}`);
+	} catch {}
+	const codebaseDocs = listCodebaseDocs(cwd);
+	return cmdOk({
+		commit_docs: config.commit_docs,
+		direction: direction ?? null,
+		has_report: hasReport,
+		report_path: ".planning/DRIFT-REPORT.md",
+		has_planning: hasPlanning,
+		state_path: ".planning/STATE.md",
+		roadmap_path: ".planning/ROADMAP.md",
+		requirements_path: ".planning/REQUIREMENTS.md",
+		phase_dirs: phaseDirs,
+		codebase_docs: codebaseDocs
+	});
+}
 
 //#endregion
 //#region src/cli.ts
@@ -16885,6 +17266,19 @@ const handleValidate = (args, cwd, raw) => {
 	if (handler) return handler();
 	error("Unknown validate subcommand. Available: consistency, health");
 };
+const handleDrift = (args, cwd, raw) => {
+	const sub = args[1];
+	const handler = sub ? {
+		"read-report": () => cmdDriftReadReport(cwd),
+		"extract-requirements": () => cmdDriftExtractRequirements(cwd),
+		"extract-nogos": () => cmdDriftExtractNoGos(cwd),
+		"extract-conventions": () => cmdDriftExtractConventions(cwd),
+		"write-report": () => cmdDriftWriteReport(cwd, getFlag(args, "--content"), getFlag(args, "--content-file")),
+		"previous-hash": () => cmdDriftPreviousHash(cwd)
+	}[sub] : void 0;
+	if (handler) return handleResult(handler(), raw);
+	error("Unknown drift subcommand. Available: read-report, extract-requirements, extract-nogos, extract-conventions, write-report, previous-hash");
+};
 const handleInit = (args, cwd, raw) => {
 	const workflow = args[1];
 	const handler = workflow ? {
@@ -16900,10 +17294,17 @@ const handleInit = (args, cwd, raw) => {
 		"milestone-op": () => cmdInitMilestoneOp(cwd),
 		"map-codebase": () => cmdInitMapCodebase(cwd),
 		"init-existing": () => cmdInitExisting(cwd),
-		"progress": () => cmdInitProgress(cwd)
+		"progress": () => cmdInitProgress(cwd),
+		"executor": () => cmdInitExecutor(cwd, args[2]),
+		"planner": () => cmdInitPlanner(cwd, args[2]),
+		"researcher": () => cmdInitResearcher(cwd, args[2]),
+		"verifier": () => cmdInitVerifier(cwd, args[2]),
+		"debugger": () => cmdInitDebugger(cwd, args[2]),
+		"check-drift": () => cmdInitCheckDrift(cwd),
+		"realign": () => cmdInitRealign(cwd, args[2])
 	}[workflow] : void 0;
 	if (handler) return handleResult(handler(), raw);
-	error(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, init-existing, progress`);
+	error(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, init-existing, progress, executor, planner, researcher, verifier, debugger, check-drift, realign`);
 };
 const COMMANDS = {
 	"state": handleState,
@@ -16938,6 +17339,7 @@ const COMMANDS = {
 	"phase": handlePhase,
 	"milestone": handleMilestone,
 	"validate": handleValidate,
+	"drift": handleDrift,
 	"progress": (args, cwd, raw) => handleResult(cmdProgressRender(cwd, args[1] || "json", raw), raw),
 	"todo": (args, cwd, raw) => {
 		if (args[1] === "complete") handleResult(cmdTodoComplete(cwd, args[2], raw), raw);
