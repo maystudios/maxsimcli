@@ -127,6 +127,14 @@ CONTEXT: [✓ if has_context | - if not]
 [Next phase/plan objective from roadmap analyze]
 ```
 
+**Performance metrics table truncation:**
+
+When displaying the performance metrics table from STATE.md (the `## Performance Metrics` section):
+- Show only the **last 20 entries** (most recent) by default.
+- If there are more than 20 metric entries in STATE.md, add a note above the table: `Showing last 20 of {total} metrics entries.`
+- This is a **display-time truncation only** — STATE.md retains all metrics as the source of truth. Do not modify or remove older entries from STATE.md.
+- If there are 20 or fewer entries, show all without any truncation note.
+
 </step>
 
 <step name="route">
