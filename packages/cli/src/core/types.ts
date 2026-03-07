@@ -91,7 +91,8 @@ export type AgentType =
   | 'maxsim-codebase-mapper'
   | 'maxsim-verifier'
   | 'maxsim-plan-checker'
-  | 'maxsim-integration-checker';
+  | 'maxsim-integration-checker'
+  | 'maxsim-drift-checker';
 
 export type ModelProfiles = Record<AgentType, ModelProfileEntry>;
 
@@ -598,6 +599,61 @@ export interface DebuggerAgentContext {
   phase_name: string | null;
   state_path: string;
   conventions_path?: string;
+  codebase_docs: string[];
+}
+
+// ─── Drift detection types ──────────────────────────────────────────────────
+
+export type DriftStatus = 'drift' | 'aligned';
+export type DriftSeverity = 'critical' | 'warning' | 'info';
+export type DriftDirection = 'spec_ahead' | 'code_ahead' | 'undocumented';
+export type DriftItemStatus = 'NEW' | 'RESOLVED' | 'UNCHANGED';
+
+export interface DriftReportFrontmatter {
+  status: DriftStatus;
+  checked: string;
+  previous_hash: string | null;
+  previous_report_date: string | null;
+  total_items: number;
+  aligned_count: number;
+  critical_count: number;
+  warning_count: number;
+  info_count: number;
+  undocumented_count: number;
+  spec_files_checked: string[];
+}
+
+export interface CheckDriftContext {
+  drift_model: string;
+  commit_docs: boolean;
+  has_planning: boolean;
+  has_requirements: boolean;
+  has_roadmap: boolean;
+  has_nogos: boolean;
+  has_conventions: boolean;
+  has_previous_report: boolean;
+  previous_report_path: string | null;
+  spec_files: string[];
+  phase_dirs: string[];
+  archived_milestone_dirs: string[];
+  state_path: string;
+  requirements_path: string;
+  roadmap_path: string;
+  nogos_path: string | null;
+  conventions_path: string | null;
+  codebase_docs: string[];
+}
+
+export interface RealignContext {
+  commit_docs: boolean;
+  direction: string | null;
+  has_report: boolean;
+  report_path: string;
+  has_planning: boolean;
+  state_path: string;
+  roadmap_path: string;
+  requirements_path: string;
+  phase_dirs: string[];
   codebase_docs: string[];
 }
 

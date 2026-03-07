@@ -99,6 +99,9 @@ export const FRONTMATTER_SCHEMAS: Record<string, FrontmatterSchema> = {
   review: {
     required: ['status', 'critical_count', 'warning_count'],
   },
+  drift: {
+    required: ['status', 'checked', 'total_items', 'critical_count', 'warning_count', 'info_count'],
+  },
 };
 
 // ─── Frontmatter CRUD commands ──────────────────────────────────────────────

@@ -39,6 +39,7 @@ export const MODEL_PROFILES: ModelProfiles = {
   'maxsim-verifier':             { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', tokenburner: 'opus' },
   'maxsim-plan-checker':         { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', tokenburner: 'opus' },
   'maxsim-integration-checker':  { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', tokenburner: 'opus' },
+  'maxsim-drift-checker':        { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', tokenburner: 'opus' },
 };
 
 // ─── Output helpers ──────────────────────────────────────────────────────────
