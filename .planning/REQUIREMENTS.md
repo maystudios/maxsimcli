@@ -17,9 +17,9 @@
 
 ### Deep Init Questioning
 
-- [ ] **INIT-01**: New-project and init-existing ask comprehensive tech stack questions before generating any plan
-- [ ] **INIT-02**: Requirements gathering explicitly covers no-gos, hard constraints, and anti-patterns
-- [ ] **INIT-03**: Agentic research step investigates tech stack choices and surfaces trade-offs the user may not have considered
+- [x] **INIT-01**: New-project and init-existing ask comprehensive tech stack questions before generating any plan
+- [x] **INIT-02**: Requirements gathering explicitly covers no-gos, hard constraints, and anti-patterns
+- [x] **INIT-03**: Agentic research step investigates tech stack choices and surfaces trade-offs the user may not have considered
 - [x] **INIT-04**: Generated context documents (PROJECT.md, REQUIREMENTS.md, NO-GOS.md) contain enough detail that a fresh agent can begin work without requesting clarification
 
 ### Agent Coherence
@@ -73,9 +73,9 @@
 | ROT-02 | Phase 1 | Complete |
 | ROT-03 | Phase 1 | Pending |
 | ROT-04 | Phase 1 | Complete |
-| INIT-01 | Phase 2 | Pending |
-| INIT-02 | Phase 2 | Pending |
-| INIT-03 | Phase 2 | Pending |
+| INIT-01 | Phase 2 | Complete |
+| INIT-02 | Phase 2 | Complete |
+| INIT-03 | Phase 2 | Complete |
 | INIT-04 | Phase 2 | Complete |
 | AGENT-01 | Phase 3 | Pending |
 | AGENT-02 | Phase 3 | Pending |

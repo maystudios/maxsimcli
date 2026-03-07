@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-03-06)
 
 Milestone: v5.0 Context-Aware SDD
 Phase: 2 of 5 (executing)
-Plan: 02-02 complete (02-01 + 02-02 done, 02-03 remaining)
+Plan: 02-01 + 02-02 complete (02-03 remaining)
 Status: executing
-Last activity: 2026-03-07 -- Completed 02-02 Template creation (CONVENTIONS.md + PROJECT.md Tech Stack Decisions)
+Last activity: 2026-03-07 -- Completed 02-01 Deep init questioning building blocks (domain checklist, no-gos, research agents)
 
 Progress: [██████░░░░] 60%
 
@@ -24,6 +24,7 @@ Progress: [██████░░░░] 60%
 | 01 | 01 | ~15min | 2 | 6 |
 | Phase 01 P02 | ~10min | 2 tasks | 6 files |
 | Phase 02 P02 | 2min | 2 tasks | 2 files |
+| Phase 02 P01 | 5min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -34,6 +35,9 @@ Progress: [██████░░░░] 60%
 - **Phase order**: Phase 1 (rot prevention) first. Phase 2 (init) and Phase 5 (workflow gaps) can run in parallel. Phase 3 (agents) depends on Phase 2. Phase 4 (drift) depends on Phase 3.
 - [Phase 02]: CONVENTIONS.md template created with 4 must-have sections: Tech Stack, File Layout, Error Handling, Testing
 - [Phase 02]: PROJECT.md template expanded with Tech Stack Decisions table for research-locked choices
+- [Phase 02-01]: questioning.md rewritten with 21-domain silent checklist, 80% gate, no-gos tracking -- all in-context, no runtime code
+- [Phase 02-01]: Research agent enhanced with 5 mandatory output sections + web verification confidence levels
+- [Phase 02-01]: Synthesizer gets locked decisions with approval gate and PROJECT.md enrichment
 
 ### Architecture
 
@@ -53,7 +57,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-07T00:03:37.904Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-03-07T00:05:00Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
 Next action: Execute 02-03 plan (Wire templates into init workflows)
