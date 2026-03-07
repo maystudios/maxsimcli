@@ -301,7 +301,7 @@ This review protocol applies to ALL plans including gap-closure plans. No except
    ```
 
 3. **Parse review output:**
-   Extract frontmatter from reviewer output using pattern matching for:
+   Extract frontmatter from reviewer output (reviewers produce YAML frontmatter with status fields, parseable via `extractFrontmatter()` from `frontmatter.ts`). Check:
    - `status:` field (PASS or FAIL)
    - `critical_count:` field (integer)
    - `warning_count:` field (integer)
