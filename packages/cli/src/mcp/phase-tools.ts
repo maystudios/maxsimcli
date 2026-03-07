@@ -77,15 +77,25 @@ export function registerPhaseTools(server: McpServer): void {
 
   server.tool(
     'mcp_list_phases',
-    'List all phase directories, sorted correctly. Optionally include archived phases from milestones.',
+    'List phase directories with pagination. Returns sorted phases with offset/limit support.',
     {
       include_archived: z
         .boolean()
         .optional()
         .default(false)
         .describe('Include archived phases from completed milestones'),
+      offset: z
+        .number()
+        .optional()
+        .default(0)
+        .describe('Number of phases to skip (for pagination)'),
+      limit: z
+        .number()
+        .optional()
+        .default(20)
+        .describe('Maximum number of phases to return'),
     },
-    async ({ include_archived }) => {
+    async ({ include_archived, offset, limit }) => {
       try {
         const cwd = detectProjectRoot();
         if (!cwd) {
@@ -95,7 +105,7 @@ export function registerPhaseTools(server: McpServer): void {
         const phasesDir = phasesPath(cwd);
         if (!fs.existsSync(phasesDir)) {
           return mcpSuccess(
-            { directories: [], count: 0 },
+            { directories: [], count: 0, total_count: 0, offset, limit, has_more: false },
             'No phases directory found',
           );
         }
@@ -111,9 +121,13 @@ export function registerPhaseTools(server: McpServer): void {
 
         dirs.sort((a, b) => comparePhaseNum(a, b));
 
+        const total_count = dirs.length;
+        const paginated = dirs.slice(offset, offset + limit);
+        const has_more = offset + limit < total_count;
+
         return mcpSuccess(
-          { directories: dirs, count: dirs.length },
-          `Found ${dirs.length} phase(s)`,
+          { directories: paginated, count: paginated.length, total_count, offset, limit, has_more },
+          `Showing ${paginated.length} of ${total_count} phase(s)`,
         );
       } catch (e) {
         return mcpError((e as Error).message, 'Operation failed');
