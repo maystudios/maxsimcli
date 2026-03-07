@@ -87,7 +87,7 @@ describe('install real-world verification (E2E-05)', () => {
     expect(skillDirs.length).toBeGreaterThanOrEqual(11);
 
     // Verify key skills are present
-    const expectedSkills = ['simplify', 'tdd', 'systematic-debugging', 'verification-before-completion'];
+    const expectedSkills = ['maxsim-simplify', 'tdd', 'systematic-debugging', 'verification-before-completion'];
     for (const skill of expectedSkills) {
       expect(skillDirs).toContain(skill);
     }
