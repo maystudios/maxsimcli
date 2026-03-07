@@ -6,6 +6,7 @@ Initialize a new project through unified flow: questioning, research (optional),
 Read all files referenced by the invoking prompt's execution_context before starting.
 @./references/dashboard-bridge.md
 @./references/thinking-partner.md
+@./references/questioning.md
 </required_reading>
 
 <tool_mandate>
@@ -251,13 +252,40 @@ Consult `questioning.md` for techniques:
 - Find edges
 - Reveal motivation
 
-**Check context (background, not out loud):**
+**Track context with domain checklist (background, not out loud):**
 
-As you go, mentally check the context checklist from `questioning.md`. If gaps remain, weave questions naturally. Don't suddenly switch to checklist mode.
+Follow the `<domain_checklist>` from `questioning.md`. Silently track which domains have been COVERED, marked N/A, or remain UNCOVERED as the conversation progresses. Do NOT show the checklist or switch to checklist mode. Weave uncovered domains naturally when the conversation allows.
 
-**Decision gate:**
+Also follow the `<nogos_tracking>` from `questioning.md`:
+- Watch for rejection signals, past failures, and strong opinions throughout
+- Silently accumulate no-gos — do NOT confirm each one as it comes up
+- After 5+ rounds, weave challenge-based probing naturally ("What would make this project fail?")
+- After understanding the domain, suggest common anti-patterns for their project type
 
-When you could write a clear PROJECT.md, use AskUserQuestion:
+**Count questioning rounds internally.** Each AskUserQuestion call counts as one round. Do NOT show the count to the user.
+
+**Decision gate (with coverage gate):**
+
+The "Ready?" option ONLY appears when BOTH conditions are met:
+1. Round count >= 10 (at least 10 questioning rounds completed)
+2. Domain coverage >= 80% (at least 80% of relevant domains are COVERED or N/A)
+
+If either condition is not met, continue questioning — weave uncovered domains naturally.
+
+When both conditions are met, **first display a coverage summary** (this IS shown to the user):
+
+```
+## Domain Coverage Summary
+
+**Core:** Auth (COVERED), Data Model (COVERED), API Style (N/A), Deployment (COVERED), Error Handling (UNCOVERED), Testing (COVERED)
+**Infrastructure:** Caching (N/A), Search (N/A), Monitoring (COVERED), CI/CD (COVERED), Environments (COVERED)
+**UX/Product:** Roles (COVERED), Notifications (N/A), File Uploads (N/A), i18n (N/A), Accessibility (N/A)
+**Scale/Ops:** Performance (COVERED), Concurrency (N/A), Migration (N/A), Backup (N/A), Rate Limiting (N/A)
+
+Coverage: [X]% ([covered + na] / [total]) — [X] rounds completed
+```
+
+Then use AskUserQuestion:
 
 - header: "Ready?"
 - question: "I think I understand what you're after. Ready to create PROJECT.md?"
@@ -267,7 +295,40 @@ When you could write a clear PROJECT.md, use AskUserQuestion:
 
 If "Keep exploring" — ask what they want to add, or identify gaps and probe naturally.
 
-Loop until "Create PROJECT.md" selected.
+**No-Gos Confirmation (after user selects "Create PROJECT.md"):**
+
+Before writing any documents, present ALL accumulated no-gos for user confirmation:
+
+```
+## No-Gos Collected
+
+During our conversation, I captured these boundaries:
+
+### Hard Constraints
+- [constraint 1]
+
+### Anti-Patterns
+- [pattern to avoid 1]
+
+### Previous Failures
+- [past failure 1]
+
+### Domain-Specific Risks
+- [risk 1]
+
+Anything to add, remove, or change before these become locked?
+```
+
+Use AskUserQuestion:
+- header: "No-Gos"
+- question: "Confirm these no-gos?"
+- options:
+  - "Confirmed" — Lock these no-gos
+  - "Adjust" — I want to add/remove/change some
+
+If "Adjust": capture changes via freeform, update the list, re-confirm.
+
+Loop until "Confirmed" selected. These confirmed no-gos flow into NO-GOS.md using the structured template from `templates/no-gos.md`.
 
 ## 4. Write PROJECT.md
 
@@ -442,10 +503,38 @@ Write content:
 *No-gos captured during /maxsim:new-project initialization*
 ```
 
+**CONVENTIONS.md** — Coding conventions for agents to follow:
+
+Generate `.planning/CONVENTIONS.md` using the template from `templates/conventions.md`.
+
+**If research has already run (Step 6 completed):**
+Populate from research recommendations + questioning confirmations:
+- Tech Stack: from locked decisions in research synthesis
+- File Layout: from recommended framework conventions
+- Error Handling: from user's stated preference during questioning
+- Testing: from user's stated testing strategy during questioning
+- Set `{{source}}` to "new-project init (research-informed)"
+- Set `{{generated_or_confirmed}}` to "generated"
+
+**If no research (Step 6 was skipped):**
+Populate from questioning context + reasonable defaults:
+- Tech Stack: from any technology choices mentioned during questioning
+- File Layout: from framework conventions (infer from chosen framework)
+- Error Handling: from user's stated preference or framework default
+- Testing: from user's stated strategy or framework default
+- Set `{{source}}` to "new-project init (questioning-derived)"
+- Set `{{generated_or_confirmed}}` to "generated"
+
+Write content using the 4 must-have sections (Tech Stack, File Layout, Error Handling, Testing). Remove HTML comment examples and replace with actual project-specific conventions.
+
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs artefakte-write .planning/CONVENTIONS.md
+```
+
 **Commit artefakte:**
 
 ```bash
-node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs: generate initialization artefakte" --files .planning/DECISIONS.md .planning/ACCEPTANCE-CRITERIA.md .planning/NO-GOS.md
+node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs: generate initialization artefakte" --files .planning/DECISIONS.md .planning/ACCEPTANCE-CRITERIA.md .planning/NO-GOS.md .planning/CONVENTIONS.md
 ```
 
 **If auto mode:** Generate artefakte from the provided document with reasonable inferences. Mark uncertain entries with `(inferred)`.
@@ -837,7 +926,10 @@ Commit after writing.
 ", subagent_type="maxsim-research-synthesizer", model="{synthesizer_model}", description="Synthesize research")
 ```
 
-Display research complete banner and key findings:
+**Locked Decisions Approval Gate:**
+
+After synthesis completes, read `.planning/research/SUMMARY.md` and extract the "Locked Decisions" section. Present these to the user for approval:
+
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  MAXSIM ► RESEARCH COMPLETE ✓
@@ -850,6 +942,39 @@ Display research complete banner and key findings:
 **Watch Out For:** [from SUMMARY.md]
 
 Files: `.planning/research/`
+
+## Locked Decisions (Approval Required)
+
+These decisions will flow to the planner as constraints:
+
+| # | Decision | Rationale | Alternatives Rejected | Effort |
+|---|----------|-----------|----------------------|--------|
+| 1 | [from SUMMARY.md] | ... | ... | ... |
+| 2 | [from SUMMARY.md] | ... | ... | ... |
+```
+
+Use AskUserQuestion:
+- header: "Decisions"
+- question: "Approve these locked decisions? You can override any of them."
+- options:
+  - "Approve all" — Lock these decisions as-is
+  - "Override some" — I want to change some decisions
+  - "Reject all" — Start fresh on decisions
+
+If "Override some": ask which decisions to change, capture overrides, update the locked decisions list.
+If "Reject all": remove locked decisions section from SUMMARY.md; decisions will emerge during requirements/roadmap instead.
+
+**After approval, update PROJECT.md** with the "Tech Stack Decisions" section (from template `templates/project.md`):
+
+Read the current `.planning/PROJECT.md` and append the Tech Stack Decisions section populated from the approved locked decisions. Use the format from the project.md template.
+
+```bash
+# PROJECT.md already exists from Step 4 — update it with tech stack decisions
+```
+
+Commit the updated PROJECT.md:
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs: add tech stack decisions from research" --files .planning/PROJECT.md
 ```
 
 **If "Skip research":** Continue to Step 7.
@@ -1129,6 +1254,61 @@ Use AskUserQuestion:
 node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs: create roadmap ([N] phases)" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md
 ```
 
+## 8b. Agent Dry-Run Validation
+
+**Always runs after all documents are generated — this is the quality gate for init output.**
+
+Spawn a test agent to validate that all generated docs contain enough information for a fresh agent to start Phase 1 without asking clarifying questions.
+
+```
+Task(prompt="
+You are a fresh agent about to start Phase 1 of this project.
+Read the following files and report what you would need to ask before starting work.
+
+Do NOT infer missing information. If a specific library version is not stated, report it as a gap.
+If the error handling pattern is not described, report it as a gap.
+Your job is to find what is NOT written, not to demonstrate you could figure it out.
+
+<files_to_read>
+- .planning/PROJECT.md
+- .planning/REQUIREMENTS.md
+- .planning/CONVENTIONS.md
+- .planning/NO-GOS.md
+- .planning/ROADMAP.md
+</files_to_read>
+
+Report format:
+
+## DRY-RUN RESULT
+
+### Can Start: YES/NO
+
+### Gaps Found:
+- [What information is missing]
+- [What is ambiguous]
+- [What would need clarification]
+
+### Quality Score: [1-10]
+(10 = could start immediately with zero questions, 1 = need major clarifications)
+", model="{planner_model}", description="Agent readiness dry-run")
+```
+
+**Handle dry-run results:**
+
+**If gaps found (Can Start = NO or Quality Score < 7):**
+- For each gap, update the relevant document to fill it:
+  - Missing tech versions → update CONVENTIONS.md Tech Stack
+  - Missing error handling → update CONVENTIONS.md Error Handling
+  - Ambiguous requirements → update REQUIREMENTS.md
+  - Missing constraints → update NO-GOS.md
+- Commit the fixes:
+  ```bash
+  node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs: fill gaps from agent dry-run validation" --files .planning/PROJECT.md .planning/REQUIREMENTS.md .planning/CONVENTIONS.md .planning/NO-GOS.md
+  ```
+
+**If no gaps (Can Start = YES and Quality Score >= 7):**
+- Continue to Step 9.
+
 ## 9. Done
 
 Present completion summary:
@@ -1144,6 +1324,7 @@ Present completion summary:
 |----------------|-----------------------------|
 | Project        | `.planning/PROJECT.md`      |
 | Config         | `.planning/config.json`     |
+| Conventions    | `.planning/CONVENTIONS.md`  |
 | Research       | `.planning/research/`       |
 | Requirements   | `.planning/REQUIREMENTS.md` |
 | Roadmap        | `.planning/ROADMAP.md`      |
@@ -1188,6 +1369,10 @@ Exit skill and invoke SlashCommand("/maxsim:discuss-phase 1 --auto")
 
 - `.planning/PROJECT.md`
 - `.planning/config.json`
+- `.planning/CONVENTIONS.md`
+- `.planning/NO-GOS.md`
+- `.planning/DECISIONS.md`
+- `.planning/ACCEPTANCE-CRITERIA.md`
 - `.planning/research/` (if research selected)
   - `STACK.md`
   - `FEATURES.md`
@@ -1218,6 +1403,9 @@ Exit skill and invoke SlashCommand("/maxsim:discuss-phase 1 --auto")
 - [ ] ROADMAP.md created with phases, requirement mappings, success criteria
 - [ ] STATE.md initialized
 - [ ] REQUIREMENTS.md traceability updated
+- [ ] CONVENTIONS.md generated with 4 must-have sections (Tech Stack, File Layout, Error Handling, Testing)
+- [ ] NO-GOS.md populated from confirmed no-gos during questioning
+- [ ] Agent dry-run validation passed (Quality Score >= 7)
 - [ ] User knows next step is `/maxsim:discuss-phase 1`
 
 **Atomic commits:** Each phase commits its artifacts immediately. If context is lost, artifacts persist.

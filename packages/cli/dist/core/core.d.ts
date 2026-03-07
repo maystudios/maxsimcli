@@ -85,5 +85,7 @@ export declare function loadConfigAsync(cwd: string): Promise<AppConfig>;
 export declare function findPhaseInternalAsync(cwd: string, phase: string): Promise<PhaseSearchResult | null>;
 export declare function getArchivedPhaseDirsAsync(cwd: string): Promise<ArchivedPhaseDir[]>;
 export declare function getRoadmapPhaseInternalAsync(cwd: string, phaseNum: string | number): Promise<RoadmapPhaseInfo | null>;
+export declare function archivePath(cwd: string, milestone?: string): string;
+export declare function archivePathAsync(cwd: string, milestone?: string): Promise<string>;
 export declare function getMilestoneInfoAsync(cwd: string): Promise<MilestoneInfo>;
 //# sourceMappingURL=core.d.ts.map

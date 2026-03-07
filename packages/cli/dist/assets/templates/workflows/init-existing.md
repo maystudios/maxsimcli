@@ -8,6 +8,7 @@ Output: `.planning/` directory with config.json, PROJECT.md, REQUIREMENTS.md, RO
 Read all files referenced by the invoking prompt's execution_context before starting.
 @./references/dashboard-bridge.md
 @./references/thinking-partner.md
+@./references/questioning.md
 </required_reading>
 
 <tool_mandate>
@@ -534,6 +535,130 @@ Apply thinking-partner behaviors when presenting findings:
 - **Surface unstated assumptions** — "The scan assumes X is your primary framework — is that accurate?"
 - **Make consequences visible** — "Your architecture pattern means Y for future phases."
 - **Propose alternatives** — If concerns were found, suggest approaches: "The scan found tech debt in Z. We could address it early or defer — here are the trade-offs."
+
+## Step 6b: Stack Preference Questions
+
+**If auto mode:** Skip. Use all detected technologies as-is (keep all). Proceed to Step 6c.
+
+Read `.planning/codebase/STACK.md` and extract architecturally significant dependencies.
+
+**Filter to only framework-level choices:**
+- Framework (React, Next.js, Express, Django, etc.)
+- Database (PostgreSQL, MongoDB, Redis, etc.)
+- ORM/Query builder (Drizzle, Prisma, SQLAlchemy, etc.)
+- State management (Redux, Zustand, Vuex, etc.)
+- Testing framework (Vitest, Jest, pytest, etc.)
+- Build tools (Vite, Webpack, tsup, etc.)
+
+**Explicitly EXCLUDE:**
+- Utility libraries (lodash, uuid, date-fns, etc.)
+- Dev tools (prettier, eslint, biome, etc.)
+- Type definitions (@types/*)
+- Runtime dependencies that are implementation details
+
+**Cap at 8-10 items max** to avoid overwhelming the user.
+
+Present to user:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ MAXSIM ► STACK PREFERENCES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Your codebase uses these key technologies. For each, do you want to keep, evolve, or replace?
+```
+
+For each significant dependency, use AskUserQuestion:
+- header: "[Technology Name]"
+- question: "[Technology] [version] -- [detected purpose]"
+- options:
+  - "Keep" -- Continue using [Technology] as-is
+  - "Evolve" -- Upgrade or modernize (describe target)
+  - "Replace" -- Switch to alternative (describe replacement)
+
+If "Evolve" or "Replace": capture the target via freeform follow-up.
+
+**Capture decisions as constraints** for CONVENTIONS.md and DECISIONS.md. "Keep" entries become locked stack conventions. "Evolve" entries become phase goals. "Replace" entries become phase goals with migration requirements.
+
+## Step 6c: Convention Confirmation
+
+**If auto mode:** Skip. Promote all scan-detected conventions as-is. Proceed to Step 6d.
+
+Read `.planning/codebase/CONVENTIONS.md` (from the codebase mapper agent) and extract detected coding conventions.
+
+Present scan-detected conventions to user for confirmation:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ MAXSIM ► CONVENTION CONFIRMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Your codebase uses these patterns. Should new code follow them?
+```
+
+For each major convention category (file naming, error handling, testing patterns, code style):
+
+Use AskUserQuestion:
+- header: "[Convention Category]"
+- question: "Detected: [description of convention]. Should new code follow this?"
+- options:
+  - "Yes, follow this" -- Promote to project convention
+  - "No, change it" -- Describe the preferred convention
+  - "Not sure" -- Skip for now
+
+If "No, change it": capture the preferred convention via freeform.
+
+**Promote confirmed conventions** to `.planning/CONVENTIONS.md` using the template from `templates/conventions.md`:
+- Tech Stack: from Step 6b stack preferences (keep/evolve decisions)
+- File Layout: from confirmed file structure conventions
+- Error Handling: from confirmed error handling patterns
+- Testing: from confirmed testing conventions
+- Set `{{source}}` to "init-existing scan + user confirmation"
+- Set `{{generated_or_confirmed}}` to "confirmed"
+
+Write `.planning/CONVENTIONS.md`:
+```bash
+node ~/.claude/maxsim/bin/maxsim-tools.cjs artefakte-write .planning/CONVENTIONS.md
+```
+
+## Step 6d: No-Gos from Scan
+
+**If auto mode:** Skip. Auto-generate no-gos from CONCERNS.md findings. Proceed to Step 7.
+
+Read `.planning/codebase/CONCERNS.md` (if it exists) and extract findings as candidate no-gos.
+
+Present scan findings as candidate no-gos:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ MAXSIM ► NO-GOS FROM CODEBASE SCAN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Based on the codebase scan, here are potential no-gos for new code:
+```
+
+For each significant finding from CONCERNS.md:
+
+Use AskUserQuestion:
+- header: "No-Go?"
+- question: "[Finding from CONCERNS.md] -- should this be a no-go for new code?"
+- options:
+  - "Yes, add as no-go" -- This should be explicitly forbidden
+  - "No, skip" -- This is acceptable or not relevant
+  - "Modify" -- I want to adjust the wording
+
+If "Modify": capture adjusted wording via freeform.
+
+After all findings are reviewed:
+
+Use AskUserQuestion:
+- header: "Additional"
+- question: "Any additional no-gos based on your experience with this codebase?"
+- options:
+  - "No, that covers it" -- Proceed
+  - "Yes, let me add" -- Capture additional no-gos
+
+Confirmed no-gos flow into NO-GOS.md during document generation (Step 9f) using the structured template from `templates/no-gos.md`.
 
 ## Step 7: Future Direction Questions
 
@@ -1104,6 +1229,61 @@ Write content:
 node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs: generate initialization artefakte" --files .planning/DECISIONS.md .planning/ACCEPTANCE-CRITERIA.md .planning/NO-GOS.md
 ```
 
+## Step 9g: Agent Dry-Run Validation
+
+**Always runs after all documents are generated — this is the quality gate for init output.**
+
+Spawn a test agent to validate that all generated docs contain enough information for a fresh agent to start Phase 1 without asking clarifying questions.
+
+```
+Task(prompt="
+You are a fresh agent about to start Phase 1 of this project.
+Read the following files and report what you would need to ask before starting work.
+
+Do NOT infer missing information. If a specific library version is not stated, report it as a gap.
+If the error handling pattern is not described, report it as a gap.
+Your job is to find what is NOT written, not to demonstrate you could figure it out.
+
+<files_to_read>
+- .planning/PROJECT.md
+- .planning/REQUIREMENTS.md
+- .planning/CONVENTIONS.md
+- .planning/NO-GOS.md
+- .planning/ROADMAP.md
+</files_to_read>
+
+Report format:
+
+## DRY-RUN RESULT
+
+### Can Start: YES/NO
+
+### Gaps Found:
+- [What information is missing]
+- [What is ambiguous]
+- [What would need clarification]
+
+### Quality Score: [1-10]
+(10 = could start immediately with zero questions, 1 = need major clarifications)
+", model="{planner_model}", description="Agent readiness dry-run")
+```
+
+**Handle dry-run results:**
+
+**If gaps found (Can Start = NO or Quality Score < 7):**
+- For each gap, update the relevant document to fill it:
+  - Missing tech versions → update CONVENTIONS.md Tech Stack
+  - Missing error handling → update CONVENTIONS.md Error Handling
+  - Ambiguous requirements → update REQUIREMENTS.md
+  - Missing constraints → update NO-GOS.md
+- Commit the fixes:
+  ```bash
+  node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs: fill gaps from agent dry-run validation" --files .planning/PROJECT.md .planning/REQUIREMENTS.md .planning/CONVENTIONS.md .planning/NO-GOS.md
+  ```
+
+**If no gaps (Can Start = YES and Quality Score >= 7):**
+- Continue to Step 10.
+
 ## Step 10: Git Stage and Summary
 
 Stage all changed files:
@@ -1126,6 +1306,7 @@ Print structured summary:
 Created:
   ✓ .planning/config.json         -- Workflow preferences
   ✓ .planning/PROJECT.md          -- Project context + current state
+  ✓ .planning/CONVENTIONS.md      -- Confirmed coding conventions for agents
   ✓ .planning/REQUIREMENTS.md     -- [Stage]-format requirements
   ✓ .planning/ROADMAP.md          -- [Milestone name] + [N] phases
   ✓ .planning/STATE.md            -- Pre-populated project memory
@@ -1167,6 +1348,7 @@ Print next steps:
 
 - `.planning/config.json`
 - `.planning/PROJECT.md`
+- `.planning/CONVENTIONS.md`
 - `.planning/REQUIREMENTS.md`
 - `.planning/ROADMAP.md`
 - `.planning/STATE.md`
@@ -1200,6 +1382,11 @@ Print next steps:
 - [ ] config.json created with workflow settings
 - [ ] .planning/codebase/ populated with scan documents
 - [ ] Git staging completed
+- [ ] Stack preference questions asked (keep/evolve/replace for framework-level choices)
+- [ ] Convention confirmation completed (scan-detected conventions presented to user)
+- [ ] CONVENTIONS.md generated from confirmed conventions
+- [ ] CONCERNS.md findings presented as candidate no-gos
+- [ ] Agent dry-run validation passed (Quality Score >= 7)
 - [ ] Structured summary printed
 - [ ] Next steps suggested: /maxsim:roadmap then /maxsim:plan-phase 1
 

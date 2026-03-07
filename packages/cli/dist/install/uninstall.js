@@ -41,7 +41,7 @@ const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
 const os = __importStar(require("node:os"));
 const chalk_1 = __importDefault(require("chalk"));
-const index_js_1 = require("../adapters/index.js");
+const utils_js_1 = require("./utils.js");
 const shared_js_1 = require("./shared.js");
 /**
  * Uninstall MAXSIM from the specified directory
@@ -155,7 +155,7 @@ function uninstall(isGlobal, explicitConfigDir = null) {
     // 6. Clean up settings.json
     const settingsPath = path.join(targetDir, 'settings.json');
     if (fs.existsSync(settingsPath)) {
-        const settings = (0, index_js_1.readSettings)(settingsPath);
+        const settings = (0, utils_js_1.readSettings)(settingsPath);
         let settingsModified = false;
         const statusLine = settings.statusLine;
         if (statusLine &&
@@ -207,7 +207,7 @@ function uninstall(isGlobal, explicitConfigDir = null) {
             delete settings.hooks;
         }
         if (settingsModified) {
-            (0, index_js_1.writeSettings)(settingsPath, settings);
+            (0, utils_js_1.writeSettings)(settingsPath, settings);
             removedCount++;
         }
     }

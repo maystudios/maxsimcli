@@ -23,4 +23,10 @@ export declare function cmdStateAddBlocker(cwd: string, text: string | StateBloc
 export declare function cmdStateResolveBlocker(cwd: string, text: string | null, raw: boolean): Promise<CmdResult>;
 export declare function cmdStateRecordSession(cwd: string, options: StateSessionOptions, raw: boolean): Promise<CmdResult>;
 export declare function cmdStateSnapshot(cwd: string, raw: boolean): Promise<CmdResult>;
+export interface StaleReference {
+    section: string;
+    line: string;
+    phase: string;
+}
+export declare function cmdDetectStaleContext(cwd: string): Promise<CmdResult>;
 //# sourceMappingURL=state.d.ts.map

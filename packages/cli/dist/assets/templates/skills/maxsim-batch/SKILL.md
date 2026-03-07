@@ -1,9 +1,9 @@
 ---
-name: batch-worktree
+name: maxsim-batch
 description: >-
   Decomposes large tasks into independent units and executes each in an isolated
   git worktree with its own branch and PR. Use when parallelizing work across
-  5-30 independent units or orchestrating worktree-based parallel execution. Not
+  3-30 independent units or orchestrating worktree-based parallel execution. Not
   for sequential dependencies or fewer than 3 units.
 ---
 
@@ -83,7 +83,7 @@ Before reporting completion, confirm:
 
 ## MAXSIM Integration
 
-When a plan specifies `skill: "batch-worktree"`:
+When a plan specifies `skill: "maxsim-batch"`:
 - The orchestrator decomposes the plan's tasks into independent units
 - Each unit becomes a worktree agent with its own branch and PR
 - The orchestrator tracks progress and reports the final PR list in SUMMARY.md

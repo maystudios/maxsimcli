@@ -48,31 +48,40 @@ exports.verifyInstallComplete = verifyInstallComplete;
 const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
-const index_js_1 = require("../adapters/index.js");
+const os = __importStar(require("node:os"));
+const utils_js_1 = require("./utils.js");
 // Get version from package.json — read at runtime so semantic-release's version bump
 // is reflected without needing to rebuild dist/install.cjs after the version bump.
 exports.pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'package.json'), 'utf-8'));
 // Resolve template asset root — bundled into dist/assets/templates at publish time
 exports.templatesRoot = path.resolve(__dirname, 'assets', 'templates');
 // Built-in skill names shipped with MAXSIM — used for cleanup during install/uninstall
-exports.builtInSkills = ['tdd', 'systematic-debugging', 'verification-before-completion', 'simplify', 'code-review', 'memory-management', 'using-maxsim', 'brainstorming', 'roadmap-writing'];
+exports.builtInSkills = ['tdd', 'systematic-debugging', 'verification-before-completion', 'maxsim-simplify', 'code-review', 'memory-management', 'using-maxsim', 'brainstorming', 'roadmap-writing', 'sdd', 'maxsim-batch'];
 /**
- * Get the global config directory, using the Claude adapter
+ * Get the global config directory for Claude Code.
+ * Priority: explicitDir > CLAUDE_CONFIG_DIR env > ~/.claude
  */
 function getGlobalDir(explicitDir = null) {
-    return index_js_1.claudeAdapter.getGlobalDir(explicitDir);
+    if (explicitDir) {
+        return (0, utils_js_1.expandTilde)(explicitDir);
+    }
+    if (process.env.CLAUDE_CONFIG_DIR) {
+        return (0, utils_js_1.expandTilde)(process.env.CLAUDE_CONFIG_DIR);
+    }
+    return path.join(os.homedir(), '.claude');
 }
 /**
- * Get the config directory path relative to home for hook templating
+ * Get the config directory path relative to home for hook templating.
+ * Used for path.join(homeDir, '<configDir>', ...) replacement in hooks.
  */
-function getConfigDirFromHome(isGlobal) {
-    return index_js_1.claudeAdapter.getConfigDirFromHome(isGlobal);
+function getConfigDirFromHome(_isGlobal) {
+    return "'.claude'";
 }
 /**
  * Get the local directory name
  */
 function getDirName() {
-    return index_js_1.claudeAdapter.dirName;
+    return '.claude';
 }
 /**
  * Recursively remove a directory, handling Windows read-only file attributes.
@@ -134,7 +143,7 @@ function verifyFileInstalled(filePath, description) {
  * Returns an object with `complete` (boolean) and `missing` (list of
  * component names that are absent or incomplete).
  */
-function verifyInstallComplete(configDir, _runtime, manifest = null) {
+function verifyInstallComplete(configDir, manifest = null) {
     const missing = [];
     // If a manifest exists, verify every file in it is still present
     if (manifest && manifest.files) {

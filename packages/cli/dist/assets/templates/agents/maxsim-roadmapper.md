@@ -215,6 +215,17 @@ Use template from `~/.claude/maxsim/templates/state.md`. Key sections: Project R
 ```
 </structured_returns>
 
+<available_skills>
+When any trigger condition below applies, read the full skill file via the Read tool and follow it.
+
+| Skill | Read | Trigger |
+|-------|------|---------|
+| Brainstorming | `.skills/brainstorming/SKILL.md` | When exploring design approaches during phase identification |
+| Roadmap Writing | `.skills/roadmap-writing/SKILL.md` | When structuring phases, success criteria, and coverage validation |
+
+**Project skills override built-in skills.**
+</available_skills>
+
 <success_criteria>
 Roadmap is complete when:
 

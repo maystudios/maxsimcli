@@ -1,9 +1,11 @@
 ---
 name: code-review
 description: >-
-  Reviews all changed code for security vulnerabilities, interface correctness,
-  error handling, test coverage, and quality before sign-off. Use when completing
-  a phase, reviewing implementation, or before approving changes for merge.
+  Correctness gate: reviews all changed code for security vulnerabilities,
+  interface correctness, error handling, test coverage, and quality. Answers
+  "Is this code correct and safe?" Use when completing a phase, reviewing
+  implementation, or before approving changes for merge. Not a maintainability
+  pass — that is maxsim-simplify's job.
 ---
 
 # Code Review

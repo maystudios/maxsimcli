@@ -165,6 +165,9 @@ function cmdInitPlanPhase(cwd, phase) {
         roadmap_path: '.planning/ROADMAP.md',
         requirements_path: '.planning/REQUIREMENTS.md',
     };
+    if ((0, core_js_1.pathExistsInternal)(cwd, '.planning/CONVENTIONS.md')) {
+        result.conventions_path = '.planning/CONVENTIONS.md';
+    }
     if (phaseInfo?.directory) {
         const artifacts = scanPhaseArtifacts(cwd, phaseInfo.directory);
         if (artifacts.context_path)
@@ -325,6 +328,9 @@ function cmdInitPhaseOp(cwd, phase) {
         roadmap_path: '.planning/ROADMAP.md',
         requirements_path: '.planning/REQUIREMENTS.md',
     };
+    if ((0, core_js_1.pathExistsInternal)(cwd, '.planning/CONVENTIONS.md')) {
+        result.conventions_path = '.planning/CONVENTIONS.md';
+    }
     if (phaseInfo?.directory) {
         const artifacts = scanPhaseArtifacts(cwd, phaseInfo.directory);
         if (artifacts.context_path)

@@ -2,100 +2,99 @@
 
 ## What This Is
 
-MAXSIM is a spec-driven development (SDD) system for Claude Code that prevents context rot by offloading work to fresh-context subagents. It ships as an npm package (`maxsimcli`) that installs markdown commands, workflows, agents, and skills into Claude Code's config directories. Users run `/maxsim:*` slash commands to plan, execute, and verify project phases with isolated agents.
+MAXSIM is a spec-driven development (SDD) system for Claude Code. It prevents context rot by offloading work to fresh-context subagents. Ships as an npm package (`maxsimcli`) that installs markdown commands, workflows, agents, and skills into `~/.claude/`. Users run `/maxsim:*` slash commands to plan, execute, and verify project phases.
 
 ## Core Value
 
-Every AI-assisted coding task runs with the right amount of context — no more, no less — producing consistent, correct output from phase 1 to phase 50.
+Every AI-assisted coding task runs with the right amount of context -- no more, no less -- producing consistent, correct output from phase 1 to phase 50.
 
-## Requirements
+## What Already Exists
 
-### Validated
+MAXSIM is a working product at v4.2.x with real users. The following is implemented and shipped:
 
-<!-- Shipped and confirmed valuable. -->
+### CLI & Core Engine
+- **CLI tools router** (`cli.cjs`) dispatching 150+ commands to core modules
+- **Phase lifecycle**: create, list, complete, insert, remove phases with `.planning/` directory structure
+- **State management**: STATE.md CRUD with decisions, blockers, metrics tracking
+- **Roadmap parsing**: phase goal/criteria extraction, dependency analysis
+- **Plan verification**: structure validation, health checks, auto-repair
+- **Smart context loading**: topic-based file selection to prevent context overload
+- **Model profiles**: quality/balanced/budget/tokenburner tiers with per-agent model resolution
+- **Atomic git commits** per task with conventional commit format
 
-- [x] Phase-driven project planning (new-project, init-existing, plan-phase, execute-phase)
-- [x] Fresh-context subagents for isolated task execution (11 specialized agents)
-- [x] Atomic git commits per task with state tracking
-- [x] Real-time dashboard with phase overview, terminal, and Q&A panel
-- [x] MCP server integration for Claude Code tool access
-- [x] Skill system (11 built-in skills for workflow enforcement)
-- [x] Wave-based parallel plan execution
-- [x] Multi-model profiles (quality/balanced/budget/tokenburner)
+### Agents (13 specialized subagent prompts)
+- **Executor**: runs tasks with atomic commits and deviation handling
+- **Planner**: creates phase plans with task breakdown and dependency analysis
+- **Phase Researcher**: investigates implementation approaches before planning
+- **Plan Checker**: verifies plans achieve phase goals before execution
+- **Spec Reviewer**: checks implementation matches spec (stage 1 review)
+- **Code Reviewer**: checks code quality, security, patterns (stage 2 review)
+- **Verifier**: goal-backward phase verification
+- **Debugger**: scientific method bug investigation
+- **Codebase Mapper**: parallel codebase analysis (4 focus areas)
+- **Research Synthesizer**: merges parallel research outputs
+- **Roadmapper**: creates roadmaps with phase breakdown and success criteria
+- **Project Researcher**: domain ecosystem research before roadmap creation
+- **Integration Checker**: cross-phase E2E flow verification
 
-### Active
+### Skills (11 built-in workflow enforcement skills)
+- **using-maxsim**: entry point, routes work through MAXSIM workflow
+- **tdd**: Red-Green-Refactor enforcement
+- **systematic-debugging**: root-cause analysis before any fix
+- **verification-before-completion**: evidence-first gates, blocks false completion claims
+- **code-review**: security/correctness/quality gates
+- **maxsim-simplify**: 3-reviewer parallel pattern (reuse, quality, efficiency)
+- **maxsim-batch**: worktree-based parallel execution (5-30 agents)
+- **sdd**: fresh subagent per task with mandatory 2-stage review
+- **brainstorming**: hard-gate design approval with trade-off analysis
+- **roadmap-writing**: standardized roadmap format generation
+- **memory-management**: persistent pattern/error/decision storage
 
-<!-- Current scope. Building toward these for v5.0. -->
+### Workflows (orchestration templates)
+- **execute-phase**: wave-based parallel plan execution with Execute-Review-Simplify-Review cycle
+- **plan-phase**: research -> plan -> verify loop
+- **new-project**: vision -> requirements -> acceptance criteria -> roadmap
+- **init-existing**: codebase scan -> validation -> context generation
+- **discuss-phase**: adaptive questioning before planning
+- **sdd**: spec-driven dispatch with fresh agent per task
+- **batch**: worktree-based parallel execution orchestration
 
-- [ ] SDD-native architecture — agents and skills work as a coherent system, not isolated pieces
-- [ ] Spec drift management — command to realign `.planning/` with actual codebase state
-- [ ] Deeper initialization questioning — comprehensive tech stack, requirements, and no-go gathering
-- [ ] Improved agent prompt coherence — prompts that reference and complement each other
-- [ ] Rename conflicting skills (simplify -> maxsim-simplify, batch -> maxsim-batch)
-- [ ] Remove multi-runtime adapter dead weight (focus Claude Code only)
-- [ ] Two-stage review per task (spec compliance + code quality) as standard workflow
-- [ ] Better context engineering — smart context assembly per agent role
+### Dashboard
+- **React 19 + Vite frontend** with phase overview, terminal (xterm.js), Q&A panel
+- **Express + WebSocket backend** for real-time `.planning/` file watching
+- **MCP server integration** for Claude Code tool access
+- **`maxsimcli start`** launches Dashboard + MCP + Terminal
+- **Multi-project** via port range isolation (3333-3343)
 
-### Out of Scope
-
-<!-- Explicit boundaries. -->
-
-- Multi-runtime support (OpenCode, Gemini CLI, Codex) — Claude Code only, simplifies codebase significantly
-- GUI/Electron desktop app — CLI + dashboard is sufficient
-- Cloud-hosted planning service — `.planning/` stays local/git-tracked
-- AI model provider abstraction — Claude models only via Claude Code
-
-## Context
-
-MAXSIM is at v4.2.0 with 35+ commands, 13 agents, 11 skills, and a real-time dashboard. The codebase is a 3-package npm workspaces monorepo (cli, dashboard, website). It was inspired by GSD (Get Shit Done) and Superpowers, incorporating ideas from both:
-
-- **From GSD:** Phase-driven planning, roadmap structure, state management
-- **From Superpowers:** SDD workflow (fresh subagent per task + two-stage review), skill system, hard gates
-
-Key reference: `docs/superpowers-research.md` contains a detailed comparison of Superpowers vs MAXSIM architectures, identifying what each does well.
-
-The main pain point driving v5.0: agents and skills currently operate as independent pieces rather than a coherent system. Prompts don't reference each other well, context assembly is ad-hoc, and the spec can drift from reality without a mechanism to detect and correct it.
+### Install System
+- **`npx maxsimcli@latest`** installs commands, workflows, agents, skills to `~/.claude/`
+- **Manifest tracking** with hash-based modification detection
+- **Patch persistence** for user customizations across updates
+- **Claude Code only** -- no multi-runtime selection
 
 ## Constraints
 
-- **npm delivery**: Everything must work via `npx maxsimcli@latest` — we build for external users, not the monorepo
-- **Backward compatibility**: Existing `.planning/` directories from v4.x must remain readable
-- **Claude Code only**: No need to maintain adapter abstractions for other runtimes
-- **Build verification**: `npm run build` must pass before any push to main (pre-push hook)
+- **npm delivery**: everything must work via `npx maxsimcli@latest`
+- **Backward compatibility**: existing `.planning/` directories must remain readable
+- **Claude Code only**: no adapter abstractions for other runtimes
+- **Build verification**: `npm run build` must pass before any push to main
+- **Single-user**: no multi-user collaboration support planned
 
-## Key Decisions
+## Tech Stack
 
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| Claude Code only (drop multi-runtime) | Simplifies codebase, enables deeper integration, one runtime to optimize for | -- Pending |
-| SDD as core methodology | Two-stage review (spec + quality) catches more errors than end-of-phase review | -- Pending |
-| Rename conflicting skills | Claude Code has built-in simplify/batch commands; naming collision confuses users | -- Pending |
-| MVP stage assessment | Tests + CI + npm publishing exist but agent coherence needs significant work | -- Pending |
+- TypeScript 5.9.3, Node.js 22+, npm workspaces monorepo
+- React 19 + Vite for dashboard, tsdown for Node.js bundling
+- Express + WebSockets for dashboard backend, MCP SDK for Claude integration
+- Vitest for testing, Biome for linting, semantic-release for publishing
 
-## Current State Summary
+## Known Tech Debt
 
-Tech stack: TypeScript 5.9.3, Node.js 22+, npm workspaces monorepo. React 19 + Vite for dashboard. tsdown for Node.js bundling. Express + WebSockets for dashboard backend. MCP SDK for Claude integration.
-
-Architecture: CLI tools router (150+ commands) dispatches to core modules (phase, state, roadmap, config, verify). Dashboard is Vite+React with xterm.js terminal. Commands are markdown prompts executed by Claude.
-
-Patterns: `cmd*` function prefix, `CmdResult` union type, branded types, barrel exports, conventional commits with semantic-release.
-
-## Known Risks / Tech Debt
-
-- **Large monolithic modules**: server.ts (1159 lines), verify.ts (965 lines), phase.ts (940 lines) — hard to test/refactor
-- **98 `any` type usages**: Runtime type errors not caught at compile time
-- **Mixed error handling**: Exceptions vs CmdResult vs CliOutput/CliError — unpredictable error flow
-- **Sync/async file I/O inconsistency**: Can block event loop
-- **Multi-runtime adapter code**: Dead weight now that we're Claude Code only
-
-## Codebase Analysis
-
-Detailed codebase analysis available in:
-- `.planning/codebase/STACK.md` -- Technology stack
-- `.planning/codebase/ARCHITECTURE.md` -- Architecture patterns
-- `.planning/codebase/CONVENTIONS.md` -- Code conventions
-- `.planning/codebase/CONCERNS.md` -- Known issues and tech debt
-- `.planning/codebase/STRUCTURE.md` -- File tree overview
+- Large monolithic modules: server.ts (1159 lines), verify.ts (965 lines), phase.ts (940 lines)
+- 98 `any` type usages across 26 files
+- Mixed error handling: exceptions vs CmdResult vs CliOutput/CliError
+- Sync/async file I/O inconsistency in hot paths
+- No pagination for large phase listings
+- Missing todo/bug discussion flow
 
 ---
-*Last updated: 2026-03-03 after /maxsim:init-existing initialization*
+*Rewritten 2026-03-06 -- clean slate for next milestone*

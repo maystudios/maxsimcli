@@ -45,7 +45,7 @@ exports.finishInstall = finishInstall;
 const fs = __importStar(require("node:fs"));
 const chalk_1 = __importDefault(require("chalk"));
 const prompts_1 = require("@inquirer/prompts");
-const index_js_1 = require("../adapters/index.js");
+const utils_js_1 = require("./utils.js");
 const shared_js_1 = require("./shared.js");
 const path = __importStar(require("node:path"));
 const ora_1 = __importDefault(require("ora"));
@@ -154,15 +154,15 @@ function installHookFiles(targetDir, isGlobal, failures) {
 function configureSettingsHooks(targetDir, isGlobal) {
     const dirName = (0, shared_js_1.getDirName)();
     const settingsPath = path.join(targetDir, 'settings.json');
-    const settings = cleanupOrphanedHooks((0, index_js_1.readSettings)(settingsPath));
+    const settings = cleanupOrphanedHooks((0, utils_js_1.readSettings)(settingsPath));
     const statuslineCommand = isGlobal
-        ? (0, index_js_1.buildHookCommand)(targetDir, 'maxsim-statusline.js')
+        ? (0, utils_js_1.buildHookCommand)(targetDir, 'maxsim-statusline.js')
         : 'node ' + dirName + '/hooks/maxsim-statusline.js';
     const updateCheckCommand = isGlobal
-        ? (0, index_js_1.buildHookCommand)(targetDir, 'maxsim-check-update.js')
+        ? (0, utils_js_1.buildHookCommand)(targetDir, 'maxsim-check-update.js')
         : 'node ' + dirName + '/hooks/maxsim-check-update.js';
     const contextMonitorCommand = isGlobal
-        ? (0, index_js_1.buildHookCommand)(targetDir, 'maxsim-context-monitor.js')
+        ? (0, utils_js_1.buildHookCommand)(targetDir, 'maxsim-context-monitor.js')
         : 'node ' + dirName + '/hooks/maxsim-context-monitor.js';
     // Configure SessionStart hook for update checking
     if (!settings.hooks) {
@@ -249,7 +249,7 @@ function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallS
         console.log(`  ${chalk_1.default.green('\u2713')} Configured statusline`);
     }
     if (settingsPath && settings) {
-        (0, index_js_1.writeSettings)(settingsPath, settings);
+        (0, utils_js_1.writeSettings)(settingsPath, settings);
     }
     console.log(`
   ${chalk_1.default.green('Done!')} Launch Claude Code and run ${chalk_1.default.cyan('/maxsim:help')}.

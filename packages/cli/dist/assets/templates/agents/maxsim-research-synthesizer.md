@@ -58,18 +58,70 @@ Read all 4 files from `.planning/research/` and extract:
 
 Per area (Stack/Features/Architecture/Pitfalls): assign confidence level based on source quality. Identify gaps needing attention during planning.
 
-## Step 5: Write SUMMARY.md
+## Step 5: Produce Locked Decisions
+
+Extract the most impactful decisions from research into a **Locked Decisions** table. These flow to the planner as hard constraints.
+
+### Locked Decisions Format
+
+```markdown
+## Locked Decisions
+
+These decisions have been validated by research and approved by the user. They flow to the planner as constraints.
+
+| # | Decision | Rationale | Alternatives Rejected | Effort |
+|---|----------|-----------|----------------------|--------|
+| 1 | [e.g., Use PostgreSQL] | [Why this over alternatives] | [e.g., MongoDB (schema flexibility not needed)] | M |
+| 2 | [e.g., Use NextAuth] | [Why this over alternatives] | [e.g., Clerk (SaaS dependency)] | S |
+```
+
+### Rules for Locked Decisions
+
+- **Cross-reference PROJECT.md:** Read `.planning/PROJECT.md` Key Decisions section. Do NOT lock decisions that contradict what the user already decided during questioning. User decisions from questioning take precedence over research recommendations.
+- **Limit scope:** Only lock decisions that are architecturally significant (framework, database, auth, hosting, major patterns). Do NOT lock utility library choices.
+- **Include effort:** Every locked decision must have a T-shirt size effort estimate (S/M/L/XL).
+- **Rationale required:** Every locked decision must explain WHY, not just WHAT.
+
+## Step 5b: Approval Gate
+
+After producing locked decisions, the workflow MUST present them to the user before proceeding:
+
+**Approval gate instruction:** Present the Locked Decisions table to the user with the message: "These are the technology decisions from research. You can approve all, override specific decisions, or request changes." The user must explicitly approve before locked decisions flow to the planner. User can override any decision.
+
+Do NOT proceed to roadmap creation until the user has approved locked decisions.
+
+## Step 5c: Enrich PROJECT.md with Tech Stack Decisions
+
+After user approval, add a **Tech Stack Decisions** section to `.planning/PROJECT.md` containing the approved locked decisions. This makes PROJECT.md self-contained for downstream agents.
+
+```markdown
+## Tech Stack Decisions
+
+> Locked during research phase. Approved by user on {{date}}.
+
+| Category | Decision | Rationale |
+|----------|----------|-----------|
+| Database | PostgreSQL | Relational queries dominate; strong ecosystem |
+| Auth | NextAuth | Self-hosted, no vendor lock-in |
+| ...      | ...      | ...       |
+```
+
+Cross-reference: These decisions appear in both PROJECT.md (for quick agent reference) and `.planning/research/SUMMARY.md` (with full rationale and alternatives).
+
+## Step 6: Write SUMMARY.md
 
 Use template: `~/.claude/maxsim/templates/research-project/SUMMARY.md`
 Write to `.planning/research/SUMMARY.md`
 
-## Step 6: Commit All Research
+Include the Locked Decisions table in SUMMARY.md as a dedicated section.
+
+## Step 7: Commit All Research
 
 ```bash
 node ~/.claude/maxsim/bin/maxsim-tools.cjs commit "docs: complete project research" --files .planning/research/
 ```
 
-## Step 7: Return Summary
+## Step 8: Return Summary
 
 </execution_flow>
 

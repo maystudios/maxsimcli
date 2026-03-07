@@ -84,7 +84,7 @@ Task(
 - .planning/STATE.md (Project State)
 - .planning/ROADMAP.md (Phase structure)
 - ./CLAUDE.md (if exists — follow project-specific guidelines)
-- .skills/batch-worktree/SKILL.md (if exists — batch-worktree constraints)
+- .skills/maxsim-batch/SKILL.md (if exists — maxsim-batch constraints)
 </files_to_read>
 
 **Project skills:** Check .skills/ directory (if exists) — read SKILL.md files, plans should account for project skill rules

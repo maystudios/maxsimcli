@@ -54,8 +54,10 @@ Skills are behavioral rules that activate automatically based on context:
 | `memory-management` | Recurring patterns, errors, or decisions worth persisting |
 | `brainstorming` | Before implementing any significant feature or design |
 | `roadmap-writing` | When creating or restructuring a project roadmap |
-| `simplify` | When reviewing and cleaning up code changes |
-| `code-review` | When reviewing implementation quality |
+| `maxsim-simplify` | Maintainability pass: reviewing code for duplication, dead code, and unnecessary complexity |
+| `code-review` | Correctness gate: reviewing implementation for security, interfaces, errors, and test coverage |
+| `sdd` | Executing sequential tasks where context rot is a concern (spec-driven dispatch) |
+| `maxsim-batch` | Parallelizing work across 3-30 independent units in isolated worktrees |
 
 ### Available Agents
 

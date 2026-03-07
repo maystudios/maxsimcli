@@ -486,6 +486,7 @@ When any trigger condition below applies, read the full skill file via the Read 
 |-------|------|---------|
 | TDD Enforcement | `.skills/tdd/SKILL.md` | When identifying TDD candidates during task breakdown |
 | Verification Before Completion | `.skills/verification-before-completion/SKILL.md` | When writing <verify> sections for tasks |
+| Brainstorming | `.skills/brainstorming/SKILL.md` | When exploring design approaches during task breakdown |
 
 **Project skills override built-in skills.**
 </available_skills>

@@ -63,6 +63,21 @@ Common types: Tech stack, Timeline, Budget, Dependencies, Compatibility, Perform
 |----------|-----------|---------|
 | [Choice] | [Why] | [✓ Good / ⚠️ Revisit / — Pending] |
 
+## Tech Stack Decisions
+
+<!-- Locked technology choices from research synthesis. Agents treat these as constraints.
+     These are non-negotiable for the current milestone — changing them requires explicit discussion. -->
+
+| Category | Decision | Rationale | Alternatives Rejected | Effort |
+|----------|----------|-----------|----------------------|--------|
+| [e.g. Framework] | [e.g. Next.js 15] | [Why this choice] | [What was considered and why not] | [S/M/L/XL] |
+
+<!-- Effort: S = hours, M = days, L = week, XL = weeks -->
+
+<!-- If no research was conducted, this section may be empty or populated from questioning context. -->
+
+See `.planning/CONVENTIONS.md` for coding standards and file layout conventions.
+
 ---
 *Last updated: [date] after [trigger]*
 ```
@@ -116,6 +131,14 @@ Common types: Tech stack, Timeline, Budget, Dependencies, Compatibility, Perform
   - ✓ Good — decision proved correct
   - ⚠️ Revisit — decision may need reconsideration
   - — Pending — too early to evaluate
+
+**Tech Stack Decisions:**
+- Locked technology choices from research synthesis or questioning
+- Agents treat these as hard constraints — no substitutions without explicit approval
+- Each row includes: what was chosen, why, what was rejected, and effort estimate
+- Populated by research synthesizer (if research ran) or from questioning context
+- Links to CONVENTIONS.md for coding standards (file layout, error handling, testing)
+- If no research was conducted, this section may be empty or minimal
 
 **Last Updated:**
 - Always note when and why the document was updated

@@ -1,3 +1,48 @@
+## [4.2.3](https://github.com/maystudios/maxsimcli/compare/v4.2.2...v4.2.3) (2026-03-03)
+
+
+### Bug Fixes
+
+* **test:** mock node:fs in adapters test to handle shared.ts side effects ([648176f](https://github.com/maystudios/maxsimcli/commit/648176f411b47d6fe83fada2fb240d83481dd171))
+
+## [4.2.2](https://github.com/maystudios/maxsimcli/compare/v4.2.1...v4.2.2) (2026-03-03)
+
+
+### Bug Fixes
+
+* **hooks:** restore shebang in pre-push hook ([d03f1cb](https://github.com/maystudios/maxsimcli/commit/d03f1cbfd7001c60884c880d7feb73d85e3ffe05))
+
+## [4.2.1](https://github.com/maystudios/maxsimcli/compare/v4.2.0...v4.2.1) (2026-03-02)
+
+
+### Bug Fixes
+
+* **dashboard:** execute commands on button click instead of just copying ([ab10ff9](https://github.com/maystudios/maxsimcli/commit/ab10ff9bcb6d74695d52cb1430e5f99485484652))
+
+# [4.2.0](https://github.com/maystudios/maxsimcli/compare/v4.1.0...v4.2.0) (2026-03-02)
+
+
+### Bug Fixes
+
+* **core:** resolve merge conflicts from parallel async migration PRs ([b8630ba](https://github.com/maystudios/maxsimcli/commit/b8630bae6c79e433abd0eafe7f91b6b5e48fa847))
+* **execute-plan:** replace single-executor simplify stage with 3 parallel code reviewers ([d932fc7](https://github.com/maystudios/maxsimcli/commit/d932fc77143e74700aa88d7f776354cac2dde01a))
+
+
+### Features
+
+* add /maxsim:artefakte command for viewing and managing project artefakte ([b92b09e](https://github.com/maystudios/maxsimcli/commit/b92b09ecf35b6bf4fd489b3b55d873afa62719ab))
+* add /maxsim:batch command and workflow for worktree-based parallel execution ([a5f38e8](https://github.com/maystudios/maxsimcli/commit/a5f38e84091a09ef9387db3c99995fbb8740104e))
+* add /maxsim:sdd command and workflow for Spec-Driven Dispatch ([038a496](https://github.com/maystudios/maxsimcli/commit/038a496d61fc96bf34e698754881a6137ddacdc3))
+* add batch and sdd commands to help reference, complete Phase 6 requirements ([4310461](https://github.com/maystudios/maxsimcli/commit/431046199d7695ee2c42d640921cef71a00645e2))
+* **core:** add async versions of internal helpers for Phase 10 performance ([5833d44](https://github.com/maystudios/maxsimcli/commit/5833d44a2e1644fce10a52be535e6c70070d2d64))
+* **dashboard:** add in-tab project switching to ProjectSwitcher ([6e037e5](https://github.com/maystudios/maxsimcli/commit/6e037e536969c0171fca1c18bfc141bed60bfcbb))
+* **dashboard:** add project switcher for multi-dashboard navigation (DASH-07) ([47d2d00](https://github.com/maystudios/maxsimcli/commit/47d2d002ef4d32f82e56c07890ca7fd4b35fd7f7))
+* **dashboard:** add terminal Q&A overlay for answering questions inline (DISC-07) ([07b4040](https://github.com/maystudios/maxsimcli/commit/07b4040525c5c62a04819c7c5ea67cc9d7b7dcdb))
+* **discuss:** add phase-scoped artefakte to discuss-phase workflow ([8ce2e4b](https://github.com/maystudios/maxsimcli/commit/8ce2e4bf06bc7aec29df1c4bcb4349b403baacdd))
+* expand check-todos brainstorm into thinking-partner discussion ([ebe603d](https://github.com/maystudios/maxsimcli/commit/ebe603d63587f8340cf072f03015c63d648328ed))
+* expand thinking-partner reference with context modes and escalation patterns ([f5e7b8e](https://github.com/maystudios/maxsimcli/commit/f5e7b8ee158db4e74b21f50c470851f6c59e5d67))
+* implement task-based context loading for planning agents (PS-03) ([457d72b](https://github.com/maystudios/maxsimcli/commit/457d72b002b12df3e482a9b12574bd43fa971865))
+
 # [4.1.0](https://github.com/maystudios/maxsimcli/compare/v4.0.2...v4.1.0) (2026-03-02)
 
 

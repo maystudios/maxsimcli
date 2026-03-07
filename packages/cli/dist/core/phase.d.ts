@@ -47,4 +47,7 @@ export declare function cmdPhaseRemove(cwd: string, targetPhase: string | undefi
     force: boolean;
 }): Promise<CmdResult>;
 export declare function cmdPhaseComplete(cwd: string, phaseNum: string | undefined): Promise<CmdResult>;
+export declare function archivePhasePreview(cwd: string, phaseNum: string, outcomeSummary: string): Promise<CmdResult>;
+export declare function archivePhaseExecute(cwd: string, phaseNum: string, outcomeSummary: string): Promise<CmdResult>;
+export declare function cmdGetArchivedPhase(cwd: string, phaseNum: string): Promise<CmdResult>;
 //# sourceMappingURL=phase.d.ts.map

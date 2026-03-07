@@ -59,6 +59,7 @@ export interface PlanPhaseContext {
     state_path: string;
     roadmap_path: string;
     requirements_path: string;
+    conventions_path?: string;
     context_path?: string;
     research_path?: string;
     verification_path?: string;
@@ -152,6 +153,7 @@ export interface PhaseOpContext {
     state_path: string;
     roadmap_path: string;
     requirements_path: string;
+    conventions_path?: string;
     context_path?: string;
     research_path?: string;
     verification_path?: string;

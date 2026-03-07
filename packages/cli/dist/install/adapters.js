@@ -35,7 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCommitAttribution = getCommitAttribution;
 const path = __importStar(require("node:path"));
-const index_js_1 = require("../adapters/index.js");
+const utils_js_1 = require("./utils.js");
 const shared_js_1 = require("./shared.js");
 // Cache for attribution settings (populated once during install)
 let attributionCached = false;
@@ -48,7 +48,7 @@ function getCommitAttribution(explicitConfigDir) {
     if (attributionCached) {
         return attributionValue;
     }
-    const settings = (0, index_js_1.readSettings)(path.join((0, shared_js_1.getGlobalDir)(explicitConfigDir), 'settings.json'));
+    const settings = (0, utils_js_1.readSettings)(path.join((0, shared_js_1.getGlobalDir)(explicitConfigDir), 'settings.json'));
     const attr = settings.attribution;
     if (!attr || attr.commit === undefined) {
         attributionValue = undefined;

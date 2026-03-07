@@ -14,14 +14,14 @@ Skills with `alwaysApply: true` load automatically at conversation start:
 
 | Agent | Skills | Role |
 |-------|--------|------|
-| `maxsim-executor` | `tdd`, `verification-before-completion`, `using-maxsim` | Implements plan tasks with TDD and verified completion |
+| `maxsim-executor` | `tdd`, `verification-before-completion`, `using-maxsim`, `maxsim-simplify` | Implements plan tasks with TDD, verified completion, and simplification |
 | `maxsim-debugger` | `systematic-debugging`, `verification-before-completion` | Investigates bugs via reproduce-hypothesize-isolate-verify-fix cycle |
 | `maxsim-verifier` | `verification-before-completion` | Checks phase goal achievement with fresh evidence |
-| `maxsim-planner` | `using-maxsim` | Creates executable PLAN.md files for phases |
+| `maxsim-planner` | `using-maxsim`, `brainstorming` | Creates executable PLAN.md files for phases |
 | `maxsim-plan-checker` | `verification-before-completion` | Verifies plans achieve phase goal before execution |
-| `maxsim-code-reviewer` | `verification-before-completion` | Reviews implementation for code quality with evidence |
+| `maxsim-code-reviewer` | `verification-before-completion`, `code-review` | Reviews implementation for code quality with evidence |
 | `maxsim-spec-reviewer` | `verification-before-completion` | Reviews implementation for spec compliance |
-| `maxsim-roadmapper` | `using-maxsim` | Creates project roadmaps with phase breakdown and requirement mapping |
+| `maxsim-roadmapper` | `using-maxsim`, `brainstorming`, `roadmap-writing` | Creates project roadmaps with phase breakdown and requirement mapping |
 | `maxsim-phase-researcher` | `memory-management` | Researches phase implementation domain for planning context |
 | `maxsim-project-researcher` | `memory-management` | Researches project domain ecosystem during init |
 | `maxsim-research-synthesizer` | `memory-management` | Synthesizes parallel research outputs into unified findings |
@@ -39,5 +39,7 @@ Skills with `alwaysApply: true` load automatically at conversation start:
 | `memory-management` | `skills/memory-management/` | Pattern and error persistence |
 | `brainstorming` | `skills/brainstorming/` | Multi-approach exploration before design |
 | `roadmap-writing` | `skills/roadmap-writing/` | Phased planning with success criteria |
-| `simplify` | `skills/simplify/` | Code simplification and cleanup |
-| `code-review` | `skills/code-review/` | Implementation quality review |
+| `maxsim-simplify` | `skills/maxsim-simplify/` | Maintainability optimization pass (duplication, dead code, complexity) |
+| `code-review` | `skills/code-review/` | Correctness gate (security, interfaces, errors, test coverage) |
+| `sdd` | `skills/sdd/` | Orchestration strategy: spec-driven dispatch with fresh agent per task |
+| `maxsim-batch` | `skills/maxsim-batch/` | Orchestration strategy: parallel worktree execution with one PR per unit |

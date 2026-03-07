@@ -36,7 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.copyWithPathReplacement = copyWithPathReplacement;
 const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
-const index_js_1 = require("../adapters/index.js");
+const utils_js_1 = require("./utils.js");
 const adapters_js_1 = require("./adapters.js");
 /**
  * Recursively copy directory, replacing paths in .md files
@@ -60,7 +60,7 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix, explicitConfigDir,
             const localClaudeRegex = /\.\/\.claude\//g;
             content = content.replace(globalClaudeRegex, pathPrefix);
             content = content.replace(localClaudeRegex, './.claude/');
-            content = (0, index_js_1.processAttribution)(content, (0, adapters_js_1.getCommitAttribution)(explicitConfigDir));
+            content = (0, utils_js_1.processAttribution)(content, (0, adapters_js_1.getCommitAttribution)(explicitConfigDir));
             fs.writeFileSync(destPath, content);
         }
         else {

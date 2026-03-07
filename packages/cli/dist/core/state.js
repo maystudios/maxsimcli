@@ -23,6 +23,7 @@ exports.cmdStateAddBlocker = cmdStateAddBlocker;
 exports.cmdStateResolveBlocker = cmdStateResolveBlocker;
 exports.cmdStateRecordSession = cmdStateRecordSession;
 exports.cmdStateSnapshot = cmdStateSnapshot;
+exports.cmdDetectStaleContext = cmdDetectStaleContext;
 const node_fs_1 = require("node:fs");
 const node_path_1 = __importDefault(require("node:path"));
 const escape_string_regexp_1 = __importDefault(require("escape-string-regexp"));
@@ -509,5 +510,73 @@ async function cmdStateSnapshot(cwd, raw) {
         session,
     };
     return (0, types_js_1.cmdOk)(snapshot);
+}
+async function cmdDetectStaleContext(cwd) {
+    const rmPath = (0, core_js_1.roadmapPath)(cwd);
+    const stPath = (0, core_js_1.statePath)(cwd);
+    const [roadmapContent, stateContent] = await Promise.all([
+        (0, core_js_1.safeReadFileAsync)(rmPath),
+        (0, core_js_1.safeReadFileAsync)(stPath),
+    ]);
+    if (!roadmapContent) {
+        return (0, types_js_1.cmdErr)('ROADMAP.md not found');
+    }
+    if (!stateContent) {
+        return (0, types_js_1.cmdErr)('STATE.md not found');
+    }
+    // Identify completed phases from ROADMAP.md (lines matching `- [x]` with Phase N)
+    const completedPhases = [];
+    const checkboxPattern = /^-\s*\[x\]\s*.*Phase\s+(\d+[A-Z]?(?:\.\d+)?)/gim;
+    let match;
+    while ((match = checkboxPattern.exec(roadmapContent)) !== null) {
+        completedPhases.push(match[1]);
+    }
+    if (completedPhases.length === 0) {
+        return (0, types_js_1.cmdOk)({
+            stale_references: [],
+            completed_phases: [],
+            clean: true,
+            message: 'No completed phases found in ROADMAP.md',
+        });
+    }
+    // Scan STATE.md decisions and blockers sections for references to completed phases
+    const staleReferences = [];
+    const decisionsPattern = /(#{2,3}\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n#{2,3}\s|\n##[^#]|$)/i;
+    const blockersPattern = /(#{2,3}\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n\s*\n?)([\s\S]*?)(?=\n#{2,3}\s|$)/i;
+    const sections = [
+        { name: 'Decisions', pattern: decisionsPattern },
+        { name: 'Blockers', pattern: blockersPattern },
+    ];
+    for (const section of sections) {
+        const sectionMatch = stateContent.match(section.pattern);
+        if (!sectionMatch || !sectionMatch[2])
+            continue;
+        const lines = sectionMatch[2].split('\n');
+        for (const line of lines) {
+            if (!line.trim())
+                continue;
+            for (const phase of completedPhases) {
+                const escaped = (0, core_js_1.escapePhaseNum)(phase);
+                // Match `- [Phase N]:` tagged lines or free-text `Phase N` mentions
+                const tagPattern = new RegExp(`\\bPhase\\s+${escaped}\\b`, 'i');
+                if (tagPattern.test(line)) {
+                    staleReferences.push({
+                        section: section.name,
+                        line: line.trim(),
+                        phase,
+                    });
+                    break; // Don't double-count same line for multiple phases
+                }
+            }
+        }
+    }
+    return (0, types_js_1.cmdOk)({
+        stale_references: staleReferences,
+        completed_phases: completedPhases,
+        clean: staleReferences.length === 0,
+        message: staleReferences.length === 0
+            ? 'No stale references found — STATE.md is clean'
+            : `Found ${staleReferences.length} stale reference(s) to completed phases`,
+    });
 }
 //# sourceMappingURL=state.js.map

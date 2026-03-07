@@ -1,10 +1,11 @@
 ---
-name: simplify
+name: maxsim-simplify
 description: >-
-  Reviews changed code for reuse opportunities, unnecessary complexity, and
-  dead weight using three parallel review agents. Use when reviewing code
-  before committing, cleaning up implementations, or preparing changes for
-  review.
+  Maintainability optimization pass: finds duplication, dead code, and
+  unnecessary complexity. Answers "Is this code as simple as it can be?"
+  Use when reviewing code before committing, cleaning up implementations,
+  or preparing changes for review. Not a correctness gate — that is
+  code-review's job.
 ---
 
 # Simplify
@@ -134,7 +135,7 @@ Before reporting completion, confirm:
 
 ## MAXSIM Integration
 
-When a plan specifies `skill: "simplify"`:
+When a plan specifies `skill: "maxsim-simplify"`:
 - The orchestrator collects changed files from the implementation step
 - Three parallel reviewers (Reuse, Quality, Efficiency) are spawned
 - Findings are consolidated and fixes applied

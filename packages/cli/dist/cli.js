@@ -202,13 +202,15 @@ const handlePhase = async (args, cwd, raw) => {
         'insert': () => (0, index_js_1.cmdPhaseInsert)(cwd, args[2], args.slice(3).join(' ')),
         'remove': () => (0, index_js_1.cmdPhaseRemove)(cwd, args[2], { force: hasFlag(args, 'force') }),
         'complete': () => (0, index_js_1.cmdPhaseComplete)(cwd, args[2]),
+        'archive-preview': () => (0, index_js_1.archivePhasePreview)(cwd, args[2], args.slice(3).join(' ')),
+        'archive-execute': () => (0, index_js_1.archivePhaseExecute)(cwd, args[2], args.slice(3).join(' ')),
     };
     const handler = sub ? handlers[sub] : undefined;
     if (handler)
         return handleResult(await handler(), raw);
-    (0, index_js_1.error)('Unknown phase subcommand. Available: next-decimal, add, insert, remove, complete');
+    (0, index_js_1.error)('Unknown phase subcommand. Available: next-decimal, add, insert, remove, complete, archive-preview, archive-execute');
 };
-const handleMilestone = (args, cwd, raw) => {
+const handleMilestone = async (args, cwd, raw) => {
     const sub = args[1];
     if (sub === 'complete') {
         const nameIndex = args.indexOf('--name');
@@ -222,7 +224,7 @@ const handleMilestone = (args, cwd, raw) => {
             }
             milestoneName = nameArgs.join(' ') || null;
         }
-        handleResult((0, index_js_1.cmdMilestoneComplete)(cwd, args[2], {
+        handleResult(await (0, index_js_1.cmdMilestoneComplete)(cwd, args[2], {
             name: milestoneName ?? undefined,
             archivePhases: hasFlag(args, 'archive-phases'),
         }), raw);
@@ -314,6 +316,8 @@ const COMMANDS = {
         handleResult((0, index_js_1.cmdScaffold)(cwd, args[1], { phase: f.phase, name: f.name ? args.slice(args.indexOf('--name') + 1).join(' ') : null }, raw), raw);
     },
     'init': handleInit,
+    'detect-stale-context': async (_args, cwd, raw) => handleResult(await (0, index_js_1.cmdDetectStaleContext)(cwd), raw),
+    'get-archived-phase': async (args, cwd, raw) => handleResult(await (0, index_js_1.cmdGetArchivedPhase)(cwd, args[1]), raw),
     'phase-plan-index': async (args, cwd, raw) => handleResult(await (0, index_js_1.cmdPhasePlanIndex)(cwd, args[1]), raw),
     'state-snapshot': async (_args, cwd, raw) => handleResult(await (0, index_js_1.cmdStateSnapshot)(cwd, raw), raw),
     'summary-extract': (args, cwd, raw) => {

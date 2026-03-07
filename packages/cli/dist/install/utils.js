@@ -1,6 +1,7 @@
 "use strict";
 /**
- * @maxsim/adapters — Shared base utilities extracted from bin/install.js
+ * Install utilities — shared helper functions for the install pipeline.
+ * (Inlined from the former adapters/base.ts after multi-runtime removal.)
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -37,7 +38,6 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.expandTilde = expandTilde;
-exports.extractFrontmatterAndBody = extractFrontmatterAndBody;
 exports.processAttribution = processAttribution;
 exports.buildHookCommand = buildHookCommand;
 exports.readSettings = readSettings;
@@ -53,23 +53,6 @@ function expandTilde(filePath) {
         return path.join(os.homedir(), filePath.slice(2));
     }
     return filePath;
-}
-/**
- * Extract YAML frontmatter and body from markdown content.
- * Returns null frontmatter if content doesn't start with ---.
- */
-function extractFrontmatterAndBody(content) {
-    if (!content.startsWith('---')) {
-        return { frontmatter: null, body: content };
-    }
-    const endIndex = content.indexOf('---', 3);
-    if (endIndex === -1) {
-        return { frontmatter: null, body: content };
-    }
-    return {
-        frontmatter: content.substring(3, endIndex).trim(),
-        body: content.substring(endIndex + 3),
-    };
 }
 /**
  * Process Co-Authored-By lines based on attribution setting.
@@ -113,4 +96,4 @@ function readSettings(settingsPath) {
 function writeSettings(settingsPath, settings) {
     fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n');
 }
-//# sourceMappingURL=base.js.map
+//# sourceMappingURL=utils.js.map

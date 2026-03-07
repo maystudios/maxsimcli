@@ -7507,10 +7507,11 @@ var require_minimist = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region src/adapters/base.ts
+//#region src/install/utils.ts
 var import_minimist = /* @__PURE__ */ __toESM(require_minimist());
 /**
-* @maxsim/adapters — Shared base utilities extracted from bin/install.js
+* Install utilities — shared helper functions for the install pipeline.
+* (Inlined from the former adapters/base.ts after multi-runtime removal.)
 */
 /**
 * Expand ~ to home directory (shell doesn't expand in env vars passed to node)
@@ -7555,21 +7556,27 @@ function writeSettings(settingsPath, settings) {
 }
 
 //#endregion
-//#region src/adapters/claude.ts
-/**
-* @maxsim/adapters — Claude Code adapter
-*
-* Ports the Claude-specific logic from bin/install.js:
-*   - getGlobalDir('claude', ...)  (lines 135-142)
-*   - getDirName('claude')         (line 49)
-*   - getConfigDirFromHome('claude', isGlobal) (lines 58-72)
-*   - copyWithPathReplacement for Claude (lines 839-892)
-*/
+//#region src/install/shared.ts
+const pkg = JSON.parse(node_fs.readFileSync(node_path.resolve(__dirname, "..", "package.json"), "utf-8"));
+const templatesRoot = node_path.resolve(__dirname, "assets", "templates");
+const builtInSkills = [
+	"tdd",
+	"systematic-debugging",
+	"verification-before-completion",
+	"maxsim-simplify",
+	"code-review",
+	"memory-management",
+	"using-maxsim",
+	"brainstorming",
+	"roadmap-writing",
+	"sdd",
+	"maxsim-batch"
+];
 /**
 * Get the global config directory for Claude Code.
 * Priority: explicitDir > CLAUDE_CONFIG_DIR env > ~/.claude
 */
-function getGlobalDir$1(explicitDir) {
+function getGlobalDir(explicitDir = null) {
 	if (explicitDir) return expandTilde(explicitDir);
 	if (process.env.CLAUDE_CONFIG_DIR) return expandTilde(process.env.CLAUDE_CONFIG_DIR);
 	return node_path.join(node_os.homedir(), ".claude");
@@ -7578,66 +7585,14 @@ function getGlobalDir$1(explicitDir) {
 * Get the config directory path relative to home for hook templating.
 * Used for path.join(homeDir, '<configDir>', ...) replacement in hooks.
 */
-function getConfigDirFromHome$1(isGlobal) {
+function getConfigDirFromHome(_isGlobal) {
 	return "'.claude'";
-}
-/**
-* Transform markdown content for Claude Code installation.
-* For Claude, this is path replacement only — no frontmatter conversion needed.
-* Replaces ~/.claude/ and ./.claude/ references with the actual install path prefix.
-*/
-function transformContent(content, pathPrefix) {
-	const globalClaudeRegex = /~\/\.claude\//g;
-	const localClaudeRegex = /\.\/\.claude\//g;
-	let result = content.replace(globalClaudeRegex, pathPrefix);
-	result = result.replace(localClaudeRegex, `./.claude/`);
-	return result;
-}
-/**
-* Claude Code adapter configuration.
-* Claude uses nested command structure (commands/maxsim/*.md).
-*/
-const claudeAdapter = {
-	runtime: "claude",
-	dirName: ".claude",
-	getGlobalDir: getGlobalDir$1,
-	getConfigDirFromHome: getConfigDirFromHome$1,
-	transformContent,
-	commandStructure: "nested"
-};
-
-//#endregion
-//#region src/install/shared.ts
-const pkg = JSON.parse(node_fs.readFileSync(node_path.resolve(__dirname, "..", "package.json"), "utf-8"));
-const templatesRoot = node_path.resolve(__dirname, "assets", "templates");
-const builtInSkills = [
-	"tdd",
-	"systematic-debugging",
-	"verification-before-completion",
-	"simplify",
-	"code-review",
-	"memory-management",
-	"using-maxsim",
-	"brainstorming",
-	"roadmap-writing"
-];
-/**
-* Get the global config directory, using the Claude adapter
-*/
-function getGlobalDir(explicitDir = null) {
-	return claudeAdapter.getGlobalDir(explicitDir);
-}
-/**
-* Get the config directory path relative to home for hook templating
-*/
-function getConfigDirFromHome(isGlobal) {
-	return claudeAdapter.getConfigDirFromHome(isGlobal);
 }
 /**
 * Get the local directory name
 */
 function getDirName() {
-	return claudeAdapter.dirName;
+	return ".claude";
 }
 /**
 * Recursively remove a directory, handling Windows read-only file attributes.
@@ -7697,7 +7652,7 @@ function verifyFileInstalled(filePath, description) {
 * Returns an object with `complete` (boolean) and `missing` (list of
 * component names that are absent or incomplete).
 */
-function verifyInstallComplete(configDir, _runtime, manifest = null) {
+function verifyInstallComplete(configDir, manifest = null) {
 	const missing = [];
 	if (manifest && manifest.files) {
 		for (const relPath of Object.keys(manifest.files)) if (!node_fs.existsSync(node_path.join(configDir, relPath))) missing.push(relPath);
@@ -8410,7 +8365,6 @@ if (hasHelp) {
 	process.exit(0);
 }
 async function install(isGlobal) {
-	const runtime = "claude";
 	const dirName = getDirName();
 	const src = templatesRoot;
 	const targetDir = isGlobal ? getGlobalDir(explicitConfigDir) : node_path.join(process.cwd(), dirName);
@@ -8421,7 +8375,7 @@ async function install(isGlobal) {
 	const existingManifest = readManifest(targetDir);
 	const isAlreadyCurrent = existingManifest !== null && existingManifest.version === pkg.version;
 	if (existingManifest !== null) {
-		const { complete, missing } = verifyInstallComplete(targetDir, runtime, existingManifest);
+		const { complete, missing } = verifyInstallComplete(targetDir, existingManifest);
 		if (!complete) console.log(`  ${chalk.yellow("!")} Previous install (v${existingManifest.version}) is incomplete — ${missing.length} missing file(s). Re-installing.`);
 		else if (isAlreadyCurrent) console.log(`  ${chalk.dim(`Version ${pkg.version} already installed — upgrading in place`)}`);
 	}
@@ -8644,8 +8598,7 @@ async function install(isGlobal) {
 	return {
 		settingsPath,
 		settings,
-		statuslineCommand,
-		runtime
+		statuslineCommand
 	};
 }
 /**

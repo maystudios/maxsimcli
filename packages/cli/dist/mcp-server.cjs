@@ -27089,6 +27089,19 @@ async function findPhaseInternalAsync(cwd, phase) {
 	const normalized = normalizePhaseName(phase);
 	const current = await searchPhaseInDirAsync(pd, node_path.default.join(".planning", "phases"), normalized);
 	if (current) return current;
+	const archiveDir = planningPath(cwd, "archive");
+	if (await pathExistsAsync(archiveDir)) try {
+		const versionDirs = (await node_fs.promises.readdir(archiveDir, { withFileTypes: true })).filter((e) => e.isDirectory()).map((e) => e.name).sort().reverse();
+		for (const versionName of versionDirs) {
+			const result = await searchPhaseInDirAsync(node_path.default.join(archiveDir, versionName), node_path.default.join(".planning", "archive", versionName), normalized);
+			if (result) {
+				result.archived = versionName;
+				return result;
+			}
+		}
+	} catch (e) {
+		debugLog("find-phase-async-archive-search-failed", e);
+	}
 	const milestonesDir = planningPath(cwd, "milestones");
 	if (!await pathExistsAsync(milestonesDir)) return null;
 	try {

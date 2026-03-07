@@ -263,9 +263,12 @@ export interface MilestoneResult {
         requirements: boolean;
         audit: boolean;
         phases: boolean;
+        state_snapshot?: boolean;
+        roadmap_snapshot?: boolean;
     };
     milestones_updated: boolean;
     state_updated: boolean;
+    state_reset?: boolean;
 }
 export interface ArchiveResult {
     updated: boolean;
@@ -373,14 +376,13 @@ export interface PhasesListOptions {
     offset?: number;
     limit?: number;
 }
-export type RuntimeName = 'claude';
-export interface AdapterConfig {
-    runtime: RuntimeName;
-    dirName: string;
-    getGlobalDir(explicitDir?: string | null): string;
-    getConfigDirFromHome(isGlobal: boolean): string;
-    transformContent(content: string, pathPrefix: string): string;
-    commandStructure: 'nested';
+export interface ArchivePreview {
+    phase_dir: string;
+    archive_dir: string;
+    decisions_to_prune: string[];
+    blockers_to_prune: string[];
+    roadmap_section_to_collapse: string;
+    collapsed_line: string;
 }
 export {};
 //# sourceMappingURL=types.d.ts.map

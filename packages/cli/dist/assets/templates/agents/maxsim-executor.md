@@ -279,6 +279,7 @@ When any trigger below applies, Read the full skill file and follow it. Always r
 | TDD Enforcement | `.skills/tdd/SKILL.md` | Before writing implementation code for new feature/bug fix, or plan type is `tdd` |
 | Systematic Debugging | `.skills/systematic-debugging/SKILL.md` | Any bug, test failure, or unexpected behavior during execution |
 | Verification Before Completion | `.skills/verification-before-completion/SKILL.md` | Before claiming any task is done, fixed, or passing |
+| Simplification | `.skills/maxsim-simplify/SKILL.md` | After implementing a task, before committing |
 
 Project skills in `.skills/` override built-in skills.
 </available_skills>

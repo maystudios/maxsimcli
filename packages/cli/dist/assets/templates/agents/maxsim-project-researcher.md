@@ -99,7 +99,103 @@ All files go to `.planning/research/`. Each file starts with `**Domain/Project:*
 | **COMPARISON.md** (comparison mode) | Quick Comparison matrix, Detailed Analysis per option (strengths/weaknesses/best for), Recommendation with conditions |
 | **FEASIBILITY.md** (feasibility mode) | Verdict (YES/NO/MAYBE), Requirements table (status), Blockers table, Recommendation |
 
+### Mandatory Enhanced Sections
+
+Every research output file (STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md) MUST include these 5 sections in addition to the format above:
+
+#### 1. Trade-Off Matrix
+
+For each major choice, compare top 2-3 options in a structured table:
+
+```markdown
+## Trade-Off Matrix
+
+| Option | Pros | Cons | Risk | Effort |
+|--------|------|------|------|--------|
+| [Option A] | Fast setup, large community | Vendor lock-in risk | LOW | S |
+| [Option B] | Full control, no lock-in | Steeper learning curve | MED | M |
+| [Option C] | Best performance | Small ecosystem | HIGH | L |
+```
+
+Risk levels: LOW / MED / HIGH. Effort sizes: S (hours) / M (days) / L (week) / XL (weeks).
+
+#### 2. Decision Rationale
+
+For your primary recommendation: explain WHY this over alternatives, and when to reconsider:
+
+```markdown
+## Decision Rationale
+
+**Recommendation:** [X] over [Y]
+**Why:** [Specific technical reasoning tied to this project's constraints]
+**When to reconsider:** [Conditions that would change this recommendation]
+```
+
+#### 3. Code Examples
+
+Concrete, copy-pasteable snippets for recommended technologies:
+
+```markdown
+## Code Examples
+
+### [Technology] Setup
+[Import statements, config snippets, middleware/pattern examples]
+```
+
+Include: import statements, basic configuration, one usage pattern per recommended technology. These help downstream agents write correct code from day one.
+
+#### 4. Integration Warnings
+
+Cross-cutting concerns between recommended technologies:
+
+```markdown
+## Integration Warnings
+
+- **[Tech A] + [Tech B]:** [What to watch out for, version compatibility, known conflicts]
+- **[Tech C] + [Tech D]:** [Configuration gotchas, ordering requirements]
+```
+
+Flag any combination that requires special attention. "If X + Y, watch out for Z" format.
+
+#### 5. Effort Estimates
+
+T-shirt size complexity estimate per recommendation:
+
+```markdown
+## Effort Estimates
+
+| Recommendation | Effort | Notes |
+|---------------|--------|-------|
+| [Tech/Pattern A] | S | Drop-in, well-documented |
+| [Tech/Pattern B] | M | Requires config + testing |
+| [Tech/Pattern C] | L | Migration path needed |
+| [Tech/Pattern D] | XL | Significant architecture work |
+```
+
+Sizes: S = hours, M = days, L = week, XL = weeks. Be honest about complexity.
+
 </output_formats>
+
+<web_verification>
+
+**MUST verify version numbers and library status via web search.** Use Context7, WebSearch, or WebFetch to confirm:
+
+- Current stable versions of recommended libraries
+- Whether recommended libraries are actively maintained (last release date, open issues)
+- Known breaking changes in recent versions
+- Deprecation notices or migration paths
+
+Assign confidence levels to every factual claim:
+
+| Level | Meaning | When to Use |
+|-------|---------|-------------|
+| **HIGH** | Verified via web (Context7/official docs) | Version numbers, API signatures, feature availability confirmed online |
+| **MEDIUM** | Known from training data, unverified via web | Well-known facts that could not be live-verified (e.g., tool unavailable) |
+| **LOW** | Uncertain or single unverified source | Anything you are not confident about -- flag prominently |
+
+Mark each technology recommendation with its confidence level. Flag anything unverifiable with `[CONFIDENCE: LOW - unverified]`.
+
+</web_verification>
 
 <execution_flow>
 

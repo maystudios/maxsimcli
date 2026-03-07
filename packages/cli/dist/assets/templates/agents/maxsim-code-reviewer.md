@@ -85,6 +85,17 @@ Return this exact structure:
 - FAIL: One or more CRITICAL issues. List each with actionable fix suggestion.
 </verdict_format>
 
+<available_skills>
+When any trigger condition below applies, read the full skill file via the Read tool and follow it.
+
+| Skill | Read | Trigger |
+|-------|------|---------|
+| Code Review | `.skills/code-review/SKILL.md` | Always — primary skill for this agent |
+| Verification Before Completion | `.skills/verification-before-completion/SKILL.md` | Before claiming any review is complete |
+
+**Project skills override built-in skills.**
+</available_skills>
+
 <success_criteria>
 - [ ] CLAUDE.md read for project conventions
 - [ ] Every modified file read in FULL (not scanned)

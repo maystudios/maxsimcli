@@ -5205,6 +5205,19 @@ async function findPhaseInternalAsync(cwd, phase) {
 	const normalized = normalizePhaseName(phase);
 	const current = await searchPhaseInDirAsync(pd, node_path.default.join(".planning", "phases"), normalized);
 	if (current) return current;
+	const archiveDir = planningPath(cwd, "archive");
+	if (await pathExistsAsync(archiveDir)) try {
+		const versionDirs = (await node_fs.promises.readdir(archiveDir, { withFileTypes: true })).filter((e) => e.isDirectory()).map((e) => e.name).sort().reverse();
+		for (const versionName of versionDirs) {
+			const result = await searchPhaseInDirAsync(node_path.default.join(archiveDir, versionName), node_path.default.join(".planning", "archive", versionName), normalized);
+			if (result) {
+				result.archived = versionName;
+				return result;
+			}
+		}
+	} catch (e) {
+		debugLog("find-phase-async-archive-search-failed", e);
+	}
 	const milestonesDir = planningPath(cwd, "milestones");
 	if (!await pathExistsAsync(milestonesDir)) return null;
 	try {
@@ -5225,27 +5238,69 @@ async function findPhaseInternalAsync(cwd, phase) {
 	return null;
 }
 async function getArchivedPhaseDirsAsync(cwd) {
-	const milestonesDir = planningPath(cwd, "milestones");
 	const results = [];
+	const archiveDir = planningPath(cwd, "archive");
+	try {
+		const versionDirs = (await node_fs.promises.readdir(archiveDir, { withFileTypes: true })).filter((e) => e.isDirectory()).map((e) => e.name).sort().reverse();
+		for (const versionName of versionDirs) {
+			const versionPath = node_path.default.join(archiveDir, versionName);
+			const dirs = await listSubDirsAsync(versionPath, true);
+			for (const dir of dirs) results.push({
+				name: dir,
+				milestone: versionName,
+				basePath: node_path.default.join(".planning", "archive", versionName),
+				fullPath: node_path.default.join(versionPath, dir)
+			});
+		}
+	} catch (e) {
+		debugLog("get-archived-phase-dirs-async-archive-failed", e);
+	}
+	const milestonesDir = planningPath(cwd, "milestones");
 	try {
 		const phaseDirs = (await node_fs.promises.readdir(milestonesDir, { withFileTypes: true })).filter((e) => e.isDirectory() && /^v[\d.]+-phases$/.test(e.name)).map((e) => e.name).sort().reverse();
 		for (const archiveName of phaseDirs) {
 			const versionMatch = archiveName.match(/^(v[\d.]+)-phases$/);
 			if (!versionMatch) continue;
 			const version = versionMatch[1];
-			const archivePath = node_path.default.join(milestonesDir, archiveName);
-			const dirs = await listSubDirsAsync(archivePath, true);
+			const archiveMilestonePath = node_path.default.join(milestonesDir, archiveName);
+			const dirs = await listSubDirsAsync(archiveMilestonePath, true);
 			for (const dir of dirs) results.push({
 				name: dir,
 				milestone: version,
 				basePath: node_path.default.join(".planning", "milestones", archiveName),
-				fullPath: node_path.default.join(archivePath, dir)
+				fullPath: node_path.default.join(archiveMilestonePath, dir)
 			});
 		}
 	} catch (e) {
 		debugLog("get-archived-phase-dirs-async-failed", e);
 	}
 	return results;
+}
+function archivePath(cwd, milestone) {
+	return planningPath(cwd, "archive", milestone ?? getMilestoneInfo(cwd).version);
+}
+async function archivePathAsync(cwd, milestone) {
+	return planningPath(cwd, "archive", milestone ?? (await getMilestoneInfoAsync(cwd)).version);
+}
+async function getMilestoneInfoAsync(cwd) {
+	try {
+		const roadmap = await safeReadFileAsync(roadmapPath(cwd));
+		if (!roadmap) return {
+			version: "v1.0",
+			name: "milestone"
+		};
+		const versionMatch = roadmap.match(/v(\d+\.\d+)/);
+		const nameMatch = roadmap.match(/## .*v\d+\.\d+[:\s]+([^\n(]+)/);
+		return {
+			version: versionMatch ? versionMatch[0] : "v1.0",
+			name: nameMatch ? nameMatch[1].trim() : "milestone"
+		};
+	} catch {
+		return {
+			version: "v1.0",
+			name: "milestone"
+		};
+	}
 }
 
 //#endregion
@@ -12608,6 +12663,55 @@ async function cmdStateSnapshot(cwd, raw) {
 		session
 	});
 }
+async function cmdDetectStaleContext(cwd) {
+	const rmPath = roadmapPath(cwd);
+	const stPath = statePath(cwd);
+	const [roadmapContent, stateContent] = await Promise.all([safeReadFileAsync(rmPath), safeReadFileAsync(stPath)]);
+	if (!roadmapContent) return cmdErr("ROADMAP.md not found");
+	if (!stateContent) return cmdErr("STATE.md not found");
+	const completedPhases = [];
+	const checkboxPattern = /^-\s*\[x\]\s*.*Phase\s+(\d+[A-Z]?(?:\.\d+)?)/gim;
+	let match;
+	while ((match = checkboxPattern.exec(roadmapContent)) !== null) completedPhases.push(match[1]);
+	if (completedPhases.length === 0) return cmdOk({
+		stale_references: [],
+		completed_phases: [],
+		clean: true,
+		message: "No completed phases found in ROADMAP.md"
+	});
+	const staleReferences = [];
+	for (const section of [{
+		name: "Decisions",
+		pattern: /(#{2,3}\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n#{2,3}\s|\n##[^#]|$)/i
+	}, {
+		name: "Blockers",
+		pattern: /(#{2,3}\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n\s*\n?)([\s\S]*?)(?=\n#{2,3}\s|$)/i
+	}]) {
+		const sectionMatch = stateContent.match(section.pattern);
+		if (!sectionMatch || !sectionMatch[2]) continue;
+		const lines = sectionMatch[2].split("\n");
+		for (const line of lines) {
+			if (!line.trim()) continue;
+			for (const phase of completedPhases) {
+				const escaped = escapePhaseNum(phase);
+				if (new RegExp(`\\bPhase\\s+${escaped}\\b`, "i").test(line)) {
+					staleReferences.push({
+						section: section.name,
+						line: line.trim(),
+						phase
+					});
+					break;
+				}
+			}
+		}
+	}
+	return cmdOk({
+		stale_references: staleReferences,
+		completed_phases: completedPhases,
+		clean: staleReferences.length === 0,
+		message: staleReferences.length === 0 ? "No stale references found — STATE.md is clean" : `Found ${staleReferences.length} stale reference(s) to completed phases`
+	});
+}
 
 //#endregion
 //#region src/core/roadmap.ts
@@ -12850,31 +12954,31 @@ function cmdRequirementsMarkComplete(cwd, reqIdsRaw) {
 		total: reqIds.length
 	}, `${updated.length}/${reqIds.length} requirements marked complete`);
 }
-function cmdMilestoneComplete(cwd, version, options) {
+async function cmdMilestoneComplete(cwd, version, options) {
 	if (!version) return cmdErr("version required for milestone complete (e.g., v1.0)");
 	const roadmapPath$1 = roadmapPath(cwd);
 	const reqPath = planningPath(cwd, "REQUIREMENTS.md");
 	const statePath$1 = statePath(cwd);
 	const milestonesPath = planningPath(cwd, "MILESTONES.md");
-	const archiveDir = planningPath(cwd, "milestones");
+	const archiveDir = archivePath(cwd, version);
 	const phasesDir = phasesPath(cwd);
 	const today = todayISO();
 	const milestoneName = options.name || version;
-	node_fs.default.mkdirSync(archiveDir, { recursive: true });
+	await node_fs.promises.mkdir(archiveDir, { recursive: true });
 	let phaseCount = 0;
 	let totalPlans = 0;
 	let totalTasks = 0;
 	const accomplishments = [];
 	try {
-		const dirs = listSubDirs(phasesDir, true);
+		const dirs = await listSubDirsAsync(phasesDir, true);
 		for (const dir of dirs) {
 			phaseCount++;
-			const phaseFiles = node_fs.default.readdirSync(node_path.default.join(phasesDir, dir));
+			const phaseFiles = await node_fs.promises.readdir(node_path.default.join(phasesDir, dir));
 			const plans = phaseFiles.filter(isPlanFile);
 			const summaries = phaseFiles.filter(isSummaryFile);
 			totalPlans += plans.length;
 			for (const s of summaries) try {
-				const content = node_fs.default.readFileSync(node_path.default.join(phasesDir, dir, s), "utf-8");
+				const content = await node_fs.promises.readFile(node_path.default.join(phasesDir, dir, s), "utf-8");
 				const fm = extractFrontmatter(content);
 				if (fm["one-liner"]) accomplishments.push(String(fm["one-liner"]));
 				const taskMatches = content.match(/##\s*Task\s*\d+/gi) || [];
@@ -12886,36 +12990,77 @@ function cmdMilestoneComplete(cwd, version, options) {
 	} catch (e) {
 		debugLog(e);
 	}
-	if (node_fs.default.existsSync(roadmapPath$1)) {
-		const roadmapContent = node_fs.default.readFileSync(roadmapPath$1, "utf-8");
-		node_fs.default.writeFileSync(node_path.default.join(archiveDir, `${version}-ROADMAP.md`), roadmapContent, "utf-8");
+	const stateExists = await pathExistsAsync(statePath$1);
+	if (stateExists) {
+		const stateContent = await node_fs.promises.readFile(statePath$1, "utf-8");
+		await node_fs.promises.writeFile(node_path.default.join(archiveDir, "STATE.md"), stateContent, "utf-8");
 	}
-	if (node_fs.default.existsSync(reqPath)) {
-		const reqContent = node_fs.default.readFileSync(reqPath, "utf-8");
+	const roadmapExists = await pathExistsAsync(roadmapPath$1);
+	if (roadmapExists) {
+		const roadmapContent = await node_fs.promises.readFile(roadmapPath$1, "utf-8");
+		await node_fs.promises.writeFile(node_path.default.join(archiveDir, "ROADMAP.md"), roadmapContent, "utf-8");
+	}
+	if (roadmapExists) {
+		const roadmapContent = await node_fs.promises.readFile(roadmapPath$1, "utf-8");
+		await node_fs.promises.writeFile(node_path.default.join(archiveDir, `${version}-ROADMAP.md`), roadmapContent, "utf-8");
+	}
+	if (await pathExistsAsync(reqPath)) {
+		const reqContent = await node_fs.promises.readFile(reqPath, "utf-8");
 		const archiveHeader = `# Requirements Archive: ${version} ${milestoneName}\n\n**Archived:** ${today}\n**Status:** SHIPPED\n\nFor current requirements, see \`.planning/REQUIREMENTS.md\`.\n\n---\n\n`;
-		node_fs.default.writeFileSync(node_path.default.join(archiveDir, `${version}-REQUIREMENTS.md`), archiveHeader + reqContent, "utf-8");
+		await node_fs.promises.writeFile(node_path.default.join(archiveDir, `${version}-REQUIREMENTS.md`), archiveHeader + reqContent, "utf-8");
 	}
 	const auditFile = node_path.default.join(cwd, ".planning", `${version}-MILESTONE-AUDIT.md`);
-	if (node_fs.default.existsSync(auditFile)) node_fs.default.renameSync(auditFile, node_path.default.join(archiveDir, `${version}-MILESTONE-AUDIT.md`));
+	if (await pathExistsAsync(auditFile)) await node_fs.promises.rename(auditFile, node_path.default.join(archiveDir, `${version}-MILESTONE-AUDIT.md`));
 	const accomplishmentsList = accomplishments.map((a) => `- ${a}`).join("\n");
 	const milestoneEntry = `## ${version} ${milestoneName} (Shipped: ${today})\n\n**Phases completed:** ${phaseCount} phases, ${totalPlans} plans, ${totalTasks} tasks\n\n**Key accomplishments:**\n${accomplishmentsList || "- (none recorded)"}\n\n---\n\n`;
-	if (node_fs.default.existsSync(milestonesPath)) {
-		const existing = node_fs.default.readFileSync(milestonesPath, "utf-8");
-		node_fs.default.writeFileSync(milestonesPath, existing + "\n" + milestoneEntry, "utf-8");
-	} else node_fs.default.writeFileSync(milestonesPath, `# Milestones\n\n${milestoneEntry}`, "utf-8");
-	if (node_fs.default.existsSync(statePath$1)) {
-		let stateContent = node_fs.default.readFileSync(statePath$1, "utf-8");
-		stateContent = stateContent.replace(/(\*\*Status:\*\*\s*).*/, `$1${version} milestone complete`);
-		stateContent = stateContent.replace(/(\*\*Last Activity:\*\*\s*).*/, `$1${today}`);
-		stateContent = stateContent.replace(/(\*\*Last Activity Description:\*\*\s*).*/, `$1${version} milestone completed and archived`);
-		node_fs.default.writeFileSync(statePath$1, stateContent, "utf-8");
+	if (await pathExistsAsync(milestonesPath)) {
+		const existing = await node_fs.promises.readFile(milestonesPath, "utf-8");
+		await node_fs.promises.writeFile(milestonesPath, existing + "\n" + milestoneEntry, "utf-8");
+	} else await node_fs.promises.writeFile(milestonesPath, `# Milestones\n\n${milestoneEntry}`, "utf-8");
+	if (stateExists) {
+		const cleanState = `# Project State
+
+## Project Reference
+
+See: .planning/PROJECT.md (updated ${today})
+
+## Current Position
+
+Milestone: ${options.name || "Next milestone"}
+Phase: 0 of ? (not started)
+Status: planning
+Last activity: ${today}
+
+## Performance Metrics
+
+No plans executed yet in this milestone.
+
+## Accumulated Context
+
+### Decisions
+
+None.
+
+### Pending Todos
+
+None.
+
+### Blockers/Concerns
+
+None.
+
+## Session Continuity
+
+Last session: ${today}
+`;
+		await node_fs.promises.writeFile(statePath$1, cleanState, "utf-8");
 	}
 	let phasesArchived = false;
 	if (options.archivePhases) try {
-		const phaseArchiveDir = node_path.default.join(archiveDir, `${version}-phases`);
-		node_fs.default.mkdirSync(phaseArchiveDir, { recursive: true });
-		const phaseDirNames = listSubDirs(phasesDir);
-		for (const dir of phaseDirNames) node_fs.default.renameSync(node_path.default.join(phasesDir, dir), node_path.default.join(phaseArchiveDir, dir));
+		const phaseArchiveDir = node_path.default.join(archiveDir, "phases");
+		await node_fs.promises.mkdir(phaseArchiveDir, { recursive: true });
+		const phaseDirNames = await listSubDirsAsync(phasesDir);
+		for (const dir of phaseDirNames) await node_fs.promises.rename(node_path.default.join(phasesDir, dir), node_path.default.join(phaseArchiveDir, dir));
 		phasesArchived = phaseDirNames.length > 0;
 	} catch (e) {
 		debugLog(e);
@@ -12929,13 +13074,16 @@ function cmdMilestoneComplete(cwd, version, options) {
 		tasks: totalTasks,
 		accomplishments,
 		archived: {
-			roadmap: node_fs.default.existsSync(node_path.default.join(archiveDir, `${version}-ROADMAP.md`)),
-			requirements: node_fs.default.existsSync(node_path.default.join(archiveDir, `${version}-REQUIREMENTS.md`)),
-			audit: node_fs.default.existsSync(node_path.default.join(archiveDir, `${version}-MILESTONE-AUDIT.md`)),
-			phases: phasesArchived
+			roadmap: await pathExistsAsync(node_path.default.join(archiveDir, `${version}-ROADMAP.md`)),
+			requirements: await pathExistsAsync(node_path.default.join(archiveDir, `${version}-REQUIREMENTS.md`)),
+			audit: await pathExistsAsync(node_path.default.join(archiveDir, `${version}-MILESTONE-AUDIT.md`)),
+			phases: phasesArchived,
+			state_snapshot: await pathExistsAsync(node_path.default.join(archiveDir, "STATE.md")),
+			roadmap_snapshot: await pathExistsAsync(node_path.default.join(archiveDir, "ROADMAP.md"))
 		},
 		milestones_updated: true,
-		state_updated: node_fs.default.existsSync(statePath$1)
+		state_updated: stateExists,
+		state_reset: stateExists
 	});
 }
 
@@ -15010,6 +15158,162 @@ async function cmdPhaseComplete(cwd, phaseNum) {
 		return cmdErr(e.message);
 	}
 }
+/**
+* Scan STATE.md for lines matching a phase-tagged pattern in a specific section.
+*/
+function findPhaseTaggedLines(content, sectionPattern, phaseNum) {
+	const match = content.match(sectionPattern);
+	if (!match || !match[2]) return [];
+	const escaped = escapePhaseNum(phaseNum);
+	const tagPattern = new RegExp(`^\\s*-\\s*\\[Phase\\s+${escaped}\\]`, "i");
+	return match[2].split("\n").filter((line) => tagPattern.test(line));
+}
+const DECISIONS_SECTION_PATTERN = /(#{2,3}\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n#{2,3}\s|\n##[^#]|$)/i;
+const BLOCKERS_SECTION_PATTERN = /(#{2,3}\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n\s*\n?)([\s\S]*?)(?=\n#{2,3}\s|$)/i;
+async function archivePhasePreview(cwd, phaseNum, outcomeSummary) {
+	const phaseInfo = await findPhaseInternalAsync(cwd, phaseNum);
+	if (!phaseInfo) return cmdErr(`Phase ${phaseNum} not found`);
+	const archiveDir = await archivePathAsync(cwd);
+	const phaseDirName = node_path.default.basename(phaseInfo.directory);
+	const archiveDest = node_path.default.join(archiveDir, phaseDirName);
+	const stContent = await safeReadFileAsync(statePath(cwd)) ?? "";
+	const decisionsToRemove = findPhaseTaggedLines(stContent, DECISIONS_SECTION_PATTERN, phaseNum);
+	const blockersToRemove = findPhaseTaggedLines(stContent, BLOCKERS_SECTION_PATTERN, phaseNum);
+	const rmContent = await safeReadFileAsync(roadmapPath(cwd)) ?? "";
+	const escaped = escapePhaseNum(phaseNum);
+	const sectionPattern = new RegExp(`#{2,4}\\s*Phase\\s+${escaped}\\s*:[\\s\\S]*?(?=\\n#{2,4}\\s+Phase\\s+\\d|\\n## |$)`, "i");
+	const sectionMatch = rmContent.match(sectionPattern);
+	const sectionToCollapse = sectionMatch ? sectionMatch[0].trim() : "";
+	const collapsedLine = `- [x] Phase ${phaseNum}: ${phaseInfo.phase_name ? phaseInfo.phase_name.replace(/-/g, " ") : `Phase ${phaseNum}`} -- ${outcomeSummary}`;
+	return cmdOk({
+		phase_dir: phaseInfo.directory,
+		archive_dir: node_path.default.relative(cwd, archiveDest).replace(/\\/g, "/"),
+		decisions_to_prune: decisionsToRemove,
+		blockers_to_prune: blockersToRemove,
+		roadmap_section_to_collapse: sectionToCollapse,
+		collapsed_line: collapsedLine
+	});
+}
+/**
+* Prune phase-tagged lines from a section in STATE.md content.
+*/
+function pruneSection(content, sectionPattern, phaseNum) {
+	const match = content.match(sectionPattern);
+	if (!match || !match[2]) return content;
+	const escaped = escapePhaseNum(phaseNum);
+	const tagPattern = new RegExp(`^\\s*-\\s*\\[Phase\\s+${escaped}\\]`, "i");
+	let newBody = match[2].split("\n").filter((line) => !tagPattern.test(line)).join("\n");
+	if (!newBody.trim() || !/^\s*[-*]\s+/m.test(newBody)) newBody = "\nNone.\n";
+	return content.replace(sectionPattern, (_m, header) => `${header}${newBody}`);
+}
+async function archivePhaseExecute(cwd, phaseNum, outcomeSummary) {
+	const phaseInfo = await findPhaseInternalAsync(cwd, phaseNum);
+	if (!phaseInfo) return cmdErr(`Phase ${phaseNum} not found`);
+	const archiveDir = await archivePathAsync(cwd);
+	const phaseDirName = node_path.default.basename(phaseInfo.directory);
+	const archiveDest = node_path.default.join(archiveDir, phaseDirName);
+	const phaseDirFull = node_path.default.join(cwd, phaseInfo.directory);
+	await node_fs.promises.mkdir(archiveDir, { recursive: true });
+	try {
+		await node_fs.promises.rename(phaseDirFull, archiveDest);
+	} catch (e) {
+		if (e.code === "EXDEV") {
+			debugLog("archive-rename-exdev", "falling back to copy+delete");
+			await node_fs.promises.cp(phaseDirFull, archiveDest, { recursive: true });
+			await node_fs.promises.rm(phaseDirFull, {
+				recursive: true,
+				force: true
+			});
+		} else throw e;
+	}
+	const stPath = statePath(cwd);
+	let stContent = await safeReadFileAsync(stPath);
+	if (stContent) {
+		stContent = pruneSection(stContent, DECISIONS_SECTION_PATTERN, phaseNum);
+		stContent = pruneSection(stContent, BLOCKERS_SECTION_PATTERN, phaseNum);
+		await node_fs.promises.writeFile(stPath, stContent, "utf-8");
+	}
+	const rmPath = roadmapPath(cwd);
+	let rmContent = await safeReadFileAsync(rmPath);
+	if (rmContent) {
+		const escaped = escapePhaseNum(phaseNum);
+		const sectionPattern = new RegExp(`\\n?#{2,4}\\s*Phase\\s+${escaped}\\s*:[\\s\\S]*?(?=\\n#{2,4}\\s+Phase\\s+\\d|\\n## |$)`, "i");
+		rmContent = rmContent.replace(sectionPattern, "");
+		const phaseName = phaseInfo.phase_name ? phaseInfo.phase_name.replace(/-/g, " ") : `Phase ${phaseNum}`;
+		const checklistPattern = new RegExp(`-\\s*\\[[ x]\\]\\s*(?:\\*\\*)?Phase\\s+${escaped}[:\\s][^\\n]*`, "i");
+		rmContent = rmContent.replace(checklistPattern, `- [x] Phase ${phaseNum}: ${phaseName} -- ${outcomeSummary}`);
+		await node_fs.promises.writeFile(rmPath, rmContent, "utf-8");
+	}
+	await execGit(cwd, ["add", ...[
+		phaseInfo.directory,
+		node_path.default.relative(cwd, archiveDest).replace(/\\/g, "/"),
+		".planning/STATE.md",
+		".planning/ROADMAP.md"
+	]]);
+	await execGit(cwd, [
+		"commit",
+		"-m",
+		`chore(phase-${phaseNum}): archive completed phase`
+	]);
+	return cmdOk({
+		archived: true,
+		phase: phaseNum,
+		archive_path: node_path.default.relative(cwd, archiveDest).replace(/\\/g, "/"),
+		decisions_pruned: findPhaseTaggedLines(await safeReadFileAsync(statePath(cwd)) ?? "", DECISIONS_SECTION_PATTERN, phaseNum).length === 0,
+		blockers_pruned: true,
+		roadmap_collapsed: true
+	});
+}
+async function cmdGetArchivedPhase(cwd, phaseNum) {
+	if (!phaseNum) return cmdErr("phase number required");
+	const normalized = normalizePhaseName(phaseNum);
+	const found = await searchArchiveLocations(planningPath(cwd, "archive"), normalized);
+	if (found) return cmdOk(found);
+	const milestonesDir = planningPath(cwd, "milestones");
+	if (await pathExistsAsync(milestonesDir)) try {
+		const phaseDirs = (await node_fs.promises.readdir(milestonesDir, { withFileTypes: true })).filter((e) => e.isDirectory() && /^v[\d.]+-phases$/.test(e.name)).map((e) => e.name).sort().reverse();
+		for (const archiveName of phaseDirs) {
+			const result = await searchForPhaseInDir(node_path.default.join(milestonesDir, archiveName), normalized, archiveName);
+			if (result) return cmdOk(result);
+		}
+	} catch (e) {
+		debugLog("get-archived-phase-milestones-failed", e);
+	}
+	return cmdErr(`Phase ${phaseNum} not found in archive`);
+}
+async function searchArchiveLocations(archiveDir, normalized) {
+	if (!await pathExistsAsync(archiveDir)) return null;
+	try {
+		const versionDirs = (await node_fs.promises.readdir(archiveDir, { withFileTypes: true })).filter((e) => e.isDirectory()).map((e) => e.name).sort().reverse();
+		for (const versionName of versionDirs) {
+			const result = await searchForPhaseInDir(node_path.default.join(archiveDir, versionName), normalized, versionName);
+			if (result) return result;
+		}
+	} catch (e) {
+		debugLog("search-archive-locations-failed", e);
+	}
+	return null;
+}
+async function searchForPhaseInDir(baseDir, normalized, milestone) {
+	try {
+		const match = (await listSubDirsAsync(baseDir, true)).find((d) => d.startsWith(normalized));
+		if (!match) return null;
+		const phaseDir = node_path.default.join(baseDir, match);
+		const mdFiles = (await node_fs.promises.readdir(phaseDir)).filter((f) => f.endsWith(".md"));
+		const contents = {};
+		for (const f of mdFiles) contents[f] = await node_fs.promises.readFile(node_path.default.join(phaseDir, f), "utf-8");
+		return {
+			phase: normalized,
+			milestone,
+			directory: match,
+			files: mdFiles,
+			contents
+		};
+	} catch (e) {
+		debugLog("search-for-phase-in-dir-failed", e);
+		return null;
+	}
+}
 
 //#endregion
 //#region src/core/template.ts
@@ -16016,6 +16320,7 @@ function cmdInitPlanPhase(cwd, phase) {
 		roadmap_path: ".planning/ROADMAP.md",
 		requirements_path: ".planning/REQUIREMENTS.md"
 	};
+	if (pathExistsInternal(cwd, ".planning/CONVENTIONS.md")) result.conventions_path = ".planning/CONVENTIONS.md";
 	if (phaseInfo?.directory) {
 		const artifacts = scanPhaseArtifacts(cwd, phaseInfo.directory);
 		if (artifacts.context_path) result.context_path = artifacts.context_path;
@@ -16175,6 +16480,7 @@ function cmdInitPhaseOp(cwd, phase) {
 		roadmap_path: ".planning/ROADMAP.md",
 		requirements_path: ".planning/REQUIREMENTS.md"
 	};
+	if (pathExistsInternal(cwd, ".planning/CONVENTIONS.md")) result.conventions_path = ".planning/CONVENTIONS.md";
 	if (phaseInfo?.directory) {
 		const artifacts = scanPhaseArtifacts(cwd, phaseInfo.directory);
 		if (artifacts.context_path) result.context_path = artifacts.context_path;
@@ -16545,12 +16851,14 @@ const handlePhase = async (args, cwd, raw) => {
 		"add": () => cmdPhaseAdd(cwd, args.slice(2).join(" ")),
 		"insert": () => cmdPhaseInsert(cwd, args[2], args.slice(3).join(" ")),
 		"remove": () => cmdPhaseRemove(cwd, args[2], { force: hasFlag(args, "force") }),
-		"complete": () => cmdPhaseComplete(cwd, args[2])
+		"complete": () => cmdPhaseComplete(cwd, args[2]),
+		"archive-preview": () => archivePhasePreview(cwd, args[2], args.slice(3).join(" ")),
+		"archive-execute": () => archivePhaseExecute(cwd, args[2], args.slice(3).join(" "))
 	}[sub] : void 0;
 	if (handler) return handleResult(await handler(), raw);
-	error("Unknown phase subcommand. Available: next-decimal, add, insert, remove, complete");
+	error("Unknown phase subcommand. Available: next-decimal, add, insert, remove, complete, archive-preview, archive-execute");
 };
-const handleMilestone = (args, cwd, raw) => {
+const handleMilestone = async (args, cwd, raw) => {
 	if (args[1] === "complete") {
 		const nameIndex = args.indexOf("--name");
 		let milestoneName = null;
@@ -16562,7 +16870,7 @@ const handleMilestone = (args, cwd, raw) => {
 			}
 			milestoneName = nameArgs.join(" ") || null;
 		}
-		handleResult(cmdMilestoneComplete(cwd, args[2], {
+		handleResult(await cmdMilestoneComplete(cwd, args[2], {
 			name: milestoneName ?? void 0,
 			archivePhases: hasFlag(args, "archive-phases")
 		}), raw);
@@ -16643,6 +16951,8 @@ const COMMANDS = {
 		}, raw), raw);
 	},
 	"init": handleInit,
+	"detect-stale-context": async (_args, cwd, raw) => handleResult(await cmdDetectStaleContext(cwd), raw),
+	"get-archived-phase": async (args, cwd, raw) => handleResult(await cmdGetArchivedPhase(cwd, args[1]), raw),
 	"phase-plan-index": async (args, cwd, raw) => handleResult(await cmdPhasePlanIndex(cwd, args[1]), raw),
 	"state-snapshot": async (_args, cwd, raw) => handleResult(await cmdStateSnapshot(cwd, raw), raw),
 	"summary-extract": (args, cwd, raw) => {

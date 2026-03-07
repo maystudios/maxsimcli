@@ -45,7 +45,7 @@ const figlet_1 = __importDefault(require("figlet"));
 const ora_1 = __importDefault(require("ora"));
 const prompts_1 = require("@inquirer/prompts");
 const minimist_1 = __importDefault(require("minimist"));
-const index_js_1 = require("../adapters/index.js");
+const utils_js_1 = require("./utils.js");
 const shared_js_1 = require("./shared.js");
 const adapters_js_1 = require("./adapters.js");
 const dashboard_js_1 = require("./dashboard.js");
@@ -101,7 +101,6 @@ if (hasHelp) {
     process.exit(0);
 }
 async function install(isGlobal) {
-    const runtime = 'claude';
     const dirName = (0, shared_js_1.getDirName)();
     const src = shared_js_1.templatesRoot;
     const targetDir = isGlobal
@@ -119,7 +118,7 @@ async function install(isGlobal) {
     const existingManifest = (0, manifest_js_1.readManifest)(targetDir);
     const isAlreadyCurrent = existingManifest !== null && existingManifest.version === shared_js_1.pkg.version;
     if (existingManifest !== null) {
-        const { complete, missing } = (0, shared_js_1.verifyInstallComplete)(targetDir, runtime, existingManifest);
+        const { complete, missing } = (0, shared_js_1.verifyInstallComplete)(targetDir, existingManifest);
         if (!complete) {
             console.log(`  ${chalk_1.default.yellow('!')} Previous install (v${existingManifest.version}) is incomplete — ${missing.length} missing file(s). Re-installing.`);
         }
@@ -187,7 +186,7 @@ async function install(isGlobal) {
                 let content = fs.readFileSync(path.join(agentsSrc, entry.name), 'utf8');
                 const dirRegex = /~\/\.claude\//g;
                 content = content.replace(dirRegex, pathPrefix);
-                content = (0, index_js_1.processAttribution)(content, (0, adapters_js_1.getCommitAttribution)(explicitConfigDir));
+                content = (0, utils_js_1.processAttribution)(content, (0, adapters_js_1.getCommitAttribution)(explicitConfigDir));
                 fs.writeFileSync(path.join(agentsDest, entry.name), content);
             }
         }
@@ -230,7 +229,7 @@ async function install(isGlobal) {
                     let content = fs.readFileSync(skillMd, 'utf8');
                     const dirRegex = /~\/\.claude\//g;
                     content = content.replace(dirRegex, pathPrefix);
-                    content = (0, index_js_1.processAttribution)(content, (0, adapters_js_1.getCommitAttribution)(explicitConfigDir));
+                    content = (0, utils_js_1.processAttribution)(content, (0, adapters_js_1.getCommitAttribution)(explicitConfigDir));
                     fs.writeFileSync(skillMd, content);
                 }
             }
@@ -395,7 +394,7 @@ async function install(isGlobal) {
     (0, patches_js_1.reportLocalPatches)(targetDir);
     // Configure statusline and hooks in settings.json
     const { settingsPath, settings, statuslineCommand } = (0, hooks_js_1.configureSettingsHooks)(targetDir, isGlobal);
-    return { settingsPath, settings, statuslineCommand, runtime };
+    return { settingsPath, settings, statuslineCommand };
 }
 /**
  * Prompt for install location

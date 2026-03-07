@@ -44,6 +44,8 @@ exports.loadConfigAsync = loadConfigAsync;
 exports.findPhaseInternalAsync = findPhaseInternalAsync;
 exports.getArchivedPhaseDirsAsync = getArchivedPhaseDirsAsync;
 exports.getRoadmapPhaseInternalAsync = getRoadmapPhaseInternalAsync;
+exports.archivePath = archivePath;
+exports.archivePathAsync = archivePathAsync;
 exports.getMilestoneInfoAsync = getMilestoneInfoAsync;
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_fs_2 = require("node:fs");
@@ -647,6 +649,31 @@ async function findPhaseInternalAsync(cwd, phase) {
     const current = await searchPhaseInDirAsync(pd, node_path_1.default.join('.planning', 'phases'), normalized);
     if (current)
         return current;
+    // Search new archive location: .planning/archive/<milestone>/
+    const archiveDir = planningPath(cwd, 'archive');
+    if (await pathExistsAsync(archiveDir)) {
+        try {
+            const archiveEntries = await node_fs_2.promises.readdir(archiveDir, { withFileTypes: true });
+            const versionDirs = archiveEntries
+                .filter(e => e.isDirectory())
+                .map(e => e.name)
+                .sort()
+                .reverse();
+            for (const versionName of versionDirs) {
+                const versionPath = node_path_1.default.join(archiveDir, versionName);
+                const relBase = node_path_1.default.join('.planning', 'archive', versionName);
+                const result = await searchPhaseInDirAsync(versionPath, relBase, normalized);
+                if (result) {
+                    result.archived = versionName;
+                    return result;
+                }
+            }
+        }
+        catch (e) {
+            debugLog('find-phase-async-archive-search-failed', e);
+        }
+    }
+    // Legacy: search .planning/milestones/
     const milestonesDir = planningPath(cwd, 'milestones');
     if (!(await pathExistsAsync(milestonesDir)))
         return null;
@@ -662,9 +689,9 @@ async function findPhaseInternalAsync(cwd, phase) {
             if (!versionMatch)
                 continue;
             const version = versionMatch[1];
-            const archivePath = node_path_1.default.join(milestonesDir, archiveName);
+            const archiveMilestonePath = node_path_1.default.join(milestonesDir, archiveName);
             const relBase = node_path_1.default.join('.planning', 'milestones', archiveName);
-            const result = await searchPhaseInDirAsync(archivePath, relBase, normalized);
+            const result = await searchPhaseInDirAsync(archiveMilestonePath, relBase, normalized);
             if (result) {
                 result.archived = version;
                 return result;
@@ -677,8 +704,34 @@ async function findPhaseInternalAsync(cwd, phase) {
     return null;
 }
 async function getArchivedPhaseDirsAsync(cwd) {
-    const milestonesDir = planningPath(cwd, 'milestones');
     const results = [];
+    // New archive location: .planning/archive/<milestone>/
+    const archiveDir = planningPath(cwd, 'archive');
+    try {
+        const archiveEntries = await node_fs_2.promises.readdir(archiveDir, { withFileTypes: true });
+        const versionDirs = archiveEntries
+            .filter(e => e.isDirectory())
+            .map(e => e.name)
+            .sort()
+            .reverse();
+        for (const versionName of versionDirs) {
+            const versionPath = node_path_1.default.join(archiveDir, versionName);
+            const dirs = await listSubDirsAsync(versionPath, true);
+            for (const dir of dirs) {
+                results.push({
+                    name: dir,
+                    milestone: versionName,
+                    basePath: node_path_1.default.join('.planning', 'archive', versionName),
+                    fullPath: node_path_1.default.join(versionPath, dir),
+                });
+            }
+        }
+    }
+    catch (e) {
+        debugLog('get-archived-phase-dirs-async-archive-failed', e);
+    }
+    // Legacy: .planning/milestones/
+    const milestonesDir = planningPath(cwd, 'milestones');
     try {
         const milestoneEntries = await node_fs_2.promises.readdir(milestonesDir, { withFileTypes: true });
         const phaseDirs = milestoneEntries
@@ -691,14 +744,14 @@ async function getArchivedPhaseDirsAsync(cwd) {
             if (!versionMatch)
                 continue;
             const version = versionMatch[1];
-            const archivePath = node_path_1.default.join(milestonesDir, archiveName);
-            const dirs = await listSubDirsAsync(archivePath, true);
+            const archiveMilestonePath = node_path_1.default.join(milestonesDir, archiveName);
+            const dirs = await listSubDirsAsync(archiveMilestonePath, true);
             for (const dir of dirs) {
                 results.push({
                     name: dir,
                     milestone: version,
                     basePath: node_path_1.default.join('.planning', 'milestones', archiveName),
-                    fullPath: node_path_1.default.join(archivePath, dir),
+                    fullPath: node_path_1.default.join(archiveMilestonePath, dir),
                 });
             }
         }
@@ -741,6 +794,14 @@ async function getRoadmapPhaseInternalAsync(cwd, phaseNum) {
         debugLog('get-roadmap-phase-async-failed', { phase: phaseNum, error: errorMsg(e) });
         return null;
     }
+}
+function archivePath(cwd, milestone) {
+    const ms = milestone ?? getMilestoneInfo(cwd).version;
+    return planningPath(cwd, 'archive', ms);
+}
+async function archivePathAsync(cwd, milestone) {
+    const ms = milestone ?? (await getMilestoneInfoAsync(cwd)).version;
+    return planningPath(cwd, 'archive', ms);
 }
 async function getMilestoneInfoAsync(cwd) {
     try {
