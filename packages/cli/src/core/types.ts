@@ -512,3 +512,92 @@ export interface ArchivePreview {
   collapsed_line: string;
 }
 
+// ─── Agent-level init context interfaces ─────────────────────────────────────
+
+export interface ExecutorAgentContext {
+  executor_model: string;
+  verifier_model: string;
+  commit_docs: boolean;
+  parallelization: boolean;
+  branching_strategy: string;
+  phase_branch_template: string;
+  milestone_branch_template: string;
+  phase_found: boolean;
+  phase_dir: string | null;
+  phase_number: string | null;
+  phase_name: string | null;
+  state_path: string;
+  conventions_path?: string;
+  codebase_docs: string[];
+}
+
+export interface PlannerAgentContext {
+  planner_model: string;
+  checker_model: string;
+  commit_docs: boolean;
+  research_enabled: boolean;
+  plan_checker_enabled: boolean;
+  phase_found: boolean;
+  phase_dir: string | null;
+  phase_number: string | null;
+  phase_name: string | null;
+  phase_req_ids: string | null;
+  has_research: boolean;
+  has_context: boolean;
+  has_plans: boolean;
+  plan_count: number;
+  state_path: string;
+  roadmap_path: string;
+  requirements_path: string;
+  conventions_path?: string;
+  context_path?: string;
+  research_path?: string;
+  codebase_docs: string[];
+}
+
+export interface ResearcherAgentContext {
+  researcher_model: string;
+  commit_docs: boolean;
+  brave_search: boolean;
+  phase_found: boolean;
+  phase_dir: string | null;
+  phase_number: string | null;
+  phase_name: string | null;
+  padded_phase: string | null;
+  phase_req_ids: string | null;
+  has_research: boolean;
+  has_context: boolean;
+  state_path: string;
+  roadmap_path: string;
+  requirements_path: string;
+  conventions_path?: string;
+  context_path?: string;
+  codebase_docs: string[];
+}
+
+export interface VerifierAgentContext {
+  verifier_model: string;
+  commit_docs: boolean;
+  phase_found: boolean;
+  phase_dir: string | null;
+  phase_number: string | null;
+  phase_name: string | null;
+  phase_req_ids: string | null;
+  state_path: string;
+  roadmap_path: string;
+  requirements_path: string;
+  codebase_docs: string[];
+}
+
+export interface DebuggerAgentContext {
+  debugger_model: string;
+  commit_docs: boolean;
+  phase_found: boolean;
+  phase_dir: string | null;
+  phase_number: string | null;
+  phase_name: string | null;
+  state_path: string;
+  conventions_path?: string;
+  codebase_docs: string[];
+}
+

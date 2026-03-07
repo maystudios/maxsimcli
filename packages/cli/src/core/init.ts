@@ -34,6 +34,11 @@ import type {
   MilestoneInfo,
   AppConfig,
   CmdResult,
+  ExecutorAgentContext,
+  PlannerAgentContext,
+  ResearcherAgentContext,
+  VerifierAgentContext,
+  DebuggerAgentContext,
 } from './types.js';
 
 // ─── Init result types ──────────────────────────────────────────────────────
@@ -795,5 +800,161 @@ export function cmdInitProgress(cwd: string): CmdResult {
     project_path: '.planning/PROJECT.md',
     config_path: '.planning/config.json',
   };
+  return cmdOk(result);
+}
+
+// ─── Helper: list codebase docs ──────────────────────────────────────────────
+
+/**
+ * Scan .planning/codebase/ for .md files and return relative paths.
+ * Returns empty array if the directory does not exist.
+ */
+export function listCodebaseDocs(cwd: string): string[] {
+  const codebaseDir = planningPath(cwd, 'codebase');
+  try {
+    const files = fs.readdirSync(codebaseDir).filter(f => f.endsWith('.md'));
+    return files.map(f => path.join('.planning', 'codebase', f));
+  } catch {
+    return [];
+  }
+}
+
+// ─── Agent-level init commands ───────────────────────────────────────────────
+
+export function cmdInitExecutor(cwd: string, phase: string | undefined): CmdResult {
+  if (!phase) return cmdErr('phase required for init executor');
+  const config = loadConfig(cwd);
+  const phaseInfo = findPhaseInternal(cwd, phase);
+  const codebaseDocs = listCodebaseDocs(cwd);
+  const result: ExecutorAgentContext = {
+    executor_model: resolveModelInternal(cwd, 'maxsim-executor'),
+    verifier_model: resolveModelInternal(cwd, 'maxsim-verifier'),
+    commit_docs: config.commit_docs,
+    parallelization: config.parallelization,
+    branching_strategy: config.branching_strategy,
+    phase_branch_template: config.phase_branch_template,
+    milestone_branch_template: config.milestone_branch_template,
+    phase_found: !!phaseInfo,
+    phase_dir: phaseInfo?.directory ?? null,
+    phase_number: phaseInfo?.phase_number ?? null,
+    phase_name: phaseInfo?.phase_name ?? null,
+    state_path: '.planning/STATE.md',
+    codebase_docs: codebaseDocs,
+  };
+  if (pathExistsInternal(cwd, '.planning/CONVENTIONS.md')) {
+    result.conventions_path = '.planning/CONVENTIONS.md';
+  }
+  return cmdOk(result);
+}
+
+export function cmdInitPlanner(cwd: string, phase: string | undefined): CmdResult {
+  if (!phase) return cmdErr('phase required for init planner');
+  const config = loadConfig(cwd);
+  const phaseInfo = findPhaseInternal(cwd, phase);
+  const phase_req_ids = extractReqIds(cwd, phase);
+  const codebaseDocs = listCodebaseDocs(cwd);
+  const result: PlannerAgentContext = {
+    planner_model: resolveModelInternal(cwd, 'maxsim-planner'),
+    checker_model: resolveModelInternal(cwd, 'maxsim-plan-checker'),
+    commit_docs: config.commit_docs,
+    research_enabled: config.research,
+    plan_checker_enabled: config.plan_checker,
+    phase_found: !!phaseInfo,
+    phase_dir: phaseInfo?.directory ?? null,
+    phase_number: phaseInfo?.phase_number ?? null,
+    phase_name: phaseInfo?.phase_name ?? null,
+    phase_req_ids,
+    has_research: phaseInfo?.has_research ?? false,
+    has_context: phaseInfo?.has_context ?? false,
+    has_plans: (phaseInfo?.plans?.length ?? 0) > 0,
+    plan_count: phaseInfo?.plans?.length ?? 0,
+    state_path: '.planning/STATE.md',
+    roadmap_path: '.planning/ROADMAP.md',
+    requirements_path: '.planning/REQUIREMENTS.md',
+    codebase_docs: codebaseDocs,
+  };
+  if (pathExistsInternal(cwd, '.planning/CONVENTIONS.md')) {
+    result.conventions_path = '.planning/CONVENTIONS.md';
+  }
+  if (phaseInfo?.directory) {
+    const artifacts = scanPhaseArtifacts(cwd, phaseInfo.directory);
+    if (artifacts.context_path) result.context_path = artifacts.context_path;
+    if (artifacts.research_path) result.research_path = artifacts.research_path;
+  }
+  return cmdOk(result);
+}
+
+export function cmdInitResearcher(cwd: string, phase: string | undefined): CmdResult {
+  if (!phase) return cmdErr('phase required for init researcher');
+  const config = loadConfig(cwd);
+  const phaseInfo = findPhaseInternal(cwd, phase);
+  const phase_req_ids = extractReqIds(cwd, phase);
+  const codebaseDocs = listCodebaseDocs(cwd);
+  const result: ResearcherAgentContext = {
+    researcher_model: resolveModelInternal(cwd, 'maxsim-phase-researcher'),
+    commit_docs: config.commit_docs,
+    brave_search: config.brave_search,
+    phase_found: !!phaseInfo,
+    phase_dir: phaseInfo?.directory ?? null,
+    phase_number: phaseInfo?.phase_number ?? null,
+    phase_name: phaseInfo?.phase_name ?? null,
+    padded_phase: phaseInfo?.phase_number?.padStart(2, '0') ?? null,
+    phase_req_ids,
+    has_research: phaseInfo?.has_research ?? false,
+    has_context: phaseInfo?.has_context ?? false,
+    state_path: '.planning/STATE.md',
+    roadmap_path: '.planning/ROADMAP.md',
+    requirements_path: '.planning/REQUIREMENTS.md',
+    codebase_docs: codebaseDocs,
+  };
+  if (pathExistsInternal(cwd, '.planning/CONVENTIONS.md')) {
+    result.conventions_path = '.planning/CONVENTIONS.md';
+  }
+  if (phaseInfo?.directory) {
+    const artifacts = scanPhaseArtifacts(cwd, phaseInfo.directory);
+    if (artifacts.context_path) result.context_path = artifacts.context_path;
+  }
+  return cmdOk(result);
+}
+
+export function cmdInitVerifier(cwd: string, phase: string | undefined): CmdResult {
+  if (!phase) return cmdErr('phase required for init verifier');
+  const config = loadConfig(cwd);
+  const phaseInfo = findPhaseInternal(cwd, phase);
+  const phase_req_ids = extractReqIds(cwd, phase);
+  const codebaseDocs = listCodebaseDocs(cwd);
+  const result: VerifierAgentContext = {
+    verifier_model: resolveModelInternal(cwd, 'maxsim-verifier'),
+    commit_docs: config.commit_docs,
+    phase_found: !!phaseInfo,
+    phase_dir: phaseInfo?.directory ?? null,
+    phase_number: phaseInfo?.phase_number ?? null,
+    phase_name: phaseInfo?.phase_name ?? null,
+    phase_req_ids,
+    state_path: '.planning/STATE.md',
+    roadmap_path: '.planning/ROADMAP.md',
+    requirements_path: '.planning/REQUIREMENTS.md',
+    codebase_docs: codebaseDocs,
+  };
+  return cmdOk(result);
+}
+
+export function cmdInitDebugger(cwd: string, phase: string | undefined): CmdResult {
+  const config = loadConfig(cwd);
+  const phaseInfo = phase ? findPhaseInternal(cwd, phase) : null;
+  const codebaseDocs = listCodebaseDocs(cwd);
+  const result: DebuggerAgentContext = {
+    debugger_model: resolveModelInternal(cwd, 'maxsim-debugger'),
+    commit_docs: config.commit_docs,
+    phase_found: !!phaseInfo,
+    phase_dir: phaseInfo?.directory ?? null,
+    phase_number: phaseInfo?.phase_number ?? null,
+    phase_name: phaseInfo?.phase_name ?? null,
+    state_path: '.planning/STATE.md',
+    codebase_docs: codebaseDocs,
+  };
+  if (pathExistsInternal(cwd, '.planning/CONVENTIONS.md')) {
+    result.conventions_path = '.planning/CONVENTIONS.md';
+  }
   return cmdOk(result);
 }
