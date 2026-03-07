@@ -96,6 +96,9 @@ export const FRONTMATTER_SCHEMAS: Record<string, FrontmatterSchema> = {
   verification: {
     required: ['phase', 'verified', 'status', 'score'],
   },
+  review: {
+    required: ['status', 'critical_count', 'warning_count'],
+  },
 };
 
 // ─── Frontmatter CRUD commands ──────────────────────────────────────────────

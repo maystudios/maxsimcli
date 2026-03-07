@@ -65,6 +65,11 @@ export type {
   PhasePlanIndexResult,
   PhasesListOptions,
   ArchivePreview,
+  ExecutorAgentContext,
+  PlannerAgentContext,
+  ResearcherAgentContext,
+  VerifierAgentContext,
+  DebuggerAgentContext,
 } from './types.js';
 
 // Runtime value exports from types
@@ -318,4 +323,10 @@ export {
   cmdInitMapCodebase,
   cmdInitExisting,
   cmdInitProgress,
+  cmdInitExecutor,
+  cmdInitPlanner,
+  cmdInitResearcher,
+  cmdInitVerifier,
+  cmdInitDebugger,
+  listCodebaseDocs,
 } from './init.js';

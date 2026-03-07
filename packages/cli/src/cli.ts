@@ -84,6 +84,11 @@ import {
   cmdInitMapCodebase,
   cmdInitExisting,
   cmdInitProgress,
+  cmdInitExecutor,
+  cmdInitPlanner,
+  cmdInitResearcher,
+  cmdInitVerifier,
+  cmdInitDebugger,
   cmdArtefakteRead,
   cmdArtefakteWrite,
   cmdArtefakteAppend,
@@ -324,10 +329,16 @@ const handleInit: Handler = (args, cwd, raw) => {
     'map-codebase': () => cmdInitMapCodebase(cwd),
     'init-existing': () => cmdInitExisting(cwd),
     'progress': () => cmdInitProgress(cwd),
+    // Agent-level inits
+    'executor': () => cmdInitExecutor(cwd, args[2]),
+    'planner': () => cmdInitPlanner(cwd, args[2]),
+    'researcher': () => cmdInitResearcher(cwd, args[2]),
+    'verifier': () => cmdInitVerifier(cwd, args[2]),
+    'debugger': () => cmdInitDebugger(cwd, args[2]),
   };
   const handler = workflow ? handlers[workflow] : undefined;
   if (handler) return handleResult(handler(), raw);
-  error(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, init-existing, progress`);
+  error(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, init-existing, progress, executor, planner, researcher, verifier, debugger`);
 };
 
 // ─── Command registry ────────────────────────────────────────────────────────
