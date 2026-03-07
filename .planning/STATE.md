@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** Every AI-assisted coding task runs with the right amount of context -- no more, no less -- producing consistent, correct output from phase 1 to phase 50.
-**Current focus:** Phase 2 -- Deep Init Questioning (COMPLETE -- all 3 plans executed)
+**Current focus:** Phases 1 & 2 complete -- ready for Phase 3 (Agent Coherence)
 
 ## Current Position
 
 Milestone: v5.0 Context-Aware SDD
-Phase: 2 of 5 (complete)
-Plan: 02-03 complete (all plans done)
-Status: phase-complete
-Last activity: 2026-03-07 -- Completed 02-03 Workflow integration (deep questioning gate, conventions, dry-run into init workflows)
+Phase: 2 of 5 (Phases 1-2 complete)
+Plan: All plans complete for Phases 1 & 2
+Status: between-phases
+Last activity: 2026-03-07 -- Fixed roadmap/requirements drift for Phases 1-2
 
-Progress: [████████░░] 80%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
