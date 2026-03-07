@@ -55,8 +55,8 @@ MAXSIM is a working product with 35+ commands, 13 agents, 11 skills, and a dashb
   3. Two-stage review (spec compliance then code quality) runs automatically after every task completion
   4. Agent handoff points are documented and implemented -- context loss between agent transitions is eliminated
 **Plans**: 4 plans in 2 waves
-  - [ ] 03-01: Agent coherence - core agents (AGENT-01, AGENT-04) — Wave 1
-  - [ ] 03-02: Agent coherence - support agents + registry (AGENT-01, AGENT-04) — Wave 1
+  - [x] 03-01: Agent coherence - core agents (AGENT-01, AGENT-04) — Wave 1
+  - [x] 03-02: Agent coherence - support agents + registry (AGENT-01, AGENT-04) — Wave 1
   - [ ] 03-03: CLI init commands + frontmatter schema (AGENT-02) — Wave 2
   - [ ] 03-04: Two-stage review enforcement (AGENT-03) — Wave 2
 
@@ -89,6 +89,6 @@ Phase 1 -> Phase 2 || Phase 5 -> Phase 3 -> Phase 4
 |-------|----------------|--------|-----------|
 | 1. Context Rot Prevention | 2/2 | Complete | 2026-03-06 |
 | 2. Deep Init Questioning | 3/3 | Complete | 2026-03-07 |
-| 3. Agent Coherence | 0/4 | Planned | - |
+| 3. Agent Coherence | 2/4 | In Progress | - |
 | 4. Spec Drift Management | 0/? | Not started | - |
 | 5. Workflow Coverage | 0/? | Not started | - |
