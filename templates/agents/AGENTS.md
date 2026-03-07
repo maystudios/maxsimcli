@@ -27,6 +27,7 @@ Skills with `alwaysApply: true` load automatically at conversation start:
 | `maxsim-research-synthesizer` | `memory-management` | Synthesizes parallel research outputs into unified findings |
 | `maxsim-codebase-mapper` | `memory-management` | Maps codebase structure, patterns, and conventions |
 | `maxsim-integration-checker` | `verification-before-completion` | Validates cross-component integration with tested evidence |
+| `maxsim-drift-checker` | `verification-before-completion`, `memory-management` | Compares .planning/ spec against codebase, produces DRIFT-REPORT.md |
 
 ## Skill Reference
 
