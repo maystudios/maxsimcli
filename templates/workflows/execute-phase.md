@@ -174,11 +174,15 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
    - Verify first 2 files from `key-files.created` exist on disk
    - Check `git log --oneline --all --grep="{phase}-{plan}"` returns ≥1 commit
    - Check for `## Self-Check: FAILED` marker
-   - **Check for `## Review Cycle` section** — verify all review stages show PASS/APPROVED/CLEAN/FIXED (not BLOCKED or FAIL)
+   - **Check for `## Review Cycle` section** — verify both review stages (Spec and Code) show PASS or SKIPPED (not BLOCKED or FAIL)
 
    If ANY spot-check fails: report which plan failed, route to failure handler — ask "Retry plan?" or "Continue with remaining waves?"
 
    If review cycle is missing or has unresolved issues: flag the plan as **review-incomplete** — ask "Run review cycle for this plan?" or "Continue (review will block phase completion)?"
+
+   **Note:** The executor agent runs the two-stage review (Spec Review + Code Review) after each wave. The orchestrator does NOT run reviews itself -- it only checks the executor's review results in SUMMARY.md. If review is missing, the executor failed to run it, and the orchestrator should offer to re-run the affected plan.
+
+   Review stages to check: `Spec:` and `Code:` lines in `## Review Cycle`. Both must be PASS or SKIPPED for the plan to be considered review-complete.
 
    If pass — **emit plan-complete lifecycle event** (if `DASHBOARD_ACTIVE`):
    ```
@@ -279,10 +283,10 @@ After all waves:
 2. **03-02**: [one-liner from SUMMARY.md]
 
 ### Review Cycle Summary
-| Plan | Spec Review | Code Review | Simplify | Final Review |
-|------|-------------|-------------|----------|--------------|
-| 03-01 | PASS | APPROVED | CLEAN | — |
-| 03-02 | PASS | APPROVED | FIXED | APPROVED |
+| Plan | Spec Review | Code Review | Retries |
+|------|-------------|-------------|---------|
+| 03-01 | PASS | PASS | 0 |
+| 03-02 | PASS | PASS | 1 |
 
 [Aggregate review findings from each plan's SUMMARY.md `## Review Cycle` section.
 If any plan has no Review Cycle section: mark as "NOT RUN" and flag for attention.
@@ -295,7 +299,7 @@ If any plan has unresolved BLOCKED/FAIL status: list the blocking issues below.]
 [Aggregate from SUMMARYs, or "None"]
 ```
 
-**Phase completion gate:** If any plan has unresolved review issues (BLOCKED or FAIL in any review stage), the phase CANNOT proceed to `verify_phase_goal`. Present unresolved issues and offer:
+**Phase completion gate:** If any plan has unresolved review issues (BLOCKED or FAIL in Spec Review or Code Review stages), the phase CANNOT proceed to `verify_phase_goal`. Present unresolved issues and offer:
 - "Fix review issues now" — re-run the review cycle for affected plans
 - "Override and continue" — mark as acknowledged, proceed (adds warning to VERIFICATION.md)
 </step>
