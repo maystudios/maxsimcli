@@ -39,7 +39,7 @@
 ### Missing Workflow Coverage
 
 - [x] **FLOW-01**: Todo/bug discussion flow exists as a shorter collaborative workflow (15-20 min) for small work items
-- [ ] **FLOW-02**: Phase listing supports pagination for projects with 50+ phases
+- [x] **FLOW-02**: Phase listing supports pagination for projects with 50+ phases
 
 ---
 
@@ -86,7 +86,7 @@
 | DRIFT-03 | Phase 4 | Complete |
 | DRIFT-04 | Phase 4 | Complete |
 | FLOW-01 | Phase 5 | Complete |
-| FLOW-02 | Phase 5 | Pending |
+| FLOW-02 | Phase 5 | Complete |
 | GUARD-01 | All | Active |
 | GUARD-02 | All | Active |
 | GUARD-03 | All | Active |
