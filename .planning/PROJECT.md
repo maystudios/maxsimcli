@@ -8,9 +8,9 @@ MAXSIM is a spec-driven development (SDD) system for Claude Code. It prevents co
 
 Every AI-assisted coding task runs with the right amount of context -- no more, no less -- producing consistent, correct output from phase 1 to phase 50.
 
-## What Already Exists
+## Current State
 
-MAXSIM is a working product at v4.2.x with real users. The following is implemented and shipped:
+MAXSIM is a working product at v5.0 with real users. Shipped v5.0 Context-Aware SDD on 2026-03-08. The following is implemented and shipped:
 
 ### CLI & Core Engine
 - **CLI tools router** (`cli.cjs`) dispatching 150+ commands to core modules
@@ -22,7 +22,7 @@ MAXSIM is a working product at v4.2.x with real users. The following is implemen
 - **Model profiles**: quality/balanced/budget/tokenburner tiers with per-agent model resolution
 - **Atomic git commits** per task with conventional commit format
 
-### Agents (13 specialized subagent prompts)
+### Agents (14 specialized subagent prompts)
 - **Executor**: runs tasks with atomic commits and deviation handling
 - **Planner**: creates phase plans with task breakdown and dependency analysis
 - **Phase Researcher**: investigates implementation approaches before planning
@@ -36,6 +36,7 @@ MAXSIM is a working product at v4.2.x with real users. The following is implemen
 - **Roadmapper**: creates roadmaps with phase breakdown and success criteria
 - **Project Researcher**: domain ecosystem research before roadmap creation
 - **Integration Checker**: cross-phase E2E flow verification
+- **Drift Checker**: spec-vs-codebase drift analysis with severity-tiered reporting
 
 ### Skills (11 built-in workflow enforcement skills)
 - **using-maxsim**: entry point, routes work through MAXSIM workflow
@@ -56,6 +57,9 @@ MAXSIM is a working product at v4.2.x with real users. The following is implemen
 - **new-project**: vision -> requirements -> acceptance criteria -> roadmap
 - **init-existing**: codebase scan -> validation -> context generation
 - **discuss-phase**: adaptive questioning before planning
+- **discuss**: triage problems/ideas/bugs to todo or phase with adaptive questioning
+- **check-drift**: compare spec against codebase, produce severity-tiered drift report
+- **realign**: correct spec-code divergence in either direction (to-code or to-spec)
 - **sdd**: spec-driven dispatch with fresh agent per task
 - **batch**: worktree-based parallel execution orchestration
 
@@ -95,4 +99,4 @@ MAXSIM is a working product at v4.2.x with real users. The following is implemen
 - Sync/async file I/O inconsistency in CLI tool functions
 
 ---
-*Rewritten 2026-03-06 -- clean slate for next milestone*
+*Last updated: 2026-03-08 after v5.0 milestone*
