@@ -1,3 +1,25 @@
+# [4.5.0](https://github.com/maystudios/maxsimcli/compare/v4.4.0...v4.5.0) (2026-03-07)
+
+
+### Bug Fixes
+
+* **e2e:** update file count assertions for new commands and agents ([a6fef5d](https://github.com/maystudios/maxsimcli/commit/a6fef5d71a2262faa9f77947e09cd1fb9980ea68))
+
+
+### Features
+
+* **04-01:** add drift types, frontmatter schema, and core drift module ([94e964b](https://github.com/maystudios/maxsimcli/commit/94e964b9a0280861da47e13ec511be3f6a351356))
+* **04-01:** wire drift init commands and CLI dispatch ([2148bd7](https://github.com/maystudios/maxsimcli/commit/2148bd758a5cff6093d058d78dedd6f3761cc4b3))
+* **04-02:** create check-drift command and workflow ([1b2f1b3](https://github.com/maystudios/maxsimcli/commit/1b2f1b3f8d6243c2430caf63104ef388bba7b16b))
+* **04-02:** create drift-checker agent and register in AGENTS.md ([88171af](https://github.com/maystudios/maxsimcli/commit/88171af03421752ebcca0970e2319a15e8860155))
+* **04-03:** add /maxsim:realign command template ([2fbe83c](https://github.com/maystudios/maxsimcli/commit/2fbe83c8a59b4c8e6f0a1e34f15163646dfbfe52))
+* **04-03:** add realign workflow with to-code and to-spec directions ([70458fc](https://github.com/maystudios/maxsimcli/commit/70458fc4168461029d86039e9722feb9f11eab65))
+* **04:** build dist with drift detection templates and UAT ([567ddcc](https://github.com/maystudios/maxsimcli/commit/567ddcc32d06c1a96b524c986d70dd694e3a346d))
+* **05-01:** create /maxsim:discuss command spec ([16db195](https://github.com/maystudios/maxsimcli/commit/16db1953b87a9adc3c1f793e71288132e71b9c21))
+* **05-01:** create discuss triage workflow ([bb73a49](https://github.com/maystudios/maxsimcli/commit/bb73a49238f479142974b6b8c78358c562680df3))
+* **05-02:** add pagination to MCP mcp_list_phases tool ([9fabd92](https://github.com/maystudios/maxsimcli/commit/9fabd9292a9860914ab592384f240a39f506641f))
+* **05-02:** add pagination to roadmap and progress workflows ([0f1c63d](https://github.com/maystudios/maxsimcli/commit/0f1c63d461dd404c938df83daac000829dc521b2))
+
 # [4.4.0](https://github.com/maystudios/maxsimcli/compare/v4.3.1...v4.4.0) (2026-03-07)
 
 
