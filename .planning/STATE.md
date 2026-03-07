@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** Every AI-assisted coding task runs with the right amount of context -- no more, no less -- producing consistent, correct output from phase 1 to phase 50.
-**Current focus:** Phase 2 -- Deep Init Questioning (executing Wave 1: Plans 01 + 02)
+**Current focus:** Phase 2 -- Deep Init Questioning (COMPLETE -- all 3 plans executed)
 
 ## Current Position
 
 Milestone: v5.0 Context-Aware SDD
-Phase: 2 of 5 (executing)
-Plan: 02-01 + 02-02 complete (02-03 remaining)
-Status: executing
-Last activity: 2026-03-07 -- Completed 02-01 Deep init questioning building blocks (domain checklist, no-gos, research agents)
+Phase: 2 of 5 (complete)
+Plan: 02-03 complete (all plans done)
+Status: phase-complete
+Last activity: 2026-03-07 -- Completed 02-03 Workflow integration (deep questioning gate, conventions, dry-run into init workflows)
 
-Progress: [██████░░░░] 60%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -25,6 +25,7 @@ Progress: [██████░░░░] 60%
 | Phase 01 P02 | ~10min | 2 tasks | 6 files |
 | Phase 02 P02 | 2min | 2 tasks | 2 files |
 | Phase 02 P01 | 5min | 2 tasks | 4 files |
+| Phase 02 P03 | 6min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -38,6 +39,9 @@ Progress: [██████░░░░] 60%
 - [Phase 02-01]: questioning.md rewritten with 21-domain silent checklist, 80% gate, no-gos tracking -- all in-context, no runtime code
 - [Phase 02-01]: Research agent enhanced with 5 mandatory output sections + web verification confidence levels
 - [Phase 02-01]: Synthesizer gets locked decisions with approval gate and PROJECT.md enrichment
+- [Phase 02-03]: Both init workflows now have agent dry-run validation as final quality gate
+- [Phase 02-03]: init.ts conventions_path added to PlanPhaseContext and PhaseOpContext (existence-checked)
+- [Phase 02-03]: Stack preference questions filter to framework-level only, capped at 8-10 items
 
 ### Architecture
 
@@ -57,7 +61,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-07T00:05:00Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-03-07T00:15:34.899Z
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None
-Next action: Execute 02-03 plan (Wire templates into init workflows)
+Next action: Start Phase 3 or Phase 5 (per roadmap -- Phase 3 depends on Phase 2, Phase 5 is independent)
