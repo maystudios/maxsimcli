@@ -1,3 +1,10 @@
+## [4.3.1](https://github.com/maystudios/maxsimcli/compare/v4.3.0...v4.3.1) (2026-03-07)
+
+
+### Bug Fixes
+
+* **install:** skip symlinks in manifest generation to prevent EISDIR crash ([02b113b](https://github.com/maystudios/maxsimcli/commit/02b113bf2301737d9fc658e8e60e3b48013b4624))
+
 # [4.3.0](https://github.com/maystudios/maxsimcli/compare/v4.2.3...v4.3.0) (2026-03-07)
 
 
